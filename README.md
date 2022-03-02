@@ -1,6 +1,6 @@
-# strolly
+# strollie
 
-Strolly
+Strollie
 
 ## Getting Started
 
