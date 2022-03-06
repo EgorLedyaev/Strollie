@@ -1,4 +1,4 @@
-name: strollie
+name: Strollie
 description: Strollie
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -26,3 +26,4 @@ flutter:
   assets:
     - assets/images/Strollie_logo.png
     - assets/images/start_icon.svg
+    - assets/images/profile_icon.svg
