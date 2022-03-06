@@ -58,6 +58,7 @@ class nav_menu extends StatefulWidget{
   @override
   _nav_menu_state createState() => _nav_menu_state();
 }
+
 class _nav_menu_state extends State<nav_menu>{
   @override
   Widget build(BuildContext context){
@@ -92,7 +93,14 @@ class _search_bar_state extends State<search_bar>{
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoSearchTextField(controller: _textController);
+    return CupertinoSearchTextField(
+      onChanged: (String value) {
+        print('The text has changed to: $value');
+      },
+      onSubmitted: (String value) {
+        print('Submitted text: $value');
+      },
+    );
   }
 
 }
@@ -171,22 +179,22 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
         ),
         Container(
         alignment: Alignment.topCenter,
-        padding: EdgeInsets.only(top:35,left: 20,right:20),
+        padding: const EdgeInsets.only(top:35,left: 20,right:20),
         child: up_bar_bg(),
         ),
         Container(
           alignment: Alignment.bottomCenter,
-          padding: EdgeInsets.only(bottom:20,left: 20,right:20),
+          padding: const EdgeInsets.only(bottom:20,left: 20,right:20),
           child: nav_menu(),
         ),
         Container(
           alignment: Alignment.topCenter,
-          padding: EdgeInsets.only(top:40,left: 60,right:30),
-          child: search_bar(),
+          padding: const EdgeInsets.only(top:40,left: 60,right:30),
+          child: const search_bar(),
         ),
         Container(
           alignment: Alignment.topCenter,
-          padding: EdgeInsets.only(top:42,left: 25,right:20),
+          padding: const EdgeInsets.only(top:42,left: 25,right:20),
           child: profile_img_bar(),
         ),
       ],
