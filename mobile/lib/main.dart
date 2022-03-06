@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() => runApp(Strollie());
@@ -168,6 +169,49 @@ class _up_bar_bg_state extends State<up_bar_bg>{
   }
 }
 
+class main_start_button extends StatefulWidget{
+  @override
+  _main_start_button_state createState() => _main_start_button_state();
+}
+
+class _main_start_button_state extends State<main_start_button>{
+  @override
+  Widget build(BuildContext context){
+    return Container(
+        width: 65,
+        height: 65,
+        decoration: const BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(40.93220520019531),
+            topRight: Radius.circular(40.93220520019531),
+            bottomLeft: Radius.circular(40.93220520019531),
+            bottomRight: Radius.circular(40.93220520019531),
+          ),
+          gradient : LinearGradient(
+              begin : Alignment.topLeft,
+              end: Alignment(0.2, 0.0),
+              colors: [Color.fromRGBO(0, 122, 254, 1),Color.fromRGBO(27, 224, 124, 1)]
+          ),
+        )
+    );
+  }
+}
+
+class main_start_button_icon extends StatefulWidget{
+  @override
+  _main_start_button_icon_state createState() => _main_start_button_icon_state();
+}
+
+class _main_start_button_icon_state extends State<main_start_button_icon>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/start_icon.svg',
+        semanticsLabel: 'start_icon'
+    );
+  }
+}
+
 class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMixin {
 
   @override
@@ -186,6 +230,16 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
           alignment: Alignment.bottomCenter,
           padding: const EdgeInsets.only(bottom:20,left: 20,right:20),
           child: nav_menu(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:32,left: 20,right:20),
+          child: main_start_button(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:56,left: 20,right:20),
+          child: main_start_button_icon(),
         ),
         Container(
           alignment: Alignment.topCenter,
