@@ -30,32 +30,81 @@ class Main_screen extends StatelessWidget {
 }
 
 class MapScreen extends StatefulWidget {
+  const MapScreen({Key? key}) : super(key: key);
+
   @override
   _MapScreenState createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMixin {
   static const _initialCameraPosition = CameraPosition(
       target: LatLng(53.228992, 50.199425),
       zoom: 16,
   );
 
-  //GoogleMapController _googleMapController;
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2,vsync: this);
+  }
 
   @override
   void dispose(){
     //_googleMapController.dispose();
     super.dispose();
+    _tabController.dispose();
   }
+
   @override
   Widget build(BuildContext context){
-    return const Scaffold(
-      body: GoogleMap(
+    return Scaffold(
+      body: const GoogleMap(
         myLocationButtonEnabled: false,
         zoomControlsEnabled: false,
         initialCameraPosition: _initialCameraPosition,
-        //onMapCreated: (controller) => _googleMapController = controller,
-      )
+      ),
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.all(16.0),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(50.0)
+          ),
+          child: Container(
+            color: Colors.green,
+              child: TabBar(
+                labelColor: Color(0xFFC41A3B),
+                unselectedLabelColor: Colors.white,
+                labelStyle: TextStyle(fontSize: 10.0),
+                indicator: const UnderlineTabIndicator(
+                  borderSide: BorderSide(color: Colors.black54, width: 0.0),
+                  insets: EdgeInsets.fromLTRB(50.0, 0.0, 50.0, 40.0),
+                ),
+                indicatorColor: Colors.black54,
+                tabs: const <Widget>[
+              Tab(
+              icon: Icon(
+                Icons.home,
+                size: 24.0,
+              ),
+            text: 'Home',
+          ),
+          Tab(
+            icon: Icon(
+              Icons.category,
+              size: 24.0,
+            ),
+            text: 'Department',
+          ),
+          ],
+                controller: _tabController,
+            )
+          )
+        )
+      ),
     );
   }
+
+
 }
