@@ -20,7 +20,7 @@ class Main_screen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Strolly',
+      title: 'Strollie',
       debugShowCheckedModeBanner: true, // плашка дебага
       theme: ThemeData(
         primaryColor: Colors.transparent,
@@ -84,6 +84,7 @@ class search_bar extends StatefulWidget{
   _search_bar_state createState() => _search_bar_state();
 
 }
+
 class _search_bar_state extends State<search_bar>{
   late TextEditingController _textController;
   @override
@@ -212,6 +213,36 @@ class _main_start_button_icon_state extends State<main_start_button_icon>{
   }
 }
 
+class profile_button_icon extends StatefulWidget{
+  @override
+  _profile_button_icon_state createState() => _profile_button_icon_state();
+}
+
+class _profile_button_icon_state extends State<profile_button_icon>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/profile_icon.svg',
+        semanticsLabel: 'profile_icon'
+    );
+  }
+}
+
+class stats_button_icon extends StatefulWidget{
+  @override
+  _stats_button_icon_state createState() => _stats_button_icon_state();
+}
+
+class _stats_button_icon_state extends State<stats_button_icon>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/profile_icon.svg',
+        semanticsLabel: 'profile_icon'
+    );
+  }
+}
+
 class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMixin {
 
   @override
@@ -240,6 +271,16 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
           alignment: Alignment.bottomCenter,
           padding: const EdgeInsets.only(bottom:56,left: 20,right:20),
           child: main_start_button_icon(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:132,left: 20,right:20),
+          child: profile_button_icon(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:132,left: 20,right:20),
+          child: stats_button_icon(),
         ),
         Container(
           alignment: Alignment.topCenter,
