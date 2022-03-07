@@ -67,8 +67,8 @@ class _nav_menu_state extends State<nav_menu>{
       constraints: const BoxConstraints(
         minWidth: 380,
         minHeight: 80,
-        maxWidth: 500,
-        maxHeight: 90,
+        maxWidth: 380,
+        maxHeight: 80,
       ),
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.all(Radius.circular(40)),
@@ -259,7 +259,7 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
         ),
         Container(
           alignment: Alignment.bottomCenter,
-          padding: const EdgeInsets.only(bottom:20,left: 20,right:20),
+          padding: const EdgeInsets.only(bottom:25,left: 20,right:20),
           child: nav_menu(),
         ),
         Container(
@@ -273,13 +273,13 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
           child: main_start_button_icon(),
         ),
         Container(
-          alignment: Alignment.bottomLeft,
-          padding: const EdgeInsets.only(bottom:50,left: 240,right:20),
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:50,right: 200),
           child: profile_button_icon(),
         ),
         Container(
-          alignment: Alignment.bottomRight,
-          padding: const EdgeInsets.only(bottom:50,left: 20,right:240),
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:50,left:200),
           child: profile_button_icon(),
         ),
         Container(
