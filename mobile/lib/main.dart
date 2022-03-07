@@ -154,7 +154,6 @@ class _up_bar_bg_state extends State<up_bar_bg>{
       constraints: const BoxConstraints(
         minWidth: 380,
         minHeight: 45,
-        maxWidth: 500,
         maxHeight: 45,
       ),
         decoration: const BoxDecoration(
@@ -237,8 +236,9 @@ class _stats_button_icon_state extends State<stats_button_icon>{
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
-        'assets/images/profile_icon.svg',
-        semanticsLabel: 'profile_icon'
+        'assets/images/stats_icon.svg',
+        semanticsLabel: 'stats_icon',
+        color: Colors.blue
     );
   }
 }
@@ -273,14 +273,14 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
           child: main_start_button_icon(),
         ),
         Container(
-          alignment: Alignment.bottomCenter,
-          padding: const EdgeInsets.only(bottom:132,left: 20,right:20),
+          alignment: Alignment.bottomLeft,
+          padding: const EdgeInsets.only(bottom:50,left: 240,right:20),
           child: profile_button_icon(),
         ),
         Container(
-          alignment: Alignment.bottomCenter,
-          padding: const EdgeInsets.only(bottom:132,left: 20,right:20),
-          child: stats_button_icon(),
+          alignment: Alignment.bottomRight,
+          padding: const EdgeInsets.only(bottom:50,left: 20,right:240),
+          child: profile_button_icon(),
         ),
         Container(
           alignment: Alignment.topCenter,
