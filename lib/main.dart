@@ -238,7 +238,6 @@ class _stats_button_icon_state extends State<stats_button_icon>{
     return SvgPicture.asset(
         'assets/images/stats_icon.svg',
         semanticsLabel: 'stats_icon',
-        color: Colors.blue
     );
   }
 }
@@ -279,8 +278,8 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
         ),
         Container(
           alignment: Alignment.bottomCenter,
-          padding: const EdgeInsets.only(bottom:50,left:200),
-          child: profile_button_icon(),
+          padding: const EdgeInsets.only(bottom:48,left:200),
+          child: stats_button_icon(),
         ),
         Container(
           alignment: Alignment.topCenter,
