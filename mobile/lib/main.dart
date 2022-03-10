@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'home.dart';
+import 'profile.dart';
 
 void main() => runApp(Strollie());
 
@@ -12,15 +13,6 @@ bool _isElevated = true;
 
 class Strollie extends StatelessWidget {
   @override
-  Widget build(BuildContext context){
-    return MaterialApp(
-      home: Main_screen(),
-    );
-  }
-}
-
-class Main_screen extends StatelessWidget {
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Strollie',
@@ -28,7 +20,11 @@ class Main_screen extends StatelessWidget {
       theme: ThemeData(
         primaryColor: Colors.transparent,
       ),
-      home: MapScreen(),
+      initialRoute: '/home',
+      routes: {
+        '/home': (context) => const MapScreen(),
+        '/profile': (context) => ProfileScreen(),
+      },
     );
   }
 }
