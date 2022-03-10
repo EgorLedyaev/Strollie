@@ -7,6 +7,8 @@ void main() => runApp(Strollie());
 
 const bg_color_green = const Color(0xFF1BE07C);
 
+bool _isElevated = true;
+
 class Strollie extends StatelessWidget {
   @override
   Widget build(BuildContext context){
@@ -177,22 +179,42 @@ class main_start_button extends StatefulWidget{
 class _main_start_button_state extends State<main_start_button>{
   @override
   Widget build(BuildContext context){
-    return Container(
-        width: 65,
-        height: 65,
-        decoration: const BoxDecoration(
-          borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(40.93220520019531),
-            topRight: Radius.circular(40.93220520019531),
-            bottomLeft: Radius.circular(40.93220520019531),
-            bottomRight: Radius.circular(40.93220520019531),
-          ),
-          gradient : LinearGradient(
-              begin : Alignment.topLeft,
-              end: Alignment(0.2, 0.0),
-              colors: [Color.fromRGBO(0, 122, 254, 1),Color.fromRGBO(27, 224, 124, 1)]
-          ),
-        )
+       return GestureDetector(
+          onTap: () {
+            setState(() {
+              _isElevated = !_isElevated;
+            });
+            print("DEBUG : onTap main called.");
+          },
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 200),
+            height: 65,
+            width: 65,
+            decoration: BoxDecoration(
+              gradient : const LinearGradient(
+                  begin : Alignment.topLeft,
+                  end: Alignment(0.2, 0.0),
+                  colors: [Color.fromRGBO(0, 122, 254, 1),Color.fromRGBO(27, 224, 124, 1)]
+              ),
+              borderRadius: BorderRadius.circular(40),
+              boxShadow: _isElevated
+              ? [
+                BoxShadow(
+                  color: Colors.green[300]!,
+                  offset: const Offset(2,2),
+                  blurRadius: 15,
+                  spreadRadius: 1,
+                ),
+                const BoxShadow(
+                  color: Colors.white,
+                  offset: Offset(-2,-2),
+                  blurRadius: 15,
+                  spreadRadius: 1,
+                )
+              ]
+              : null,
+            ),
+          )
     );
   }
 }
@@ -205,9 +227,16 @@ class main_start_button_icon extends StatefulWidget{
 class _main_start_button_icon_state extends State<main_start_button_icon>{
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
-        'assets/images/start_icon.svg',
-        semanticsLabel: 'start_icon'
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isElevated = !_isElevated;
+        });
+        print("DEBUG : onTap main called.");
+      },
+      child: SvgPicture.asset(
+      'assets/images/start_icon.svg',
+    ),
     );
   }
 }
@@ -220,9 +249,16 @@ class profile_button_icon extends StatefulWidget{
 class _profile_button_icon_state extends State<profile_button_icon>{
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isElevated = !_isElevated;
+        });
+        print("DEBUG : onTap profile called.");
+      },
+      child: SvgPicture.asset(
         'assets/images/profile_icon.svg',
-        semanticsLabel: 'profile_icon'
+      ),
     );
   }
 }
@@ -235,9 +271,16 @@ class stats_button_icon extends StatefulWidget{
 class _stats_button_icon_state extends State<stats_button_icon>{
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.asset(
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _isElevated = !_isElevated;
+        });
+        print("DEBUG : onTap stats called.");
+      },
+      child: SvgPicture.asset(
         'assets/images/stats_icon.svg',
-        semanticsLabel: 'stats_icon',
+      ),
     );
   }
 }
