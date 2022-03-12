@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
+import 'plugins.dart';
 
 
 
@@ -89,6 +89,31 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           alignment: Alignment.topCenter,
           padding: const EdgeInsets.only(top:35,left: 20,right:20),
           child:second_route_inf(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:25,left: 20,right:20),
+          child: nav_menu(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:32,left: 20,right:20),
+          child: main_start_button(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:56,left: 20,right:20),
+          child: main_start_button_icon(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:50,right: 200),
+          child: profile_button_icon(),
+        ),
+        Container(
+          alignment: Alignment.bottomCenter,
+          padding: const EdgeInsets.only(bottom:48,left:200),
+          child: stats_button_icon(),
         ),
         /// сюда нужно будет добавить контейнер с нижним меню, а также с кнопкой посмотреть остальные маршруты
       ],
