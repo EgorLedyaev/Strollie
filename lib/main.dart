@@ -4,6 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'home.dart';
 import 'profile.dart';
+import 'plugins.dart';
 
 void main() => runApp(Strollie());
 
