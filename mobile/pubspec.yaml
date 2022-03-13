@@ -28,3 +28,5 @@ flutter:
     - assets/images/start_icon.svg
     - assets/images/profile_icon.svg
     - assets/images/stats_icon.svg
+    - assets/images/settings_1.svg
+    - assets/images/settings_2.svg

@@ -9,6 +9,7 @@ import 'plugins.dart';
 void main() => runApp(Strollie());
 
 const bg_color_green = const Color(0xFF1BE07C);
+const bg_color = const Color(0xFFFFFFFF);
 
 bool _isElevated = true;
 
@@ -19,7 +20,7 @@ class Strollie extends StatelessWidget {
       title: 'Strollie',
       debugShowCheckedModeBanner: true, // плашка дебага
       theme: ThemeData(
-        primaryColor: Colors.transparent,
+        primaryColor: bg_color,
       ),
       initialRoute: '/home',
       routes: {
