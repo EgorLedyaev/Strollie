@@ -19,9 +19,7 @@ class Strollie extends StatelessWidget {
     return MaterialApp(
       title: 'Strollie',
       debugShowCheckedModeBanner: true, // плашка дебага
-      theme: ThemeData(
-        primaryColor: bg_color,
-      ),
+      theme: new ThemeData(scaffoldBackgroundColor: const Color(0x40FFFFFF)),
       initialRoute: '/home',
       routes: {
         '/home': (context) => const MapScreen(),

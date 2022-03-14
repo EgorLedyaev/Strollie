@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'dart:math' as math;import 'dart:math' as math;
 
 bool _isElevated = true;
 
@@ -347,7 +348,7 @@ class _full_inf_profile_box_state extends State<full_inf_profile_box>{
                   child: Container(
                       width: 14.9606294631958,
                       height: 15,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         gradient : LinearGradient(
                             begin: Alignment(6.123234262925839e-17,1),
                             end: Alignment(-1,6.123234262925839e-17),
@@ -362,7 +363,7 @@ class _full_inf_profile_box_state extends State<full_inf_profile_box>{
                   child: Container(
                       width: 14.9606294631958,
                       height: 15,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         gradient : LinearGradient(
                             begin: Alignment(6.123234262925839e-17,1),
                             end: Alignment(-1,6.123234262925839e-17),
@@ -377,7 +378,7 @@ class _full_inf_profile_box_state extends State<full_inf_profile_box>{
                   child: Container(
                       width: 14.9606294631958,
                       height: 15,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         gradient : LinearGradient(
                             begin: Alignment(6.123234262925839e-17,1),
                             end: Alignment(-1,6.123234262925839e-17),
@@ -386,7 +387,7 @@ class _full_inf_profile_box_state extends State<full_inf_profile_box>{
                         borderRadius : BorderRadius.all(Radius.elliptical(14.9606294631958, 15)),
                       )
                   )
-              ),Positioned(
+              ),const Positioned(
                   top: 36,
                   left: 23.0472412109375,
                   child: Text('День рождения : 24.06.2004', textAlign: TextAlign.left, style: TextStyle(
@@ -397,7 +398,7 @@ class _full_inf_profile_box_state extends State<full_inf_profile_box>{
                       fontWeight: FontWeight.normal,
                       height: 1.1111111111111112
                   ),)
-              ),Positioned(
+              ),const Positioned(
                   top: 0,
                   left: 23.0472412109375,
                   child: Text('Имя : Егор Ледяев', textAlign: TextAlign.left, style: TextStyle(
@@ -408,7 +409,7 @@ class _full_inf_profile_box_state extends State<full_inf_profile_box>{
                       fontWeight: FontWeight.normal,
                       height: 1.1111111111111112
                   ),)
-              ),Positioned(
+              ),const Positioned(
                   top: 72,
                   left: 23.047245025634766,
                   child: Text('Родной город : Самара', textAlign: TextAlign.left, style: TextStyle(
@@ -448,6 +449,241 @@ class _second_bg_box_profile_state extends State<second_bg_box_profile>{
           ),
           color : Color.fromRGBO(255, 255, 255, 1),
         )
+    );
+  }
+}
+
+class first_inf_route_box extends StatefulWidget{
+  @override
+  _first_inf_route_box_state createState() => _first_inf_route_box_state();
+}
+
+class _first_inf_route_box_state extends State<first_inf_route_box>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: double.infinity,
+        height: 180,
+        decoration: const BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+            bottomLeft: Radius.circular(24),
+            bottomRight: Radius.circular(24),
+          ),
+          color : Color.fromRGBO(255, 255, 255, 1),
+        )
+    );
+  }
+}
+
+class first_inf_route_pic extends StatefulWidget{
+  @override
+  _first_ing_route_pic_state createState() => _first_ing_route_pic_state();
+}
+
+class _first_ing_route_pic_state extends State<first_inf_route_pic>{
+  @override
+  Widget build(BuildContext context) {
+    // Figma Flutter Generator Img_20210704_2103431Widget - RECTANGLE
+
+    return Container(
+        width: double.infinity,
+        height: 120,
+        decoration: const BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+            bottomLeft: Radius.circular(0),
+            bottomRight: Radius.circular(0),
+          ),
+          image : DecorationImage(
+              image: AssetImage('assets/images/Img_20210704_2103431.png'),
+              fit: BoxFit.fitWidth
+          ),
+        )
+    );
+  }
+}
+class first_info_route extends StatefulWidget{
+  @override
+  _first_info_route_state createState() => _first_info_route_state();
+}
+
+class _first_info_route_state extends State<first_info_route>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Stack(
+            children: const <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Text('pr-t. Karla Marksa - st. Vetvistaya ', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 14,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.4285714285714286
+                  ),)
+              ),Positioned(
+                  top: 20,
+                  left: 0,
+                  child: Text('25.07.2021   21 km   2 h 38 min', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 0.699999988079071),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 13,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.5384615384615385
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class view_first_info_route extends StatefulWidget{
+  @override
+  _view_first_info_route_state createState() => _view_first_info_route_state();
+}
+
+class _view_first_info_route_state extends State<view_first_info_route>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/view_info_route.svg',
+        semanticsLabel: 'vector'
+    );;
+  }
+}
+
+class second_inf_route_box extends StatefulWidget{
+  @override
+  _second_inf_route_box_state createState() => _second_inf_route_box_state();
+}
+
+class _second_inf_route_box_state extends State<second_inf_route_box>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: double.infinity,
+        height: 180,
+        decoration: const BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+            bottomLeft: Radius.circular(24),
+            bottomRight: Radius.circular(24),
+          ),
+          color : Color.fromRGBO(255, 255, 255, 1),
+        )
+    );
+  }
+}
+
+class second_inf_route_pic extends StatefulWidget{
+  @override
+  _second_ing_route_pic_state createState() => _second_ing_route_pic_state();
+}
+
+class _second_ing_route_pic_state extends State<second_inf_route_pic>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: double.infinity,
+        height: 120,
+        decoration: const BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+            bottomLeft: Radius.circular(0),
+            bottomRight: Radius.circular(0),
+          ),
+          image : DecorationImage(
+              image: AssetImage('assets/images/Dsc_00111.png'),
+              fit: BoxFit.fitWidth
+          ),
+        )
+    );
+  }
+}
+
+class second_info_route extends StatefulWidget{
+  @override
+  _second_info_route_state createState() => _second_info_route_state();
+}
+
+class _second_info_route_state extends State<second_info_route>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Stack(
+            children: const <Widget>[
+              Positioned(
+                  top: 20,
+                  left: 0,
+                  child: Text('12.09.2021   11 км   1 ч 14 мин', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 0.699999988079071),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 13,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.5384615384615385
+                  ),)
+              ),Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Text('sh. Moskovskoe - st. Lesnaya ', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 14,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.4285714285714286
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class view_second_info_route extends StatefulWidget{
+  @override
+  _view_second_info_route_state createState() => _view_second_info_route_state();
+}
+
+class _view_second_info_route_state extends State<view_second_info_route>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/view_info_route.svg',
+        semanticsLabel: 'vector'
+    );;
+  }
+}
+
+class bg extends StatefulWidget{
+  @override
+  _bg_state createState() => _bg_state();
+}
+
+class _bg_state extends State<bg>{
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: ClipPath(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: Color(0xF0FFFFFF),
+          ),
+        ),
+      ),
     );
   }
 }
