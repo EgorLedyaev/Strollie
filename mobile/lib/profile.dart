@@ -190,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         Container(
           alignment: Alignment.bottomCenter,
           padding: const EdgeInsets.only(bottom:50,right: 200),
-          child: profile_button_icon(),
+          child: profile_menu_icon(),
         ),
         Container(
           alignment: Alignment.bottomCenter,
