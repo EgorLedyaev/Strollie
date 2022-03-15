@@ -505,6 +505,7 @@ class _first_ing_route_pic_state extends State<first_inf_route_pic>{
     );
   }
 }
+
 class first_info_route extends StatefulWidget{
   @override
   _first_info_route_state createState() => _first_info_route_state();
