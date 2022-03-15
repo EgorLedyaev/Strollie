@@ -687,3 +687,50 @@ class _bg_state extends State<bg>{
     );
   }
 }
+
+class profile_menu_icon extends StatefulWidget{
+  @override
+  _profile_menu_icon_state createState() => _profile_menu_icon_state();
+}
+
+class _profile_menu_icon_state extends State<profile_menu_icon>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 57,
+        height: 37,
+
+        child: Stack(
+            children: <Widget>[
+              const Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Text('Profile', textAlign: TextAlign.center, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 22,
+                  left: 21,
+                  child: Container(
+                      width: 15,
+                      height: 15,
+                      decoration: const BoxDecoration(
+                        gradient : LinearGradient(
+                            begin: Alignment(6.123234262925839e-17,1),
+                            end: Alignment(-1,6.123234262925839e-17),
+                            colors: [Color.fromRGBO(0, 122, 254, 1),Color.fromRGBO(26, 224, 124, 1)]
+                        ),
+                        borderRadius : BorderRadius.all(Radius.elliptical(15, 15)),
+                      )
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
