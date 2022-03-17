@@ -4,28 +4,60 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'plugins.dart';
+import 'package:location/location.dart';
 
 const bg_color_green = const Color(0xFF1BE07C);
 
 bool _isElevated = true;
 
-class google_map_page extends StatelessWidget{
-  static const _initialCameraPosition = CameraPosition(
-    target: LatLng(53.228992, 50.199425),
-    zoom: 16,
-  );
+
+class google_map_page extends StatefulWidget {
+  @override
+  _google_map_page_state createState() => _google_map_page_state();
+}
+
+class _google_map_page_state extends State<google_map_page> {
+
+  final LatLng _initialcameraposition = LatLng(53.228992, 50.199425);
+  late GoogleMapController _controller;
+  Location _location = Location();
+
+  void _onMapCreated(GoogleMapController _cntlr) {
+    _controller = _cntlr;
+    _location.onLocationChanged.listen((l) {
+      _controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: LatLng(l.latitude!, l.longitude!), zoom: 15),
+        ),
+      );
+    });
+  }
 
   @override
-  Widget build(BuildContext context){
-    return const Scaffold(
-      body: GoogleMap(
-        myLocationButtonEnabled: false,
-        zoomControlsEnabled: false,
-        initialCameraPosition: _initialCameraPosition,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: CameraPosition(target: _initialcameraposition),
+              mapType: MapType.normal,
+              onMapCreated: _onMapCreated,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+
+
 
 class MapScreen extends StatefulWidget {
   const MapScreen({Key? key}) : super(key: key);
@@ -179,6 +211,5 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
       ],
     );
   }
-
-
+  
 }
