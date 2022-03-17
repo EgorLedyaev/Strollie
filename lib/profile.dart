@@ -88,7 +88,16 @@ class _first_route_inf extends State<first_route_inf> with SingleTickerProviderS
             alignment: Alignment.topLeft,
             child:first_inf_route_pic(),
           ),
-
+          Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(left: 10,top:125),
+            child:first_info_route(),
+          ),
+          Container(
+            alignment: Alignment.topRight,
+            padding: const EdgeInsets.only(right: 20,top:135),
+            child:view_first_info_route(),
+          ),
         ]
     );
   }
@@ -112,6 +121,16 @@ class _second_route_inf_state extends State<second_route_inf> with SingleTickerP
             alignment: Alignment.topLeft,
             child:second_inf_route_pic(),
           ),
+          Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(left: 10,top:125),
+            child:second_info_route(),
+          ),
+          Container(
+            alignment: Alignment.topRight,
+            padding: const EdgeInsets.only(right: 20,top:135),
+            child:view_second_info_route(),
+          ),
         ]
     );
   }
@@ -130,9 +149,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return Scaffold(
       appBar: null,
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: (MediaQuery.of(context).size.height),
         width: MediaQuery.of(context).size.width,
-        color: Color(0xF0FFFFFF),
+        color: Color(0xE0FFFFFF),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -173,7 +192,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         Container(
                           alignment: Alignment.topCenter,
                           padding: const EdgeInsets.only(top:10),
-                          child:first_route_inf(),
+                          child:view_all_routes(),
+                        ),
+                        Container(
+                          alignment: Alignment.topCenter,
+                          padding: const EdgeInsets.only(top:42),
+                          child:empty_chto_to(),
                         ),
                       ],
                     ),

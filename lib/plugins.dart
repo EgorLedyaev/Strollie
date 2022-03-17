@@ -515,12 +515,12 @@ class _first_info_route_state extends State<first_info_route>{
   @override
   Widget build(BuildContext context) {
     return Container(
+        width: 300,
+        height: 37,
         child: Stack(
             children: const <Widget>[
               Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Text('pr-t. Karla Marksa - st. Vetvistaya ', textAlign: TextAlign.left, style: TextStyle(
+                  child: Text('просп. Карла Маркса - ул. Ветвистая  ', textAlign: TextAlign.left, style: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 1),
                       fontFamily: 'SF Pro Text',
                       fontSize: 14,
@@ -531,7 +531,7 @@ class _first_info_route_state extends State<first_info_route>{
               ),Positioned(
                   top: 20,
                   left: 0,
-                  child: Text('25.07.2021   21 km   2 h 38 min', textAlign: TextAlign.left, style: TextStyle(
+                  child: Text('25.07.2021   21 км   2 ч 38 мин', textAlign: TextAlign.left, style: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 0.699999988079071),
                       fontFamily: 'SF Pro Text',
                       fontSize: 13,
@@ -621,6 +621,8 @@ class _second_info_route_state extends State<second_info_route>{
   @override
   Widget build(BuildContext context) {
     return Container(
+        width: 300,
+        height: 37,
         child: Stack(
             children: const <Widget>[
               Positioned(
@@ -637,7 +639,7 @@ class _second_info_route_state extends State<second_info_route>{
               ),Positioned(
                   top: 0,
                   left: 0,
-                  child: Text('sh. Moskovskoe - st. Lesnaya ', textAlign: TextAlign.left, style: TextStyle(
+                  child: Text('Московское ш. - ул. Лесная ', textAlign: TextAlign.left, style: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 1),
                       fontFamily: 'SF Pro Text',
                       fontSize: 14,
@@ -698,25 +700,25 @@ class _profile_menu_icon_state extends State<profile_menu_icon>{
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: 57,
+        width: 90,
         height: 37,
-
         child: Stack(
             children: <Widget>[
               const Positioned(
                   top: 0,
-                  left: 0,
-                  child: Text('Profile', textAlign: TextAlign.center, style: TextStyle(
+                  left:-20,
+                  right: 0,
+                  child: Text('Профиль', textAlign: TextAlign.center, style: TextStyle(
                       color: Color.fromRGBO(0, 0, 0, 1),
                       fontFamily: 'SF Pro Text',
-                      fontSize: 18,
+                      fontSize: 17,
                       letterSpacing: -0.23999999463558197,
                       fontWeight: FontWeight.normal,
                       height: 1.1111111111111112
                   ),)
               ),Positioned(
                   top: 22,
-                  left: 21,
+                  left: 28,
                   child: Container(
                       width: 15,
                       height: 15,
@@ -729,6 +731,82 @@ class _profile_menu_icon_state extends State<profile_menu_icon>{
                         borderRadius : BorderRadius.all(Radius.elliptical(15, 15)),
                       )
                   )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class view_all_routes extends StatefulWidget{
+  @override
+  _view_all_routes_state createState() => _view_all_routes_state();
+}
+
+class _view_all_routes_state extends State<view_all_routes>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 380,
+        height: 66,
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  child: Container(
+                      width: 380,
+                      height: 66,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(15),
+                          topRight: Radius.circular(15),
+                          bottomLeft: Radius.circular(15),
+                          bottomRight: Radius.circular(15),
+                        ),
+                        color : Color.fromRGBO(26, 224, 124, 0.8500000238418579),
+                      )
+                  )
+              ),Positioned(
+                  top: 20,
+                  left: 80,
+                  child: Text('Все прогулки', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 26,
+                      letterSpacing: 0 /*percentages not used in flutter. defaulting to zero*/,
+                      fontWeight: FontWeight.normal,
+                      height: 1
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class empty_chto_to extends StatefulWidget{
+  @override
+  _empty_chto_to_state createState() => _empty_chto_to_state();
+}
+
+class _empty_chto_to_state extends State<empty_chto_to>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 380,
+        height: 66,
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 17,
+                  left: 97,
+                  child: Text('', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color(0xE0FFFFFF),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 26,
+                      letterSpacing: 0 /*percentages not used in flutter. defaulting to zero*/,
+                      fontWeight: FontWeight.normal,
+                      height: 1
+                  ),)
               ),
             ]
         )
