@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'home.dart';
 import 'profile.dart';
 import 'plugins.dart';
+import 'stats.dart';
 
 void main() => runApp(Strollie());
 
@@ -24,6 +25,7 @@ class Strollie extends StatelessWidget {
       routes: {
         '/home': (context) => const MapScreen(),
         '/profile': (context) => ProfileScreen(),
+        '/stats': (context) => StatsScreen(),
       },
     );
   }
