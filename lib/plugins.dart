@@ -138,7 +138,7 @@ class _stats_button_icon_state extends State<stats_button_icon>{
     return GestureDetector(
       onTap: () {
         Navigator.pop(context);
-        Navigator.pushNamedAndRemoveUntil(context, '/profile', (route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, '/stats', (route) => false);
         setState(() {
           _isElevated = !_isElevated;
         });
@@ -795,7 +795,7 @@ class _empty_chto_to_state extends State<empty_chto_to>{
         width: 380,
         height: 66,
         child: Stack(
-            children: <Widget>[
+            children: const <Widget>[
               Positioned(
                   top: 17,
                   left: 97,
@@ -807,6 +807,406 @@ class _empty_chto_to_state extends State<empty_chto_to>{
                       fontWeight: FontWeight.normal,
                       height: 1
                   ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+
+class default_base_stats extends StatefulWidget{
+  @override
+  _default_base_stats_state createState() => _default_base_stats_state();
+}
+
+class _default_base_stats_state extends State<default_base_stats>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 155,
+        height: 141,
+        decoration: const BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+            bottomLeft: Radius.circular(24),
+            bottomRight: Radius.circular(24),
+          ),
+          color : Color.fromRGBO(255, 255, 255, 1),
+        )
+    );
+  }
+}
+
+
+class StepsWidget extends StatefulWidget {
+  @override
+  _StepsWidgetState createState() => _StepsWidgetState();
+}
+
+class _StepsWidgetState extends State<StepsWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 130,
+        height: 102.7627182006836,
+
+        child: Stack(
+            children: <Widget>[
+              const Positioned(
+                  top: 83.64407348632812,
+                  left: 0,
+                  child: Text('Шагов', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 14,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1428571428571428
+                  ),)
+              ),
+              const Positioned(
+                  top: 47.796600341796875,
+                  left: 0,
+                  child: Text('7 229', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Display',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.5555555555555556
+                  ),)
+              ),
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                      width: 148.025634765625,
+                      height: 48.296630859375,
+
+                      child: Stack(
+                          children: <Widget>[
+                            Positioned(
+                                top: 0.296630859375,
+                                left: 100.025634765625,
+                                child: Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+
+                                    ),
+                                )
+                            ),
+                            const Positioned(
+                                top: 0,
+                                left: 0,
+                                child: Text('Сделано', textAlign: TextAlign.left, style: TextStyle(
+                                    color: Color.fromRGBO(4, 4, 21, 1),
+                                    fontFamily: 'SF Pro Text',
+                                    fontSize: 18,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1.3333333333333333
+                                ),)
+                            ),
+                          ]
+                      )
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class steps_logo extends StatefulWidget{
+  @override
+  _steps_logo_state createState() => _steps_logo_state();
+}
+
+class _steps_logo_state extends State<steps_logo>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/steps_logo.svg',
+        semanticsLabel: 'steps_logo'
+    );;
+  }
+}
+
+class steps_info extends StatefulWidget{
+  @override
+  _steps_info_class createState() => _steps_info_class();
+}
+
+class _steps_info_class extends State<steps_info>{
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child:default_base_stats(),
+          ),
+          Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(top:20,left:20),
+            child:StepsWidget(),
+          ),
+          Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(top:75,left:90),
+            child:steps_logo(),
+          ),
+        ]
+    );
+  }
+}
+
+
+class DistanceWidget extends StatefulWidget {
+  @override
+  _DistanceWidgetState createState() => _DistanceWidgetState();
+}
+
+class _DistanceWidgetState extends State<DistanceWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 130,
+        height: 102.7627182006836,
+
+        child: Stack(
+            children: <Widget>[
+              const Positioned(
+                  top: 83.64407348632812,
+                  left: 0,
+                  child: Text('Метров', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 14,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1428571428571428
+                  ),)
+              ),
+              const Positioned(
+                  top: 47.796600341796875,
+                  left: 0,
+                  child: Text('13 549', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Display',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.5555555555555556
+                  ),)
+              ),
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                      width: 148.025634765625,
+                      height: 48.296630859375,
+
+                      child: Stack(
+                          children: <Widget>[
+                            Positioned(
+                                top: 0.296630859375,
+                                left: 100.025634765625,
+                                child: Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+
+                                  ),
+                                )
+                            ),
+                            const Positioned(
+                                top: 0,
+                                left: 0,
+                                child: Text('Пройдено', textAlign: TextAlign.left, style: TextStyle(
+                                    color: Color.fromRGBO(4, 4, 21, 1),
+                                    fontFamily: 'SF Pro Text',
+                                    fontSize: 18,
+                                    letterSpacing: 0,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1.3333333333333333
+                                ),)
+                            ),
+                          ]
+                      )
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class distance_logo extends StatefulWidget{
+  @override
+  _distance_logo_state createState() => _distance_logo_state();
+}
+
+class _distance_logo_state extends State<distance_logo>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/distance_logo.svg',
+        semanticsLabel: 'distance_logo'
+    );;
+  }
+}
+
+class distance_info extends StatefulWidget{
+  @override
+  _distance_info_class createState() => _distance_info_class();
+}
+
+class _distance_info_class extends State<distance_info>{
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child:default_base_stats(),
+          ),
+          Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(top:20,left:20),
+            child:DistanceWidget(),
+          ),
+          Container(
+            alignment: Alignment.topLeft,
+            padding: const EdgeInsets.only(top:75,left:90),
+            child:distance_logo(),
+          ),
+        ]
+    );
+  }
+}
+
+class ScorepointsWidget extends StatefulWidget {
+  @override
+  _ScorepointsWidgetState createState() => _ScorepointsWidgetState();
+}
+
+class _ScorepointsWidgetState extends State<ScorepointsWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 381,
+        height: 180,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                      width: 320,
+                      height: 180,
+                      decoration: const BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                          bottomLeft: Radius.circular(24),
+                          bottomRight: Radius.circular(24),
+                        ),
+                        color : Color.fromRGBO(255, 255, 255, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 0,
+                  left: 0,
+                  child: SvgPicture.asset(
+                      'assets/images/score.svg',
+                      semanticsLabel: 'score',
+                    color: Colors.green,
+                  )
+              ),const Positioned(
+                  top: 149,
+                  left: 139,
+                  child: Text('Очков', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 14,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.7142857142857142
+                  ),)
+              ),const Positioned(
+                  top: 125,
+                  left: 145,
+                  child: Text('298', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.3333333333333333
+                  ),)
+              ),const Positioned(
+                  top: 22,
+                  left: 19,
+                  child: Text('Результат', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.3333333333333333
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class stats_menu_icon extends StatefulWidget{
+  @override
+  _stats_menu_icon_state createState() => _stats_menu_icon_state();
+}
+
+class _stats_menu_icon_state extends State<stats_menu_icon>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 90,
+        height: 37,
+        child: Stack(
+            children: <Widget>[
+              const Positioned(
+                  top: 0,
+                  left:-20,
+                  right: 0,
+                  child: Text('Таланты', textAlign: TextAlign.center, style: TextStyle(
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 17,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 22,
+                  left: 28,
+                  child: Container(
+                      width: 15,
+                      height: 15,
+                      decoration: const BoxDecoration(
+                        gradient : LinearGradient(
+                            begin: Alignment(6.123234262925839e-17,1),
+                            end: Alignment(-1,6.123234262925839e-17),
+                            colors: [Color.fromRGBO(0, 122, 254, 1),Color.fromRGBO(26, 224, 124, 1)]
+                        ),
+                        borderRadius : BorderRadius.all(Radius.elliptical(15, 15)),
+                      )
+                  )
               ),
             ]
         )
