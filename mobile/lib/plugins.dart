@@ -1213,3 +1213,201 @@ class _stats_menu_icon_state extends State<stats_menu_icon>{
     );
   }
 }
+
+class VisitedWidget extends StatefulWidget {
+  @override
+  _VisitedWidgetState createState() => _VisitedWidgetState();
+}
+
+class _VisitedWidgetState extends State<VisitedWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 155,
+        height: 141,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                      width: 155,
+                      height: 141,
+                      decoration: const BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                          bottomLeft: Radius.circular(24),
+                          bottomRight: Radius.circular(24),
+                        ),
+                        color : Color.fromRGBO(255, 255, 255, 1),
+                      )
+                  )
+              ),
+              const Positioned(
+                  top: 106.347412109375,
+                  left: 18.974365234375,
+                  child: Text('Мест', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 14,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1428571428571428
+                  ),)
+              ),
+              const Positioned(
+                  top: 70.5,
+                  left: 18.974365234375,
+                  child: Text('12', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Display',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.5555555555555556
+                  ),)
+              ),
+              const Positioned(
+                  top: 22.703369140625,
+                  left: 18.974365234375,
+                  child: Text('Посещено', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.3333333333333333
+                  ),)
+              ),
+              Positioned(
+                  top: 70,
+                  left: 90,
+                  child: Container(
+                      width: 48,
+                      height: 60,
+                      decoration: BoxDecoration(),
+                      child: Stack(
+                          children: <Widget>[
+                            Positioned(
+                                top: 0,
+                                left: 0,
+                                child: Container(
+                                    width: 48,
+                                    height: 60,
+                                    child: Stack(
+                                        children: <Widget>[
+                                          Positioned(
+                                              top: 0,
+                                              left: 0,
+                                              child: SvgPicture.asset(
+                                                  'assets/images/visited_places.svg',
+                                                  semanticsLabel: 'visited_places'
+                                              )
+                                          )
+                                        ]
+                                    )
+                                )
+                            ),
+                          ]
+                      )
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class WalksWidget extends StatefulWidget {
+  @override
+  _WalksWidgetState createState() => _WalksWidgetState();
+}
+
+class _WalksWidgetState extends State<WalksWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 155,
+        height: 141,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                      width: 155,
+                      height: 141,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                          bottomLeft: Radius.circular(24),
+                          bottomRight: Radius.circular(24),
+                        ),
+                        color : Color.fromRGBO(255, 255, 255, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 22.703369140625,
+                  left: 18.974365234375,
+                  child: Text('Совершено', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.3333333333333333
+                  ),)
+              ),Positioned(
+                  top: 70,
+                  left: 70,
+                  child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color : Color.fromRGBO(255, 255, 255, 1),
+                      ),
+                      child: Stack(
+                          children: <Widget>[
+                            Positioned(
+                                top: 4,
+                                left: 22,
+                                child: SvgPicture.asset(
+                                    'assets/images/walks.svg',
+                                    semanticsLabel: 'walks'
+                                )
+                            ),
+                          ]
+                      )
+                  )
+              ),const Positioned(
+                  top: 70.5,
+                  left: 19,
+                  child: Text('8', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Display',
+                      fontSize: 18,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.5555555555555556
+                  ),)
+              ),Positioned(
+                  top: 106,
+                  left: 19,
+                  child: Text('Прогулок', textAlign: TextAlign.left, style: TextStyle(
+                      color: Color.fromRGBO(4, 4, 21, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 14,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1428571428571428
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}

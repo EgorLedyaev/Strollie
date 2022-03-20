@@ -42,4 +42,6 @@ flutter:
     - assets/images/Dsc_00111.png
     - assets/images/steps_logo.svg
     - assets/images/distance_logo.svg
-    - - assets/images/score.svg
+    - assets/images/score.svg
+    - assets/images/visited_places.svg
+    - assets/images/walks.svg

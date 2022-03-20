@@ -44,12 +44,12 @@ class _up_box_info_state extends State<up_box_info>{
   }
 }
 
-class second_box_stats_info extends StatefulWidget{
+class first_box_stats_info extends StatefulWidget{
   @override
-  _second_box_stats_info createState() => _second_box_stats_info();
+  _first_box_stats_info createState() => _first_box_stats_info();
 }
 
-class _second_box_stats_info extends State<second_box_stats_info>{
+class _first_box_stats_info extends State<first_box_stats_info>{
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -62,6 +62,31 @@ class _second_box_stats_info extends State<second_box_stats_info>{
             alignment: Alignment.topRight,
             padding: const EdgeInsets.only(top:0,left: 165),
             child:distance_info(),
+          ),
+        ]
+    );
+  }
+}
+
+
+class second_box_stats_info extends StatefulWidget{
+  @override
+  _second_box_stats_info createState() => _second_box_stats_info();
+}
+
+class _second_box_stats_info extends State<second_box_stats_info>{
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+        children: <Widget>[
+          Container(
+            alignment: Alignment.topLeft,
+            child:VisitedWidget(),
+          ),
+          Container(
+            alignment: Alignment.topRight,
+            padding: const EdgeInsets.only(top:0,left: 165),
+            child:WalksWidget(),
           ),
         ]
     );
@@ -109,7 +134,7 @@ class _StatsScreenState extends State<StatsScreen> with SingleTickerProviderStat
                         Container(
                           alignment: Alignment.topCenter,
                           padding: const EdgeInsets.only(top:8),
-                          child:second_box_stats_info(),
+                          child:first_box_stats_info(),
                         ),
                         Container(
                           alignment: Alignment.topCenter,
