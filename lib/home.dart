@@ -181,12 +181,12 @@ class _MapScreenState extends State<MapScreen> with SingleTickerProviderStateMix
         Container(
           alignment: Alignment.bottomCenter,
           padding: const EdgeInsets.only(bottom:32,left: 20,right:20),
-          child: main_start_button(),
+          child: main_start_button_2(),
         ),
         Container(
           alignment: Alignment.bottomCenter,
           padding: const EdgeInsets.only(bottom:56,left: 20,right:20),
-          child: main_start_button_icon(),
+          child: main_start_button_icon_2(),
         ),
         Container(
           alignment: Alignment.bottomCenter,

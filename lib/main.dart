@@ -6,6 +6,7 @@ import 'home.dart';
 import 'profile.dart';
 import 'plugins.dart';
 import 'stats.dart';
+import 'make_route_view.dart';
 
 void main() => runApp(Strollie());
 
@@ -26,6 +27,7 @@ class Strollie extends StatelessWidget {
         '/home': (context) => const MapScreen(),
         '/profile': (context) => ProfileScreen(),
         '/stats': (context) => StatsScreen(),
+        '/makeroute': (context) => MakeRouteScreen(),
       },
     );
   }
