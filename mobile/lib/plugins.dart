@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'dart:math' as math;import 'dart:math' as math;
+import 'dart:math' as math;
 
 bool _isElevated = true;
 
@@ -22,7 +22,7 @@ class _nav_menu_state extends State<nav_menu>{
           maxHeight: 80,
         ),
         decoration: const BoxDecoration(
-          borderRadius : BorderRadius.all(Radius.circular(40)),
+          borderRadius : BorderRadius.all(Radius.circular(30)),
           color : Color.fromRGBO(255, 255, 255, 1),
         )
     );
@@ -200,10 +200,10 @@ class _first_bg_box_profile_state extends State<first_bg_box_profile>{
         height: 104,
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-            bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(24),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
           ),
           color : Color.fromRGBO(255, 255, 255, 1),
         )
@@ -223,10 +223,6 @@ class _settings_profile_bt_state extends State<settings_profile_bt>{
         width: 60,
         height: 60,
         decoration: BoxDecoration(
-          border : Border.all(
-            color: Color(0x40040415),
-            width: 1.5,
-          ),
           borderRadius : BorderRadius.all(Radius.elliptical(60, 60)),
         )
     );
@@ -334,7 +330,6 @@ class full_inf_profile_box extends StatefulWidget{
 class _full_inf_profile_box_state extends State<full_inf_profile_box>{
   @override
   Widget build(BuildContext context) {
-    // Figma Flutter Generator Group20Widget - GROUP
 
     return Container(
         width: 284.0472412109375,
@@ -442,10 +437,10 @@ class _second_bg_box_profile_state extends State<second_bg_box_profile>{
         height: 120,
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-            bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(24),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
           ),
           color : Color.fromRGBO(255, 255, 255, 1),
         )
@@ -466,10 +461,10 @@ class _first_inf_route_box_state extends State<first_inf_route_box>{
         height: 180,
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-            bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(24),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
           ),
           color : Color.fromRGBO(255, 255, 255, 1),
         )
@@ -492,8 +487,8 @@ class _first_ing_route_pic_state extends State<first_inf_route_pic>{
         height: 120,
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
             bottomLeft: Radius.circular(0),
             bottomRight: Radius.circular(0),
           ),
@@ -574,10 +569,10 @@ class _second_inf_route_box_state extends State<second_inf_route_box>{
         height: 180,
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-            bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(24),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
           ),
           color : Color.fromRGBO(255, 255, 255, 1),
         )
@@ -598,8 +593,8 @@ class _second_ing_route_pic_state extends State<second_inf_route_pic>{
         height: 120,
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
             bottomLeft: Radius.circular(0),
             bottomRight: Radius.circular(0),
           ),
@@ -769,7 +764,7 @@ class _view_all_routes_state extends State<view_all_routes>{
                   top: 20,
                   left: 80,
                   child: Text('Все прогулки', textAlign: TextAlign.left, style: TextStyle(
-                      color: Color.fromRGBO(0, 0, 0, 1),
+                      color: Colors.white,
                       fontFamily: 'SF Pro Text',
                       fontSize: 26,
                       letterSpacing: 0 /*percentages not used in flutter. defaulting to zero*/,
@@ -828,10 +823,10 @@ class _default_base_stats_state extends State<default_base_stats>{
         height: 141,
         decoration: const BoxDecoration(
           borderRadius : BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-            bottomLeft: Radius.circular(24),
-            bottomRight: Radius.circular(24),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
           ),
           color : Color.fromRGBO(255, 255, 255, 1),
         )
@@ -1111,10 +1106,10 @@ class _ScorepointsWidgetState extends State<ScorepointsWidget> {
                       height: 180,
                       decoration: const BoxDecoration(
                         borderRadius : BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
                         ),
                         color : Color.fromRGBO(255, 255, 255, 1),
                       )
@@ -1168,6 +1163,8 @@ class _ScorepointsWidgetState extends State<ScorepointsWidget> {
 }
 
 class stats_menu_icon extends StatefulWidget{
+  const stats_menu_icon({Key? key}) : super(key: key);
+
   @override
   _stats_menu_icon_state createState() => _stats_menu_icon_state();
 }
@@ -1215,6 +1212,8 @@ class _stats_menu_icon_state extends State<stats_menu_icon>{
 }
 
 class VisitedWidget extends StatefulWidget {
+  const VisitedWidget({Key? key}) : super(key: key);
+
   @override
   _VisitedWidgetState createState() => _VisitedWidgetState();
 }
@@ -1236,10 +1235,10 @@ class _VisitedWidgetState extends State<VisitedWidget> {
                       height: 141,
                       decoration: const BoxDecoration(
                         borderRadius : BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
                         ),
                         color : Color.fromRGBO(255, 255, 255, 1),
                       )
@@ -1340,17 +1339,17 @@ class _WalksWidgetState extends State<WalksWidget> {
                   child: Container(
                       width: 155,
                       height: 141,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         borderRadius : BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                          bottomLeft: Radius.circular(24),
-                          bottomRight: Radius.circular(24),
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
                         ),
                         color : Color.fromRGBO(255, 255, 255, 1),
                       )
                   )
-              ),Positioned(
+              ),const Positioned(
                   top: 22.703369140625,
                   left: 18.974365234375,
                   child: Text('Совершено', textAlign: TextAlign.left, style: TextStyle(
@@ -1367,7 +1366,7 @@ class _WalksWidgetState extends State<WalksWidget> {
                   child: Container(
                       width: 60,
                       height: 60,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color : Color.fromRGBO(255, 255, 255, 1),
                       ),
                       child: Stack(
@@ -1394,7 +1393,7 @@ class _WalksWidgetState extends State<WalksWidget> {
                       fontWeight: FontWeight.normal,
                       height: 1.5555555555555556
                   ),)
-              ),Positioned(
+              ),const Positioned(
                   top: 106,
                   left: 19,
                   child: Text('Прогулок', textAlign: TextAlign.left, style: TextStyle(
@@ -1408,6 +1407,1360 @@ class _WalksWidgetState extends State<WalksWidget> {
               ),
             ]
         )
+    );
+  }
+}
+
+class make_route_view_bg extends StatefulWidget{
+  @override
+  _make_route_view_bg createState() => _make_route_view_bg();
+}
+
+class _make_route_view_bg extends State<make_route_view_bg>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius : const BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+          color : Color.fromRGBO(255, 255, 255, 1),
+          border : Border.all(
+            color: Color.fromRGBO(214, 214, 214, 1),
+            width: 1,
+          ),
+        )
+    );
+  }
+}
+
+class main_start_button_2 extends StatefulWidget{
+  @override
+  _main_start_button_2_state createState() => _main_start_button_2_state();
+}
+
+class _main_start_button_2_state extends State<main_start_button_2>{
+  @override
+  Widget build(BuildContext context){
+    return GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.pushNamedAndRemoveUntil(context, '/makeroute', (route) => false);
+          setState(() {
+            _isElevated = !_isElevated;
+          });
+          print("DEBUG : onTap makeroute called.");
+        },
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          height: 65,
+          width: 65,
+          decoration: BoxDecoration(
+            gradient : const LinearGradient(
+                begin : Alignment.topLeft,
+                end: Alignment(0.2, 0.0),
+                colors: [Color.fromRGBO(0, 122, 254, 1),Color.fromRGBO(27, 224, 124, 1)]
+            ),
+            borderRadius: BorderRadius.circular(40),
+            boxShadow: _isElevated
+                ? [
+              BoxShadow(
+                color: Colors.green[300]!,
+                offset: const Offset(2,2),
+                blurRadius: 15,
+                spreadRadius: 1,
+              ),
+              const BoxShadow(
+                color: Colors.white,
+                offset: Offset(-2,-2),
+                blurRadius: 15,
+                spreadRadius: 1,
+              )
+            ]
+                : null,
+          ),
+        )
+    );
+  }
+}
+
+class main_start_button_icon_2 extends StatefulWidget{
+  @override
+  _main_start_button_icon_2_state createState() => _main_start_button_icon_2_state();
+}
+
+class _main_start_button_icon_2_state extends State<main_start_button_icon_2>{
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.pushNamedAndRemoveUntil(context, '/makeroute', (route) => false);
+        setState(() {
+          _isElevated = !_isElevated;
+        });
+        print("DEBUG : onTap makeroute called.");
+      },
+      child: SvgPicture.asset(
+        'assets/images/start_icon.svg',
+      ),
+    );
+  }
+}
+
+class from_route extends StatefulWidget{
+  @override
+  _from_route_state createState() => _from_route_state();
+}
+
+class _from_route_state extends State<from_route>{
+  @override
+  Widget build(BuildContext context) {
+
+    return Container(
+        width: 303,
+        height: 57,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 10,
+                  left: 22,
+                  child: Text('Откуда', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(60, 60, 67, 0.6000000238418579),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 17,
+                      letterSpacing: -0.40799999237060547,
+                      fontWeight: FontWeight.normal,
+                      height: 1.2941176470588236
+                  ),
+                  )
+              ),Positioned(
+                  top: 10,
+                  left: 0,
+                  child: SvgPicture.asset(
+                      'assets/images/arrow.svg',
+                      semanticsLabel: 'arrow',
+                    color: Colors.green
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class to_route extends StatefulWidget{
+  @override
+  _to_route_state createState() => _to_route_state();
+}
+
+class _to_route_state extends State<to_route>{
+  @override
+  Widget build(BuildContext context) {
+
+    return Container(
+        width: 303,
+        height: 57,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 35,
+                  left: 22,
+                  child: Text('Куда', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(60, 60, 67, 0.6000000238418579),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 17,
+                      letterSpacing: -0.40799999237060547,
+                      fontWeight: FontWeight.normal,
+                      height: 1.2941176470588236
+                  ),
+                  )
+              ),Positioned(
+                  top: 42,
+                  left: 2,
+                  child: SvgPicture.asset(
+                    'assets/images/ellipse.svg',
+                    semanticsLabel: 'ellipse',
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class additional_route extends StatefulWidget{
+  @override
+  _additional_route_state createState() => _additional_route_state();
+}
+
+class _additional_route_state extends State<additional_route>{
+  @override
+  Widget build(BuildContext context) {
+
+    return Container(
+        width: 303,
+        height: 100,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 50,
+                  left: 22,
+                  child: Text('Промежуточная точка', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(60, 60, 67, 0.6000000238418579),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 17,
+                      letterSpacing: -0.40799999237060547,
+                      fontWeight: FontWeight.normal,
+                      height: 1.2941176470588236
+                  ),
+                  )
+              ),Positioned(
+                  top: 55,
+                  left: 2,
+                  child: SvgPicture.asset(
+                    'assets/images/ellipse_2.svg',
+                    semanticsLabel: 'ellipse_2',
+                    color: Colors.black,
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class separator extends StatefulWidget{
+  @override
+  _separator_state createState() => _separator_state();
+}
+
+class _separator_state extends State<separator>{
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: 1.4033419209422001e-14 * (math.pi / 180),
+      child: const Divider(
+          color: Color.fromRGBO(198, 198, 200, 1),
+          thickness: 0.5
+      )
+      ,
+    );
+  }
+}
+
+class crossicon extends StatefulWidget{
+  @override
+  _crossicon_state createState() => _crossicon_state();
+}
+
+class _crossicon_state extends State<crossicon>{
+  @override
+  Widget build(BuildContext context) {
+    return SvgPicture.asset(
+        'assets/images/crossicon.svg',
+        semanticsLabel: 'crossicon'
+    );
+  }
+}
+
+class From_to_settings extends StatefulWidget {
+  @override
+  _From_to_settings_State createState() => _From_to_settings_State();
+}
+
+class _From_to_settings_State extends State<From_to_settings> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: double.infinity,
+        height: double.infinity,
+        child: Stack(
+            children: [
+              Container(
+                alignment: Alignment.topCenter,
+                child:from_route(),
+              ),
+              Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(top:30,right:20,left:20),
+                child:separator(),
+              ),
+              Container(
+                alignment: Alignment.topRight,
+                padding: const EdgeInsets.only(top:10,right:25),
+                child:crossicon(),
+              ),
+              Container(
+                alignment: Alignment.topCenter,
+                child:additional_route(),
+              ),
+              Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(top:70,right:20,left:20),
+                child:separator(),
+              ),
+              Container(
+                alignment: Alignment.topRight,
+                padding: const EdgeInsets.only(top:50,right:25),
+                child:crossicon(),
+              ),
+              Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(top:50),
+                child:to_route(),
+              ),
+              Container(
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.only(top:110,right:20,left:20),
+                child:separator(),
+              ),
+              Container(
+                alignment: Alignment.topRight,
+                padding: const EdgeInsets.only(top:90,right:25),
+                child:crossicon(),
+              ),
+        ]
+    )
+    );
+  }
+}
+
+class change_time_or_km extends StatefulWidget{
+  @override
+  _change_time_or_km createState() => _change_time_or_km();
+}
+
+class _change_time_or_km extends State<change_time_or_km>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 352,
+        height: 32,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius : BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30),
+                      ),
+                      color : Color.fromRGBO(242, 242, 242, 1),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+
+                      children: <Widget>[
+                        Container(
+                            width: 140,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              borderRadius : BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30),
+                                bottomLeft: Radius.circular(30),
+                                bottomRight: Radius.circular(30),
+                              ),
+                              boxShadow : [BoxShadow(
+                                  color: Color.fromRGBO(0, 0, 0, 0.11999999731779099),
+                                  offset: Offset(0,3),
+                                  blurRadius: 8
+                              )],
+                              color : Color.fromRGBO(255, 255, 255, 1),
+                              border : Border.all(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                width: 0.5,
+                              ),
+                            ),
+                            child: Stack(
+                                children: <Widget>[
+                                  Positioned(
+                                      top: 5.999495506286621,
+                                      left: 171,
+                                      child: Container(
+                                          width: 1,
+                                          height: 15.99865436553955,
+                                          decoration: BoxDecoration(
+                                            borderRadius : BorderRadius.only(
+                                              topLeft: Radius.circular(0.5),
+                                              topRight: Radius.circular(0.5),
+                                              bottomLeft: Radius.circular(0.5),
+                                              bottomRight: Radius.circular(0.5),
+                                            ),
+                                            color : Color.fromRGBO(60, 60, 67, 0.36000001430511475),
+                                          )
+                                      )
+                                  ),Positioned(
+                                      top: 2,
+                                      left: 25,
+                                      child: Text('По времени', textAlign: TextAlign.center, style: TextStyle(
+                                          decoration: TextDecoration.none,
+                                          color: Color.fromRGBO(0, 0, 0, 1),
+                                          fontFamily: 'SF Pro Text',
+                                          fontSize: 15,
+                                          letterSpacing: -0.5,
+                                          fontWeight: FontWeight.normal,
+                                          height: 1.3333333333333333
+                                      ),)
+                                  ),
+                                ]
+                            )
+                        ), SizedBox(width : 0),
+                        Container(
+                            width: 135,
+                            height: 28,
+                            decoration: const BoxDecoration(
+                              borderRadius : BorderRadius.only(
+                                topLeft: Radius.circular(6.929999828338623),
+                                topRight: Radius.circular(6.929999828338623),
+                                bottomLeft: Radius.circular(6.929999828338623),
+                                bottomRight: Radius.circular(6.929999828338623),
+                              ),
+                            ),
+                            child: Stack(
+                                children: <Widget>[
+                                  Positioned(
+                                      top: 5.999495506286621,
+                                      left: 171,
+                                      child: Container(
+                                          width: 1,
+                                          height: 15.99865436553955,
+                                          decoration: const BoxDecoration(
+                                            borderRadius : BorderRadius.only(
+                                              topLeft: Radius.circular(0.5),
+                                              topRight: Radius.circular(0.5),
+                                              bottomLeft: Radius.circular(0.5),
+                                              bottomRight: Radius.circular(0.5),
+                                            ),
+                                            color : Color.fromRGBO(60, 60, 67, 0.36000001430511475),
+                                          )
+                                      )
+                                  ),const Positioned(
+                                      top: 3,
+                                      left: 15,
+                                      child: Text('По расстоянию', textAlign: TextAlign.center, style: TextStyle(
+                                          decoration: TextDecoration.none,
+                                          color: Color.fromRGBO(0, 0, 0, 1),
+                                          fontFamily: 'SF Pro Text',
+                                          fontSize: 15,
+                                          letterSpacing: -0.5,
+                                          fontWeight: FontWeight.normal,
+                                          height: 1.3333333333333333
+                                      ),)
+                                  ),
+                                ]
+                            )
+                        ),
+
+                      ],
+                    ),
+                  )
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class costyl_bg extends StatefulWidget{
+  @override
+  _costyl_bg_state createState() => _costyl_bg_state();
+}
+
+class _costyl_bg_state extends State<costyl_bg>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 89,
+        height: 229,
+        decoration: const BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+          color : Color.fromRGBO(242, 242, 242, 1),
+        )
+    );
+  }
+}
+
+class buttons_reset_plus extends StatefulWidget {
+  @override
+  _buttons_reset_plus_State createState() => _buttons_reset_plus_State();
+}
+
+class _buttons_reset_plus_State extends State<buttons_reset_plus> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 330,
+        height: 20,
+        child: Stack(
+            children: const <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 208,
+                  child: Text('Сбросить', textAlign: TextAlign.center, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(142, 142, 147, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 15,
+                      letterSpacing: -0.5,
+                      fontWeight: FontWeight.normal,
+                      height: 1.3333333333333333
+                  ),)
+              ),Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Text('Добавить', textAlign: TextAlign.center, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(142, 142, 147, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 15,
+                      letterSpacing: -0.5,
+                      fontWeight: FontWeight.normal,
+                      height: 1.3333333333333333
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class time_change extends StatefulWidget {
+  @override
+  _time_change_State createState() => _time_change_State();
+}
+
+class _time_change_State extends State<time_change> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 352,
+        height: 60,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                      width: 280,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                        color : Color.fromRGBO(242, 242, 242, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 20,
+                  left: 40,
+                  child: Text('00 ', textAlign: TextAlign.center, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 0.4000000059604645),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 25,
+                      letterSpacing: -0.5,
+                      fontWeight: FontWeight.normal,
+                      height: 0.8
+                  ),)
+              ),Positioned(
+                  top: 20,
+                  left: 90,
+                  child: Text('ч.', textAlign: TextAlign.center, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 0.4000000059604645),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 25,
+                      letterSpacing: -0.5,
+                      fontWeight: FontWeight.normal,
+                      height: 0.8
+                  ),)
+              ),Positioned(
+                  top: 20,
+                  left: 160,
+                  child: Text('15', textAlign: TextAlign.center, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 0.4000000059604645),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 25,
+                      letterSpacing: -0.5,
+                      fontWeight: FontWeight.normal,
+                      height: 0.8
+                  ),)
+              ),Positioned(
+                  top: 20,
+                  left: 200,
+                  child: Text('мин.', textAlign: TextAlign.center, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 0.4000000059604645),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 25,
+                      letterSpacing: -0.5,
+                      fontWeight: FontWeight.normal,
+                      height: 0.8
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class check_mark_cafe extends StatefulWidget {
+  @override
+  _check_mark_cafe_state createState() => _check_mark_cafe_state();
+}
+
+class _check_mark_cafe_state extends State<check_mark_cafe> {
+  Color _containerColor = Color(0xFF1BE07C);
+  Border _containerBorder = Border.all(color: Colors.white, width: 0);
+  static const mark = 1;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+          width: 20,
+          height: 20,
+
+          child: Stack(
+              children: <Widget>[
+                Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Ink(
+                        child: InkWell(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color : _containerColor,
+                                border : _containerBorder,
+                                borderRadius : BorderRadius.all(Radius.elliptical(20, 20)),
+                              )
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _containerColor = _containerColor == Colors.white ?
+                              Color(0xFF1BE07C) :
+                              Colors.white;
+                              _containerBorder = _containerBorder == Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1) ?
+                              Border.all(color: Colors.white, width: 0) :
+                              Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1);
+                            });
+                          },
+                        )
+                    )
+
+                ),Positioned(
+                    top: 6,
+                    left: 4,
+                    child: SvgPicture.asset(
+                        'assets/images/check_mark.svg',
+                        semanticsLabel: 'check_mark'
+                    )
+                ),
+              ]
+          )
+      ),
+    );
+  }
+}
+
+class check_mark_history extends StatefulWidget {
+  @override
+  _check_mark_history_state createState() => _check_mark_history_state();
+}
+
+class _check_mark_history_state extends State<check_mark_history> {
+  Color _containerColor = Color(0xFF1BE07C);
+  Border _containerBorder = Border.all(color: Colors.white, width: 0);
+  static const mark = 1;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+          width: 20,
+          height: 20,
+
+          child: Stack(
+              children: <Widget>[
+                Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Ink(
+                        child: InkWell(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color : _containerColor,
+                                border : _containerBorder,
+                                borderRadius : BorderRadius.all(Radius.elliptical(20, 20)),
+                              )
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _containerColor = _containerColor == Colors.white ?
+                              Color(0xFF1BE07C) :
+                              Colors.white;
+                              _containerBorder = _containerBorder == Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1) ?
+                              Border.all(color: Colors.white, width: 0) :
+                              Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1);
+                            });
+                          },
+                        )
+                    )
+
+                ),Positioned(
+                    top: 6,
+                    left: 4,
+                    child: SvgPicture.asset(
+                        'assets/images/check_mark.svg',
+                        semanticsLabel: 'check_mark'
+                    )
+                ),
+              ]
+          )
+      ),
+    );
+  }
+}
+
+class check_mark_mall extends StatefulWidget {
+  @override
+  _check_mark_mall_state createState() => _check_mark_mall_state();
+}
+
+class _check_mark_mall_state extends State<check_mark_mall> {
+  Color _containerColor = Color(0xFF1BE07C);
+  Border _containerBorder = Border.all(color: Colors.white, width: 0);
+  static const mark = 1;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+          width: 20,
+          height: 20,
+
+          child: Stack(
+              children: <Widget>[
+                Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Ink(
+                        child: InkWell(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color : _containerColor,
+                                border : _containerBorder,
+                                borderRadius : BorderRadius.all(Radius.elliptical(20, 20)),
+                              )
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _containerColor = _containerColor == Colors.white ?
+                              Color(0xFF1BE07C) :
+                              Colors.white;
+                              _containerBorder = _containerBorder == Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1) ?
+                              Border.all(color: Colors.white, width: 0) :
+                              Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1);
+                            });
+                          },
+                        )
+                    )
+
+                ),Positioned(
+                    top: 6,
+                    left: 4,
+                    child: SvgPicture.asset(
+                        'assets/images/check_mark.svg',
+                        semanticsLabel: 'check_mark'
+                    )
+                ),
+              ]
+          )
+      ),
+    );
+  }
+}
+
+class check_mark_parks extends StatefulWidget {
+  @override
+  _check_mark_parks_state createState() => _check_mark_parks_state();
+}
+
+class _check_mark_parks_state extends State<check_mark_parks> {
+  Color _containerColor = Color(0xFF1BE07C);
+  Border _containerBorder = Border.all(color: Colors.white, width: 0);
+  static const mark = 1;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+          width: 20,
+          height: 20,
+
+          child: Stack(
+              children: <Widget>[
+                Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Ink(
+                        child: InkWell(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color : _containerColor,
+                                border : _containerBorder,
+                                borderRadius : BorderRadius.all(Radius.elliptical(20, 20)),
+                              )
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _containerColor = _containerColor == Colors.white ?
+                              Color(0xFF1BE07C) :
+                              Colors.white;
+                              _containerBorder = _containerBorder == Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1) ?
+                              Border.all(color: Colors.white, width: 0) :
+                              Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1);
+                            });
+                          },
+                        )
+                    )
+
+                ),Positioned(
+                    top: 6,
+                    left: 4,
+                    child: SvgPicture.asset(
+                        'assets/images/check_mark.svg',
+                        semanticsLabel: 'check_mark'
+                    )
+                ),
+              ]
+          )
+      ),
+    );
+  }
+}
+
+class check_mark_monuments extends StatefulWidget {
+  @override
+  _check_mark_monuments_state createState() => _check_mark_monuments_state();
+}
+
+class _check_mark_monuments_state extends State<check_mark_monuments> {
+  Color _containerColor = Color(0xFF1BE07C);
+  Border _containerBorder = Border.all(color: Colors.white, width: 0);
+  static const mark = 1;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+          width: 20,
+          height: 20,
+
+          child: Stack(
+              children: <Widget>[
+                Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Ink(
+                        child: InkWell(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color : _containerColor,
+                                border : _containerBorder,
+                                borderRadius : BorderRadius.all(Radius.elliptical(20, 20)),
+                              )
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _containerColor = _containerColor == Colors.white ?
+                              Color(0xFF1BE07C) :
+                              Colors.white;
+                              _containerBorder = _containerBorder == Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1) ?
+                              Border.all(color: Colors.white, width: 0) :
+                              Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1);
+                            });
+                          },
+                        )
+                    )
+
+                ),Positioned(
+                    top: 6,
+                    left: 4,
+                    child: SvgPicture.asset(
+                        'assets/images/check_mark.svg',
+                        semanticsLabel: 'check_mark'
+                    )
+                ),
+              ]
+          )
+      ),
+    );
+  }
+}
+
+class check_mark_art extends StatefulWidget {
+  @override
+  _check_mark_art_state createState() => _check_mark_art_state();
+}
+
+class _check_mark_art_state extends State<check_mark_art> {
+  Color _containerColor = Color(0xFF1BE07C);
+  Border _containerBorder = Border.all(color: Colors.white, width: 0);
+  static const mark = 1;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+          width: 20,
+          height: 20,
+
+          child: Stack(
+              children: <Widget>[
+                Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Ink(
+                        child: InkWell(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color : _containerColor,
+                                border : _containerBorder,
+                                borderRadius : BorderRadius.all(Radius.elliptical(20, 20)),
+                              )
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _containerColor = _containerColor == Colors.white ?
+                              Color(0xFF1BE07C) :
+                              Colors.white;
+                              _containerBorder = _containerBorder == Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1) ?
+                              Border.all(color: Colors.white, width: 0) :
+                              Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1);
+                            });
+                          },
+                        )
+                    )
+
+                ),Positioned(
+                    top: 6,
+                    left: 4,
+                    child: SvgPicture.asset(
+                        'assets/images/check_mark.svg',
+                        semanticsLabel: 'check_mark'
+                    )
+                ),
+              ]
+          )
+      ),
+    );
+  }
+}
+
+class check_mark_popular extends StatefulWidget {
+  @override
+  _check_mark_popular_state createState() => _check_mark_popular_state();
+}
+
+class _check_mark_popular_state extends State<check_mark_popular> {
+  Color _containerColor = Color(0xFF1BE07C);
+  Border _containerBorder = Border.all(color: Colors.white, width: 0);
+  static const mark = 1;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Container(
+          child: Stack(
+              children: <Widget>[
+                Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Ink(
+                      color:Colors.transparent,
+                        child: InkWell(
+                          child: Container(
+                              width: 20,
+                              height: 20,
+                              decoration: BoxDecoration(
+                                color : _containerColor,
+                                border : _containerBorder,
+                                borderRadius : BorderRadius.all(Radius.elliptical(20, 20)),
+                              )
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _containerColor = _containerColor == Colors.white ?
+                              Color(0xFF1BE07C) :
+                              Colors.white;
+                              _containerBorder = _containerBorder == Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1) ?
+                              Border.all(color: Colors.white, width: 0) :
+                              Border.all(color: Color.fromRGBO(214, 214, 214, 1), width: 1);
+                            });
+                          },
+                        )
+                    )
+
+                ),Positioned(
+                    top: 6,
+                    left: 4,
+                    child: SvgPicture.asset(
+                        'assets/images/check_mark.svg',
+                        semanticsLabel: 'check_mark'
+                    )
+                ),
+              ]
+          )
+      ),
+    );
+  }
+}
+
+class choice_places_bg extends StatefulWidget{
+  @override
+  _choice_places_bg_state createState() => _choice_places_bg_state();
+}
+
+class _choice_places_bg_state extends State<choice_places_bg>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 353,
+        height: 229,
+        decoration: BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+          color : Color.fromRGBO(242, 242, 242, 1),
+        )
+    );
+  }
+}
+
+class types_object extends StatefulWidget {
+  @override
+  _types_object_state createState() => _types_object_state();
+}
+
+class _types_object_state extends State<types_object> {
+  @override
+  Widget build(BuildContext context) {
+
+    return Container(
+        width: 286,
+        height: 200,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 180,
+                  left: 0,
+                  child: Text('Популярные места', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(52, 52, 52, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 16,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 60,
+                  left: 0,
+                  child: Text('Торговые центры', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(52, 52, 52, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 16,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 30,
+                  left: 0,
+                  child: Text('Исторические здания', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(52, 52, 52, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 16,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Text('Кафе и рестораны', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(52, 52, 52, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 16,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 90,
+                  left: 0,
+                  child: Text('Парки и скверы', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(52, 52, 52, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 16,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 120,
+                  left: 0,
+                  child: Text('Памятники культуры', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(52, 52, 52, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 16,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 150,
+                  left: 0,
+                  child: Text('Современные арт-объекты', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(52, 52, 52, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 16,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112,
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class choice_places extends StatefulWidget{
+  @override
+  _choice_places_state createState() => _choice_places_state();
+}
+
+class _choice_places_state extends State<choice_places>{
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Container(
+          alignment: Alignment.topCenter,
+          child:choice_places_bg(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:15,left: 20),
+          child:types_object(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:15,left: 240),
+          child:check_mark_cafe(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:45,left: 240),
+          child:check_mark_history(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:75,left: 240),
+          child:check_mark_mall(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:105,left: 240),
+          child:check_mark_parks(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:135,left: 240),
+          child:check_mark_monuments(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:165,left: 240),
+          child:check_mark_art(),
+        ),
+        Container(
+          alignment: Alignment.topLeft,
+          padding: const EdgeInsets.only(top:195,left: 240),
+          child:check_mark_popular(),
+        ),
+      ],
+    );
+  }
+
+}
+
+class make_route_button extends StatefulWidget{
+  @override
+  _make_route_button_state createState() => _make_route_button_state();
+}
+
+class _make_route_button_state extends State<make_route_button>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 285,
+        height: 50,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Container(
+                      width: 225,
+                      height: 50,
+                      decoration: const BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                        color : Color.fromRGBO(27, 224, 124, 1),
+                      )
+                  )
+              ),const Positioned(
+                  top: 17,
+                  left: 8,
+                  child: Text('Построить маршрут', textAlign: TextAlign.center, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(255, 255, 255, 1),
+                      fontFamily: 'Outfit',
+                      fontSize: 22,
+                      letterSpacing: 0,
+                      fontWeight: FontWeight.normal,
+                      height: 0.8
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class return_button extends StatefulWidget{
+  @override
+  _return_button_state createState() => _return_button_state();
+}
+
+class _return_button_state extends State<return_button>{
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      },
+      child: SvgPicture.asset(
+        'assets/images/return.svg',
+      ),
+    );
+  }
+}
+
+class settings_route extends StatefulWidget{
+  @override
+  _settings_route_state createState() => _settings_route_state();
+}
+
+class _settings_route_state extends State<settings_route>{
+  @override
+  Widget build(BuildContext context){
+    return Stack(
+      children: [
+        Container(
+          alignment: Alignment.topCenter,
+          child:make_route_view_bg(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:20,left: 20),
+          child:From_to_settings(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:150,left: 20,right:20),
+          child:buttons_reset_plus(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:180,left: 20,right:20),
+          child:change_time_or_km(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:220,left: 20,right:20),
+          child:time_change(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:290,left: 20,right:20),
+          child:choice_places(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:525,left: 75,right:20),
+          child:make_route_button(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:540,left: 20,right:260),
+          child:return_button(),
+        ),
+      ],
     );
   }
 }

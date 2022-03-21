@@ -45,3 +45,9 @@ flutter:
     - assets/images/score.svg
     - assets/images/visited_places.svg
     - assets/images/walks.svg
+    - assets/images/arrow.svg
+    - assets/images/crossicon.svg
+    - assets/images/ellipse.svg
+    - assets/images/ellipse_2.svg
+    - assets/images/check_mark.svg
+    - assets/images/return.svg
