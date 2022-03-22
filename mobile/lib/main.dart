@@ -7,6 +7,7 @@ import 'profile.dart';
 import 'plugins.dart';
 import 'stats.dart';
 import 'make_route_view.dart';
+import 'choose_route.dart';
 
 void main() => runApp(Strollie());
 
@@ -28,6 +29,7 @@ class Strollie extends StatelessWidget {
         '/profile': (context) => ProfileScreen(),
         '/stats': (context) => StatsScreen(),
         '/makeroute': (context) => MakeRouteScreen(),
+        '/choose_route': (context) => ChooseRouteScreen(),
       },
     );
   }
