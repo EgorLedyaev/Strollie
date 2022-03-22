@@ -1115,12 +1115,12 @@ class _ScorepointsWidgetState extends State<ScorepointsWidget> {
                       )
                   )
               ),Positioned(
-                  top: 0,
+                  top: 50,
                   left: 0,
                   child: SvgPicture.asset(
                       'assets/images/score.svg',
                       semanticsLabel: 'score',
-                    color: Colors.green,
+                    color: Color(0xFF1BE07C),
                   )
               ),const Positioned(
                   top: 149,
@@ -1531,11 +1531,11 @@ class _from_route_state extends State<from_route>{
               Positioned(
                   top: 10,
                   left: 22,
-                  child: Text('Откуда', textAlign: TextAlign.left, style: TextStyle(
+                  child: Text('Политехнический Университет', textAlign: TextAlign.left, style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Color.fromRGBO(60, 60, 67, 0.6000000238418579),
                       fontFamily: 'SF Pro Text',
-                      fontSize: 17,
+                      fontSize: 16,
                       letterSpacing: -0.40799999237060547,
                       fontWeight: FontWeight.normal,
                       height: 1.2941176470588236
@@ -1574,7 +1574,7 @@ class _to_route_state extends State<to_route>{
               Positioned(
                   top: 35,
                   left: 22,
-                  child: Text('Куда', textAlign: TextAlign.left, style: TextStyle(
+                  child: Text('Отель "Москва"', textAlign: TextAlign.left, style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Color.fromRGBO(60, 60, 67, 0.6000000238418579),
                       fontFamily: 'SF Pro Text',
@@ -1616,7 +1616,7 @@ class _additional_route_state extends State<additional_route>{
               Positioned(
                   top: 50,
                   left: 22,
-                  child: Text('Промежуточная точка', textAlign: TextAlign.left, style: TextStyle(
+                  child: Text('Зингер', textAlign: TextAlign.left, style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Color.fromRGBO(60, 60, 67, 0.6000000238418579),
                       fontFamily: 'SF Pro Text',
@@ -1981,7 +1981,7 @@ class _time_change_State extends State<time_change> {
               ),Positioned(
                   top: 20,
                   left: 40,
-                  child: Text('00 ', textAlign: TextAlign.center, style: TextStyle(
+                  child: Text('02 ', textAlign: TextAlign.center, style: TextStyle(
                       decoration: TextDecoration.none,
                       color: Color.fromRGBO(0, 0, 0, 0.4000000059604645),
                       fontFamily: 'SF Pro Text',
@@ -2650,42 +2650,48 @@ class make_route_button extends StatefulWidget{
 class _make_route_button_state extends State<make_route_button>{
   @override
   Widget build(BuildContext context) {
-    return Container(
-        width: 285,
-        height: 50,
+    return GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+          Navigator.pushNamedAndRemoveUntil(context, '/choose_route', (route) => false);
+        },
+        child: Container(
+            width: 285,
+            height: 50,
 
-        child: Stack(
-            children: <Widget>[
-              Positioned(
-                  top: 0,
-                  left: 0,
-                  child: Container(
-                      width: 225,
-                      height: 50,
-                      decoration: const BoxDecoration(
-                        borderRadius : BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                          bottomLeft: Radius.circular(30),
-                          bottomRight: Radius.circular(30),
-                        ),
-                        color : Color.fromRGBO(27, 224, 124, 1),
+            child: Stack(
+                children: <Widget>[
+                  Positioned(
+                      top: 0,
+                      left: 0,
+                      child: Container(
+                          width: 225,
+                          height: 50,
+                          decoration: const BoxDecoration(
+                            borderRadius : BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30),
+                              bottomLeft: Radius.circular(30),
+                              bottomRight: Radius.circular(30),
+                            ),
+                            color : Color.fromRGBO(27, 224, 124, 1),
+                          )
                       )
-                  )
-              ),const Positioned(
-                  top: 17,
-                  left: 8,
-                  child: Text('Построить маршрут', textAlign: TextAlign.center, style: TextStyle(
-                      decoration: TextDecoration.none,
-                      color: Color.fromRGBO(255, 255, 255, 1),
-                      fontFamily: 'Outfit',
-                      fontSize: 22,
-                      letterSpacing: 0,
-                      fontWeight: FontWeight.normal,
-                      height: 0.8
-                  ),)
-              ),
-            ]
+                  ),const Positioned(
+                      top: 17,
+                      left: 8,
+                      child: Text('Построить маршрут', textAlign: TextAlign.center, style: TextStyle(
+                          decoration: TextDecoration.none,
+                          color: Color.fromRGBO(255, 255, 255, 1),
+                          fontFamily: 'Outfit',
+                          fontSize: 22,
+                          letterSpacing: 0,
+                          fontWeight: FontWeight.normal,
+                          height: 0.8
+                      ),)
+                  ),
+                ]
+            )
         )
     );
   }
@@ -2760,6 +2766,388 @@ class _settings_route_state extends State<settings_route>{
           padding: const EdgeInsets.only(top:540,left: 20,right:260),
           child:return_button(),
         ),
+      ],
+    );
+  }
+}
+
+class first_route extends StatefulWidget{
+  @override
+  _first_route_state createState() => _first_route_state();
+}
+
+class _first_route_state extends State<first_route>{
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: () {
+
+          Navigator.pop(context);
+          Navigator.pushNamedAndRemoveUntil(context, '/stats', (route) => false);
+
+        },
+        child: Container(
+            width: 380,
+            height: 217,
+            child: Stack(
+                children: <Widget>[
+                  Positioned(
+                      top: 14,
+                      left: 8,
+                      child: Container(
+                          width: 150,
+                          height: 58,
+                          decoration: BoxDecoration(
+                            borderRadius : BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30),
+                              bottomLeft: Radius.circular(30),
+                              bottomRight: Radius.circular(30),
+                            ),
+                            color : Color.fromRGBO(255, 255, 255, 1),
+                            border : Border.all(
+                              color: Color.fromRGBO(27, 224, 124, 1),
+                              width: 3,
+                            ),
+                          )
+                      )
+                  ),Positioned(
+                      top: 29,
+                      left: 22,
+                      child: Container(
+                          width: 10,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            borderRadius : BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                              bottomLeft: Radius.circular(20),
+                              bottomRight: Radius.circular(20),
+                            ),
+                            color : Color.fromRGBO(24, 174, 182, 1),
+                          )
+                      )
+                  ),Positioned(
+                      top: 33,
+                      left: 35,
+                      child: Text('14,9 км', textAlign: TextAlign.left, style: TextStyle(
+                          decoration: TextDecoration.none,
+                          color: Color.fromRGBO(0, 0, 0, 1),
+                          fontFamily: 'SF Pro Text',
+                          fontSize: 18,
+                          letterSpacing: -0.23999999463558197,
+                          fontWeight: FontWeight.normal,
+                          height: 1.1111111111111112
+                      ),)
+                  ),Positioned(
+                      top: 35,
+                      left: 100,
+                      child: Text('(2ч 40 мин)', textAlign: TextAlign.left, style: TextStyle(
+                          decoration: TextDecoration.none,
+                          color: Color.fromRGBO(0, 0, 0, 0.550000011920929),
+                          fontFamily: 'SF Pro Text',
+                          fontSize: 10,
+                          letterSpacing: -0.23999999463558197,
+                          fontWeight: FontWeight.normal,
+                          height: 1.6666666666666667
+                      ),)
+                  ),
+                ]
+            )
+        )
+    );
+  }
+}
+
+class second_route extends StatefulWidget{
+  @override
+  _second_route_state createState() => _second_route_state();
+}
+
+class _second_route_state extends State<second_route>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 178,
+        height: 120,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 14,
+                  left: 8,
+                  child: Container(
+                      width: 150,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                        color : Color.fromRGBO(242, 242, 242, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 29,
+                  left: 22,
+                  child: Container(
+                      width: 10,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                        color : Color.fromRGBO(250, 61, 61, 0.6899999976158142),
+                      )
+                  )
+              ),Positioned(
+                  top: 33,
+                  left: 35,
+                  child: Text('17,7 км', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 35,
+                  left: 100,
+                  child: Text('(3ч 18 мин)', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 0.550000011920929),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 10,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.6666666666666667
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class third_route extends StatefulWidget{
+  @override
+  _third_route_state createState() => _third_route_state();
+}
+
+class _third_route_state extends State<third_route>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 178,
+        height: 120,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 14,
+                  left: 8,
+                  child: Container(
+                      width: 150,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                        color : Color.fromRGBO(242, 242, 242, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 29,
+                  left: 22,
+                  child: Container(
+                      width: 10,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                        color : Color.fromRGBO(251, 143, 29, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 33,
+                  left: 40,
+                  child: Text('7,1 км', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 35,
+                  left: 95,
+                  child: Text('(1 ч 15 мин)', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 0.550000011920929),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 10,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.6666666666666667
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class fourth_route extends StatefulWidget{
+  @override
+  _fourth_route_state createState() => _fourth_route_state();
+}
+
+class _fourth_route_state extends State<fourth_route>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 178,
+        height: 120,
+
+        child: Stack(
+            children: <Widget>[
+              Positioned(
+                  top: 14,
+                  left: 8,
+                  child: Container(
+                      width: 150,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                          bottomLeft: Radius.circular(30),
+                          bottomRight: Radius.circular(30),
+                        ),
+                        color : Color.fromRGBO(242, 242, 242, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 29,
+                  left: 22,
+                  child: Container(
+                      width: 10,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        borderRadius : BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                        color : Color.fromRGBO(0, 122, 254, 1),
+                      )
+                  )
+              ),Positioned(
+                  top: 33,
+                  left: 35,
+                  child: Text('12,3 км', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 1),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 18,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.1111111111111112
+                  ),)
+              ),Positioned(
+                  top: 35,
+                  left: 98,
+                  child: Text('(1 ч 42 мин)', textAlign: TextAlign.left, style: TextStyle(
+                      decoration: TextDecoration.none,
+                      color: Color.fromRGBO(0, 0, 0, 0.550000011920929),
+                      fontFamily: 'SF Pro Text',
+                      fontSize: 10,
+                      letterSpacing: -0.23999999463558197,
+                      fontWeight: FontWeight.normal,
+                      height: 1.6666666666666667
+                  ),)
+              ),
+            ]
+        )
+    );
+  }
+}
+
+class choose_route_menu_bg extends StatefulWidget{
+  @override
+  _choose_route_menu_bg_state createState() => _choose_route_menu_bg_state();
+}
+
+class _choose_route_menu_bg_state extends State<choose_route_menu_bg>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        width: 380,
+        height: 160,
+        decoration: BoxDecoration(
+          borderRadius : BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+            bottomRight: Radius.circular(30),
+          ),
+          color : Color.fromRGBO(255, 255, 255, 1),
+        )
+    );
+  }
+}
+
+class choose_route_menu extends StatefulWidget{
+  @override
+  _choose_route_menu_state createState() => _choose_route_menu_state();
+}
+
+class _choose_route_menu_state extends State<choose_route_menu>{
+  @override
+  Widget build(BuildContext context){
+    return Stack(
+      children: [
+        Container(
+          alignment: Alignment.topCenter,
+          child:choose_route_menu_bg(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(),
+          child:first_route(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(left: 152, right:0),
+          child:second_route(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(top:70,right:150),
+          child:third_route(),
+        ),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.only(left: 152, top:70),
+          child:fourth_route(),
+        )
       ],
     );
   }
