@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Social network.iml" filepath="$PROJECT_DIR$/Social network.iml" />
-      <module fileurl="file://$PROJECT_DIR$/services/auth-service/auth-service.iml" filepath="$PROJECT_DIR$/services/auth-service/auth-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/auth-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/auth-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
     </modules>
   </component>
 </project>

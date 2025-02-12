@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: auth-service
+
+server:
+  port: 8081
+
+keycloak:
+  realm: social-network
+  auth-server-url: http://localhost:8080
+  client-id: auth-service-client
+  client-secret: M6vEdw34pC7ISVnJfyfKtpuSiJLSlXR9
+  admin-username: admin
+  admin-password: adminpassword
