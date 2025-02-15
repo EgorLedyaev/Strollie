@@ -48,6 +48,7 @@ public class KeycloakService {
 
     public String registerUser(String username, String email, String password) {
         Keycloak keycloak = getAdminKeycloakInstance();
+
         try {
             RealmResource realmResource = keycloak.realm(realm);
 
@@ -56,6 +57,7 @@ public class KeycloakService {
             user.setEmail(email);
             user.setEnabled(true);
             user.setEmailVerified(true);
+            user.setCredentials(Collections.singletonList(createPasswordCredentials(password)));
 
             Response response = realmResource.users().create(user);
 
@@ -63,10 +65,7 @@ public class KeycloakService {
                 return "Failed to register user: " + response.getStatus() + " - " + response.readEntity(String.class);
             }
 
-            String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
-            realmResource.users().get(userId).resetPassword(createPasswordCredentials(password));
-
-            return "User registered successfully with ID: " + userId;
+            return "User registered successfully";
         } finally {
             keycloak.close();
         }
