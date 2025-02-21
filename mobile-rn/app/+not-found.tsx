@@ -1,32 +1,48 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import unmatched from '@/assets/images/unmatched.png';
+import { CustomLink } from '@/shared/CustomLink/CustomLink';
+import { Colors, Fonts, Gaps } from '@/shared/tokens';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 export default function NotFoundScreen() {
-  return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen doesn't exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
-    </>
-  );
+	return (
+		<>
+			<View style={styles.container}>
+				<View style={styles.content}>
+					<Image
+						source={unmatched}
+						resizeMode='contain'
+						style={styles.image}
+					/>
+					<Text style={styles.text}>
+						Ооо... Что-то пошло не так. Попробуйте вернуться на
+						главный экран приложения
+					</Text>
+					<CustomLink href='/' text='На главный экран' />
+				</View>
+			</View>
+		</>
+	);
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  link: {
-    marginTop: 15,
-    paddingVertical: 15,
-  },
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+		padding: 55,
+	},
+	content: {
+		alignItems: 'center',
+		gap: Gaps.g50,
+	},
+
+	text: {
+		color: Colors.white,
+		fontSize: Fonts.f18,
+		textAlign: 'center',
+		fontFamily: Fonts.regular,
+	},
+	image: {
+		width: 204,
+		height: 282,
+	},
 });

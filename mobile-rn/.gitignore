@@ -36,3 +36,26 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Пользовательские файлы
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+# AWS Пользовательские
+.idea/**/aws.xml
+# Сгенерированные файлы
+.idea/**/contentModel.xml
+# Чувствительные или файлы с высокой частотой изменений
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
+
