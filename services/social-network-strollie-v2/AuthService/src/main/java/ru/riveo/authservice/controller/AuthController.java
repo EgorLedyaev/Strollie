@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import ru.riveo.authservice.controller.request.UserLoginRequest;
 import ru.riveo.authservice.controller.request.UserRegistrationRequest;
 import ru.riveo.authservice.service.KeycloakService;
@@ -42,8 +43,9 @@ public class AuthController {
         try {
             AccessTokenResponse tokenResponse = keycloakService.loginUser(loginRequest);
             return ResponseEntity.ok(tokenResponse);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        } catch (HttpClientErrorException.Unauthorized e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
                     .body(null);
         }
     }

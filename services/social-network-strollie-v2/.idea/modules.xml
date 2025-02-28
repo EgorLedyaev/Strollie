@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AuthService.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AuthService.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PersonalCabinetService/PersonalCabinetService.iml" filepath="$PROJECT_DIR$/PersonalCabinetService/PersonalCabinetService.iml" />
       <module fileurl="file://$PROJECT_DIR$/SocialNetworkStrollie.iml" filepath="$PROJECT_DIR$/SocialNetworkStrollie.iml" />
     </modules>
   </component>

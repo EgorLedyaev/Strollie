@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: PersonalCabinetService
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/social-network
+server:
+  port: 8082
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    oauth:
+      client-id: personal-cabinet-service
+      client-secret: jE7FOpmNIH1f73n6d6LT645KEbf52Pc0

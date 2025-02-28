@@ -20,7 +20,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class KeycloakService {
 
-    private final Keycloak keycloak; // Инжектируем бин из конфигурации
+    private final Keycloak keycloak;
 
     @Value("${keycloak.realm}")
     private String realm;
