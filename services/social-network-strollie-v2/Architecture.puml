@@ -1,0 +1,63 @@
+@startuml
+!define RECTANGLE class
+
+RECTANGLE "Keycloak (SSO)" as Keycloak {
+  + Аутентификация пользователей
+  + Хранение пользователей
+  + Регистрация клиентов
+}
+
+RECTANGLE "AuthService" as AuthService {
+  + Регистрация новых пользователей
+  + Запрос на выдачу ролей
+  + Синхронизация с Keycloak
+}
+
+RECTANGLE "MessengerService" as MessengerService {
+  + Отправка и получение сообщений
+  + Управление чатами
+  + RabbitMQ для очередей сообщений
+  + PostgreSQL для хранения данных
+}
+
+RECTANGLE "PersonalCabinetService" as PersonalCabinetService {
+  + Управление профилем пользователя
+  + Загрузка и хранение файлов (MinIO)
+  + PostgreSQL для хранения данных
+}
+
+RECTANGLE "React Client" as ReactClient {
+  + Интерфейс личного кабинета
+  + Интерфейс мессенджера
+  + Интеграция с Keycloak для авторизации
+}
+
+database PersonalCabinetDatabase {
+
+}
+database MessengerDatabase {
+
+}
+
+database "Файловое хранилище" as PSMnio {
+
+}
+
+object RabbitMQ {
+    Создание очередей сообщений
+    Подключение сервиса к очереди
+}
+
+ReactClient --> AuthService : Регистрация нового\n пользователя
+AuthService --> Keycloak : Сохранение пользователя\n в системе
+ReactClient --> Keycloak : Авторизация \n Аутентификация пользовазя
+
+ReactClient --> PersonalCabinetService : Заполнение личного кабинета \n выбор аватарки
+PersonalCabinetService --> PersonalCabinetDatabase : хранение данных\n пользователя
+PersonalCabinetService  --> PSMnio : Сохранение аватарок\n пользователя
+
+ReactClient --> "MessengerService" : Создание чатов \n Отправка сообщенией \n Просмотр истории сообщений
+MessengerService --> MessengerDatabase : Хранение чатов и \n сообщений
+MessengerService --> RabbitMQ : создание очереди сообщений
+
+@enduml

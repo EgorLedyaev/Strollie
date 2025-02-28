@@ -1,0 +1,9 @@
+@startuml
+
+object users_p {
+    userId : UUID pk
+    userStatus : varchar()
+    userAvatarURL : varchar(255)
+}
+
+@enduml

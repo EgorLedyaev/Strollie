@@ -1,0 +1,27 @@
+@startuml
+' Определяем классы (сущности)
+
+object chat_t {
+    chat_id : UUID PK
+    chat_name : varchar(50)
+}
+
+object participants_t {
+    chat_id : UUID  PK
+    user_id : UUID  PK
+}
+
+object messages_t {
+    message_id : serial PK
+    user_id : UUID
+    chat_id : UUID FK
+    text : varchar()
+    created_at : timestamp
+    edit_at : timestamp
+    deleted_at : timestamp
+}
+
+chat_t ||--o{ messages_t
+chat_t ||--|{ participants_t
+
+@enduml
