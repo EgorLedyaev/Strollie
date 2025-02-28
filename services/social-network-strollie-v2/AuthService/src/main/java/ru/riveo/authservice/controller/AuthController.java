@@ -1,14 +1,16 @@
 package ru.riveo.authservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import ru.riveo.authservice.controller.request.UserLoginRequest;
 import ru.riveo.authservice.controller.request.UserRegistrationRequest;
@@ -17,10 +19,20 @@ import ru.riveo.authservice.service.KeycloakService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentication API", description = "API для регистрации и аутентификации пользователей через Keycloak")
 public class AuthController {
 
     private final KeycloakService keycloakService;
 
+    @Operation(
+            summary = "Регистрация нового пользователя",
+            description = "Создает нового пользователя в Keycloak и возвращает статус операции.",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Пользователь успешно зарегистрирован"),
+                    @ApiResponse(responseCode = "400", description = "Ошибка в запросе"),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+            }
+    )
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationRequest registrationRequest) {
         try {
@@ -38,6 +50,16 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Аутентификация пользователя",
+            description = "Позволяет пользователю войти в систему, используя учетные данные.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Успешная аутентификация",
+                            content = @Content(schema = @Schema(implementation = AccessTokenResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Неверные учетные данные"),
+                    @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+            }
+    )
     @PostMapping("/login")
     public ResponseEntity<AccessTokenResponse> loginUser(@RequestBody UserLoginRequest loginRequest) {
         try {
@@ -49,6 +71,4 @@ public class AuthController {
                     .body(null);
         }
     }
-
 }
-
