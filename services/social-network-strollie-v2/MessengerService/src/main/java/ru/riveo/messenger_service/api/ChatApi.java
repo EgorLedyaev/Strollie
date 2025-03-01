@@ -21,7 +21,7 @@ public interface ChatApi {
 
     @PostMapping
     @Operation(summary = "Создать чат", description = "Создает новый чат")
-    @ApiResponse(responseCode = "200", description = "Чат успешно создан")
+    @ApiResponse(responseCode = "201", description = "Чат успешно создан")
     @ApiResponse(responseCode = "401", description = "Пользователь не аутентифицирован", content = @Content)
     ResponseEntity<Void> createChat(@RequestBody CreateChatRequest request, Authentication authentication);
 
@@ -56,4 +56,5 @@ public interface ChatApi {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     );
+
 }
