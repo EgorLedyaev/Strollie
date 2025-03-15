@@ -1,0 +1,33 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: MessengerService
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/social-network
+
+  flyway:
+    enabled: true
+    schemas:
+      - public
+    locations:
+      - classpath:db/migration
+      - classpath:db/testdata
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/messenger_db
+    username: admin
+    password: admin
