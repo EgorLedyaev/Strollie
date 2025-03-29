@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -77,7 +78,7 @@ public class AvatarService {
                 .orElseThrow(() -> new AvatarNotFoundException("User with ID " + userId + " not found."));
 
         if (user.getUserAvatarUrl() == null || user.getUserAvatarUrl().isEmpty()) {
-            throw new RuntimeException("User does not have an avatar to delete.");
+            throw new AvatarNotFoundException("User does not have an avatar to delete.");
         }
 
         String objectName = user.getUserAvatarUrl().replace(minioUrl + "/" + bucketName + "/", "");
@@ -105,5 +106,10 @@ public class AvatarService {
             hexString.append(String.format("%02x", b));
         }
         return hexString.toString();
+    }
+
+    public String getAvatar(UUID uuid) {
+        Optional<UserEntity> userEntitiesById = userRepository.findUserEntitiesById(uuid);
+        return userEntitiesById.map(UserEntity::getUserAvatarUrl).orElse(null);
     }
 }

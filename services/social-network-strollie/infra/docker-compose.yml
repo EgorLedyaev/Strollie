@@ -69,6 +69,7 @@ services:
     image: quay.io/minio/minio
     container_name: minio
     command: server /data --console-address ":9001"
+    restart: always
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
@@ -77,6 +78,17 @@ services:
       - "9001:9001"  # Веб-консоль
     volumes:
       - minio_data:/data
+
+  rabbitmq:
+    image: rabbitmq:latest
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Веб-консоль
 
 volumes:
   postgres_keycloak_data:

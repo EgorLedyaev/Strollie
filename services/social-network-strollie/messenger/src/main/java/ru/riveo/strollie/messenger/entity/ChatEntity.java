@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "chat_t")
 public class ChatEntity {
-    
+
     @Id
     @Column(name = "chat_id", nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -26,5 +27,8 @@ public class ChatEntity {
     @Size(max = 50)
     @Column(name = "chat_name", length = 50)
     private String chatName;
+
+    @Column(name = "last_activity_at", nullable = false)
+    private Instant lastActivityAt;
 
 }

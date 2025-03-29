@@ -12,4 +12,6 @@ public interface ParticipantRepository extends JpaRepository<ParticipantsEntity,
 
     Optional<ParticipantsEntity> findById_ChatIdAndId_UserId(@NotNull UUID idChatId, @NotNull UUID idUserId);
 
+    boolean existsById_ChatIdAndId_UserId(UUID chatId, UUID userId);
+
 }
