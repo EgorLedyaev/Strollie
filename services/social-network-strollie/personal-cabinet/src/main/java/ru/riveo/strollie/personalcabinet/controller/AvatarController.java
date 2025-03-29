@@ -50,8 +50,10 @@ public class AvatarController {
 
     @GetMapping
     public ResponseEntity<String> getAvatar(@AuthenticationPrincipal Jwt jwt) {
-      return ResponseEntity.ok(avatarService.getAvatar(extractUserId(jwt)));
-    };
+        return ResponseEntity.ok(avatarService.getAvatar(extractUserId(jwt)));
+    }
+
+    ;
 
     private UUID extractUserId(Jwt jwt) {
         if (jwt == null) {

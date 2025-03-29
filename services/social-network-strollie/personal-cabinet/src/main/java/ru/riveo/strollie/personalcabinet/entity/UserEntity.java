@@ -25,10 +25,6 @@ public class UserEntity {
     private UUID id;
 
     @Size(max = 255)
-    @Column(name = "user_status")
-    private String userStatus;
-
-    @Size(max = 255)
     @Column(name = "user_avatar_url")
     private String userAvatarUrl;
 

@@ -81,4 +81,21 @@ public class ChatService {
         return mapToResponse(chat);
     }
 
+    @Transactional
+    public void joinChat(UUID userId, UUID chatId) {
+        if (!chatRepository.existsById(chatId)) {
+            throw new ChatNotFoundException(chatId);
+        }
+
+        if (participantRepository.existsById(new ParticipantsEntityId(chatId, userId))) {
+            return;
+        }
+
+        ParticipantsEntity participant = new ParticipantsEntity();
+        participant.setId(new ParticipantsEntityId(chatId, userId));
+        participantRepository.save(participant);
+
+        chatRepository.updateLastActivity(chatId, Instant.now());
+    }
+
 }

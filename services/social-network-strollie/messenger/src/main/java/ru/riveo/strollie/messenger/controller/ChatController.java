@@ -64,4 +64,13 @@ public class ChatController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
 
+    @PostMapping("/{chatId}/join")
+    public ResponseEntity<Void> joinChat(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID chatId) {
+        UUID userUUID = UUID.fromString(jwt.getSubject());
+        chatService.joinChat(userUUID, chatId);
+        return ResponseEntity.ok().build();
+    }
+
 }
