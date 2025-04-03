@@ -1,5 +1,6 @@
 import FiraSans from '@/assets/fonts/FiraSans-Regular.ttf';
 import FiraSansSemiBold from '@/assets/fonts/FiraSans-SemiBold.ttf';
+import { AuthProvider } from '@/entities/auth/model/auth-context';
 import { Colors } from '@/shared/tokens';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
@@ -27,23 +28,26 @@ export default function RootLayout() {
 		return null;
 	}
 	return (
-		<SafeAreaProvider>
-			<StatusBar backgroundColor='transparent' translucent={false} />
-			<Stack
-				screenOptions={{
-					headerShown: false,
-					contentStyle: {
-						backgroundColor: Colors.white,
-						paddingTop: insets.top,
-					},
-				}}
-			>
-				<Stack.Screen name='login' />
-				<Stack.Screen
-					name='restore'
-					options={{ presentation: 'modal' }}
-				/>
-			</Stack>
-		</SafeAreaProvider>
+		<AuthProvider>
+			<SafeAreaProvider>
+				<StatusBar backgroundColor='transparent' translucent={false} />
+				<Stack
+					screenOptions={{
+						headerShown: false,
+						contentStyle: {
+							backgroundColor: Colors.white,
+							paddingTop: insets.top,
+						},
+					}}
+				>
+					<Stack.Screen name='login' />
+					<Stack.Screen name='register' />
+					<Stack.Screen
+						name='restore'
+						options={{ presentation: 'modal' }}
+					/>
+				</Stack>
+			</SafeAreaProvider>
+		</AuthProvider>
 	);
 }

@@ -14,7 +14,7 @@ export const Input = ({
 	isPassword,
 	...props
 }: TextInputProps & { isPassword?: boolean }) => {
-	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(true);
+	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 	return (
 		<View>
 			<TextInput

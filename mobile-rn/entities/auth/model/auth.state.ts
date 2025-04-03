@@ -1,4 +1,4 @@
-import { API } from '@/entities/auth/api/api';
+import { AUTH_ENDPOINTS } from '@/entities/auth/api/api';
 import {
 	AuthResponse,
 	LoginRequest,
@@ -29,9 +29,9 @@ export const loginAtom = atom(
 			error: null,
 		});
 		try {
-			console.log(API.login);
+			console.log(AUTH_ENDPOINTS.login);
 			const { data } = await axios.post<{ data: AuthResponse }>(
-				API.login,
+				AUTH_ENDPOINTS.login,
 				{
 					email,
 					password,
@@ -67,3 +67,5 @@ export interface AuthState {
 	isLoading: boolean;
 	error: string | null;
 }
+
+export class registerAtom {}

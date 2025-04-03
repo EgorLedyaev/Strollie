@@ -3,7 +3,7 @@ import { loadProfileAtom } from '@/entities/user/model/user.state';
 import { Grid } from '@/features/profile/ui/Grid';
 import { Header } from '@/features/profile/ui/Header';
 import { ProfileInfo } from '@/features/profile/ui/ProfileInfo';
-import { Button } from '@/shared/Button/Button';
+import { AppButton } from '@/shared/Button/AppButton';
 import { Colors } from '@/shared/tokens';
 import { useAtom } from 'jotai';
 import { useSetAtom } from 'jotai/index';
@@ -29,7 +29,7 @@ export default function ProfilePage() {
 				</View>
 				<Grid />
 				<View style={styles.button}>
-					<Button text='Выйти' onPress={logout} />
+					<AppButton text='Выйти' onPress={logout} />
 				</View>
 			</View>
 		</>

@@ -59,3 +59,4 @@ app-example
 .idea/**/gradle.xml
 .idea/**/libraries
 
+.env
