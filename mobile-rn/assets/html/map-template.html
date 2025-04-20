@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Yandex Map v3</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+        }
+
+        .user-marker {
+            width: 20px;
+            height: 20px;
+            background-color: #FF7070;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 0 5px black;
+        }
+
+        .error-message {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 100;
+        }
+	</style>
+
+	<script src="https://api-maps.yandex.ru/v3/?apikey=11b63ebd-1019-4fab-8f45-1e222ca32241&lang=ru_RU"></script>
+</head>
+<body>
+<div id="map"></div>
+<div id="error-display" style="display:none" class="error-message"></div>
+
+<script type="text/javascript">
+	let mapInstance;
+	let userMarker = null;
+	let userMarkerElement = null;
+	let currentCustomRouteFeature = null;
+
+	// --- Функции ---
+	function showError(message) {
+		const errorDisplay = document.getElementById('error-display');
+		if (errorDisplay) {
+			errorDisplay.textContent = message;
+			errorDisplay.style.display = 'block';
+		}
+		console.error('Map Error:', message);
+		sendMessageToReactNative({ type: 'mapError', payload: message });
+	}
+
+	function sendMessageToReactNative(message) {
+		if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
+			window.ReactNativeWebView.postMessage(JSON.stringify(message));
+		} else {
+			console.log('ReactNativeWebView.postMessage not available, message:', message);
+		}
+	}
+
+	function handleReactNativeMessage(event) {
+		try {
+			const message = JSON.parse(event.data);
+			console.log('WebView received message from RN:', message);
+			switch (message.type) {
+				case 'updateLocation':
+					updateUserLocationMarker(message.payload.lat, message.payload.lon);
+					break;
+				case 'drawCustomRoute':
+					drawCustomRoute(message.payload.coordinates);
+					break;
+				case 'zoomIn':
+					if (mapInstance && typeof mapInstance.zoom === 'number') {
+						const currentZoom = mapInstance.zoom;
+						mapInstance.update({ location: { zoom: currentZoom + 1, duration: 300 } });
+					} else {
+						console.warn('zoomIn called but mapInstance or zoom is not available');
+					}
+					break;
+				case 'zoomOut':
+					if (mapInstance && typeof mapInstance.zoom === 'number') {
+						const currentZoom = mapInstance.zoom;
+						mapInstance.update({ location: { zoom: currentZoom - 1, duration: 300 } });
+					} else {
+						console.warn('zoomOut called but mapInstance or zoom is not available');
+					}
+					break;
+				case 'setMapMode':
+					if (mapInstance && message.payload && typeof message.payload.mode === 'string') {
+						const tiltInRadians = message.payload.mode === '3d' ? 45 * (Math.PI / 180) : 0;
+						mapInstance.update({ camera: { tilt: tiltInRadians, duration: 500 } });
+						mapInstance.update({ mode: message.payload.mode === '3d' ? 'vector' : 'auto' });
+					} else {
+						console.warn('setMapMode called with invalid payload or mapInstance unavailable');
+					}
+					break;
+				case 'startNavigation':
+					if (userMarker && mapInstance && userMarker.coordinates) {
+						mapInstance.update({ location: { center: userMarker.coordinates, zoom: 17, duration: 500 } });
+						sendMessageToReactNative({ type: 'navigationStarted' });
+					} else {
+						console.warn('startNavigation called but userMarker or mapInstance unavailable');
+					}
+					break;
+				default:
+					console.warn('WebView received unknown message type:', message.type);
+			}
+		} catch (error) {
+			console.error('Failed to handle RN message:', error);
+			showError('Ошибка обработки команды: ' + error.message);
+		}
+	}
+
+	function updateUserLocationMarker(lat, lon) {
+		if (!mapInstance || typeof ymaps3 === 'undefined' || !ymaps3.YMapMarker) {
+			console.warn('updateUserLocationMarker: Map or YMapMarker not ready.');
+			return;
+		}
+		const userLocation = [lon, lat]; // [lon, lat] for API v3
+		try {
+			if (!userMarkerElement) {
+				userMarkerElement = document.createElement('div');
+				userMarkerElement.className = 'user-marker';
+			}
+			if (!userMarker) {
+				console.log('Creating user marker at:', userLocation);
+				userMarker = new ymaps3.YMapMarker({ coordinates: userLocation, zIndex: 10 }, userMarkerElement);
+				mapInstance.addChild(userMarker);
+			} else {
+				userMarker.update({ coordinates: userLocation });
+			}
+		} catch (e) {
+			console.error('Error updating user marker:', e);
+			showError('Ошибка обновления маркера пользователя: ' + e.message);
+		}
+	}
+
+	function drawCustomRoute(coordinatesLatLon) {
+		if (!mapInstance || typeof ymaps3 === 'undefined' || !ymaps3.YMapFeature) {
+			showError('Map components not ready for drawing route.');
+			return;
+		}
+		if (currentCustomRouteFeature) {
+			try {
+				mapInstance.removeChild(currentCustomRouteFeature);
+			} catch (e) {
+				console.warn('Could not remove previous route:', e);
+			}
+			currentCustomRouteFeature = null;
+		}
+		if (!coordinatesLatLon || coordinatesLatLon.length < 2) {
+			showError('Not enough coordinates for route.');
+			return;
+		}
+		const coordinatesLonLat = coordinatesLatLon.map(coord => [coord[1], coord[0]]); // Convert to [lon, lat]
+
+		try {
+			currentCustomRouteFeature = new ymaps3.YMapFeature({
+				id: 'custom_route_' + Date.now(),
+				geometry: { type: 'LineString', coordinates: coordinatesLonLat },
+				style: { stroke: [{ width: 4, color: '#FF0000' }], zIndex: 5 }, // Красная линия
+			});
+			mapInstance.addChild(currentCustomRouteFeature);
+
+			// Простой вариант центрирования на первой точке
+			mapInstance.update({ location: { center: coordinatesLonLat[0], zoom: 14, duration: 300 } });
+
+			console.log('Custom route drawn.');
+			sendMessageToReactNative({ type: 'customRouteSuccess' });
+		} catch (error) {
+			console.error('Failed to draw custom route:', error);
+			showError(error.message || 'Error drawing route');
+		}
+	}
+
+	// --- Инициализация карты ---
+	async function initMap() {
+		try {
+			// Проверяем, что ymaps3 загрузился
+			if (typeof ymaps3 === 'undefined') {
+				throw new Error('Yandex Maps API (ymaps3) not loaded.');
+			}
+			// Ждем готовности API
+			await ymaps3.ready;
+			console.log('WebView: ymaps3.ready resolved.');
+
+			const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker, YMapFeature } = ymaps3;
+
+			mapInstance = new YMap(
+				document.getElementById('map'),
+				{
+					location: { center: [37.6176, 55.7558], zoom: 10 },
+					mode: 'vector',
+					behaviors: ['drag', 'pinchZoom', 'scrollZoom', 'dblClickZoom', 'multiTouch']
+				},
+				[new YMapDefaultSchemeLayer({}), new YMapDefaultFeaturesLayer({})],
+			);
+
+			// userMarkerElement создается теперь в updateUserLocationMarker при необходимости
+
+			document.getElementById('error-display').style.display = 'none';
+			console.log('WebView: Map initialized successfully.');
+			sendMessageToReactNative({ type: 'mapReady' });
+
+			// Добавляем слушателей сообщений
+			// Для Android
+			document.addEventListener('message', handleReactNativeMessage);
+			// Для iOS и других окружений
+			window.addEventListener('message', handleReactNativeMessage);
+
+		} catch (error) {
+			console.error('WebView: Map initialization failed:', error);
+			showError(error.message || 'Не удалось инициализировать карту');
+		}
+	}
+
+	// --- Запуск ---
+	if (typeof ymaps3 !== 'undefined' && ymaps3.ready) {
+		initMap();
+	} else {
+		window.addEventListener('load', () => {
+			if (typeof ymaps3 !== 'undefined' && ymaps3.ready) {
+				initMap();
+			} else {
+				// Если API все еще недоступно после load, показываем ошибку
+				showError('Не удалось загрузить API Яндекс Карт.');
+			}
+		});
+	}
+
+</script>
+</body>
+</html>
+

@@ -1,28 +1,34 @@
-import { logoutAtom } from '@/entities/auth/model/auth.state';
-import { loadProfileAtom } from '@/entities/user/model/user.state';
-import { Grid } from '@/features/profile/ui/Grid';
-import { Header } from '@/features/profile/ui/Header';
-import { ProfileInfo } from '@/features/profile/ui/ProfileInfo';
-import { AppButton } from '@/shared/Button/AppButton';
-import { Colors } from '@/shared/tokens';
+import { logoutAtom } from '@/src/entities/auth/model/auth.state';
+import { loadProfileAtom } from '@/src/entities/user/model/user.state';
+import { Grid } from '@/src/features/profile/ui/Grid';
+import { Header } from '@/src/features/profile/ui/Header';
+import { ProfileInfo } from '@/src/features/profile/ui/ProfileInfo';
+import { AppButton } from '@/src/shared/Button/AppButton';
+import { Colors } from '@/src/shared/tokens';
 import { useAtom } from 'jotai';
 import { useSetAtom } from 'jotai/index';
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfilePage() {
 	const [profile, loadProfile] = useAtom(loadProfileAtom);
 	const logout = useSetAtom(logoutAtom);
 	useEffect(() => {
-		loadProfile();
+		// loadProfile();
 	}, []);
 	const user = profile.profile;
+	profile.profile = {
+		email: '222',
+		user_id: 'John Doe',
+		created_at: '1234567890',
+	};
 	if (!user) {
 		return null;
 	}
 	return (
 		<>
-			<View style={styles.container}>
+			<SafeAreaView style={styles.container}>
 				<View style={styles.content}>
 					<Header email={user.email} />
 					<ProfileInfo user={user} />
@@ -31,7 +37,7 @@ export default function ProfilePage() {
 				<View style={styles.button}>
 					<AppButton text='Выйти' onPress={logout} />
 				</View>
-			</View>
+			</SafeAreaView>
 		</>
 	);
 }
@@ -39,7 +45,7 @@ export default function ProfilePage() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: Colors.blackLight,
+		backgroundColor: Colors.lightBackground,
 		paddingHorizontal: 10,
 	},
 	content: {

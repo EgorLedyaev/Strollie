@@ -1,4 +1,4 @@
-import { Colors } from '@/shared/tokens';
+import { Colors } from '@/src/shared/tokens';
 import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 

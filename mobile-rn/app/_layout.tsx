@@ -1,8 +1,5 @@
-import FiraSans from '@/assets/fonts/FiraSans-Regular.ttf';
-import FiraSansSemiBold from '@/assets/fonts/FiraSans-SemiBold.ttf';
-import { AuthProvider } from '@/entities/auth/model/auth-context';
-import { Colors } from '@/shared/tokens';
-import { useFonts } from 'expo-font';
+import { AuthProvider } from '@/src/entities/auth/model/auth-context';
+import { Colors } from '@/src/shared/tokens';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -13,38 +10,33 @@ import {
 
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
-	const insets = useSafeAreaInsets();
-	const [loaded, error] = useFonts({
-		FiraSans: FiraSans,
-		FiraSansSemiBold: FiraSansSemiBold,
-	});
-
 	useEffect(() => {
-		if (loaded || error) {
+		setTimeout(() => {
 			SplashScreen.hideAsync();
-		}
-	}, [loaded, error]);
-	if (!loaded && !error) {
-		return null;
-	}
+		}, 3000); // 3 секунды задержки
+	}, []);
+	const insets = useSafeAreaInsets();
+
 	return (
 		<AuthProvider>
 			<SafeAreaProvider>
-				<StatusBar backgroundColor='transparent' translucent={false} />
+				<StatusBar
+					style='dark'
+					translucent={true}
+					backgroundColor='transparent'
+				/>
 				<Stack
 					screenOptions={{
 						headerShown: false,
 						contentStyle: {
-							backgroundColor: Colors.white,
-							paddingTop: insets.top,
+							backgroundColor: Colors.lightBackground,
+							// paddingTop: insets.top,
 						},
 					}}
 				>
-					<Stack.Screen name='login' />
-					<Stack.Screen name='register' />
 					<Stack.Screen
-						name='restore'
-						options={{ presentation: 'modal' }}
+						name='sign-in'
+						options={{ title: 'Sign In', headerShown: false }}
 					/>
 				</Stack>
 			</SafeAreaProvider>

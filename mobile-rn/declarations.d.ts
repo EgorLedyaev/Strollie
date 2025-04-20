@@ -7,3 +7,8 @@ declare module '*.ttf' {
 	const value: never;
 	export default value;
 }
+
+declare module '*.html' {
+	const content: string;
+	export default content;
+}
