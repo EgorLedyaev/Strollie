@@ -1,26 +1,25 @@
 import mapHtmlTemplate from '@/assets/html/map-template.html';
-import LocationIcon from '@/assets/icons/map/LocationIcon';
-import MinusIcon from '@/assets/icons/map/MinusIcon';
-import PlusIcon from '@/assets/icons/map/PlusIcon';
-import { ProfileButton } from '@/src/features/layout/ui/ProfileButton/ProfileButton';
-import { Colors, Fonts, Gaps, Radius } from '@/src/shared/tokens';
+import { MapControlsOverlay } from '@/src/components/MapControlsOverlay';
+import { MapStatusIndicator } from '@/src/components/MapStatusIndicator';
+import { useLocationTracking } from '@/src/hooks/useLocationTracking';
+import { Colors, Fonts, Radius } from '@/src/shared/tokens';
 import { Asset } from 'expo-asset';
 import * as FileSystem from 'expo-file-system';
-import * as Location from 'expo-location';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+	ActionSheetIOS,
 	ActivityIndicator,
+	Alert,
 	Platform,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import 'react-native-get-random-values';
 import { WebView } from 'react-native-webview';
+import { v4 as uuidv4 } from 'uuid';
 
-// Определяем типы
-type LocationCoords = Location.LocationObjectCoords;
 type WebViewRef = WebView | null;
 
 // Определим интерфейсы для сообщений
@@ -35,10 +34,30 @@ interface WebViewMessageEvent {
 	};
 }
 
+// --- ИНТЕРФЕЙС ДЛЯ ХРАНЕНИЯ МЕТОК В RN ---
+interface PlacedMarkerData {
+	id: string;
+	coordinates: [number, number]; // [lon, lat]
+	// Можно добавить title, color и т.д., если нужно хранить в RN
+}
+
+// --- КОНЕЦ ИНТЕРФЕЙСА ---
+
+// Интерфейс для payload маршрута
+interface BuildRoutePayload {
+	startCoordinates: [number, number]; // [lon, lat]
+	// Убираем searchParams, добавляем waypoints
+	waypoints: [number, number][]; // Массив координат [lon, lat] поставленных меток
+	apiKey: string;
+}
+
 export async function loadMapHtml() {
 	try {
 		const asset = Asset.fromModule(mapHtmlTemplate);
 		await asset.downloadAsync();
+		if (!asset.localUri) {
+			throw new Error('Asset localUri is null after download');
+		}
 
 		return await FileSystem.readAsStringAsync(asset.localUri as string);
 	} catch (error) {
@@ -50,158 +69,209 @@ export async function loadMapHtml() {
 export default function MapScreen() {
 	const [is3DMode, setIs3DMode] = useState(false);
 	const webViewRef = useRef<WebViewRef>(null);
-	const [location, setLocation] = useState<LocationCoords | null>(null);
-	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 	const [mapReady, setMapReady] = useState(false);
 	const [mapError, setMapError] = useState<string | null>(null);
-	const [, setRouteDrawStatus] = useState<string>('');
 	const [htmlContent, setHtmlContent] = useState<string | null>('');
-	const [searchQuery, setSearchQuery] = useState('');
+	const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(
+		null,
+	);
 
+	const { location, locationError } = useLocationTracking(mapReady); // Включаем только когда карта готова
+	const [isBuildingRoute, setIsBuildingRoute] = useState(false);
+	const [placedMarkers, setPlacedMarkers] = useState<PlacedMarkerData[]>([]);
+
+	// Загрузка HTML
 	useEffect(() => {
 		loadMapHtml().then(html => setHtmlContent(html ?? null));
 	}, []);
 
+	// Отправка обновлений геолокации в WebView
 	useEffect(() => {
-		let watchSub: Location.LocationSubscription | null = null;
+		if (mapReady && location && webViewRef.current) {
+			sendMessageToWebView({
+				type: 'updateLocation',
+				payload: { lat: location.latitude, lon: location.longitude },
+			});
+		}
+	}, [location, mapReady]); // Зависим от location и mapReady
 
-		(async () => {
-			const { status } =
-				await Location.requestForegroundPermissionsAsync();
-			if (status !== 'granted') {
-				setErrorMsg('Permission to access location was denied');
-				return;
-			}
-			try {
-				const currentLocation = await Location.getCurrentPositionAsync(
-					{},
-				);
-				setLocation(currentLocation.coords);
-				if (mapReady && webViewRef.current) {
-					sendMessageToWebView({
-						type: 'updateLocation',
-						payload: {
-							lat: currentLocation.coords.latitude,
-							lon: currentLocation.coords.longitude,
-						},
-					});
-				}
-			} catch (e) {
-				console.error('Error getting initial location', e);
-				setErrorMsg('Could not get initial location');
-			}
-
-			watchSub = await Location.watchPositionAsync(
-				{
-					accuracy: Location.Accuracy.High,
-					timeInterval: 5000,
-					distanceInterval: 10,
-				},
-				newLocation => {
-					setLocation(newLocation.coords);
-					if (mapReady && webViewRef.current) {
-						sendMessageToWebView({
-							type: 'updateLocation',
-							payload: {
-								lat: newLocation.coords.latitude,
-								lon: newLocation.coords.longitude,
-							},
-						});
-					}
-				},
-			);
-		})();
-
-		return () => {
-			if (watchSub) {
-				watchSub.remove();
-			}
-		};
-	}, [mapReady]);
-
+	useEffect(() => {
+		if (locationError) {
+			console.warn('Location Error:', locationError);
+			// Alert.alert("Ошибка геолокации", locationError); // Пример
+		}
+	}, [locationError]);
 	// Типизируем функцию отправки сообщений
-	const sendMessageToWebView = (message: WebViewMessage) => {
+	const sendMessageToWebView = useCallback((message: WebViewMessage) => {
 		if (webViewRef.current) {
 			webViewRef.current.postMessage(JSON.stringify(message));
 		} else {
 			console.warn('WebView ref not ready to send message:', message);
 		}
-	};
+	}, []); // Пустой массив зависимостей, т.к. webViewRef не меняется
 
-	// Типизируем обработчик сообщений
-	const handleWebViewMessage = (event: WebViewMessageEvent) => {
-		try {
-			const message = JSON.parse(event.nativeEvent.data);
-			console.log('Message from WebView:', message);
-			switch (message.type) {
-				case 'mapReady':
-					setMapReady(true);
-					setMapError(null);
-					if (location) {
-						sendMessageToWebView({
-							type: 'updateLocation',
-							payload: {
-								lat: location.latitude,
-								lon: location.longitude,
-							},
-						});
-					}
-					break;
-				case 'mapError':
-					setMapError(message.payload || 'Unknown map error');
-					setMapReady(false);
-					break;
-				case 'customRouteSuccess':
-					setRouteDrawStatus('Route drawn successfully!');
-					break;
-				case 'customRouteError':
-					setRouteDrawStatus(
-						`Error drawing route: ${message.payload}`,
-					);
-					break;
-				case 'jsError':
-					console.error(
-						'JavaScript Error in WebView:',
-						message.payload,
-					);
-					setMapError(
-						`JS Error: ${message.payload?.message || 'Unknown JS error'}`,
-					);
-					break;
-				case 'searchError':
-					if (message.payload === 'Ключ API Поиска не установлен') {
-						console.warn('Search API key is missing in WebView');
-						// Можно показать некритичное уведомление пользователю один раз
-					} else {
+	const handleDeleteMarker = useCallback(
+		(idToDelete: string | null) => {
+			if (idToDelete) {
+				console.log(
+					`RN: Sending remove command for marker ${idToDelete}`,
+				);
+				sendMessageToWebView({
+					type: 'removeMarker',
+					payload: { markerId: idToDelete },
+				});
+				// Обновляем состояние RN
+				setPlacedMarkers(prev => prev.filter(m => m.id !== idToDelete));
+			} else {
+				console.warn('RN: handleDeleteMarker called with null ID!');
+			}
+			setSelectedMarkerId(null);
+		},
+		[sendMessageToWebView],
+	);
+
+	const showMarkerActionMenu = useCallback(
+		(markerId: string) => {
+			// useCallback здесь не обязателен, но оставим
+			setSelectedMarkerId(markerId);
+			// Логика ActionSheetIOS / Alert остается прежней, но вызывает handleDeleteMarker с markerId
+			if (Platform.OS === 'ios') {
+				ActionSheetIOS.showActionSheetWithOptions(buttonIndex => {
+					if (buttonIndex === 1) handleDeleteMarker(markerId);
+					else setSelectedMarkerId(null);
+				});
+			} else {
+				Alert.alert(
+					`Метка ${markerId.substring(0, 6)}...`,
+					'Выберите действие',
+					[
+						{
+							text: 'Удалить',
+							onPress: () => handleDeleteMarker(markerId),
+							style: 'destructive',
+						},
+						{
+							text: 'Отмена',
+							onPress: () => setSelectedMarkerId(null),
+							style: 'cancel',
+						},
+					],
+					{
+						cancelable: true,
+						onDismiss: () => setSelectedMarkerId(null),
+					},
+				);
+			}
+		},
+		[handleDeleteMarker],
+	); // Теперь зависит от handleDeleteMarker
+
+	const handleWebViewMessage = useCallback(
+		(event: WebViewMessageEvent) => {
+			try {
+				const message = JSON.parse(event.nativeEvent.data);
+				console.log('Message from WebView:', message); // Можно оставить для отладки
+				switch (message.type) {
+					case 'mapReady':
+						setMapReady(true);
+						setMapError(null);
+						// Отправка начальной локации теперь в useEffect [location, mapReady]
+						break;
+					case 'mapError':
+						setMapError(
+							(message.payload as string) || 'Unknown map error',
+						);
+						setMapReady(false);
+						break;
+					case 'longPressOnMap':
+						if (
+							message.payload &&
+							Array.isArray(
+								(message.payload as any).coordinates,
+							) &&
+							(message.payload as any).coordinates.length >= 2
+						) {
+							const coords = (message.payload as any)
+								.coordinates as [number, number];
+							const newMarkerId = uuidv4(); // Генерируем ID здесь
+							const newMarkerData: PlacedMarkerData = {
+								id: newMarkerId,
+								coordinates: coords,
+							};
+							const newMarkerPayload = {
+								...newMarkerData,
+								color: 'violet',
+							}; // Данные для WebView
+
+							// 1. Добавляем метку в состояние RN
+							setPlacedMarkers(prev => [...prev, newMarkerData]);
+
+							// 2. Отправляем команду на добавление в WebView
+							sendMessageToWebView({
+								type: 'addMarker',
+								payload: newMarkerPayload,
+							});
+						}
+						break;
+					case 'longPressOnMarker':
+						if (
+							message.payload &&
+							typeof (message.payload as any).markerId ===
+								'string'
+						) {
+							showMarkerActionMenu(
+								(message.payload as any).markerId,
+							);
+						}
+						break;
+					case 'routeBuildStarted':
+						setIsBuildingRoute(true);
+						break;
+					case 'routeBuildSuccess':
+						setIsBuildingRoute(false);
+						break; // Успех
+					case 'routeBuildError':
 						console.error(
-							'Search error from WebView:',
+							'RN: Route build error:',
 							message.payload,
 						);
-					}
-					break;
+						setIsBuildingRoute(false);
+						Alert.alert(
+							'Ошибка маршрута',
+							(message.payload as string) || 'Неизвестная ошибка',
+						);
+						break;
+					case 'jsError':
+						console.error(
+							'JavaScript Error in WebView:',
+							message.payload,
+						);
+						// Показываем только сообщение об ошибке
+						setMapError(
+							`JS Error: ${(message.payload as any)?.message || 'Unknown JS error'}`,
+						);
+						break;
+					// Другие обработчики ('customRouteSuccess', etc.), если нужны
+				}
+			} catch (error) {
+				console.error(
+					'Failed to parse message from WebView or handle it:',
+					error,
+				);
 			}
-		} catch (error) {
-			console.error(
-				'Failed to parse message from WebView or handle it:',
-				error,
-			);
-		}
-	};
+		},
+		[sendMessageToWebView],
+	); // Добавляем sendMessageToWebView в зависимости
 
-	// Обработчики для новых кнопок
-	const handleZoomIn = () => {
-		if (mapReady) {
-			sendMessageToWebView({ type: 'zoomIn' });
-		}
-	};
+	const handleZoomIn = useCallback(() => {
+		if (mapReady) sendMessageToWebView({ type: 'zoomIn' });
+	}, [mapReady, sendMessageToWebView]);
 
-	const handleZoomOut = () => {
-		if (mapReady) {
-			sendMessageToWebView({ type: 'zoomOut' });
-		}
-	};
+	const handleZoomOut = useCallback(() => {
+		if (mapReady) sendMessageToWebView({ type: 'zoomOut' });
+	}, [mapReady, sendMessageToWebView]);
 
-	const toggleMapMode = () => {
+	const toggleMapMode = useCallback(() => {
 		if (mapReady) {
 			const newMode = !is3DMode;
 			setIs3DMode(newMode);
@@ -210,28 +280,94 @@ export default function MapScreen() {
 				payload: { mode: newMode ? '3d' : '2d' },
 			});
 		}
-	};
+	}, [mapReady, is3DMode, sendMessageToWebView]);
 
-	const handleNavigate = () => {
-		if (mapReady && location) {
+	const handleNavigate = useCallback(() => {
+		if (mapReady && location)
 			sendMessageToWebView({ type: 'startNavigation' });
+		// Добавляем else для обратной связи
+		else if (mapReady && !location)
+			console.log('Navigate pressed, but location is not available yet.');
+	}, [mapReady, location, sendMessageToWebView]);
+
+	const handleBuildRouteThroughPlaced = useCallback(() => {
+		if (!mapReady) {
+			Alert.alert('Карта не готова');
+			return;
 		}
-	};
+		if (!location) {
+			Alert.alert('Нет геолокации');
+			return;
+		}
+		if (placedMarkers.length === 0) {
+			Alert.alert(
+				'Нет меток',
+				'Поставьте хотя бы одну метку долгим нажатием.',
+			);
+			return;
+		}
+		if (isBuildingRoute) return;
+
+		console.log('RN: Requesting route through placed markers');
+		setIsBuildingRoute(true);
+
+		// ВАЖНО: Используйте ваш ключ для Маршрутизатора/Матрицы
+		const ROUTING_API_KEY = '11b63ebd-1019-4fab-8f45-1e222ca32241'; // Замените!
+
+		if (ROUTING_API_KEY === 'YOUR_ROUTING_API_KEY_PLACEHOLDER') {
+			// Проверка на плейсхолдер
+			Alert.alert('Ошибка', 'Необходим ключ API Маршрутизатора.');
+			setIsBuildingRoute(false);
+			return;
+		}
+
+		const payload: BuildRoutePayload = {
+			startCoordinates: [location.longitude, location.latitude],
+			waypoints: placedMarkers.map(m => m.coordinates), // Передаем координаты из состояния RN
+			apiKey: ROUTING_API_KEY,
+		};
+		sendMessageToWebView({
+			type: 'buildRouteThroughPlacedMarkers',
+			payload,
+		}); // Новый тип сообщения
+	}, [
+		mapReady,
+		location,
+		isBuildingRoute,
+		placedMarkers,
+		sendMessageToWebView,
+	]);
 
 	if (htmlContent === null) {
 		return (
-			<View style={styles.loader}>
-				<Text>Error loading map resources.</Text>
+			<View style={styles.errorView}>
+				<Text>Ошибка загрузки ресурсов карты.</Text>
 			</View>
-		); // Показываем ошибку, если HTML не загрузился
+		);
 	}
-	if (htmlContent === '') {
+	if (htmlContent === '' || !mapReady) {
 		return (
-			<View style={styles.loader}>
-				<ActivityIndicator size='large' />
-				<Text>Preparing map...</Text>
+			<View style={styles.container}>
+				{/* Показываем WebView в фоне, чтобы он мог инициализироваться */}
+				{htmlContent !== '' && (
+					<WebView
+						ref={webViewRef}
+						source={{ html: htmlContent }}
+						style={styles.webviewLoading} // Стиль, чтобы скрыть его визуально
+						onMessage={handleWebViewMessage}
+						// ... остальные необходимые props WebView ...
+						javaScriptEnabled={true}
+						domStorageEnabled={true}
+						originWhitelist={['*']}
+						allowFileAccess={true}
+						injectedJavaScriptBeforeContentLoaded={`/* ... JS для ошибок ... */ true;`}
+						onError={() => setMapError('Ошибка загрузки WebView')} // Простая обработка ошибки загрузки
+					/>
+				)}
+				{/* Индикатор поверх */}
+				<MapStatusIndicator mapReady={mapReady} mapError={mapError} />
 			</View>
-		); // Показываем индикатор, пока HTML грузится
+		);
 	}
 
 	return (
@@ -313,195 +449,101 @@ export default function MapScreen() {
 			/>
 
 			{/* Показываем лоадер или сообщение об ошибке поверх WebView */}
-			{!mapReady && (
-				<View style={styles.loader}>
-					<ActivityIndicator
-						size='large'
-						color={Colors.greenPrimary}
-					/>
-					<Text style={styles.loaderText}>
-						{mapError ? 'Ошибка карты' : 'Загрузка карты...'}
-					</Text>
-					{mapError && (
-						<Text style={styles.errorText}>{mapError}</Text>
-					)}
-				</View>
-			)}
-			<SafeAreaView
-				style={styles.overlayContainer}
-				pointerEvents='box-none'
-			>
-				<View style={styles.header} pointerEvents='box-none'>
-					<ProfileButton href={'/profile'} pointerEvents='auto' />
-					<View style={styles.headerSpacer} />
-				</View>
+			<MapStatusIndicator mapReady={mapReady} mapError={mapError} />
 
-				<View
-					style={styles.mapControlsWrapper}
-					pointerEvents='box-none'
+			{/* Оверлей с контролами */}
+			<MapControlsOverlay
+				is3DMode={is3DMode}
+				mapReady={mapReady}
+				isLocationAvailable={!!location} // Передаем флаг доступности локации
+				onZoomIn={handleZoomIn}
+				onZoomOut={handleZoomOut}
+				onToggleMode={toggleMapMode}
+				onNavigate={handleNavigate}
+				// profileHref="/profile" // Можно передать, если нужно
+			/>
+			<View style={styles.buildRouteButtonContainer}>
+				<TouchableOpacity
+					style={[
+						styles.buildRouteButton,
+						// Блокируем, если нет меток
+						(!mapReady ||
+							!location ||
+							placedMarkers.length === 0 ||
+							isBuildingRoute) &&
+							styles.buttonDisabled,
+					]}
+					onPress={handleBuildRouteThroughPlaced} // Новый обработчик
+					disabled={
+						!mapReady ||
+						!location ||
+						placedMarkers.length === 0 ||
+						isBuildingRoute
+					}
 				>
-					<View style={styles.mapControls} pointerEvents='auto'>
-						<TouchableOpacity
-							style={[styles.mapButton, styles.mapButtonPlus]}
-							onPress={handleZoomIn}
-							disabled={!mapReady}
-						>
-							<PlusIcon />
-						</TouchableOpacity>
-
-						<TouchableOpacity
-							style={[styles.mapButton, styles.mapButtonMinus]}
-							onPress={handleZoomOut}
-							disabled={!mapReady}
-						>
-							<MinusIcon />
-						</TouchableOpacity>
-					</View>
-
-					<View
-						style={styles.mapModeControls}
-						pointerEvents='box-none'
-					>
-						<TouchableOpacity
-							style={[
-								styles.mapButton,
-								is3DMode ? styles.activeButton : {},
-							]}
-							onPress={toggleMapMode}
-							disabled={!mapReady}
-						>
-							<Text
-								style={[
-									styles.mapButtonText,
-									is3DMode ? styles.activeButtonText : {},
-								]}
-							>
-								{is3DMode ? '3D' : '2D'}
-							</Text>
-						</TouchableOpacity>
-						<TouchableOpacity
-							style={styles.mapButton}
-							onPress={handleNavigate}
-							disabled={!mapReady || !location}
-						>
-							<LocationIcon width={24} height={24} />
-						</TouchableOpacity>
-					</View>
-				</View>
-			</SafeAreaView>
+					{isBuildingRoute ? (
+						<ActivityIndicator color={Colors.white} size='small' />
+					) : (
+						<Text style={styles.buildRouteButtonText}>
+							{/* Новый текст кнопки */}
+							Маршрут через метки ({placedMarkers.length})
+						</Text>
+					)}
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 }
 
-// Вынесем цвета в константы для исправления ESLint ошибок
-const COLORS = {
-	loaderBackground: 'rgba(255,255,255,0.8)',
-	controlsBackground: '#fff',
-	controlsBorder: '#ccc',
-	routeInfo: 'blue',
-};
-
 const styles = StyleSheet.create({
 	container: { flex: 1, backgroundColor: Colors.lightBackground },
 	webview: { flex: 1, opacity: 1 },
-	loader: {
-		...StyleSheet.absoluteFillObject,
-		backgroundColor: COLORS.loaderBackground,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	loaderText: {
-		marginTop: 10,
-		fontSize: 16,
-		color: Colors.black,
-	},
-	errorText: {
-		color: Colors.red,
-		marginTop: 5,
-		textAlign: 'center',
-		fontSize: 12,
-	},
-	// Контейнер для всех UI элементов поверх карты
-	overlayContainer: {
+	webviewLoading: {
+		flex: 1,
+		opacity: 0,
 		position: 'absolute',
 		top: 0,
 		left: 0,
-		right: 0,
-		bottom: 0,
-		pointerEvents: 'box-none',
+		width: 1,
+		height: 1,
+	}, // Стиль для скрытого WebView во время загрузки
+	webViewContainer: { flex: 1 },
+	errorView: {
 		flex: 1,
-		paddingTop: Platform.OS === 'android' ? 10 : 0, // Отступ сверху для Android, т.к. SafeAreaView может не покрывать статус бар
-	},
-	header: {
-		paddingHorizontal: 16,
-		flexDirection: 'row',
-		paddingTop: 10, // Отступ сверху внутри SafeAreaView
-	},
-	webViewContainer: {
-		flex: 1,
-	},
-	headerSpacer: {
-		flex: 1,
-	},
-	mapControlsWrapper: {
-		position: 'absolute',
-		top: '40%',
-		right: 16,
-		alignItems: 'flex-end',
-		gap: Gaps.g16,
-	},
-	mapControls: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		// Добавим тень для лучшей видимости
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.2,
-		shadowRadius: 2,
-		elevation: 3,
-	},
-	mapModeControls: {
-		gap: Gaps.g16, // Уменьшим гэп
-		alignItems: 'flex-end', // Кнопки будут справа
-	},
-	mapButton: {
-		width: 46,
-		height: 46,
-		alignItems: 'center',
 		justifyContent: 'center',
-		backgroundColor: Colors.white, // Фон по умолчанию
-		borderRadius: Radius.r15, // Используем токен
-		// Тень для отдельных кнопок
+		alignItems: 'center',
+		backgroundColor: Colors.lightBackground,
+	}, // Стиль для ошибки загрузки HTML
+
+	buildRouteButtonContainer: {
+		position: 'absolute',
+		bottom: 30, // Отступ снизу
+		left: 20,
+		right: 20,
+		alignItems: 'center', // Центрируем кнопку
+		pointerEvents: 'box-none', // Контейнер пропускает касания
+	},
+	buildRouteButton: {
+		backgroundColor: Colors.greenPrimary, // Цвет кнопки
+		paddingVertical: 12,
+		paddingHorizontal: 20,
+		borderRadius: Radius.r15, // Используем ваш радиус
 		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.2,
-		shadowRadius: 2,
-		elevation: 3,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 3.84,
+		elevation: 5,
+		pointerEvents: 'auto', // Кнопка принимает касания
+		minHeight: 48, // Минимальная высота для удобства нажатия
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
-	mapButtonPlus: {
-		// Стили для кнопки + (верхняя часть сгруппированных)
-		borderBottomRightRadius: 0,
-		borderBottomLeftRadius: 0,
-		// Убираем тень снизу, т.к. кнопки соединены
-		shadowOffset: { width: 0, height: 0 },
-		elevation: 0, // Убираем elevation для соединенных кнопок
+	buttonDisabled: {
+		backgroundColor: Colors.gray, // Цвет неактивной кнопки
 	},
-	mapButtonMinus: {
-		// Стили для кнопки - (нижняя часть сгруппированных)
-		borderTopRightRadius: 0,
-		borderTopLeftRadius: 0,
-		borderTopWidth: 1, // Разделитель
-		borderTopColor: Colors.gray,
-	},
-	activeButton: {
-		backgroundColor: Colors.greenPrimary, // Цвет активной кнопки
-	},
-	mapButtonText: {
-		fontSize: 16, // Сделаем текст чуть больше
-		fontFamily: Fonts.regular, // Используем medium шрифт
-		color: Colors.black, // Цвет текста по умолчанию
-	},
-	activeButtonText: {
-		color: Colors.black, // Цвет текста активной кнопки
+	buildRouteButtonText: {
+		color: Colors.black, // Цвет текста на кнопке
+		fontSize: 16,
+		fontFamily: Fonts.semibold, // Используем ваш шрифт
 	},
 });

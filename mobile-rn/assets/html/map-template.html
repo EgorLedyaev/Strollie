@@ -46,7 +46,16 @@
 	let mapInstance;
 	let userMarker = null;
 	let userMarkerElement = null;
-	let currentCustomRouteFeature = null;
+
+	let placedMarkersById = {};
+	let YMapDefaultMarkerClass = null; // Для маркеров по умолчанию
+	let currentRouteFeatures = [];
+	let currentStartMarker = null; // Маркер стартовой точки маршрута
+
+
+	let longPressTimer = null;
+	const LONG_PRESS_DURATION = 700;
+	let longPressTargetInfo = null; // { type: 'map' | 'marker', coordinates?: [lon, lat], markerId?: string }
 
 	// --- Функции ---
 	function showError(message) {
@@ -63,56 +72,402 @@
 		if (window.ReactNativeWebView && window.ReactNativeWebView.postMessage) {
 			window.ReactNativeWebView.postMessage(JSON.stringify(message));
 		} else {
-			console.log('ReactNativeWebView.postMessage not available, message:', message);
+			console.log(
+				'ReactNativeWebView.postMessage not available, message:',
+				message,
+			);
+		}
+	}
+
+	function addPlacedMarker(payload) {
+		if (!mapInstance || !payload || !payload.coordinates || !payload.id) return;
+		const { coordinates, id, title, subtitle, color } = payload;
+
+		console.log(`WebView: Adding marker ${id} at`, coordinates);
+		removePlacedMarker(id); // Удаляем старый, если есть
+
+		let markerInstance;
+		const markerProps = {
+			coordinates: coordinates,
+			zIndex: 5,
+			properties: { markerId: id },
+		};
+
+		if (YMapDefaultMarkerClass) {
+			try {
+				markerInstance = new YMapDefaultMarkerClass({
+					...markerProps, // Передаем общие свойства
+					title: title || `Метка ${id}`,
+					color: color && ['red', 'blue', 'green', 'black', 'gray', 'orange', 'yellow', 'night', 'white'].includes(color) ? color : 'red'
+				});
+			} catch (e) {
+				console.error(
+					'Error creating YMapDefaultMarker for placed marker:',
+					e,
+				);
+				const markerElem = document.createElement('div');
+				markerElem.style.cssText =
+					'width:15px;height:15px;background:red;border-radius:50%;border:2px solid white;box-shadow:0 0 3px black;';
+				try {
+					// Пытаемся создать базовый маркер и ПРИСВОИТЬ его markerInstance
+					markerInstance = new ymaps3.YMapMarker(markerProps, markerElem);
+				} catch (fallbackError) {
+					console.error("Error creating fallback YMapMarker:", fallbackError);
+					markerInstance = null; // Явно обнуляем при ошибке
+				}
+			}
+		} else {
+			const markerElem = document.createElement('div');
+			markerElem.style.cssText = 'width:15px;height:15px;background:red;border-radius:50%;border:2px solid white;box-shadow:0 0 3px black;';
+			try {
+				// Пытаемся создать базовый маркер и ПРИСВОИТЬ его markerInstance
+				markerInstance = new ymaps3.YMapMarker(markerProps, markerElem);
+			} catch (fallbackError) {
+				console.error("Error creating fallback YMapMarker (default class null):", fallbackError);
+				markerInstance = null; // Явно обнуляем при ошибке
+			}
+		}
+
+		if (!markerInstance) { // Если фоллбэк тоже не сработал
+			console.error(`WebView: Failed to create any marker instance for ${id}`);
+			// Отправляем ошибку обратно в RN, если нужно
+			sendMessageToReactNative({ type: 'markerAddError', payload: { id: id, error: 'Failed to create marker instance' } });
+			return; // Прерываем выполнение функции
+		}
+
+		try {
+			mapInstance.addChild(markerInstance);
+			placedMarkersById[id] = markerInstance;
+		} catch (e) {
+			console.error(`WebView: Failed to add marker ${id} to map:`, e);
+			// Отправляем ошибку обратно в RN, если нужно
+			sendMessageToReactNative({ type: 'markerAddError', payload: { id: id, error: 'Failed to add marker to map' } });
+		}
+	}
+
+	function removePlacedMarker(markerId) {
+		if (mapInstance && placedMarkersById[markerId]) {
+			try {
+				mapInstance.removeChild(placedMarkersById[markerId]);
+				console.log(`WebView: Removed marker ${markerId}`);
+			} catch (e) {
+				console.warn(`WebView: Could not remove marker ${markerId}:`, e);
+			}
+			delete placedMarkersById[markerId];
+		} else {
+			console.warn(`WebView: removePlacedMarker called for unknown id: ${markerId}`);
+		}
+	}
+	function clearCurrentRoute() {
+		console.log("WebView: Clearing current route elements");
+		currentRouteFeatures.forEach(feature => {
+			if (mapInstance) {
+				try { mapInstance.removeChild(feature); } catch(e) {console.warn("Error removing route feature:", e)}
+			}
+		});
+		if (currentStartMarker && mapInstance) {
+			try { mapInstance.removeChild(currentStartMarker); } catch(e) {console.warn("Error removing start marker:", e)}
+		}
+		currentRouteFeatures = [];
+		currentStartMarker = null;
+	}
+	function clearRouteAndPOIs() {
+		console.log("WebView: Clearing route and POIs");
+		// Удаляем маркеры POI
+		currentRouteFeatures.forEach(feature => {
+			if (feature.properties?.type === 'poi_marker' && mapInstance) { // Добавляем проверку типа
+				try { mapInstance.removeChild(feature); } catch(e) {console.warn("Error removing POI marker:", e)}
+			}
+		});
+		// Удаляем линии маршрута
+		currentRouteFeatures.forEach(feature => {
+			if (feature.geometry?.type === 'LineString' && mapInstance) {
+				try { mapInstance.removeChild(feature); } catch(e) {console.warn("Error removing route line:", e)}
+			}
+		});
+		// Удаляем стартовый маркер
+		if (currentStartMarker && mapInstance) {
+			try { mapInstance.removeChild(currentStartMarker); } catch(e) {console.warn("Error removing start marker:", e)}
+			currentStartMarker = null;
+		}
+		currentRouteFeatures = [];
+	}
+	async function getOptimalRoute(allCoordinates, apiKey) {
+		if (!ymaps3 || !ymaps3.route) throw new Error("API or Map not ready for routing");
+		if (!apiKey) throw new Error("Routing API Key is missing");
+
+		ymaps3.getDefaultConfig().setApikeys({ router: apiKey });
+
+		try {
+			console.log("WebView: Requesting route for points:", allCoordinates);
+			const response = await ymaps3.route({
+				points: allCoordinates, // Используем переданные точки
+				type: 'walking',
+				bounds: true
+			});
+
+			if (!response || response.length === 0 || !response[0]) throw new Error('Маршрут не найден.');
+
+			const route = response[0].toRoute();
+			if (!route.geometry || route.geometry.coordinates.length === 0) throw new Error('Маршрут не содержит координат.');
+
+			console.log("WebView: Route received.");
+			return route; // Возвращаем Feature маршрута
+		} catch (error) {
+			console.error('Error fetching route:', error);
+			throw error;
+		}
+	}
+	async function handleBuildRouteThroughPlacedMarkers(payload) {
+		if (!mapInstance) {
+			showError("Карта не готова для построения маршрута.");
+			sendMessageToReactNative({ type: 'routeBuildError', payload: "Карта не готова" });
+			return;
+		}
+		clearCurrentRoute(); // Очищаем предыдущий маршрут
+		sendMessageToReactNative({ type: 'routeBuildStarted' });
+
+		const { startCoordinates, waypoints, apiKey } = payload;
+
+		if (!startCoordinates || !Array.isArray(waypoints) || !apiKey) {
+			showError("Некорректные данные для построения маршрута.");
+			sendMessageToReactNative({ type: 'routeBuildError', payload: "Некорректные данные" });
+			return;
+		}
+
+		try {
+			// 1. Добавляем маркер старта
+			if (YMapDefaultMarkerClass) {
+				currentStartMarker = new YMapDefaultMarkerClass({ coordinates: startCoordinates, color: 'red', title: "Старт" });
+			} else {
+				const markerElem = document.createElement('div');
+				markerElem.style.cssText = 'width:15px;height:15px;background:#FF7070;border-radius:50%;border:2px solid white;box-shadow:0 0 3px black;';
+				currentStartMarker = new ymaps3.YMapMarker({ coordinates: startCoordinates, zIndex: 6 }, markerElem);
+			}
+			mapInstance.addChild(currentStartMarker);
+			// currentRouteFeatures.push(currentStartMarker); // Добавляем в список для очистки НЕ НУЖНО, очищаем отдельно
+
+			// 2. Строим маршрут через старт и пользовательские точки
+			const allRoutePoints = [startCoordinates, ...waypoints]; // Массив координат [lon, lat]
+			if (allRoutePoints.length < 2) {
+				throw new Error("Нужно как минимум две точки для маршрута (старт + 1 метка).");
+			}
+			const routeFeature = await getOptimalRoute(allRoutePoints, apiKey);
+
+			// 3. Рисуем линию маршрута
+			const routeLine = new ymaps3.YMapFeature({
+				geometry: routeFeature.geometry,
+				style: { stroke: [{ color: '#7373E6', width: 4, dash: [5, 10] }] }
+			});
+			mapInstance.addChild(routeLine);
+			currentRouteFeatures.push(routeLine); // Добавляем ЛИНИЮ для очистки
+
+			// 4. Центрируем карту на маршруте
+			if (routeFeature.properties?.bounds) {
+				mapInstance.update({ location: { bounds: routeFeature.properties.bounds, duration: 500 } });
+			} else {
+				mapInstance.update({ location: { center: startCoordinates, zoom: 14, duration: 500 } });
+			}
+
+			sendMessageToReactNative({ type: 'routeBuildSuccess' });
+
+		} catch (error) {
+			console.error("WebView: Failed to build route through placed markers:", error);
+			showError("Ошибка построения маршрута: " + error.message);
+			sendMessageToReactNative({ type: 'routeBuildError', payload: error.message || "Неизвестная ошибка" });
+			clearCurrentRoute(); // Очищаем, если ошибка
+		}
+	}
+
+	// --- ОБРАБОТЧИК СООБЩЕНИЯ buildOptimalRoute ---
+	async function handleBuildOptimalRoute(payload) {
+		if (!mapInstance) { // Оставляем только проверку карты
+			showError("Карта не готова для построения маршрута.");
+			sendMessageToReactNative({ type: 'routeBuildError', payload: "Карта не готова" });
+			return;
+		}
+		clearRouteAndPOIs(); // Очищаем старый маршрут и POI
+		sendMessageToReactNative({ type: 'routeBuildStarted' });
+
+		const { startCoordinates, searchParams, apiKey } = payload;
+
+		try {
+			// 1. Добавляем маркер старта
+			if (YMapDefaultMarkerClass) {
+				currentStartMarker = new YMapDefaultMarkerClass({
+					coordinates: startCoordinates,
+					color: 'red',
+					title: "Старт"
+				});
+			} else {
+				// Фоллбэк, если класс не загрузился
+				const markerElem = document.createElement('div');
+				markerElem.style.cssText = 'width:15px;height:15px;background:#FF7070;border-radius:50%;border:2px solid white;box-shadow:0 0 3px black;';
+				currentStartMarker = new ymaps3.YMapMarker({ coordinates: startCoordinates, zIndex: 6 }, markerElem);
+			}
+			mapInstance.addChild(currentStartMarker);
+
+			// 2. Ищем ближайшие POI
+			const nearbyPlaces = await getNearbyPlaces(startCoordinates, searchParams || [], apiKey);
+			if (nearbyPlaces.length === 0) {
+				throw new Error("Не найдено интересных мест рядом.");
+			}
+
+			// 3. Добавляем маркеры для POI
+			nearbyPlaces.forEach(place => {
+				let poiMarker;
+				if (YMapDefaultMarkerClass) {
+					poiMarker = new YMapDefaultMarkerClass({
+						coordinates: place.geometry.coordinates,
+						color: 'gray',
+						title: place.properties?.name,
+						properties: { type: 'poi_marker' }
+					});
+				} else {
+					const markerElem = document.createElement('div');
+					markerElem.style.cssText = 'width:10px;height:10px;background:#919191;border-radius:50%;border:1px solid white;';
+					poiMarker = new ymaps3.YMapMarker({ coordinates: place.geometry.coordinates, zIndex: 4, properties: { type: 'poi_marker' } }, markerElem);
+				}
+				mapInstance.addChild(poiMarker);
+				currentRouteFeatures.push(poiMarker);
+			});
+
+
+			// 4. Строим оптимальный маршрут
+			const allRoutePoints = [startCoordinates, ...nearbyPlaces.map(p => p.geometry.coordinates)];
+			const routeFeature = await getOptimalRoute(allRoutePoints, apiKey);
+
+			// 5. Рисуем маршрут
+			const routeLine = new ymaps3.YMapFeature({
+				geometry: routeFeature.geometry,
+				style: { stroke: [{ color: '#7373E6', width: 4, dash: [5, 10] }] } // Стиль линии
+			});
+			mapInstance.addChild(routeLine);
+			currentRouteFeatures.push(routeLine); // Добавляем в список для очистки
+
+			// 6. Центрируем карту на маршруте (используем bounds из ответа)
+			if (routeFeature.properties?.bounds) {
+				mapInstance.update({ location: { bounds: routeFeature.properties.bounds, duration: 500 } });
+			} else {
+				// Фоллбэк на центрирование по стартовой точке
+				mapInstance.update({ location: { center: startCoordinates, zoom: 14, duration: 500 } });
+			}
+
+			sendMessageToReactNative({ type: 'routeBuildSuccess' });
+
+		} catch (error) {
+			console.error("WebView: Failed to build optimal route:", error);
+			showError("Ошибка построения маршрута: " + error.message);
+			sendMessageToReactNative({ type: 'routeBuildError', payload: error.message || "Неизвестная ошибка" });
+			clearRouteAndPOIs(); // Очищаем, если что-то пошло не так
 		}
 	}
 
 	function handleReactNativeMessage(event) {
 		try {
 			const message = JSON.parse(event.data);
-			console.log('WebView received message from RN:', message);
+			// console.log('WebView received message from RN:', message); // Раскомментировать для отладки
 			switch (message.type) {
 				case 'updateLocation':
-					updateUserLocationMarker(message.payload.lat, message.payload.lon);
+					if (
+						message.payload &&
+						typeof message.payload.lat === 'number' &&
+						typeof message.payload.lon === 'number'
+					) {
+						updateUserLocationMarker(
+							message.payload.lat,
+							message.payload.lon,
+						);
+					}
 					break;
 				case 'drawCustomRoute':
-					drawCustomRoute(message.payload.coordinates);
+					if (
+						message.payload &&
+						Array.isArray(message.payload.coordinates)
+					) {
+						drawCustomRoute(message.payload.coordinates);
+					}
 					break;
 				case 'zoomIn':
 					if (mapInstance && typeof mapInstance.zoom === 'number') {
-						const currentZoom = mapInstance.zoom;
-						mapInstance.update({ location: { zoom: currentZoom + 1, duration: 300 } });
-					} else {
-						console.warn('zoomIn called but mapInstance or zoom is not available');
+						mapInstance.update({
+							location: { zoom: mapInstance.zoom + 1, duration: 300 },
+						});
 					}
 					break;
 				case 'zoomOut':
 					if (mapInstance && typeof mapInstance.zoom === 'number') {
-						const currentZoom = mapInstance.zoom;
-						mapInstance.update({ location: { zoom: currentZoom - 1, duration: 300 } });
-					} else {
-						console.warn('zoomOut called but mapInstance or zoom is not available');
+						mapInstance.update({
+							location: { zoom: mapInstance.zoom - 1, duration: 300 },
+						});
 					}
 					break;
 				case 'setMapMode':
-					if (mapInstance && message.payload && typeof message.payload.mode === 'string') {
-						const tiltInRadians = message.payload.mode === '3d' ? 45 * (Math.PI / 180) : 0;
-						mapInstance.update({ camera: { tilt: tiltInRadians, duration: 500 } });
-						mapInstance.update({ mode: message.payload.mode === '3d' ? 'vector' : 'auto' });
-					} else {
-						console.warn('setMapMode called with invalid payload or mapInstance unavailable');
+					if (
+						mapInstance &&
+						message.payload &&
+						typeof message.payload.mode === 'string'
+					) {
+						const tiltInRadians =
+							message.payload.mode === '3d'
+								? 45 * (Math.PI / 180)
+								: 0;
+						mapInstance.update({
+							camera: { tilt: tiltInRadians, duration: 500 },
+						});
+						if (message.payload.mode === '3d') {
+							mapInstance.update({ mode: 'vector' });
+						}
+						// else { mapInstance.update({ mode: 'auto' }); } // Можно вернуть auto если нужно
 					}
 					break;
 				case 'startNavigation':
 					if (userMarker && mapInstance && userMarker.coordinates) {
-						mapInstance.update({ location: { center: userMarker.coordinates, zoom: 17, duration: 500 } });
+						mapInstance.update({
+							location: {
+								center: userMarker.coordinates,
+								zoom: 17,
+								duration: 500,
+							},
+						});
 						sendMessageToReactNative({ type: 'navigationStarted' });
-					} else {
-						console.warn('startNavigation called but userMarker or mapInstance unavailable');
 					}
 					break;
+				case 'addMarker':
+					if (
+						message.payload &&
+						message.payload.coordinates &&
+						message.payload.id
+					) {
+						addPlacedMarker(message.payload);
+					} else {
+						console.warn('Invalid payload for addMarker');
+					}
+					break;
+				case 'removeMarker':
+					if (message.payload && typeof message.payload.markerId === 'string') {
+						removePlacedMarker(message.payload.markerId);
+					} else {
+						console.warn('Invalid payload for removeMarker');
+					}
+					break;
+				case 'buildOptimalRoute':
+					if (message.payload && message.payload.startCoordinates) {
+						handleBuildOptimalRoute(message.payload);
+				} else {
+					console.warn("Invalid payload for buildOptimalRoute");
+				}
+					break;
+				case 'buildRouteThroughPlacedMarkers':
+					if (message.payload) {
+						handleBuildRouteThroughPlacedMarkers(message.payload);
+					} else { console.warn("Invalid payload for buildRouteThroughPlacedMarkers"); }
+					break;
 				default:
-					console.warn('WebView received unknown message type:', message.type);
+					console.warn(
+						'WebView received unknown message type:',
+						message.type,
+					);
 			}
 		} catch (error) {
 			console.error('Failed to handle RN message:', error);
@@ -125,7 +480,7 @@
 			console.warn('updateUserLocationMarker: Map or YMapMarker not ready.');
 			return;
 		}
-		const userLocation = [lon, lat]; // [lon, lat] for API v3
+		const userLocation = [lon, lat];
 		try {
 			if (!userMarkerElement) {
 				userMarkerElement = document.createElement('div');
@@ -133,7 +488,10 @@
 			}
 			if (!userMarker) {
 				console.log('Creating user marker at:', userLocation);
-				userMarker = new ymaps3.YMapMarker({ coordinates: userLocation, zIndex: 10 }, userMarkerElement);
+				userMarker = new ymaps3.YMapMarker(
+					{ coordinates: userLocation, zIndex: 10 },
+					userMarkerElement,
+				);
 				mapInstance.addChild(userMarker);
 			} else {
 				userMarker.update({ coordinates: userLocation });
@@ -161,19 +519,21 @@
 			showError('Not enough coordinates for route.');
 			return;
 		}
-		const coordinatesLonLat = coordinatesLatLon.map(coord => [coord[1], coord[0]]); // Convert to [lon, lat]
+		const coordinatesLonLat = coordinatesLatLon.map(coord => [
+			coord[1],
+			coord[0],
+		]);
 
 		try {
 			currentCustomRouteFeature = new ymaps3.YMapFeature({
 				id: 'custom_route_' + Date.now(),
 				geometry: { type: 'LineString', coordinates: coordinatesLonLat },
-				style: { stroke: [{ width: 4, color: '#FF0000' }], zIndex: 5 }, // Красная линия
+				style: { stroke: [{ width: 4, color: '#FF0000' }], zIndex: 5 },
 			});
 			mapInstance.addChild(currentCustomRouteFeature);
-
-			// Простой вариант центрирования на первой точке
-			mapInstance.update({ location: { center: coordinatesLonLat[0], zoom: 14, duration: 300 } });
-
+			mapInstance.update({
+				location: { center: coordinatesLonLat[0], zoom: 14, duration: 300 },
+			});
 			console.log('Custom route drawn.');
 			sendMessageToReactNative({ type: 'customRouteSuccess' });
 		} catch (error) {
@@ -182,41 +542,145 @@
 		}
 	}
 
+	// --- Логика долгого нажатия ---
+	function clearLongPressTimer() {
+		if (longPressTimer) {
+			clearTimeout(longPressTimer);
+			longPressTimer = null;
+		}
+		longPressTargetInfo = null; // Сбрасываем информацию о цели
+	}
+
+	function handlePointerDown(object, event) { // `object` - содержит информацию о том, на что нажали
+		clearLongPressTimer(); // Очищаем предыдущий таймер
+
+		const targetMarkerId = object?.entity?.properties?.markerId; // Пытаемся получить ID из properties метки
+		const isPlacedMarker = targetMarkerId && placedMarkersById[targetMarkerId] && object.entity !== userMarker; // Проверяем, что это наша метка и не маркер юзера
+
+		if (isPlacedMarker) {
+			// --- Долгое нажатие на МЕТКУ ---
+			console.log('Pointer Down on marker:', targetMarkerId);
+			longPressTargetInfo = { type: 'marker', markerId: targetMarkerId };
+			longPressTimer = setTimeout(() => {
+				console.log('Long press detected on marker:', longPressTargetInfo.markerId);
+				sendMessageToReactNative({
+					type: 'longPressOnMarker', // Новое событие
+					payload: { markerId: longPressTargetInfo.markerId }, // Отправляем ID метки
+				});
+				longPressTimer = null;
+				longPressTargetInfo = null; // Сбрасываем после срабатывания
+			}, LONG_PRESS_DURATION);
+
+		} else if (!object) { // Если object не определен, значит клик по карте (пустому месту)
+			// --- Долгое нажатие на КАРТУ ---
+			console.log('Pointer Down on map background');
+			longPressTargetInfo = { type: 'map', coordinates: event.coordinates };
+			longPressTimer = setTimeout(() => {
+				console.log('Long press detected on map at:', longPressTargetInfo.coordinates);
+				sendMessageToReactNative({
+					type: 'longPressOnMap', // Старое событие для добавления
+					payload: { coordinates: longPressTargetInfo.coordinates },
+				});
+				longPressTimer = null;
+				longPressTargetInfo = null; // Сбрасываем после срабатывания
+			}, LONG_PRESS_DURATION);
+		} else {
+			// Нажали на что-то другое (маркер юзера, фичу карты) - игнорируем долгое нажатие
+			console.log('Pointer Down on other object, ignoring long press.');
+			longPressTargetInfo = null;
+		}
+	}
+
+	function handlePointerMove(object, event) { // object здесь тоже может быть полезен
+		if (!longPressTimer || !longPressTargetInfo) return; // Если таймера нет, или нет цели, выходим
+
+		// Проверяем смещение только если есть экранные координаты начала
+		if (longPressTargetInfo.coordinates || longPressTargetInfo.markerId) {
+			// Нужны координаты начала (можно сохранить screenCoordinates в longPressTargetInfo)
+			// Пока просто отменяем таймер при любом движении, если он запущен
+			// console.log("Movement detected, cancelling long press timer.");
+			clearLongPressTimer();
+		}
+	}
+
+	function handlePointerUp(object, event) {
+		clearLongPressTimer(); // Всегда очищаем таймер при отпускании
+	}
+
+
 	// --- Инициализация карты ---
 	async function initMap() {
 		try {
-			// Проверяем, что ymaps3 загрузился
-			if (typeof ymaps3 === 'undefined') {
+			if (typeof ymaps3 === 'undefined')
 				throw new Error('Yandex Maps API (ymaps3) not loaded.');
-			}
-			// Ждем готовности API
 			await ymaps3.ready;
 			console.log('WebView: ymaps3.ready resolved.');
 
-			const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer, YMapMarker, YMapFeature } = ymaps3;
+			const {
+				YMap,
+				YMapDefaultSchemeLayer,
+				YMapDefaultFeaturesLayer,
+				YMapMarker,
+				YMapFeature,
+				YMapListener,
+			} = ymaps3;
 
+			// Загрузка маркеров по умолчанию
+			try {
+				const defaultThemeVersion = 'latest'; // Или конкретная версия '0.0.1' и т.д.
+				ymaps3.import.registerCdn(
+					'https://cdn.jsdelivr.net/npm/{package}', // Стандартный CDN для npm-пакетов
+					[`@yandex/ymaps3-default-ui-theme@${defaultThemeVersion}`]
+				);
+				console.log('WebView: CDN registered for @yandex/ymaps3-default-ui-theme');
+			} catch (cdnError) {
+				console.error("WebView: Failed to register CDN for default theme:", cdnError);
+			}
+			try {
+				const DefaultMarkerModule = await ymaps3.import('@yandex/ymaps3-default-ui-theme');
+				YMapDefaultMarkerClass = DefaultMarkerModule.YMapDefaultMarker; // Сохраняем класс
+				console.log('WebView: Default UI theme package loaded successfully.');
+			} catch (e) {
+				console.error('WebView: Could not load @yandex/ymaps3-default-ui-theme package. Using fallback markers.', e);
+				YMapDefaultMarkerClass = null; // Явно указываем, что класс не загружен
+				// Отправим ошибку в RN, чтобы было понятно, почему маркеры простые
+				sendMessageToReactNative({ type: 'warning', payload: 'Не удалось загрузить стили маркеров' });
+			}
 			mapInstance = new YMap(
 				document.getElementById('map'),
 				{
 					location: { center: [37.6176, 55.7558], zoom: 10 },
 					mode: 'vector',
-					behaviors: ['drag', 'pinchZoom', 'scrollZoom', 'dblClickZoom', 'multiTouch']
+					behaviors: [
+						'drag',
+						'pinchZoom',
+						'scrollZoom',
+						'dblClickZoom',
+						'multiTouch',
+					], // Основные поведения
 				},
 				[new YMapDefaultSchemeLayer({}), new YMapDefaultFeaturesLayer({})],
 			);
 
-			// userMarkerElement создается теперь в updateUserLocationMarker при необходимости
+			// Добавление слушателя событий карты
+			const mapListener = new YMapListener({
+				layer: 'any',
+				onPointerDown: handlePointerDown,
+				onPointerMove: handlePointerMove,
+				onPointerUp: handlePointerUp,
+				// onTouchStart: handlePointerDown, // Можно дублировать для надежности на моб.
+				// onTouchMove: handlePointerMove,
+				// onTouchEnd: handlePointerUp,
+			});
+			mapInstance.addChild(mapListener);
 
 			document.getElementById('error-display').style.display = 'none';
 			console.log('WebView: Map initialized successfully.');
 			sendMessageToReactNative({ type: 'mapReady' });
 
-			// Добавляем слушателей сообщений
-			// Для Android
+			// Слушатели сообщений от RN
 			document.addEventListener('message', handleReactNativeMessage);
-			// Для iOS и других окружений
 			window.addEventListener('message', handleReactNativeMessage);
-
 		} catch (error) {
 			console.error('WebView: Map initialization failed:', error);
 			showError(error.message || 'Не удалось инициализировать карту');
@@ -224,17 +688,33 @@
 	}
 
 	// --- Запуск ---
-	if (typeof ymaps3 !== 'undefined' && ymaps3.ready) {
-		initMap();
+	// Добавим проверку на документ (на случай раннего вызова)
+	if (
+		document.readyState === 'complete' ||
+		document.readyState === 'interactive'
+	) {
+		if (typeof ymaps3 !== 'undefined' && ymaps3.ready) {
+			initMap();
+		} else {
+			// Если API еще не готово, дождемся его в событии load
+			window.addEventListener('load', waitForApiAndInit);
+		}
 	} else {
-		window.addEventListener('load', () => {
-			if (typeof ymaps3 !== 'undefined' && ymaps3.ready) {
-				initMap();
-			} else {
-				// Если API все еще недоступно после load, показываем ошибку
-				showError('Не удалось загрузить API Яндекс Карт.');
-			}
+		document.addEventListener('DOMContentLoaded', () => {
+			// DOM загружен, ждем API
+			window.addEventListener('load', waitForApiAndInit);
 		});
+	}
+
+	function waitForApiAndInit() {
+		if (typeof ymaps3 !== 'undefined' && ymaps3.ready) {
+			initMap();
+		} else {
+			// Можно добавить небольшой таймаут и повторную проверку,
+			// но если после load API нет, скорее всего, проблема с загрузкой
+			console.error('API Yandex Maps не доступно после события window.load.');
+			showError('Не удалось загрузить API Яндекс Карт.');
+		}
 	}
 
 </script>
