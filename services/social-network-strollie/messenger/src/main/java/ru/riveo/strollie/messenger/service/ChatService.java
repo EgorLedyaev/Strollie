@@ -1,9 +1,6 @@
-// src/main/java/ru/riveo/strollie/messenger/service/ChatService.java
 package ru.riveo.strollie.messenger.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +27,6 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final ParticipantsRepository participantsRepository;
     private final UserRepository userRepository;
-    private final RabbitTemplate rabbitTemplate;
-
-    @Value("${rabbitmq.exchange.name:chat.exchange}")
-    private String exchangeName;
 
     public String getUsernameById(UUID userId) {
         return userRepository.findById(userId)
@@ -118,7 +111,6 @@ public class ChatService {
         MessageDto messageDto = mapToMessageDto(savedMessage, senderUsername);
 
         String routingKey = "chat.message." + request.getChatId().toString();
-        rabbitTemplate.convertAndSend(exchangeName, routingKey, messageDto);
         System.out.println("Sent message to RabbitMQ: " + routingKey + " Payload: " + messageDto);
 
         return messageDto;

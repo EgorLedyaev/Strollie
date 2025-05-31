@@ -32,12 +32,3 @@ spring:
     port: 5672
     username: guest
     password: guest
-
-rabbitmq:
-  host: ${spring.rabbitmq.host}
-  stomp:
-    port: 61613
-  user: ${spring.rabbitmq.username}
-  password: ${spring.rabbitmq.password}
-  exchange:
-    name: chat.exchange

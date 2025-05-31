@@ -70,7 +70,7 @@ public class ChatController {
     @PostMapping("/messages")
     public ResponseEntity<MessageDto> sendHttpMessage(@Valid @RequestBody SendMessageRequest request, Authentication authentication) {
         UUID senderId = PrincipalUtil.getUserId(authentication);
-        String senderUsername = PrincipalUtil.getUsername(authentication); // Get username for DTO
+        String senderUsername = PrincipalUtil.getUsername(authentication);
         MessageDto messageDto = chatService.sendMessage(senderId, senderUsername, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(messageDto);
     }
