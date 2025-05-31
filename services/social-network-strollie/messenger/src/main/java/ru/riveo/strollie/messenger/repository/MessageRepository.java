@@ -1,6 +1,5 @@
 package ru.riveo.strollie.messenger.repository;
 
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,10 +8,12 @@ import ru.riveo.strollie.messenger.entity.MessageEntity;
 import java.util.List;
 import java.util.UUID;
 
-public interface MessageRepository extends JpaRepository<MessageEntity, Integer> {
+public interface MessageRepository extends JpaRepository<MessageEntity, UUID> {
 
-    List<MessageEntity> findByChatId(@NotNull UUID chatId);
+    List<MessageEntity> findByChatIdOrderByTimestampAsc(UUID chatId);
 
-    Page<MessageEntity> findByChatIdAndDeletedAtIsNull(UUID chatId, Pageable pageable);
+    List<MessageEntity> findByChatIdOrderByTimestampDesc(UUID chatId);
+
+    Page<MessageEntity> findByChatIdOrderByTimestampDesc(UUID chatId, Pageable pageable);
 
 }

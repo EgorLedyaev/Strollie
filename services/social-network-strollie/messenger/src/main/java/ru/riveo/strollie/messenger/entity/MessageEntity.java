@@ -1,3 +1,4 @@
+// src/main/java/ru/riveo/strollie/messenger/entity/MessageEntity.java
 package ru.riveo.strollie.messenger.entity;
 
 import jakarta.persistence.*;
@@ -5,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -13,37 +13,35 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "messages_t")
+@Table(name = "message_t")
 public class MessageEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "messages_t_id_gen")
-    @SequenceGenerator(name = "messages_t_id_gen", sequenceName = "messages_t_message_id_seq", allocationSize = 1)
     @Column(name = "message_id", nullable = false)
-    private Integer id;
-
-    @NotNull
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @NotNull
     @Column(name = "chat_id", nullable = false)
-    private UUID chatId;
+    private UUID chatId; // Foreign key to ChatEntity
 
     @NotNull
-    @Size(max = 1200)
-    @Column(name = "text", nullable = false, length = 1200)
-    private String text;
+    @Column(name = "sender_id", nullable = false)
+    private UUID senderId; // ID of the user who sent the message
 
-    @jakarta.validation.constraints.NotNull
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+    @Size(max = 2000)
+    @NotNull
+    @Column(name = "content", length = 2000, nullable = false)
+    private String content;
 
-    @Column(name = "edit_at")
-    private Instant editAt;
+    @NotNull
+    @Column(name = "timestamp", nullable = false)
+    private Instant timestamp;
 
-    @Column(name = "deleted_at")
-    private Instant deletedAt;
-
+    @PrePersist
+    protected void onCreate() {
+        if (timestamp == null) {
+            timestamp = Instant.now();
+        }
+    }
 }

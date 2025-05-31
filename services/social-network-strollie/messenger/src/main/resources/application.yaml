@@ -4,21 +4,17 @@ server:
 spring:
   application:
     name: MessengerService
-
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/social-network
-
+          issuer-uri: http://keycloak:8080/realms/social-network
   flyway:
     enabled: true
     schemas:
       - public
     locations:
       - classpath:db/migration
-      - classpath:db/testdata
-
   jpa:
     hibernate:
       ddl-auto: validate
@@ -28,6 +24,20 @@ spring:
         format_sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/messenger_db
+    url: jdbc:postgresql://postgres-messenger:5432/messenger_db
     username: admin
     password: admin
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+rabbitmq:
+  host: ${spring.rabbitmq.host}
+  stomp:
+    port: 61613
+  user: ${spring.rabbitmq.username}
+  password: ${spring.rabbitmq.password}
+  exchange:
+    name: chat.exchange

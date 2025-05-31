@@ -1,0 +1,24 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: messenger-client
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/social-network
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: client-app
+            client-secret: 9Z3Lw3vf195jQH8bSexLe92ZCSCeU6bo
+            scope:
+              - openid
+              - microprofile-jwt
+
+messenger:
+  service:
+    base-url: "http://messenger:8082/api/v1/messenger"

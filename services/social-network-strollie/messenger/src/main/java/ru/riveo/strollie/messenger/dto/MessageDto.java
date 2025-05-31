@@ -9,10 +9,10 @@ import java.util.UUID;
 @Data
 @Builder
 public class MessageDto {
-    private Integer id;
-    private UUID userId;
+    private UUID id;
     private UUID chatId;
-    private String text;
-    private Instant createdAt;
-    private Instant editAt;
+    private UUID senderId;
+    private String senderUsername;
+    private String content;
+    private Instant timestamp;
 }

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Чат: ' + ${chat.chatName}">Чат</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-page {
+            display: flex;
+            height: calc(100vh - 20px);
+            padding: 10px;
+            box-sizing: border-box;
+            gap: 20px;
+        }
+
+        .messages-section {
+            flex: 4px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 0;
+        }
+
+        .participants-section {
+            flex: 1;
+            max-width: 250px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+            box-sizing: border-box;
+        }
+
+        .participants-list {
+            flex: 1;
+            overflow-y: auto;
+            margin: 10px 0;
+            padding: 0;
+            list-style: none;
+            min-height: 0;
+        }
+
+        .add-participant-form {
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .participants-section h3 {
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+
+        .back-arrow {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 1.5em;
+            text-decoration: none;
+            color: #333;
+            transition: color 0.3s;
+        }
+
+        .back-arrow:hover {
+            color: #007bff;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-page">
+    <section class="messages-section">
+        <div class="chat-header">
+            <a href="/chats" class="back-arrow">←</a>
+            <h2 th:text="${chat.chatName}">Название чата</h2>
+        </div>
+        <span class="chat-author" th:text="'Создатель: ' + ${author}">Автор чата</span>
+        <div class="messages-container">
+            <div th:if="${#lists.isEmpty(messages)}">
+                <p>Сообщений пока нет.</p>
+            </div>
+            <ul th:if="${!#lists.isEmpty(messages)}" style="padding-left: 20px;">
+                <li th:each="msg : ${messages}" style="margin-bottom: 10px;">
+                    <strong th:text="${msg.senderUsername}">Имя отправителя</strong>:
+                    <span th:text="${msg.content}">Текст сообщения</span>
+                    <small style="display: block; color: #666; font-size: 0.8em;"
+                           th:text="${#dates.format(msg.timestamp, 'dd.MM.yyyy HH:mm')}">Дата</small>
+                </li>
+            </ul>
+        </div>
+
+        <form th:action="@{/chats/{id}/send(id=${chat.id})}" method="post" class="message-form">
+            <input type="hidden" name="chatId" th:value="${chat.id}">
+            <textarea name="content" placeholder="Введите сообщение..." required></textarea>
+            <button type="submit">Отправить</button>
+        </form>
+    </section>
+
+    <aside class="participants-section">
+        <h3 style="margin-top: 0;">Участники</h3>
+        <ul class="participants-list">
+            <li class="participant" th:each="username : ${chat.participantsNames}">
+                <span th:text="${username}">Имя участника</span>
+                <form th:action="@{/chats/{id}/remove-participant(id=${chat.id})}" method="post"
+                      style="display: inline;" onsubmit="return confirm('Удалить участника?')">
+                    <input type="hidden" name="username" th:value="${username}">
+                    <button type="submit" class="remove-btn" title="Удалить участника">×</button>
+                </form>
+            </li>
+        </ul>
+
+        <form th:action="@{/chats/{id}/add-participant(id=${chat.id})}" method="post" class="add-participant-form">
+            <input type="text" name="username" placeholder="Никнейм" required>
+            <button type="submit" title="Добавить участника">+</button>
+        </form>
+    </aside>
+</div>
+
+</body>
+</html>

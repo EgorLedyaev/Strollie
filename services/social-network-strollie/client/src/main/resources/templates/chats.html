@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Strollie – Чаты</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>Strollie</h1>
+            <div class="user-info" style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 8px;">
+                <p style="margin: 0; font-weight: 500;" th:text="${username}">Имя пользователя</p>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="active">Чаты</a>
+            <a th:href="@{/logout}" class="logout-btn">Выйти</a>
+        </nav>
+    </div>
+
+    <main class="content">
+        <div class="chat-list-container">
+            <div class="chat-list-header">
+                <h2>Ваши чаты</h2>
+                <a th:href="@{/chats/create}" class="create-chat-btn">+ Создать</a>
+            </div>
+
+            <div class="chat-list" th:if="${not #lists.isEmpty(chats)}">
+                <div class="chat-item" th:each="chat : ${chats}">
+                    <a th:href="@{/chats/{id}(id=${chat.id})}" class="chat-link">
+                        <div class="chat-avatar"></div>
+                        <div class="chat-details">
+                            <h3 class="chat-name" th:text="${chat.chatName}">Название чата</h3>
+                            <p class="chat-meta">
+                                <span class="last-activity" th:text="${#dates.format(chat.lastActivityAt, 'dd.MM.yyyy HH:mm')}">дата</span>
+                                <span class="members-count" th:text="${chat.participantsNames.size()} + ' участников'">0 участников</span>
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${#lists.isEmpty(chats)}">
+                <img src="/images/empty-chat.svg" alt="No chats" class="empty-icon">
+                <h3>У вас пока нет чатов</h3>
+                <p>Создайте новый чат, чтобы начать общение</p>
+                <a th:href="@{/chats/create}" class="create-chat-btn">Создать чат</a>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
