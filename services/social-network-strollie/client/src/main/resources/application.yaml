@@ -18,7 +18,3 @@ spring:
             scope:
               - openid
               - microprofile-jwt
-
-messenger:
-  service:
-    base-url: "http://messenger:8082/api/v1/messenger"

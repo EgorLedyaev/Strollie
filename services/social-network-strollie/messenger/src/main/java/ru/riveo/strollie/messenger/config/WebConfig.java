@@ -17,5 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(userExistenceInterceptor)
                 .addPathPatterns("/api/v1/messenger/**");
     }
+
 }
 

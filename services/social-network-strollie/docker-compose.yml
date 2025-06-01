@@ -7,12 +7,13 @@ services:
     ports:
       - "8080:8080"  # Keycloak port
       - "8090:8090"  # oauth-sample port
+      - "8082:8082"
     networks:
       - app-network
   postgres-keycloak:
     image: postgres:latest
     container_name: keycloak-postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
@@ -32,7 +33,7 @@ services:
     image: quay.io/keycloak/keycloak:24.0
     container_name: keycloak
     command: start-dev
-    restart: always
+    restart: unless-stopped
     environment:
       KC_DB: postgres
       KC_DB_URL_HOST: postgres-keycloak
@@ -51,7 +52,7 @@ services:
   postgres-messenger:
     image: postgres:latest
     container_name: messenger-postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_DB: messenger_db
       POSTGRES_USER: admin
@@ -65,7 +66,7 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
-    restart: always
+    restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -91,14 +92,11 @@ services:
       context: ./messenger
       dockerfile: Dockerfile
     container_name: messenger
-    ports:
-      - "8082:8082"
     restart: unless-stopped
     depends_on:
       - postgres-messenger
       - rabbitmq
-    networks:
-      - app-network
+    network_mode: "service:localhost"
 volumes:
   postgres_keycloak_data:
   messenger_postgres_data:

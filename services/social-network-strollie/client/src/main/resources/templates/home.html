@@ -4,9 +4,25 @@
     <meta charset="UTF-8">
     <title>Strollie</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .con{
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-<h1>Strollie – мессенджер</h1>
-<a href="/chats" class="button">Перейти в приложение</a>
+<div class="con">
+    <h1>Strollie – мессенджер</h1>
+    <a href="/chats" class="button">Перейти в приложение</a>
+</div>
 </body>
 </html>

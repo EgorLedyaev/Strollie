@@ -15,7 +15,7 @@ public class ClientBeans {
 
     @Bean
     public RestClientMessenger productsRestClient(
-            @Value("${messenger.service.base-url:http://messenger:8082}") String catalogueBaseUri,
+            @Value("${messenger.service.base-url:http://localhost:8082}") String catalogueBaseUri,
             ClientRegistrationRepository clientRegistrationRepository,
             OAuth2AuthorizedClientRepository authorizedClientRepository,
             @Value("${strollie.services.catalogue.registration-id:keycloak}") String registrationId) {
