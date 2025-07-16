@@ -2,6 +2,10 @@ import LocationIcon from '@/assets/icons/map/LocationIcon';
 import MinusIcon from '@/assets/icons/map/MinusIcon';
 import PlusIcon from '@/assets/icons/map/PlusIcon';
 import { ProfileButton } from '@/src/features/layout/ui/ProfileButton/ProfileButton';
+import {
+	SearchInput,
+	SearchInputProps,
+} from '@/src/features/search/ui/SearchInput';
 import { Colors, Fonts, Gaps, Radius } from '@/src/shared/tokens';
 import { LinkProps } from 'expo-router';
 import React from 'react';
@@ -22,7 +26,8 @@ interface MapControlsOverlayProps {
 	onZoomOut: () => void;
 	onToggleMode: () => void;
 	onNavigate: () => void;
-	profileHref?: LinkProps['href']; // Сделаем опциональным
+	profileHref?: LinkProps['href'];
+	onSearchResultSelect: (coordinates: [number, number], addressText: string) => void; // [lon, lat]
 }
 
 export const MapControlsOverlay: React.FC<MapControlsOverlayProps> = ({
@@ -34,6 +39,7 @@ export const MapControlsOverlay: React.FC<MapControlsOverlayProps> = ({
 	onToggleMode,
 	onNavigate,
 	profileHref = '/profile', // Значение по умолчанию
+	onSearchResultSelect,
 }) => {
 	return (
 		<SafeAreaView
@@ -44,7 +50,8 @@ export const MapControlsOverlay: React.FC<MapControlsOverlayProps> = ({
 			{/* Шапка */}
 			<View style={styles.header} pointerEvents='box-none'>
 				<ProfileButton href={profileHref} pointerEvents='auto' />
-				<View style={styles.headerSpacer} pointerEvents='none' />
+				<SearchInput onSearchResultSelect={onSearchResultSelect} />
+				{/*<View style={styles.headerSpacer} pointerEvents='none' />*/}
 			</View>
 
 			{/* Контролы карты */}

@@ -1,5 +1,6 @@
 import { MapControlsOverlay } from '@/src/components/MapControlsOverlay';
 import { MapStatusIndicator } from '@/src/components/MapStatusIndicator';
+import { EditableRoutePointsList } from '@/src/features/map/ui/EditableRoutePointsList';
 import {
 	RoutePreferences,
 	RouteSettingsPanel,
@@ -9,6 +10,7 @@ import { loadMapHtml } from '@/src/pages/MapScreen/mapService';
 import {
 	RouteResponse,
 	buildOptimalRoute,
+	ValhallaRouteRequest,
 } from '@/src/pages/MapScreen/routeService';
 import { Colors, Fonts, Radius } from '@/src/shared/tokens';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -28,10 +30,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 type WebViewRef = WebView | null;
 
-// Определим интерфейсы для сообщений
+/**
+ * Интерфейс сообщения, отправляемого в WebView
+ */
 interface WebViewMessage {
+	/** Тип команды */
 	type: string;
-	payload?: unknown;
+	/** Дополнительные данные команды */
+	payload?: Record<string, any>;
 }
 
 interface WebViewMessageEvent {
@@ -40,15 +46,14 @@ interface WebViewMessageEvent {
 	};
 }
 
-interface PlacedMarkerData {
+/**
+ * Интерфейс данных о размещенном на карте маркере
+ */
+export interface PlacedMarkerData {
+	/** Уникальный идентификатор маркера */
 	id: string;
+	/** Координаты маркера в формате [долгота, широта] */
 	coordinates: [number, number]; // [lon, lat]
-	// Можно добавить title, color и т.д., если нужно хранить в RN
-}
-
-interface LngLat {
-	lon: number;
-	lat: number;
 }
 
 export default function MapScreen() {
@@ -57,111 +62,73 @@ export default function MapScreen() {
 	const [mapReady, setMapReady] = useState(false);
 	const [mapError, setMapError] = useState<string | null>(null);
 	const [htmlContent, setHtmlContent] = useState<string | null>('');
-	const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(
-		null,
-	);
 
-	const { location, locationError } = useLocationTracking(mapReady); // Включаем только когда карта готова
+	const { location, locationError } = useLocationTracking(mapReady);
 	const [isBuildingRoute, setIsBuildingRoute] = useState(false);
 	const [placedMarkers, setPlacedMarkers] = useState<PlacedMarkerData[]>([]);
 
 	const [routePreferences, setRoutePreferences] = useState<RoutePreferences>({
 		preferParks: false,
-		avoidHills: true, // Изначально избегаем холмов, как у тебя было
-		walkingSpeed: 5, // Средняя скорость пешехода
+		avoidHills: true,
+		walkingSpeed: 5,
 		desiredDistance: 5.0,
 	});
-	const [isSettingsPanelVisible, setIsSettingsPanelVisible] = useState(false); // Для показа/скрытия
+	const [isSettingsPanelVisible, setIsSettingsPanelVisible] = useState(false);
 	const [actualRouteDistance, setActualRouteDistance] = useState<
 		number | null
 	>(null);
+	const [isEditPointsPanelVisible, setIsEditPointsPanelVisible] =
+		useState(false);
 
-	const handlePreferencesChange = useCallback(
-		(newPreferences: RoutePreferences) => {
-			// Сначала обновляем локальное состояние предпочтений
-			setRoutePreferences(newPreferences);
-			// Затем, если условия позволяют, сразу перестраиваем маршрут
-			if (mapReady && location && placedMarkers.length > 0) {
-				console.log(
-					'[RN]: Preferences changed, rebuilding route with new preferences:',
-					newPreferences,
-				);
-				handleBuildRouteThroughPlaced(newPreferences);
-			} else {
-				console.log(
-					'[RN]: Preferences changed, but conditions not met for immediate rebuild:',
-					newPreferences,
-				);
-			}
-		},
-		// Зависимости: mapReady, location, placedMarkers нужны для условия перестроения.
-		// handleBuildRouteThroughPlaced будет вызван с новыми newPreferences,
-		// поэтому его текущее состояние routePreferences внутри него не так критично для этого useCallback,
-		// но лучше его включить, если он как-то косвенно использует routePreferences из замыкания.
-		// Для чистоты, лучше чтобы handleBuildRouteThroughPlaced всегда брал preferences как аргумент.
-		[
-			mapReady,
-			location,
-			placedMarkers,
-			sendMessageToWebView,
-			routePreferences,
-		], // Добавил routePreferences для полноты
-	);
+	const sendMessageToWebView = useCallback((message: WebViewMessage) => {
+		if (!webViewRef.current) {
+			console.warn('WebView ref not ready to send message:', message);
+			return;
+		}
+		
+		// Логирование всех сообщений для отладки
+		console.log('Sending to WebView:', message.type, message.payload);
+
+		webViewRef.current.postMessage(JSON.stringify(message));
+	}, []);
+
+	useEffect(() => {
+		if (mapReady && location) {
+			sendMessageToWebView({
+				type: 'updateUserLocation',
+				payload: {
+					coordinates: [location.longitude, location.latitude], // [lon, lat]
+				},
+			});
+		}
+	}, [location, mapReady, sendMessageToWebView]);
+
+	useEffect(() => {
+		if (locationError) {
+			console.warn('Location Error:', locationError);
+		}
+	}, [locationError]);
+
 	// Загрузка HTML
 	useEffect(() => {
 		loadMapHtml().then(html => setHtmlContent(html ?? null));
 	}, []);
 
-	// Отправка обновлений геолокации в WebView
-	useEffect(() => {
-		if (mapReady && location && webViewRef.current) {
-			sendMessageToWebView({
-				type: 'updateLocation',
-				payload: { lat: location.latitude, lon: location.longitude },
-			});
-		}
-	}, [location, mapReady]); // Зависим от location и mapReady
-
-	useEffect(() => {
-		if (locationError) {
-			console.warn('Location Error:', locationError);
-			// Alert.alert("Ошибка геолокации", locationError); // Пример
-		}
-	}, [locationError]);
-	// Типизируем функцию отправки сообщений
-	const sendMessageToWebView = useCallback((message: WebViewMessage) => {
-		if (webViewRef.current) {
-			webViewRef.current.postMessage(JSON.stringify(message));
-		} else {
-			console.warn('WebView ref not ready to send message:', message);
-		}
-	}, []); // Пустой массив зависимостей, т.к. webViewRef не меняется
-
 	const handleDeleteMarker = useCallback(
 		(idToDelete: string | null) => {
 			if (idToDelete) {
-				console.log(
-					`RN: Sending remove command for marker ${idToDelete}`,
-				);
 				sendMessageToWebView({
 					type: 'removeMarker',
 					payload: { markerId: idToDelete },
 				});
-				// Обновляем состояние RN
 				setPlacedMarkers(prev => prev.filter(m => m.id !== idToDelete));
-			} else {
-				console.warn('RN: handleDeleteMarker called with null ID!');
 			}
-			setSelectedMarkerId(null);
 		},
 		[sendMessageToWebView],
 	);
 
 	const showMarkerActionMenu = useCallback(
 		(markerId: string) => {
-			// useCallback здесь не обязателен, но оставим
-			setSelectedMarkerId(markerId);
-			// Логика ActionSheetIOS / Alert остается прежней, но вызывает handleDeleteMarker с markerId
 			if (Platform.OS === 'ios') {
 				ActionSheetIOS.showActionSheetWithOptions(
 					{
@@ -172,7 +139,6 @@ export default function MapScreen() {
 					},
 					buttonIndex => {
 						if (buttonIndex === 1) handleDeleteMarker(markerId);
-						else setSelectedMarkerId(null);
 					},
 				);
 			} else {
@@ -185,179 +151,126 @@ export default function MapScreen() {
 							onPress: () => handleDeleteMarker(markerId),
 							style: 'destructive',
 						},
-						{
-							text: 'Отмена',
-							onPress: () => setSelectedMarkerId(null),
-							style: 'cancel',
-						},
+						{ text: 'Отмена', style: 'cancel' },
 					],
-					{
-						cancelable: true,
-						onDismiss: () => setSelectedMarkerId(null),
-					},
+					{ cancelable: true },
 				);
 			}
 		},
 		[handleDeleteMarker],
-	); // Теперь зависит от handleDeleteMarker
+	);
 
 	const handleWebViewMessage = useCallback(
 		(event: WebViewMessageEvent) => {
 			try {
 				const message = JSON.parse(event.nativeEvent.data);
-				console.log('Message from WebView:', message); // Можно оставить для отладки
+				console.log('Message from WebView:', message);
+				
 				switch (message.type) {
 					case 'mapReady':
 						setMapReady(true);
 						setMapError(null);
-						console.log(
-							'[RN]: Map is ready. Restoring markers if any.',
-						);
+						
+						// Восстанавливаем состояние карты после загрузки
 						if (placedMarkers.length > 0) {
-							console.log(
-								`[RN]: Restoring ${placedMarkers.length} markers.`,
-							);
+							// Отправляем все сохраненные маркеры на карту
 							placedMarkers.forEach(marker => {
 								sendMessageToWebView({
 									type: 'addMarker',
-									// Убедись, что payload соответствует тому, что ожидает addPlacedMarker в WebView
-									payload: {
-										id: marker.id,
-										coordinates: marker.coordinates,
-										// title: marker.title, // если есть
-										// color: marker.color, // если есть
-									},
+									payload: marker,
 								});
 							});
 						}
-						// Отправка текущей геолокации, если она уже есть
+						
+						// Показываем текущее местоположение пользователя
 						if (location) {
 							sendMessageToWebView({
-								type: 'updateLocation',
+								type: 'updateUserLocation',
 								payload: {
-									lat: location.latitude,
-									lon: location.longitude,
+									coordinates: [location.longitude, location.latitude], // [lon, lat]
 								},
 							});
 						}
 						break;
+						
 					case 'mapError':
-						setMapError(
-							(message.payload as string) || 'Unknown map error',
-						);
+						setMapError(message.payload?.message || 'Неизвестная ошибка карты');
 						setMapReady(false);
 						break;
-					case 'longPressOnMap':
-						if (
-							message.payload &&
-							Array.isArray(
-								(message.payload as any).coordinates,
-							) &&
-							(message.payload as any).coordinates.length >= 2
-						) {
-							const coords = (message.payload as any)
-								.coordinates as [number, number];
-							const newMarkerId = uuidv4(); // Генерируем ID здесь
-							const newMarkerData: PlacedMarkerData = {
-								id: newMarkerId,
-								coordinates: coords,
-							};
-							const newMarkerPayload = {
-								...newMarkerData,
-								color: 'violet',
-							}; // Данные для WebView
-
-							// 1. Добавляем метку в состояние RN
-							setPlacedMarkers(prev => [...prev, newMarkerData]);
-
-							// 2. Отправляем команду на добавление в WebView
-							sendMessageToWebView({
-								type: 'addMarker',
-								payload: newMarkerPayload,
-							});
-						}
+						
+					case 'mapModeChanged':
+						setIs3DMode(message.payload?.mode === '3d');
 						break;
+						
+					case 'mapClick': {
+						const { coordinates } = message.payload as { coordinates: [number, number] };
+						
+						// Создаем новый маркер с уникальным ID
+						const newMarker: PlacedMarkerData = {
+							id: uuidv4(),
+							coordinates, // [lon, lat]
+						};
+						
+						// Добавляем маркер в состояние и отправляем на карту
+						setPlacedMarkers(prev => [...prev, newMarker]);
+						sendMessageToWebView({
+							type: 'addMarker',
+							payload: newMarker,
+						});
+						break;
+					}
+					
 					case 'longPressOnMarker':
-						if (
-							message.payload &&
-							typeof (message.payload as any).markerId ===
-								'string'
-						) {
-							showMarkerActionMenu(
-								(message.payload as any).markerId,
-							);
-						}
+						showMarkerActionMenu(message.payload.markerId);
 						break;
-					case 'routeBuildStarted':
-						setIsBuildingRoute(true);
-						break;
-					case 'routeBuildSuccess':
-						setIsBuildingRoute(false);
-						break; // Успех
-					case 'routeBuildError':
-						console.error(
-							'RN: Route build error:',
-							message.payload,
-						);
-						setIsBuildingRoute(false);
-						Alert.alert(
-							'Ошибка маршрута',
-							(message.payload as string) || 'Неизвестная ошибка',
-						);
-						break;
-					case 'routeDrawStarted': // Новое событие от WebView
-						console.log('RN: Route drawing started in WebView');
-						// Можно добавить доп. индикацию
-						break;
-					case 'routeDrawSuccess': // Новое событие от WebView
-						console.log('RN: Route drawing successful in WebView');
-						setIsBuildingRoute(false); // Завершаем индикацию
-						break;
-					case 'routeDrawError': // Новое событие от WebView
-						console.error(
-							'RN: Route drawing error from WebView:',
-							message.payload,
-						);
-						setIsBuildingRoute(false);
-						Alert.alert(
-							'Ошибка отрисовки маршрута',
-							(message.payload as string) || 'Неизвестная ошибка',
-						);
-						break;
+						
 					case 'jsError':
-						console.error(
-							'JavaScript Error in WebView:',
-							message.payload,
-						);
-						// Показываем только сообщение об ошибке
-						setMapError(
-							`JS Error: ${message.payload?.message || 'Unknown JS error'}`,
-						);
+						console.error('JavaScript Error in WebView:', message.payload?.message);
+						setMapError(`JS Error: ${message.payload?.message || 'Неизвестная JS ошибка'}`);
 						break;
-					// Другие обработчики ('customRouteSuccess', etc.), если нужны
+						
+					case 'routeDrawSuccess':
+						console.log("Маршрут успешно отрисован в WebView");
+						break;
+						
+					case 'routeDrawError':
+						Alert.alert("Ошибка отрисовки", message.payload?.message || 'WebView не смог отрисовать маршрут');
+						break;
+
+					case 'log':
+						console.log(
+							'WebView Log:',
+							message.payload?.message,
+							message.payload?.data,
+						);
+					break;
+					default:
+						console.warn('Неизвестный тип сообщения от WebView:', message.type);
 				}
 			} catch (error) {
-				console.error(
-					'Failed to parse message from WebView or handle it:',
-					error,
-				);
+				console.error('Ошибка при разборе сообщения от WebView:', error);
 			}
 		},
 		[sendMessageToWebView, showMarkerActionMenu, placedMarkers, location],
 	);
 
+	// Функции управления картой
 	const handleZoomIn = useCallback(() => {
-		if (mapReady) sendMessageToWebView({ type: 'zoomIn' });
+		if (mapReady) {
+			sendMessageToWebView({ type: 'zoomIn', payload: {} });
+		}
 	}, [mapReady, sendMessageToWebView]);
 
 	const handleZoomOut = useCallback(() => {
-		if (mapReady) sendMessageToWebView({ type: 'zoomOut' });
+		if (mapReady) {
+			sendMessageToWebView({ type: 'zoomOut', payload: {} });
+		}
 	}, [mapReady, sendMessageToWebView]);
 
 	const toggleMapMode = useCallback(() => {
 		if (mapReady) {
 			const newMode = !is3DMode;
-			setIs3DMode(newMode);
+			// Не обновляем состояние напрямую - оно изменится по событию mapModeChanged из WebView
 			sendMessageToWebView({
 				type: 'setMapMode',
 				payload: { mode: newMode ? '3d' : '2d' },
@@ -366,117 +279,122 @@ export default function MapScreen() {
 	}, [mapReady, is3DMode, sendMessageToWebView]);
 
 	const handleNavigate = useCallback(() => {
-		if (mapReady && location)
-			sendMessageToWebView({ type: 'startNavigation' });
-		// Добавляем else для обратной связи
-		else if (mapReady && !location)
-			console.log('Navigate pressed, but location is not available yet.');
+		if (mapReady && location) {
+			sendMessageToWebView({
+				type: 'centerOnUser', payload: {
+					coordinates: [location.longitude, location.latitude], // [lon, lat]
+				
+			} });
+		} else if (mapReady && !location) {
+			Alert.alert(
+				'Геолокация недоступна',
+				'Невозможно определить ваше местоположение.'
+			);
+		}
 	}, [mapReady, location, sendMessageToWebView]);
 
+	const handleSearchResultSelect = useCallback(
+		(coordinates: [number, number], addressText: string) => {
+			if (mapReady) {
+				// Центрирование карты на выбранных координатах с заданным зумом
+				sendMessageToWebView({
+					type: 'setMapLocation',
+					payload: { center: coordinates, zoom: 16 },
+				});
+				
+				// Добавление маркера по результатам поиска
+				sendMessageToWebView({
+					type: 'addMarker',
+					payload: {
+						id: `search-${uuidv4()}`,
+						coordinates,
+						title: addressText,
+					},
+				});
+			}
+		},
+		[mapReady, sendMessageToWebView],
+	);
+
+	/**
+	 * Построение маршрута через указанные точки
+	 */
 	const handleBuildRouteThroughPlaced = useCallback(
-		async (currentPrefs?: RoutePreferences) => {
-			const prefsToUse = currentPrefs || routePreferences;
-			if (!mapReady) {
-				Alert.alert('Карта не готова');
+		async (
+			currentPrefs: RoutePreferences = routePreferences,
+			currentPoints: PlacedMarkerData[] = placedMarkers,
+		) => {
+			const pointsToUse = currentPoints;
+			
+			// Проверка необходимых условий для построения маршрута
+			if (!mapReady || !location || pointsToUse.length === 0) {
+				Alert.alert(
+					'Недостаточно данных',
+					'Для построения маршрута требуется ваше местоположение и хотя бы одна точка на карте.'
+				);
 				return;
 			}
-			if (!location) {
-				Alert.alert('Нет геолокации');
-				return;
-			}
-			if (
-				placedMarkers.length === 0 &&
-				!(prefsToUse === routePreferences && currentPrefs === undefined)
-			) {
-				if (currentPrefs === undefined) {
-					// Значит вызов был от кнопки "Маршрут"
-					Alert.alert(
-						'Нет меток',
-						'Поставьте хотя бы одну метку долгим нажатием.',
-					);
-				}
-				return;
-			}
+			
+			// Защита от повторных вызовов
 			if (isBuildingRoute) return;
 
-			console.log('RN: Requesting route from SERVER');
+			// Начинаем процесс построения маршрута
 			setIsBuildingRoute(true);
 			setActualRouteDistance(null);
 			sendMessageToWebView({ type: 'clearRoute' });
+			sendMessageToWebView({ type: 'routeBuildStarted' });
 
 			try {
 				const locationsForBackend: Array<{ lat: number; lon: number }> =
 					[
-						{ lat: location.latitude, lon: location.longitude }, // Начальная точка
-						...placedMarkers.map(marker => ({
-							lat: marker.coordinates[1], // Lat из [lon, lat]
-							lon: marker.coordinates[0], // Lon из [lon, lat]
+						{ lat: location.latitude, lon: location.longitude },
+						...pointsToUse.map(marker => ({
+							lat: marker.coordinates[1],
+							lon: marker.coordinates[0],
 						})),
 					];
 
-				// Формируем объект запроса к твоему бэкенду
-				const requestDataForBackend = {
+				const requestData: ValhallaRouteRequest = {
 					locations: locationsForBackend,
-					costing: 'pedestrian', // Указываем нужный тип
-					preferences: prefsToUse,
+					costing: 'pedestrian',
+					costing_options: {
+						pedestrian: {
+							// Примерные настройки
+							use_roads: 0.5,
+							use_hills: currentPrefs.avoidHills ? 0.2 : 0.7,
+							use_ferry: 0.5,
+							// Другие возможные параметры
+						},
+					},
+					id: `strollie-route-${uuidv4()}`,
 				};
 
-				console.log(
-					`RN: Sending request to backend API. Точек: ${requestDataForBackend.locations.length}, режим: ${requestDataForBackend.costing}`,
-				);
-
-				// Вызываем твой сервис, который теперь шлет запрос на твой бэкенд
-
-				const routeData: RouteResponse = await buildOptimalRoute(
-					requestDataForBackend,
-				);
-
-				console.log(
-					`RN: Received route from backend with ${routeData.coordinates?.length || 0} points, distance: ${routeData.distance || 'unknown'}km`,
-				);
-
-				// --- Обработка ответа (остается такой же) ---
-				if (
-					routeData &&
-					routeData.coordinates &&
-					Array.isArray(routeData.coordinates) &&
-					routeData.coordinates.length >= 2
-				) {
-					console.log(
-						'RN: Sending drawServerRoute command to WebView',
-					);
+				console.log('RN: Sending route request to backend...');
+				const routeData: RouteResponse =
+					await buildOptimalRoute(requestData);					// Обработка успешного ответа
+				if (routeData && routeData.coordinates?.length) {
+					// ИСПРАВЛЕНО: Отправляем только координаты без лишних полей
 					sendMessageToWebView({
-						type: 'drawServerRoute',
+						type: 'drawRoute',
 						payload: {
-							coordinates: routeData.coordinates, // Массив [lon, lat] от бэкенда
-							startCoordinates: [
-								location.longitude,
-								location.latitude,
-							], // Старт для маркера
+							coordinates: routeData.coordinates.map(p => [p.lon, p.lat]), // [lon, lat]
 						},
 					});
 					setActualRouteDistance(routeData.distance || null);
 				} else {
-					// Обрабатываем ошибку, если бэкенд ее вернул в поле error
-					const errorMessage =
-						routeData?.error ||
-						'Некорректный ответ от бэкенд-сервиса.';
-					console.error('RN: Backend error:', errorMessage);
-					throw new Error(errorMessage);
+					throw new Error(routeData.error || 
+						'Не удалось построить маршрут. Попробуйте другие точки или настройки.'
+					);
 				}
 			} catch (error: any) {
-				console.error('RN: Failed to get route from backend:', error);
-				setIsBuildingRoute(false);
-				Alert.alert(
-					'Ошибка маршрутизации',
-					error.message || 'Не удалось связаться с сервером.',
-				);
-				sendMessageToWebView({
-					type: 'routeBuildError',
-					payload: error.message || 'Ошибка связи с сервером',
+				console.error('Ошибка построения маршрута:', error);
+				Alert.alert('Ошибка маршрута', error.message || 'Неизвестная ошибка');
+				sendMessageToWebView({ 
+					type: 'routeBuildError', 
+					payload: { message: error.message } 
 				});
 			} finally {
-				setIsBuildingRoute(false); // Сбрасываем флаг в любом случае
+				setIsBuildingRoute(false);
 			}
 		},
 		[
@@ -485,38 +403,68 @@ export default function MapScreen() {
 			isBuildingRoute,
 			placedMarkers,
 			sendMessageToWebView,
-			routePreferences,
 		],
 	);
+
+	const handleReorderPoints = useCallback(
+		(newOrderedPoints: PlacedMarkerData[]) => {
+			setPlacedMarkers(newOrderedPoints);
+			if (mapReady && location && newOrderedPoints.length > 0) {
+				handleBuildRouteThroughPlaced(routePreferences, newOrderedPoints);
+			}
+		},
+		[mapReady, location, routePreferences, handleBuildRouteThroughPlaced],
+	);
+
+	const handleDeleteSinglePoint = useCallback((markerId: string) => {
+		// Удаляем точку из локального состояния
+		const newPoints = placedMarkers.filter(m => m.id !== markerId);
+		setPlacedMarkers(newPoints);
+		
+		// Удаляем маркер с карты
+		sendMessageToWebView({ 
+			type: 'removeMarker', 
+			payload: { markerId } 
+		});
+		
+		// Перестраиваем маршрут, если остались точки
+		if (mapReady && location && newPoints.length > 0) {
+			handleBuildRouteThroughPlaced(routePreferences, newPoints);
+		} else if (newPoints.length === 0) {
+			// Очищаем маршрут, если точек не осталось
+			sendMessageToWebView({ type: 'clearRoute' });
+			setActualRouteDistance(null);
+		}
+	}, [mapReady, location, placedMarkers, routePreferences, sendMessageToWebView, handleBuildRouteThroughPlaced]);
+
+	const handleDeleteAllPoints = useCallback(() => {
+		// Очищаем все маркеры с карты
+		sendMessageToWebView({ type: 'clearMarkers' });
+		setPlacedMarkers([]);
+		
+		// Очищаем маршрут
+		sendMessageToWebView({ type: 'clearRoute' });
+		setActualRouteDistance(null);
+		
+		// Закрываем панель редактирования точек
+		setIsEditPointsPanelVisible(false);
+	}, [sendMessageToWebView]);
+
+	const webviewUrl = process.env.EXPO_PUBLIC_WEBVIEW_URL;
+	if (!webviewUrl) {
+		return (
+			<View style={styles.errorView}>
+				<Text style={styles.errorText}>
+					Не задан URL для WebView в переменных окружения
+				</Text>
+			</View>
+		);
+	}
 
 	if (htmlContent === null) {
 		return (
 			<View style={styles.errorView}>
-				<Text>Ошибка загрузки ресурсов карты.</Text>
-			</View>
-		);
-	}
-	if (htmlContent === '') {
-		return (
-			<View style={styles.container}>
-				{/* Показываем WebView в фоне, чтобы он мог инициализироваться */}
-				{htmlContent !== '' && (
-					<WebView
-						ref={webViewRef}
-						source={{ html: htmlContent }}
-						style={styles.webviewLoading} // Стиль, чтобы скрыть его визуально
-						onMessage={handleWebViewMessage}
-						// ... остальные необходимые props WebView ...
-						javaScriptEnabled={true}
-						domStorageEnabled={true}
-						originWhitelist={['*']}
-						allowFileAccess={true}
-						injectedJavaScriptBeforeContentLoaded={`/* ... JS для ошибок ... */ true;`}
-						onError={() => setMapError('Ошибка загрузки WebView')} // Простая обработка ошибки загрузки
-					/>
-				)}
-				{/* Индикатор поверх */}
-				<MapStatusIndicator mapReady={mapReady} mapError={mapError} />
+				<Text style={styles.errorText}>Ошибка загрузки HTML</Text>
 			</View>
 		);
 	}
@@ -526,7 +474,7 @@ export default function MapScreen() {
 			<WebView
 				ref={webViewRef}
 				source={{
-					uri: `http://${process.env.EXPO_PUBLIC_WEBVIEW_URL}`,
+					uri: `http://${webviewUrl}`,
 				}}
 				style={styles.webview}
 				onMessage={handleWebViewMessage}
@@ -534,88 +482,42 @@ export default function MapScreen() {
 				domStorageEnabled={true}
 				originWhitelist={['*']}
 				mixedContentMode='always'
-				scrollEnabled={false} // Важно для кар
-				scalesPageToFit={false} // Важно для правильной обработки жестов
-				containerStyle={styles.webViewContainer}
-				contentInset={{ top: 0, left: 0, bottom: 0, right: 0 }}
-				allowsInlineMediaPlayback={true} // Может понадобиться для некоторых функций
-				mediaPlaybackRequiresUserAction={false} // Тоже может понадобиться
-				allowFileAccess={true} // Разрешаем доступ к файлам (для локального HTML)
-				// --- Важный инжект для отлова ошибок JS внутри WebView ---
-				injectedJavaScriptBeforeContentLoaded={`
-  window.onerror = function(message, sourcefile, lineno, colno, error) {
-    if (message !== "Script error." || (sourcefile && sourcefile !== "")) {
-      const errorData = {
-        message: message,
-        sourcefile: sourcefile,
-        lineno: lineno,
-        colno: colno,
-        error: error ? error.stack : 'Нет стека вызовов'
-      };
-      window.ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'jsError',
-        payload: errorData
-      }));
-    }
-    return true;
-  };
-  
-  // Более избирательный перехват console.error
-  const originalConsoleError = console.error;
-  console.error = (...args) => {
-    originalConsoleError.apply(console, args);
-    
-    // Не отправляем ошибки стрингификации объектов или рутинные сообщения
-    const errorMsg = args.map(arg => String(arg)).join(' ');
-    if (!errorMsg.includes('[object Object]') && !errorMsg.includes('ReactNativeWebView')) {
-      try {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'jsError',
-          payload: { message: errorMsg }
-        }));
-      } catch (e) {
-        // Игнорируем ошибки отправки
-      }
-    }
-  };
-  true;
-`}
+				scrollEnabled={false}
+				scalesPageToFit={false}
+				allowsInlineMediaPlayback={true}
+				mediaPlaybackRequiresUserAction={false}
+				allowFileAccess={true}
 				onError={syntheticEvent => {
 					const { nativeEvent } = syntheticEvent;
-					console.warn('WebView error: ', nativeEvent); // Логируем полное событие для отладки
 					setMapError(
-						`WebView Error: ${nativeEvent.description} (Code: ${nativeEvent.code})`,
-					);
-					setMapReady(false);
-				}}
-				onLoadEnd={() => console.log('WebView onLoadEnd')}
-				onHttpError={syntheticEvent => {
-					// Добавим обработчик HTTP ошибок
-					const { nativeEvent } = syntheticEvent;
-					console.warn(
-						'WebView HTTP Error: ',
-						nativeEvent.statusCode,
-						nativeEvent.url,
-						nativeEvent.description,
+						`WebView Error: ${nativeEvent.description}`
 					);
 				}}
 			/>
 
-			{/* Показываем лоадер или сообщение об ошибке поверх WebView */}
 			<MapStatusIndicator mapReady={mapReady} mapError={mapError} />
 
-			{/* Оверлей с контролами */}
 			<MapControlsOverlay
 				is3DMode={is3DMode}
 				mapReady={mapReady}
-				isLocationAvailable={!!location} // Передаем флаг доступности локации
+				isLocationAvailable={!!location}
 				onZoomIn={handleZoomIn}
 				onZoomOut={handleZoomOut}
 				onToggleMode={toggleMapMode}
 				onNavigate={handleNavigate}
-				// profileHref="/profile" // Можно передать, если нужно
+				onSearchResultSelect={handleSearchResultSelect}
 			/>
-			{mapReady && ( // Показываем кнопку только когда карта готова
+
+			<EditableRoutePointsList
+				points={placedMarkers}
+				onReorder={handleReorderPoints}
+				onDeletePoint={handleDeleteSinglePoint}
+				onDeleteAll={handleDeleteAllPoints}
+				isVisible={isEditPointsPanelVisible}
+				onClose={() => setIsEditPointsPanelVisible(false)}
+			/>
+
+			{mapReady && (
 				<TouchableOpacity
 					style={styles.settingsButton}
 					onPress={() => setIsSettingsPanelVisible(prev => !prev)}
@@ -624,18 +526,27 @@ export default function MapScreen() {
 				</TouchableOpacity>
 			)}
 
+			{mapReady && (
+				<TouchableOpacity
+					style={styles.editPointsButton}
+					onPress={() => setIsEditPointsPanelVisible(prev => !prev)}
+				>
+					<Text style={styles.editPointsButtonText}>Точки</Text>
+				</TouchableOpacity>
+			)}
+
 			<RouteSettingsPanel
 				initialPreferences={routePreferences}
-				onPreferencesChange={handlePreferencesChange}
+				onPreferencesChange={setRoutePreferences}
 				isVisible={isSettingsPanelVisible}
-				onClose={() => setIsSettingsPanelVisible(false)} // Передаем обработчик закрытия
-				actualRouteDistance={actualRouteDistance} // Передаем актуальную длину маршрута
+				onClose={() => setIsSettingsPanelVisible(false)}
+				actualRouteDistance={actualRouteDistance}
 			/>
+
 			<View style={styles.buildRouteButtonContainer}>
 				<TouchableOpacity
 					style={[
 						styles.buildRouteButton,
-						// Блокируем, если нет меток
 						(!mapReady ||
 							!location ||
 							placedMarkers.length === 0 ||
@@ -654,7 +565,6 @@ export default function MapScreen() {
 						<ActivityIndicator color={Colors.white} size='small' />
 					) : (
 						<Text style={styles.buildRouteButtonText}>
-							{/* Новый текст кнопки */}
 							Маршрут ({placedMarkers.length})
 						</Text>
 					)}
@@ -675,51 +585,59 @@ const styles = StyleSheet.create({
 		left: 0,
 		width: 1,
 		height: 1,
-	}, // Стиль для скрытого WebView во время загрузки
+	},
 	webViewContainer: { flex: 1 },
 	errorView: {
 		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: Colors.lightBackground,
-	}, // Стиль для ошибки загрузки HTML
+	},
+	errorText: {
+		color: Colors.error,
+		fontFamily: Fonts.medium,
+		fontSize: 16,
+		textAlign: 'center',
+		marginHorizontal: 20,
+	},
 
 	buildRouteButtonContainer: {
 		position: 'absolute',
-		bottom: 30, // Отступ снизу
+		bottom: 30,
 		left: 20,
 		right: 20,
-		alignItems: 'center', // Центрируем кнопку
-		pointerEvents: 'box-none', // Контейнер пропускает касания
+		alignItems: 'center',
+		pointerEvents: 'box-none',
 	},
 	buildRouteButton: {
-		backgroundColor: Colors.greenPrimary, // Цвет кнопки
+		backgroundColor: Colors.greenPrimary,
 		paddingVertical: 12,
 		paddingHorizontal: 20,
-		borderRadius: Radius.r15, // Используем ваш радиус
+		borderRadius: Radius.r15,
 		shadowColor: Colors.black,
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.25,
 		shadowRadius: 3.84,
 		elevation: 5,
-		pointerEvents: 'auto', // Кнопка принимает касания
-		minHeight: 48, // Минимальная высота для удобства нажатия
+		pointerEvents: 'auto',
+		minHeight: 48,
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
 	buttonDisabled: {
-		backgroundColor: Colors.gray, // Цвет неактивной кнопки
+		backgroundColor: Colors.gray,
 	},
 	buildRouteButtonText: {
-		color: Colors.black, // Цвет текста на кнопке
+		color: Colors.black,
 		fontSize: 16,
-		fontFamily: Fonts.semibold, // Используем ваш шрифт
+		fontFamily: Fonts.semibold,
 	},
 	settingsButton: {
 		position: 'absolute',
-		bottom: 100, // Выше кнопки "Маршрут" и панели
-		alignSelf: 'center',
-		backgroundColor: Colors.lightBackground, // Пример
+		bottom: 30,
+		left: 20,
+		alignSelf: 'flex-start',
+		backgroundColor: Colors.lightBackground,
 		padding: 10,
 		paddingHorizontal: 15,
 		borderRadius: Radius.r10,
@@ -727,6 +645,24 @@ const styles = StyleSheet.create({
 	settingsButtonText: {
 		color: Colors.black,
 		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f16,
+		fontSize: 16,
+	},
+
+	editPointsButton: {
+		position: 'absolute',
+		bottom: 30,
+		right: 20,
+		alignSelf: 'flex-end',
+		backgroundColor: Colors.lightBackground,
+		paddingVertical: 10,
+		paddingHorizontal: 15,
+		borderRadius: Radius.r10,
+		elevation: 6,
+		zIndex: 10,
+	},
+	editPointsButtonText: {
+		color: Colors.black,
+		fontFamily: Fonts.semibold,
+		fontSize: 16,
 	},
 });

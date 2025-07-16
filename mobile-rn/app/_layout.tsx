@@ -23,7 +23,6 @@ export default function RootLayout() {
 				<StatusBar
 					style='dark'
 					translucent={true}
-					backgroundColor='transparent'
 				/>
 				<Stack
 					screenOptions={{

@@ -46,7 +46,6 @@ export default function AppLayout() {
 			<StatusBar
 				style='dark'
 				translucent={true}
-				backgroundColor='transparent'
 			/>
 			<Stack
 				screenOptions={{

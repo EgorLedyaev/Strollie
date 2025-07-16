@@ -12,10 +12,12 @@ export const Colors = {
 	white: '#FFF',
 	lightBackground: '#F3F3F3',
 	red: '#CC384E',
+	error: '#CC384E', // Alias for red for error messages
 };
 
 export const Gaps = {
 	g8: 8,
+	g12: 12,
 	g16: 16,
 	g20: 20,
 	g50: 50,
@@ -28,9 +30,11 @@ export const Radius = {
 };
 
 export const Fonts = {
+	f14: 14,
 	f16: 16,
 	f18: 18,
 	f20: 20,
 	regular: 'SuisseIntl-Regular',
 	semibold: 'SuisseIntl-SemiBold',
+	medium: 'SuisseIntl-Medium',
 };
