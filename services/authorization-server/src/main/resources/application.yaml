@@ -1,0 +1,44 @@
+server:
+  port: 9100
+
+spring:
+  application:
+    name: auth-server
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: localhost
+    port: 1025
+    username: your-email@example.com
+    password: your-email-password
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_db
+    username: user
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+app:
+  otp:
+    lifetime-minutes: 5
+    max-attempts: 3
+    resend-cooldown-seconds: 60
