@@ -1,10 +1,10 @@
 package ru.riveo.strollie.authorization_server;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class AuthorizationServerApplicationTests {
+import ru.riveo.strollie.authorization_server.config.BaseIntegrationTest;
+
+class AuthorizationServerApplicationTests extends BaseIntegrationTest {
 
     @Test
     void contextLoads() {
