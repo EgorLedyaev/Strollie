@@ -7,14 +7,11 @@ spring:
 
   data:
     redis:
-      host: localhost
-      port: 6379
+      # host и port должны предоставляться средой исполнения
+      # Никаких дефолтных значений быть не должно!
 
   mail:
-    host: localhost
-    port: 1025
-    username: your-email@example.com
-    password: your-email-password
+    # host, port, username, password должны предоставляться средой исполнения
     properties:
       mail:
         smtp:
@@ -23,22 +20,32 @@ spring:
             enable: false
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/auth_db
-    username: user
-    password: password
+    # url, username, password НЕ ДОЛЖНЫ БЫТЬ ЗДЕСЬ.
+    # Они должны предоставляться ИСКЛЮЧИТЕЛЬНО средой исполнения.
     driver-class-name: org.postgresql.Driver
-
-  sql:
-    init:
-      mode: always
 
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: true
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
 app:
   otp:
     lifetime-minutes: 5
     max-attempts: 3
     resend-cooldown-seconds: 60
+
+authorization:
+  server:
+    issuer: ${AUTH_SERVER_ISSUER:http://localhost:9100}
+  security:
+    keystore:
+      path: classpath:keystore/keystore.jks
+      password: ${AUTH_KEYSTORE_PASSWORD}
+      key-alias: ${AUTH_KEYSTORE_KEY_ALIAS:jwt-signing-key}
+      private-key-passphrase: ${AUTH_KEYSTORE_KEY_PASSPHRASE}
