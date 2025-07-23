@@ -38,3 +38,8 @@ out/
 
 .docs
 .env
+*.jar
+
+src/main/resources/keystore/
+*.jks
+*.keystore
