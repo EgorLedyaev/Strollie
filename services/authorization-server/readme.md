@@ -204,16 +204,93 @@ curl -X POST http://localhost:9100/oauth2/token \
 
 ---
 
+### 4.3. Административные Сценарии
+
+Эти эндпоинты предназначены для управления сервером авторизации и требуют `access_token` пользователя с ролью `ROLE_ADMIN`.
+
+#### **Шаг 1 (для всех админ. операций): Получение токена администратора**
+
+1.  Используя email администратора (например, `admin@strollie.com`, заданный в `.env`), пройдите стандартный сценарий входа через OTP (см. секцию 4.2).
+2.  Полученный `access_token` будет содержать права администратора. Используйте его в заголовке `Authorization: Bearer <token>` для всех последующих запросов.
+
+#### **Сценарий 1: Динамическая регистрация нового OAuth2 клиента**
+
+Этот эндпоинт позволяет регистрировать новые приложения (Resource Servers, фронтенды), которые смогут использовать этот Authorization Server для аутентификации.
+
+*   **Endpoint:** `POST /api/clients`
+*   **Auth:** Требуется токен администратора.
+*   **Content-Type:** `application/json`
+*   **Body:**
+
+    ```json
+    {
+      "clientName": "Новый Сервис Профилей",
+      "grantTypes": ["authorization_code", "refresh_token", "client_credentials"],
+      "redirectUris": ["http://localhost:8080/login/oauth2/code/my-client"],
+      "scopes": ["openid", "profile", "user.read", "user.write"]
+    }
+    ```
+
+**Пример (cURL):**
+
+```bash
+curl -X POST http://localhost:9100/api/clients \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <ТОКЕН_АДМИНИСТРАТОРА>" \
+-d '{ "clientName": "Новый Сервис Профилей", "grantTypes": ["authorization_code", "refresh_token"], "redirectUris": ["http://localhost:8080/callback"], "scopes": ["openid", "profile"] }'
+```
+
+**Результат (`201 Created`):**
+Сервер вернет `clientId` и `clientSecret` для нового приложения. **`clientSecret` показывается только один раз. Его необходимо немедленно скопировать и безопасно сохранить.**
+
+```json
+{
+    "clientId": "сгенерированный-uuid",
+    "clientSecret": "сгенерированный-безопасный-секрет"
+}
+```
+
+#### **Сценарий 2: Назначение роли пользователю**
+
+Этот эндпоинт позволяет повышать права существующих пользователей.
+
+*   **Endpoint:** `POST /api/admin/roles/assign`
+*   **Auth:** Требуется токен администратора.
+*   **Content-Type:** `application/json`
+*   **Body:**
+
+    ```json
+    {
+      "email": "some.user@example.com",
+      "role": "ROLE_ADMIN"
+    }
+    ```
+
+**Пример (cURL):**
+
+```bash
+curl -X POST http://localhost:9100/api/admin/roles/assign \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer <ТОКЕН_АДМИНИСТРАТОРА>" \
+-d '{ "email": "some.user@example.com", "role": "ROLE_ADMIN" }'
+```
+
+**Результат (`200 OK`):**
+Тело ответа пустое. Пользователю `some.user@example.com` была добавлена роль `ROLE_ADMIN`.
+
+---
+
 ## 5. Управление Базой Данных
 
 Схема базы данных управляется с помощью **Flyway**.
 
-* **Расположение миграций:** `src/main/resources/db/migration`
-* **Порядок применения:** Файлы выполняются в лексикографическом порядке их имен (V1, V2, V3...).
-* **`V1`**: Создает таблицы, необходимые для Spring Authorization Server.
-* **`V2`**: Создает двух OAuth2-клиентов: `spa-client` и `mobile-app`.
-* **`V3`**: Создает таблицы для пользователей приложения (`users`, `user_roles`).
-* **`V4`**: Добавляет столбец `version` для оптимистичной блокировки.
-* **`V5`**: Расширяет таблицу `users` обязательными полями профиля (`firstName`, `lastName`, `city`, `dateOfBirth`) и переименовывает `username` в `nickname` в соответствии с бизнес-требованиями.
+*   **Расположение миграций:** `src/main/resources/db/migration`
+*   **Порядок применения:** Файлы выполняются в лексикографическом порядке их имен.
+*   **`V1`**: Создает таблицы, необходимые для Spring Authorization Server.
+*   **`V2`**: Создает двух начальных OAuth2-клиентов: `spa-client` и `mobile-app`.
+*   **`V3`**: Создает таблицы для пользователей приложения (`users`, `user_roles`).
+*   **`V4`**: Добавляет столбец `version` для оптимистичной блокировки.
+*   **`V5`**: Расширяет таблицу `users` полями профиля (`firstName`, `lastName` и т.д.) и переименовывает `username` в `nickname`.
+*   **`V6`**: Создает начального пользователя-администратора. **Критически важно:** Учетные данные для этого пользователя (`email`, `nickname`, `password_hash`) загружаются из переменных окружения и **не хранятся в коде**.
 
 **Внимание:** Никогда не изменяйте уже примененные миграции. Для любых изменений схемы создавайте новый файл миграции.
