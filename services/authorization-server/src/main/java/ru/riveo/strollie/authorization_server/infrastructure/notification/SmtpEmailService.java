@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ru.riveo.strollie.authorization_server.features.passwordless_auth.request_otp.port.EmailService;
 
 @Service
 @RequiredArgsConstructor

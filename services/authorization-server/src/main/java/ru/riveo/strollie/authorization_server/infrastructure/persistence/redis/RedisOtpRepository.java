@@ -60,7 +60,7 @@ public class RedisOtpRepository implements OtpRepository {
     @Override
     public boolean isRateLimited(String email) {
         String rateLimitKey = RATE_LIMIT_KEY_PREFIX + email;
-        return Boolean.TRUE.equals(redisTemplate.hasKey(rateLimitKey));
+        return redisTemplate.hasKey(rateLimitKey);
     }
 
     @Override
@@ -73,5 +73,14 @@ public class RedisOtpRepository implements OtpRepository {
     public void clearRateLimit(String email) {
         String rateLimitKey = RATE_LIMIT_KEY_PREFIX + email;
         redisTemplate.delete(rateLimitKey);
+    }
+
+    @Override
+    public boolean trySetRateLimit(String email, long durationSeconds) {
+        String rateLimitKey = RATE_LIMIT_KEY_PREFIX + email;
+        // setIfAbsent - это атомарная операция.
+        // Она устанавливает ключ, только если его нет, и возвращает true/false.
+        Boolean wasSet = redisTemplate.opsForValue().setIfAbsent(rateLimitKey, "locked", durationSeconds, TimeUnit.SECONDS);
+        return Boolean.TRUE.equals(wasSet);
     }
 }

@@ -12,7 +12,6 @@ spring:
 
   flyway:
     enabled: true # Flyway ДОЛЖЕН работать в тестах с настоящей БД
-
   # Свойства для datasource и redis будут предоставлены Testcontainers через @ServiceConnection
 
 # Конфигурация авторизационного сервера
@@ -31,3 +30,6 @@ app:
     lifetime-minutes: 5
     max-attempts: 3
     resend-cooldown-seconds: 2 # Уменьшаем для тестов
+  admin:
+    email: test.admin@strollie.com
+    nickname: test_admin

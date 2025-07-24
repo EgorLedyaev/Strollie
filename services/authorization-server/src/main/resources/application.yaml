@@ -5,11 +5,6 @@ spring:
   application:
     name: auth-server
 
-  data:
-    redis:
-      # host и port должны предоставляться средой исполнения
-      # Никаких дефолтных значений быть не должно!
-
   mail:
     # host, port, username, password должны предоставляться средой исполнения
     properties:
@@ -33,24 +28,22 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
-    placeholder-replacement: true
-    placeholders:
-      admin_email: ${ADMIN_EMAIL}
-      admin_nickname: ${ADMIN_NICKNAME}
-      admin_password_hash: ${ADMIN_PASSWORD_HASH}
 
 app:
   otp:
     lifetime-minutes: 5
     max-attempts: 3
     resend-cooldown-seconds: 60
+  admin:
+    email: ${ADMIN_EMAIL}
+    nickname: ${ADMIN_NICKNAME}
 
 authorization:
   server:
     issuer: ${AUTH_SERVER_ISSUER:http://localhost:9100}
   security:
     keystore:
-      path: classpath:keystore/keystore.jks
+      path: ${KEYSTORE_PATH}
       password: ${AUTH_KEYSTORE_PASSWORD}
       key-alias: ${AUTH_KEYSTORE_KEY_ALIAS:jwt-signing-key}
       private-key-passphrase: ${AUTH_KEYSTORE_KEY_PASSPHRASE}

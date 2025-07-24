@@ -57,6 +57,7 @@ services:
       mailhog:
         condition: service_started
     environment:
+      - KEYSTORE_PATH=file:/etc/secrets/keystore.jks
       - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
       - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
@@ -74,7 +75,11 @@ services:
       - AUTH_KEYSTORE_KEY_PASSPHRASE=${AUTH_KEYSTORE_KEY_PASSPHRASE}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_NICKNAME=${ADMIN_NICKNAME}
-      - ADMIN_PASSWORD_HASH=${ADMIN_PASSWORD_HASH}
+    volumes:
+        # Монтируем локальный файл в контейнер
+        # СЛЕВА: путь на вашем хосте
+        # СПРАВА: путь внутри контейнера (тот, что в KEYSTORE_PATH)
+      - ./src/main/resources/keystore/keystore.jks:/etc/secrets/keystore.jks:ro
     networks:
       - auth-net
 

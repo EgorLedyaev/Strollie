@@ -26,18 +26,14 @@ import org.springframework.security.oauth2.server.authorization.context.Authoriz
 import org.springframework.security.oauth2.server.authorization.token.DefaultOAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
-import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import ru.riveo.strollie.authorization_server.shared.security.OtpAuthenticationProvider;
-import ru.riveo.strollie.authorization_server.shared.security.OtpAuthenticationToken;
 
 /**
  * Провайдер аутентификации, который преобразует OtpAuthenticationToken
  * в OAuth2AccessTokenAuthenticationToken для выдачи токенов доступа
  */
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class OAuth2OtpAuthenticationProvider implements AuthenticationProvider {

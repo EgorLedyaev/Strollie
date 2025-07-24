@@ -6,18 +6,15 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.web.authentication.AuthenticationConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import ru.riveo.strollie.authorization_server.shared.security.OtpAuthenticationToken;
 
 /**
  * Конвертер для трансформации HTTP-запроса на /oauth2/token с
  * grant_type=urn:custom:otp
  * в токен OtpAuthenticationToken для аутентификации через OTP
  */
-@Component
 public class OtpAuthenticationConverter implements AuthenticationConverter {
 
     // Константы для параметров запроса

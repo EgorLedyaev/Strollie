@@ -43,3 +43,5 @@ out/
 src/main/resources/keystore/
 *.jks
 *.keystore
+
+node_modules/
