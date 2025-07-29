@@ -12,14 +12,15 @@ import {
 
 export const Input = ({
 	isPassword,
+	isInvalid,
 	...props
-}: TextInputProps & { isPassword?: boolean }) => {
+}: TextInputProps & { isPassword?: boolean, isInvalid?: boolean }) => {
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 	return (
 		<View>
 			<TextInput
 				placeholderTextColor={Colors.gray}
-				style={styles.input}
+				style={[styles.input, isInvalid && styles.inputInvalid]}
 				secureTextEntry={isPassword && !isPasswordVisible}
 				{...props}
 			/>
@@ -44,6 +45,11 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: Colors.black,
 		fontFamily: Fonts.regular,
+		borderWidth: 1,
+		borderColor: 'transparent',
+	},
+	inputInvalid: {
+		borderColor: Colors.error,
 	},
 	eyeIcon: {
 		position: 'absolute',

@@ -12,11 +12,13 @@
   "arrowParens": "avoid",
   "importOrder": [
     "<THIRD_PARTY_MODULES>",
-    "^@components/(.*)$",
-    "^@hooks/(.*)$",
-    "^@services/(.*)$",
-    "^@assets/(.*)$",
-    "^@providers/(.*)$",
+    "^@/app/(.*)$",
+    "^@/processes/(.*)$",
+    "^@/pages/(.*)$",
+    "^@/widgets/(.*)$",
+    "^@/features/(.*)$",
+    "^@/entities/(.*)$",
+    "^@/shared/(.*)$",
     "^[./]"
   ],
   "importOrderSeparation": true,

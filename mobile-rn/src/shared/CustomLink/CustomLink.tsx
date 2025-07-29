@@ -7,18 +7,16 @@ export const CustomLink = ({
 	...props
 }: LinkProps & { text: string }) => {
 	return (
-		<>
-			<Link style={styles.link} {...props}>
-				<Text>{text}</Text>
-			</Link>
-		</>
+		<Link {...props}>
+			<Text style={styles.link}>{text}</Text>
+		</Link>
 	);
 };
 
 const styles = StyleSheet.create({
 	link: {
-		fontSize: Fonts.f18,
-		color: Colors.black,
-		fontFamily: Fonts.regular,
+		fontSize: Fonts.f16,
+		color: Colors.greenLink,
+		fontFamily: Fonts.medium,
 	},
 });

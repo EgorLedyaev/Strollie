@@ -34,8 +34,24 @@ export default function RootLayout() {
 					}}
 				>
 					<Stack.Screen
+						name='index'
+						options={{ title: 'Splash', headerShown: false }}
+					/>
+					<Stack.Screen
 						name='sign-in'
 						options={{ title: 'Sign In', headerShown: false }}
+					/>
+					<Stack.Screen
+						name='register'
+						options={{ title: 'Register', headerShown: false }}
+					/>
+					<Stack.Screen
+						name='verify-code'
+						options={{ title: 'Verify Code', headerShown: false }}
+					/>
+					<Stack.Screen
+						name='user-data'
+						options={{ title: 'User Data', headerShown: false }}
 					/>
 				</Stack>
 			</SafeAreaProvider>

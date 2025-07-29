@@ -42,7 +42,7 @@ export default function AppLayout() {
 		);
 	}
 	return (
-		<SafeAreaProvider>
+		<>
 			<StatusBar
 				style='dark'
 				translucent={true}
@@ -59,7 +59,7 @@ export default function AppLayout() {
 				<Stack.Screen name='index' />
 				<Stack.Screen name='profile' />
 			</Stack>
-		</SafeAreaProvider>
+		</>
 	);
 }
 

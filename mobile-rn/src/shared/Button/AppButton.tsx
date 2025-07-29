@@ -25,6 +25,7 @@ interface AppButtonProps extends PressableProps {
 }
 
 // Цвета градиента
+// Цвета градиента - обновлены в соответствии с макетом
 const GRADIENT_START = Colors.greenPrimary;
 const GRADIENT_END = Colors.greenSecondary;
 

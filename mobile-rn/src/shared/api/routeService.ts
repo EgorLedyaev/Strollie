@@ -1,6 +1,6 @@
 // routeService.ts
-import apiClient from '@/src/pages/MapScreen/appClient';
 import axios from 'axios';
+import apiClient from './client';
 
 export interface RouteRequestData {
 	startPoint: { lon: number; lat: number };

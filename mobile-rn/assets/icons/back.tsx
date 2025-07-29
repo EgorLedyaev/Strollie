@@ -4,7 +4,7 @@ import Svg, { Path, SvgProps } from 'react-native-svg';
 const BackIcon = (props: SvgProps) => (
 	<Svg width={10} height={14} fill='none' {...props}>
 		<Path
-			stroke='#AAA'
+			stroke={props.stroke || '#AAA'}
 			strokeLinecap='round'
 			strokeLinejoin='round'
 			strokeWidth={2}
