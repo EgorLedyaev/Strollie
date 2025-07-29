@@ -19,6 +19,8 @@ export const Colors = {
 	lightBackground: '#F6F6F6',
 	red: '#CC384E',
 	error: '#CC384E', // Alias for red for error messages
+	disabledGray: '#EAEAEA', // Цвет фона для отключенных кнопок
+	grayMedium: '#C7C7C7', // Цвет текста для отключенных кнопок
 };
 
 export const Gaps = {

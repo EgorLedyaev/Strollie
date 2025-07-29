@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Svg, { Path, SvgProps } from 'react-native-svg';
 
-const BackIcon = (props: SvgProps) => (
+const ArrowLeftIcon = (props: SvgProps) => (
 	<Svg width={10} height={14} fill='none' {...props}>
 		<Path
 			stroke={props.stroke || '#AAA'}
@@ -12,4 +12,4 @@ const BackIcon = (props: SvgProps) => (
 		/>
 	</Svg>
 );
-export default BackIcon;
+export default ArrowLeftIcon;

@@ -13,7 +13,7 @@ import {
   Pressable,
   StatusBar,
 } from 'react-native';
-import BackIcon from '@/assets/icons/back';
+import { BackButton } from '@/src/shared/ui/BackButton';
 
 export default function VerifyCode() {
   const [code, setCode] = useState('');
@@ -84,10 +84,7 @@ export default function VerifyCode() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.lightBackground} />
       
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <BackIcon style={styles.backButtonArrow} stroke={Colors.linkGreen} />
-        <Text style={styles.backButtonText}>Вернуться</Text>
-      </TouchableOpacity>
+      <BackButton style={styles.backButton} />
       
       <View style={styles.container}>
         <View style={styles.header}>
@@ -174,20 +171,6 @@ const styles = StyleSheet.create({
     top: 69,
     left: 26,
     zIndex: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 101,
-    height: 20,
-  },
-  backButtonArrow: {
-    marginRight: 5,
-    width: 19,
-  },
-  backButtonText: {
-    fontFamily: Fonts.regular,
-    fontSize: 16,
-    color: Colors.linkGreen,
-    fontWeight: '400',
   },
   title: {
     fontFamily: Fonts.semibold,

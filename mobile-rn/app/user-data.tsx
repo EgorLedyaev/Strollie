@@ -1,11 +1,12 @@
 import { useAuth } from '@/src/entities/auth/model/auth-context';
 import { AppButton } from '@/src/shared/Button/AppButton';
 import { Input } from '@/src/shared/Input/Input';
+import { BackButton } from '@/src/shared/ui/BackButton';
+import { Select, SelectOption } from '@/src/shared/ui/Select';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native';
-import BackIcon from '@/assets/icons/back';
+import { StyleSheet, Text, View, SafeAreaView, StatusBar } from 'react-native';
 
 export default function UserData() {
   const [firstName, setFirstName] = useState('');
@@ -13,10 +14,17 @@ export default function UserData() {
   const [city, setCity] = useState('');
   const [birthdate, setBirthdate] = useState('');
   const [nickname, setNickname] = useState('');
+  const [gender, setGender] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const [formError, setFormError] = useState<string | null>(null);
   
   const { register, isLoading, error } = useAuth();
+  
+  const genderOptions: SelectOption[] = [
+    { label: 'Мужской', value: 'male' },
+    { label: 'Женский', value: 'female' },
+    { label: 'Другое', value: 'other' },
+  ];
 
   const handleRegister = async () => {
     try {
@@ -29,6 +37,7 @@ export default function UserData() {
       if (!firstName.trim()) errors.firstName = true;
       if (!lastName.trim()) errors.lastName = true;
       if (!city.trim()) errors.city = true;
+      if (!gender) errors.gender = true;
       
       if (Object.keys(errors).length > 0) {
         setValidationErrors(errors);
@@ -42,7 +51,8 @@ export default function UserData() {
         lastName,
         city,
         birthdate,
-        nickname
+        nickname,
+        gender
       });
       
       // Переход на главный экран после успешной регистрации
@@ -56,10 +66,7 @@ export default function UserData() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor={Colors.lightBackground} />
       
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <BackIcon style={styles.backButtonIcon} stroke={Colors.linkGreen} />
-        <Text style={styles.backLinkText}>Вернуться</Text>
-      </TouchableOpacity>
+      <BackButton style={styles.backButton} />
       
       <View style={styles.container}>
         <Text style={styles.title}>Данные пользователя</Text>
@@ -131,6 +138,16 @@ export default function UserData() {
               onChangeText={setNickname}
             />
           </View>
+          
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Пол</Text>
+            <Select 
+              options={genderOptions}
+              value={gender}
+              placeholder="Выберите пол"
+              onSelect={(option) => setGender(option.value)}
+            />
+          </View>
         </View>
         
         {(error || formError) && (
@@ -164,20 +181,6 @@ const styles = StyleSheet.create({
     top: 69,
     left: 26,
     zIndex: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 101,
-    height: 20,
-  },
-  backButtonIcon: {
-    marginRight: 5,
-    width: 19,
-  },
-  backLinkText: {
-    fontFamily: Fonts.regular,
-    fontSize: 16,
-    color: Colors.linkGreen,
-    fontWeight: '400',
   },
   title: {
     fontFamily: Fonts.semibold,

@@ -44,6 +44,7 @@ export const AppButton = ({
 	text,
 	isLoading,
 	variant = 'primary',
+	disabled,
 	...props
 }: AppButtonProps) => {
 	const pressed = useSharedValue(0);
@@ -54,7 +55,8 @@ export const AppButton = ({
 		dimColor(GRADIENT_START),
 		dimColor(GRADIENT_END),
 	] as const;
-	const [currentColors, setCurrentColors] = useState(gradientColors);
+	const disabledColors = [Colors.disabledGray, Colors.disabledGray] as const;
+	const [currentColors, setCurrentColors] = useState(disabled ? disabledColors : gradientColors);
 
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
@@ -63,6 +65,8 @@ export const AppButton = ({
 	});
 
 	const handlePressIn = (e: GestureResponderEvent) => {
+		if (disabled) return;
+		
 		pressed.value = withTiming(1, { duration: 100 });
 		scale.value = withTiming(0.97, { duration: 100 });
 		setCurrentColors(dimmedGradientColors);
@@ -70,6 +74,8 @@ export const AppButton = ({
 	};
 
 	const handlePressOut = (e: GestureResponderEvent) => {
+		if (disabled) return;
+		
 		pressed.value = withTiming(0, { duration: 200 });
 		scale.value = withTiming(1, { duration: 200 });
 		setCurrentColors(gradientColors);
@@ -94,7 +100,7 @@ export const AppButton = ({
 						variant !== 'outline' ? styles.shadow : null,
 					]}
 				>
-					{!isLoading && <Text style={styles.text}>{text}</Text>}
+					{!isLoading && <Text style={[styles.text, disabled && styles.disabledText]}>{text}</Text>}
 					{isLoading && (
 						<ActivityIndicator
 							size='large'
@@ -148,5 +154,8 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.semibold,
 		textAlign: 'center',
 		color: Colors.white,
+	},
+	disabledText: {
+		color: Colors.grayMedium,
 	},
 });

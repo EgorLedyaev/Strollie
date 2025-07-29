@@ -1,5 +1,5 @@
 import ActionIcon from '@/assets/icons/action';
-import BackIcon from '@/assets/icons/back';
+import ArrowLeftIcon from '@/assets/icons/arrow-left';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { useNavigation } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
@@ -8,7 +8,7 @@ export function Header({ email }: { email: string }) {
 	const navigation = useNavigation();
 	return (
 		<View style={styles.header}>
-			<BackIcon onPress={() => navigation.goBack()} />
+			<ArrowLeftIcon onPress={() => navigation.goBack()} />
 			<Text style={styles.text}>{email}</Text>
 			<ActionIcon />
 		</View>
