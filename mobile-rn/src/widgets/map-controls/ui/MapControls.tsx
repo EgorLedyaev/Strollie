@@ -22,12 +22,17 @@ export const MapControls: React.FC<MapControlsProps> = (props) => {
     return (
         <View style={styles.overlayContainer} pointerEvents="box-none">
             <View style={styles.header} pointerEvents="box-none">
-                <ProfileButton href={'/profile'} pointerEvents={'auto'} />
-                <SearchInput onSearchResultSelect={props.onSearchResultSelect} />
+                <View style={styles.searchBarContainer}>
+                    <View style={styles.searchIconContainer}>
+                        <ProfileButton href={'/profile'} pointerEvents={'auto'} />
+                    </View>
+                    <SearchInput onSearchResultSelect={props.onSearchResultSelect} />
+                </View>
             </View>
+            {/* Компонент погоды перенесен в основной экран */}
             <View style={styles.mapControlsWrapper} pointerEvents="auto">
                 <View style={styles.zoomAndModeContainer}>
-                    <View style={styles.mapControls}>
+                            <View style={styles.mapControls}>
                         <TouchableOpacity style={[styles.mapButton, styles.mapButtonPlus]} onPress={props.onZoomIn} disabled={!props.mapReady}>
                             <PlusIcon />
                         </TouchableOpacity>
@@ -63,15 +68,26 @@ const styles = StyleSheet.create({
         pointerEvents: 'box-none',
     },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
         paddingHorizontal: 16,
         paddingTop: Platform.OS === 'ios' ? 50 : 40, // Адаптивный отступ сверху
+    },
+    searchBarContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 10,
+    },
+    searchIconContainer: {
+        width: 45,
+        height: 45,
+    },
+    weatherWrapper: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? 120 : 100,
+        left: 16,
     },
     mapControlsWrapper: {
         position: 'absolute',
-        top: '45%',
+        top: 280,
         right: 16,
         alignItems: 'flex-end',
     },

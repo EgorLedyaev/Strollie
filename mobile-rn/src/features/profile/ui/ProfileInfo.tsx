@@ -2,22 +2,36 @@ import BirthdayIcon from '@/assets/icons/BirthdayIcon';
 import LocationIcon from '@/assets/icons/map/LocationIcon';
 import OutLinePointerIcon from '@/assets/profile/OutlinePointerIcon';
 import { User } from '@/src/entities/user/model/user.model';
+import { UserProfileData } from '@/src/features/profile/ui/EditProfileScreen';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { StyleSheet, Text, View } from 'react-native';
 
-export function ProfileInfo({ user }: { user: User }) {
+interface ProfileInfoProps {
+	user: User;
+	profileData?: UserProfileData;
+}
+
+export function ProfileInfo({ user, profileData }: ProfileInfoProps) {
+	const fullName = profileData 
+		? `${profileData.firstName} ${profileData.lastName}` 
+		: 'Иван Иванов';
+		
+	const nickname = profileData?.nickname || user.email;
+	const birthDate = profileData?.birthDate || user.created_at;
+	const city = profileData?.city || 'Не указан';
+
 	return (
 		<View style={styles.profile}>
 			<View style={styles.avatar}></View>
 			<View style={styles.description}>
-				<Text style={styles.info}>Иван Иванов</Text>
+				<Text style={styles.info}>{fullName}</Text>
 				<View style={styles.infoRow}>
 					<OutLinePointerIcon />
-					<Text style={styles.text}>{user.email}</Text>
+					<Text style={styles.text}>{city}</Text>
 				</View>
 				<View style={styles.infoRow}>
 					<BirthdayIcon />
-					<Text style={styles.text}>{user.created_at}</Text>
+					<Text style={styles.text}>{birthDate}</Text>
 				</View>
 			</View>
 		</View>

@@ -4,7 +4,7 @@ import { BuildRouteButton } from '@/src/features/route-build/ui/BuildRouteButton
 import { useAtom, useSetAtom } from 'jotai';
 import { mapReadyAtom, is3DModeAtom, mapErrorAtom } from '@/src/entities/map/model/map-store';
 import { useLocationTracking } from '@/src/hooks/useLocationTracking';
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { View, StyleSheet, Platform, ActionSheetIOS, Alert } from 'react-native';
 import {
 	placedMarkersAtom,
@@ -18,6 +18,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { PlacedMarkerData } from '@/src/entities/marker/model/marker-store';
 import WebView from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WeatherWidget } from '@/src/features/weather/ui/WeatherWidget';
+import { ServiceTabs } from '@/src/features/service-tabs/ui/ServiceTabs';
+import { NavBar } from '@/src/features/navigation/ui/NavBar';
+import { PlayRouteIcon } from '@/assets/icons/nav/PlayRouteIcon';
+import { ProfileIcon } from '@/assets/icons/nav/ProfileIcon';
+import { ChatIcon } from '@/assets/icons/nav/ChatIcon';
 
 export default function MapScreen() {
     const webViewRef = useRef<WebView>(null);
@@ -211,6 +217,30 @@ export default function MapScreen() {
 		[mapReady, sendMessageToWebView],
 	);
 
+    const [temperature, setTemperature] = useState(16);
+
+    const serviceTabs = [
+        { id: 'feed', title: 'Лента' },
+        { id: 'events', title: 'Афиша' },
+        { id: 'settings', title: 'Настройки' }
+    ];
+
+    const handleServiceTabSelect = (id: string) => {
+        console.log(`Selected service tab: ${id}`);
+    };
+
+    const handleNavProfilePress = () => {
+        console.log('Profile button pressed');
+    };
+
+    const handleNavRoutePress = () => {
+        handleBuildRouteThroughPlaced();
+    };
+
+    const handleNavChatPress = () => {
+        console.log('Chat button pressed');
+    };
+    
     return (
         <SafeAreaView style={styles.container}>
             <MapWidget ref={webViewRef} onMessage={handleWebViewMessage} />
@@ -224,20 +254,58 @@ export default function MapScreen() {
                 isLocationAvailable={!!location}
                 onSearchResultSelect={handleSearchResultSelect}
             />
-            <View style={styles.buildRouteButtonContainer}>
-                <BuildRouteButton
-                    onPress={handleBuildRouteThroughPlaced}
-                    disabled={!mapReady || !location || placedMarkers.length === 0 || isBuildingRoute}
-                    isBuilding={isBuildingRoute}
-                    pointCount={placedMarkers.length}
-                />
+            <View style={styles.weatherContainer}>
+                <WeatherWidget temperature={temperature} />
+            </View>
+            <View style={styles.bottomPanel}>
+                <View style={styles.servicesContainer}>
+                    <ServiceTabs tabs={serviceTabs} onSelect={handleServiceTabSelect} />
+                </View>
+                <View style={styles.navBarContainer}>
+                    <NavBar 
+                        leftComponent={<ProfileIcon />}
+                        centerComponent={<PlayRouteIcon />}
+                        rightComponent={<ChatIcon />}
+                        onPressLeft={handleNavProfilePress}
+                        onPressCenter={handleNavRoutePress}
+                        onPressRight={handleNavChatPress}
+                    />
+                </View>
             </View>
         </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: { 
+        flex: 1 
+    },
+    weatherContainer: {
+        position: 'absolute',
+        top: Platform.OS === 'ios' ? 120 : 100,
+        right: 20,
+        zIndex: 10,
+    },
+    bottomPanel: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'transparent',
+    },
+    servicesContainer: {
+        backgroundColor: '#ffffff',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 5,
+    },
+    navBarContainer: {
+        marginBottom: Platform.OS === 'ios' ? 20 : 10,
+    },
     buildRouteButtonContainer: {
 		position: 'absolute',
 		bottom: 30,

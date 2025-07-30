@@ -18,7 +18,7 @@ export default function VerifyCode() {
   const [code, setCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(60);
   const [canResend, setCanResend] = useState(false);
-  const { verifyCode, resendCode, isLoading, error, userInfo } = useAuth();
+  const { verifyCode, resendCode, isLoading, error, userInfo, isRegistrationFlow } = useAuth();
   
   // Email адрес из контекста аутентификации
   const email = userInfo?.email || 'эл. почту';
@@ -57,14 +57,18 @@ export default function VerifyCode() {
     try {
       const success = await verifyCode(code);
       if (success) {
-        // Проверяем, является ли текущая сессия регистрацией по контексту userInfo
-        // Если это регистрация, отправляем на заполнение данных
-        // Иначе переходим в приложение
-        const isRegistration = !userInfo?.firstName;
+        // Проверяем, является ли текущая сессия регистрацией
+        const isRegistration = await isRegistrationFlow();
+        
+        console.log('Верификация успешна, тип потока:', isRegistration ? 'Регистрация' : 'Вход');
         
         if (isRegistration) {
+          // Если это регистрация, отправляем на заполнение данных
+          console.log('Перенаправляем на заполнение данных пользователя');
           router.push('/user-data');
         } else {
+          // Иначе переходим в приложение
+          console.log('Перенаправляем в приложение');
           router.replace('/(app)');
         }
       }

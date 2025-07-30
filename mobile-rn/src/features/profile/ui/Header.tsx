@@ -2,15 +2,32 @@ import ActionIcon from '@/assets/icons/action';
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { useNavigation } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 
-export function Header({ email }: { email: string }) {
+interface HeaderProps {
+	email: string;
+	onMenuPress: () => void;
+}
+
+export function Header({ email, onMenuPress }: HeaderProps) {
 	const navigation = useNavigation();
 	return (
 		<View style={styles.header}>
-			<ArrowLeftIcon onPress={() => navigation.goBack()} />
+			<TouchableOpacity 
+				onPress={() => navigation.goBack()} 
+				style={styles.iconButton}
+				hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+			>
+				<ArrowLeftIcon />
+			</TouchableOpacity>
 			<Text style={styles.text}>{email}</Text>
-			<ActionIcon />
+			<TouchableOpacity 
+				onPress={onMenuPress}
+				style={styles.iconButton}
+				hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+			>
+				<ActionIcon />
+			</TouchableOpacity>
 		</View>
 	);
 }
@@ -26,5 +43,8 @@ const styles = StyleSheet.create({
 		color: Colors.darkGray,
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f16,
+	},
+	iconButton: {
+		padding: 5, // Увеличиваем область кнопки
 	},
 });

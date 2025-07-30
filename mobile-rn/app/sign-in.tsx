@@ -16,6 +16,8 @@ export default function SignIn() {
     
     try {
       await loginWithEmail(email);
+      
+      // Для демонстрационных целей переходим сразу к проверке кода
       router.push('/verify-code' as any);
     } catch (err) {
       console.error('Ошибка входа', err);

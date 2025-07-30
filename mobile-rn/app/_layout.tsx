@@ -1,5 +1,6 @@
 import { AuthProvider } from '@/src/entities/auth/model/auth-context';
 import { Colors } from '@/src/shared/tokens';
+import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -17,13 +18,17 @@ export default function RootLayout() {
 	}, []);
 	const insets = useSafeAreaInsets();
 
+	const [fontsLoaded, fontError] = useFonts({
+		'SuisseIntl-Regular': require('../assets/fonts/SuisseIntl-Regular.otf'),
+		'SuisseIntl-SemiBold': require('../assets/fonts/SuisseIntl-SemiBold.otf'),
+		'SuisseIntl-Bold': require('../assets/fonts/SuisseIntl-Bold.otf'),
+		'SuisseIntl-Medium': require('../assets/fonts/SuisseIntl-Medium.otf'),
+	});
+
 	return (
 		<AuthProvider>
 			<SafeAreaProvider>
-				<StatusBar
-					style='dark'
-					translucent={true}
-				/>
+				<StatusBar style='dark' translucent={true} />
 				<Stack
 					screenOptions={{
 						headerShown: false,

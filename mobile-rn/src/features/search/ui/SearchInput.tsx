@@ -70,8 +70,8 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 		<View style={styles.searchContainer}>
 			<TextInput
 				style={styles.searchInput}
-				placeholder='Поиск места или адреса...'
-				placeholderTextColor={Colors.darkGray}
+				placeholder='Поиск и выбор мест'
+				placeholderTextColor={Colors.lightGray}
 				value={searchQuery}
 				onChangeText={handleSearch}
 				onFocus={() => {
@@ -132,10 +132,10 @@ const styles = StyleSheet.create({
 	},
 	searchInput: {
 		backgroundColor: Colors.white,
-		borderRadius: Radius.r10,
+		borderRadius: Radius.r15,
 		paddingHorizontal: Gaps.g16,
 		paddingVertical: Platform.OS === 'ios' ? 14 : 10,
-		fontSize: Fonts.f16,
+		fontSize: Fonts.f14,
 		fontFamily: Fonts.regular,
 		color: Colors.black,
 		shadowColor: Colors.black,
