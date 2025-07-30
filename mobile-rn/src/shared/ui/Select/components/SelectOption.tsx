@@ -21,9 +21,8 @@ export const SelectOption: React.FC<SelectOptionProps> = ({
   isSelected, 
   onSelect 
 }) => {
-  // Создаем обработчик нажатия с отладкой
+  // Создаем обработчик нажатия
   const handlePress = () => {
-    console.log('SelectOption pressed:', item);
     // Явно передаем выбранную опцию в обработчик с небольшой задержкой для улучшения UX
     setTimeout(() => {
       onSelect(item);

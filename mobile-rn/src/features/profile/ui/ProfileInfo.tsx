@@ -1,7 +1,7 @@
 import BirthdayIcon from '@/assets/icons/BirthdayIcon';
 import LocationIcon from '@/assets/icons/map/LocationIcon';
 import OutLinePointerIcon from '@/assets/profile/OutlinePointerIcon';
-import { User } from '@/src/entities/user/model/user.model';
+import { type User } from '@/src/entities/user';
 import { UserProfileData } from '@/src/features/profile/ui/EditProfileScreen';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { StyleSheet, Text, View } from 'react-native';

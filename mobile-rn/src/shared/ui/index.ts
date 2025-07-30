@@ -6,3 +6,4 @@ export * from './CustomLink';
 export * from './ErrorNotification';
 export * from './Input';
 export * from './MapStatusIndicator';
+export { MenuItem } from './MenuItem';

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { useSetAtom } from 'jotai';
-import { profileAtom } from '@/src/entities/user/model/user.state';
+import { profileAtom } from '@/src/entities/user';
+import { SessionStorage, sessionAtom } from '@/src/entities/session';
+import { User } from '@/src/entities/user/model/user.model';
 
 export interface UserInfo {
   sub: string;
@@ -19,28 +21,54 @@ export const useRegisterUser = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const setProfile = useSetAtom(profileAtom);
+  const setSession = useSetAtom(sessionAtom);
 
   const register = async (userData: Partial<UserInfo>) => {
     setIsLoading(true);
     setError(null);
     try {
-      // Имитация API запроса для регистрации пользователя
-      // В реальном приложении здесь будет вызов API
+      // Получаем email из хранилища
+      const email = await SessionStorage.getEmail();
       
-      // Обновляем профиль пользователя
+      if (!email) {
+        throw new Error('Email не найден');
+      }
+
+      // Обязательно сохраняем email в локальном хранилище для последующей авторизации
+      await SessionStorage.addRegisteredUser(email);
+      
+      // Логируем для отладки
+      console.log('Регистрируем пользователя с email:', email);
+      const registeredUsers = await SessionStorage.getRegisteredUsers();
+      console.log('Текущие зарегистрированные пользователи:', registeredUsers);
+      
+      // Создаем профиль пользователя
+      const userProfile: User = {
+        user_id: 'user-' + Date.now(),
+        email: email,
+        created_at: new Date().toISOString(),
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+        nickname: userData.nickname || '',
+        city: userData.city || '',
+        birthDate: userData.birthdate || '',
+        aboutMe: userData.aboutMe as string || ''
+      };
+      
+      // Сохраняем профиль пользователя в хранилище
+      await SessionStorage.saveUserProfile(email, userProfile);
+      
+      // Обновляем атом профиля
       setProfile({
-        profile: {
-          user_id: 'user-' + Date.now(),
-          email: userData.email || '',
-          created_at: new Date().toISOString(),
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          nickname: userData.nickname,
-          city: userData.city,
-          birthDate: userData.birthdate,
-        },
+        profile: userProfile,
         isLoading: false,
         error: null
+      });
+
+      // Устанавливаем сессию как авторизованную
+      setSession({
+        isAuthenticated: true,
+        refreshToken: 'mock-token-' + Date.now(),
       });
 
       // Перенаправляем на главный экран приложения

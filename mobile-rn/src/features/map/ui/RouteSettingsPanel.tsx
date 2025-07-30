@@ -10,14 +10,9 @@ import {
 	View,
 } from 'react-native';
 
-// Slider убираем, так как были проблемы с установкой
+import type { RoutePreferences } from '@/src/entities/route';
 
-export interface RoutePreferences {
-	preferParks: boolean;
-	avoidHills: boolean;
-	walkingSpeed: number; // км/ч
-	desiredDistance: number; // км
-}
+// Slider убираем, так как были проблемы с установкой
 
 interface RouteSettingsPanelProps {
 	initialPreferences: RoutePreferences;

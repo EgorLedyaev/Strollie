@@ -9,4 +9,9 @@ export interface User {
 	city?: string;
 	birthDate?: string;
 	aboutMe?: string;
+	
+	// Дополнительные поля для совместимости
+	photo?: string;
+	name?: string; // Alias для firstName
+	surname?: string; // Alias для lastName
 }

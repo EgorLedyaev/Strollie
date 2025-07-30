@@ -1,11 +1,12 @@
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { Link, LinkProps } from 'expo-router';
+import { Link } from 'expo-router';
 import { StyleSheet, Text } from 'react-native';
+import { CustomLinkProps } from './CustomLinkProps';
 
 export const CustomLink = ({
 	text,
 	...props
-}: LinkProps & { text: string }) => {
+}: CustomLinkProps) => {
 	return (
 		<Link {...props}>
 			<Text style={styles.link}>{text}</Text>

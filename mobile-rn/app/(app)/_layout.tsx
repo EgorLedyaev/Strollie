@@ -1,4 +1,4 @@
-import { useAuthCheck } from '@/src/features/auth-check/model/use-auth-check';
+import { useAuthCheck } from '@/src/features/auth-by-email';
 import { Colors } from '@/src/shared/tokens';
 import { Redirect, Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';

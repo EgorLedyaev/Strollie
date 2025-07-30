@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Platform, TouchableOpacity, Text } from 'react-native';
-import { ProfileButton } from '@/src/features/layout/ui/ProfileButton/ProfileButton';
-import { SearchInput } from '@/src/features/search/ui/SearchInput';
+import { ProfileButton } from '@/src/features/layout';
+import { SearchInput } from '@/src/features/search';
 import { Gaps, Radius, Colors, Fonts } from '@/src/shared/tokens';
 import PlusIcon from '@/assets/icons/map/PlusIcon';
 import MinusIcon from '@/assets/icons/map/MinusIcon';

@@ -1,5 +1,5 @@
 // src/features/map/ui/EditableRoutePointsList.tsx
-import { PlacedMarkerData } from '@/src/pages/MapScreen/MapScreen';
+import { PlacedMarkerData } from '@/src/entities/marker';
 // Обязательно для DraggableFlatList!
 import { Colors, Fonts, Gaps, Radius } from '@/src/shared/tokens';
 import React from 'react';

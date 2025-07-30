@@ -61,7 +61,7 @@ export async function buildOptimalRoute(
 				`Сервер маршрутизации вернул ошибку: ${errorDetails}`,
 			);
 		} else {
-			throw new Error('Не удалось построить маршрут: ' + error.message);
+			throw new Error('Не удалось построить маршрут: ' + (error instanceof Error ? error.message : String(error)));
 		}
 	}
 }

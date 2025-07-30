@@ -1,5 +1,5 @@
-import { mapErrorAtom, mapReadyAtom } from '@/src/entities/map/model/map-store';
-import { MapStatusIndicator } from '@/src/shared/ui/MapStatusIndicator/MapStatusIndicator';
+import { mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
+import { MapStatusIndicator } from '@/src/shared/ui';
 import { useAtom, useSetAtom } from 'jotai';
 import React, { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';

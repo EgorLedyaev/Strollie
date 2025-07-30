@@ -1,8 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { sessionAtom } from '@/src/entities/session/model/session.state';
-import { SessionStorage } from '@/src/entities/session/model/session-storage';
+import { sessionAtom, SessionStorage } from '@/src/entities/session';
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,13 +9,35 @@ export const useLogin = () => {
   const setSession = useSetAtom(sessionAtom);
 
   const loginWithEmail = async (email: string) => {
-    if (!email.trim()) return;
+    if (!email.trim()) {
+      setError('Введите email');
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
     try {
-      // Имитация API запроса для отправки кода
+      // Проверяем, зарегистрирован ли пользователь
+      const isRegistered = await SessionStorage.isUserRegistered(email);
+      console.log(`Вход в систему с email: ${email}, зарегистрирован: ${isRegistered}`);
+      
+      if (!isRegistered) {
+        setError('Пользователь не найден. Пожалуйста, зарегистрируйтесь.');
+        return;
+      }
+
+      // Сохраняем email для использования на других экранах
+      await SessionStorage.setEmail(email);
       await SessionStorage.setIsRegistration(false);
+      
+      // Загружаем профиль пользователя по email
+      const userProfile = await SessionStorage.loadUserProfile(email);
+      if (userProfile) {
+        console.log(`Восстановлен профиль для ${email}:`, userProfile);
+      } else {
+        console.log(`Профиль для ${email} не найден, будет создан после верификации`);
+      }
+      
       router.push('/verify-code');
     } catch (err) {
       console.error('Ошибка входа', err);

@@ -8,13 +8,28 @@ import {
 	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { Provider as JotaiProvider } from 'jotai';
+import { SessionStorage } from '@/src/entities/session';
 
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
 	useEffect(() => {
-		setTimeout(() => {
-			SplashScreen.hideAsync();
-		}, 3000); // 3 секунды задержки
+		// Инициализируем SessionStorage при загрузке приложения
+		const initSession = async () => {
+			try {
+				// Загружаем список зарегистрированных пользователей
+				const users = await SessionStorage.getRegisteredUsers();
+				console.log('Инициализация приложения. Зарегистрированные пользователи:', users);
+			} catch (error) {
+				console.error('Ошибка инициализации сессии:', error);
+			}
+			
+			// Показываем сплеш
+			setTimeout(() => {
+				SplashScreen.hideAsync();
+			}, 3000); // 3 секунды задержки
+		};
+		
+		initSession();
 	}, []);
 	const insets = useSafeAreaInsets();
 

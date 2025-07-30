@@ -160,6 +160,8 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.semibold,
 		textAlign: 'center',
 		color: Colors.white,
+		includeFontPadding: false,
+		
 	},
 	disabledText: {
 		color: Colors.grayMedium,

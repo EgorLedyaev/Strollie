@@ -4,6 +4,7 @@
 export const Colors = {
 	// Основные цвета
 	black: '#000000',
+	blackLight: '#2E2D3D', // Темно-серый как у violetDark
 	white: '#FFF',
 	
 	// Серые оттенки
@@ -40,8 +41,11 @@ export const Colors = {
 	greenSecondary: '#1CC4C4',
 	greenHover: '#027962',
 	
-	// Другие цвета
+	// Фиолетовые оттенки
 	violetDark: '#2E2D3D',
+	primary: '#1FD975', // Основной цвет приложения
+	
+	// Другие цвета
 	red: '#CC384E',
 	error: '#CC384E', // Alias for red for error messages
 };

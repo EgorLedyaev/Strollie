@@ -1,8 +1,7 @@
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { sessionAtom } from '@/src/entities/session/model/session.state';
-import { SessionStorage } from '@/src/entities/session/model/session-storage';
+import { sessionAtom, SessionStorage } from '@/src/entities/session';
 
 export const useRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,12 +9,24 @@ export const useRegister = () => {
   const setSession = useSetAtom(sessionAtom);
 
   const registerEmail = async (email: string) => {
-    if (!email.trim()) return;
+    if (!email.trim()) {
+      setError('Введите email');
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
     try {
-      // Имитация API запроса для отправки кода
+      // Проверяем, не зарегистрирован ли уже пользователь
+      const isAlreadyRegistered = await SessionStorage.isUserRegistered(email);
+      
+      if (isAlreadyRegistered) {
+        setError('Пользователь уже зарегистрирован. Войдите в аккаунт.');
+        return;
+      }
+
+      // Сохраняем email для использования на других экранах
+      await SessionStorage.setEmail(email);
       await SessionStorage.setIsRegistration(true);
       router.push('/verify-code');
     } catch (err) {

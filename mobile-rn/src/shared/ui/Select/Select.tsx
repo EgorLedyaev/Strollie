@@ -18,8 +18,6 @@ import { SelectOption, SelectProps } from './types';
  * Компонент выпадающего списка (Select)
  *
  * Позволяет выбрать значение из списка опций с возможностью поиска.
- * Реализует дизайн из Figma с выпадающим списком непосредственно под полем ввода
- * (не модальное окно).
  *
  * @example
  * ```tsx
@@ -62,10 +60,6 @@ export const Select = ({
 	// Находим выбранную опцию
 	const selectedOption = options.find(option => option.value === value);
 	
-	// Для отладки - проверяем входные параметры
-	// console.log('Select received value:', value);
-	// console.log('Selected option:', selectedOption);
-
 	// Фильтруем опции по поисковому запросу
 	const filteredOptions = options.filter(option =>
 		option.label.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -129,7 +123,6 @@ export const Select = ({
 	const handleSelect = (option: SelectOption) => {
 		// Вызываем родительский обработчик с правильной опцией
 		if (option && option.value) {
-			console.log('Selected option:', option); // Для отладки
 			onSelect(option);
 		}
 		closeDropdown();

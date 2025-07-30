@@ -1,6 +1,6 @@
 import { Colors, Fonts } from '@/src/shared/tokens';
 import React from 'react';
-import { StyleSheet, View, Text, ScrollView, Animated, FlatList } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, Animated } from 'react-native';
 import { SelectOption } from './SelectOption';
 import { SelectOption as SelectOptionType } from '../types';
 
@@ -24,19 +24,6 @@ export const DropdownList: React.FC<DropdownListProps> = ({
   containerWidth,
   onSelect
 }) => {
-  // Отрисовка элемента списка
-  const renderItem = ({ item }: { item: SelectOptionType }) => (
-    <SelectOption
-      key={item.value}
-      item={item}
-      isSelected={item.value === value}
-      onSelect={(option) => {
-        console.log('Option selected in DropdownList:', option);
-        onSelect(option);
-      }}
-    />
-  );
-
   return (
     <Animated.View 
       style={[
@@ -49,17 +36,23 @@ export const DropdownList: React.FC<DropdownListProps> = ({
       ]}
     >
       {filteredOptions.length > 0 ? (
-        <FlatList
-          data={filteredOptions}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.value}
+        <ScrollView
           nestedScrollEnabled
           keyboardShouldPersistTaps="handled"
-          maxToRenderPerBatch={10}
-          initialNumToRender={8}
           showsVerticalScrollIndicator={true}
           style={styles.optionsList}
-        />
+        >
+          {filteredOptions.map((item) => (
+            <SelectOption
+              key={item.value}
+              item={item}
+              isSelected={item.value === value}
+              onSelect={(option) => {
+                onSelect(option);
+              }}
+            />
+          ))}
+        </ScrollView>
       ) : (
         <View style={styles.noResultsContainer}>
           <Text style={styles.noResultsText}>Ничего не найдено</Text>

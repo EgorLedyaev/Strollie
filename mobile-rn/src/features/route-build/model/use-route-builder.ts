@@ -4,19 +4,19 @@ import { useAtom, useSetAtom } from 'jotai';
 import { v4 as uuidv4 } from 'uuid';
 import {
     placedMarkersAtom,
-} from '@/src/entities/marker/model/marker-store';
+} from '@/src/entities/marker';
 import {
     routePreferencesAtom,
     isBuildingRouteAtom,
     actualRouteDistanceAtom,
-} from '@/src/entities/route/model/route-store';
+} from '@/src/entities/route';
 import {
     buildOptimalRoute,
     ValhallaRouteRequest,
     RouteResponse,
 } from '@/src/shared/api';
 import { useLocationTracking } from '@/src/hooks/useLocationTracking';
-import { mapReadyAtom } from '@/src/entities/map/model/map-store';
+import { mapReadyAtom } from '@/src/entities/map';
 
 type SendMessageToWebView = (message: any) => void;
 

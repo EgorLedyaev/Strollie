@@ -1,7 +1,7 @@
 import {
 	PlacesAPIResult,
 	geocodeAddress,
-} from '@/src/shared/api/geocoder.service';
+} from '@/src/shared/api';
 import { Colors, Fonts, Gaps, Radius } from '@/src/shared/tokens';
 import React, { useCallback, useState } from 'react';
 import {
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 2,
 		elevation: 2,
+		includeFontPadding: false,
 	},
 	searchLoader: {
 		position: 'absolute',

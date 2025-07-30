@@ -1,6 +1,12 @@
 import { atom } from 'jotai';
 
-import type { RoutePreferences } from '@/src/features/map/ui/RouteSettingsPanel';
+// Интерфейс для настроек маршрута
+export interface RoutePreferences {
+	preferParks: boolean;
+	avoidHills: boolean;
+	walkingSpeed: number; // км/ч
+	desiredDistance: number; // км
+}
 
 export const routePreferencesAtom = atom<RoutePreferences>({
 	preferParks: false,
