@@ -1,190 +1,216 @@
-import { Colors, Fonts, Radius } from '@/src/shared/tokens';
-import React, { useState } from 'react';
+import { Colors, Fonts } from '@/src/shared/tokens';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Modal,
-  FlatList,
-  Pressable,
+	Animated,
+	Keyboard,
+	LayoutChangeEvent,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+	TouchableWithoutFeedback,
 } from 'react-native';
-import ArrowDownIcon from '@/assets/icons/arrow-down';
-import ArrowUpIcon from '@/assets/icons/arrow-up';
 
-export interface SelectOption {
-  label: string;
-  value: string;
-}
+import { DropdownList, SelectField } from './components';
+import { SelectOption, SelectProps } from './types';
 
-interface SelectProps {
-  options: SelectOption[];
-  value?: string;
-  placeholder?: string;
-  onSelect: (option: SelectOption) => void;
-  label?: string;
-  isInvalid?: boolean;
-}
-
+/**
+ * Компонент выпадающего списка (Select)
+ *
+ * Позволяет выбрать значение из списка опций с возможностью поиска.
+ * Реализует дизайн из Figma с выпадающим списком непосредственно под полем ввода
+ * (не модальное окно).
+ *
+ * @example
+ * ```tsx
+ * <Select
+ *   options={[
+ *     { label: 'Опция 1', value: 'option1' },
+ *     { label: 'Опция 2', value: 'option2' }
+ *   ]}
+ *   value={selectedValue}
+ *   placeholder="Выберите опцию"
+ *   onSelect={(option) => setSelectedValue(option.value)}
+ *   label="Метка поля"
+ * />
+ * ```
+ */
 export const Select = ({
-  options,
-  value,
-  placeholder = 'Выберите...',
-  onSelect,
-  label,
-  isInvalid = false,
+	options,
+	value,
+	placeholder = 'Выберите...',
+	onSelect,
+	label,
+	isInvalid = false,
 }: SelectProps) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  
-  const selectedOption = options.find(option => option.value === value);
-  
-  const handleSelect = (option: SelectOption) => {
-    onSelect(option);
-    setModalVisible(false);
-    setIsOpen(false);
-  };
-  
-  const handleToggleModal = () => {
-    setModalVisible(!modalVisible);
-    setIsOpen(!isOpen);
-  };
+	// Состояние компонента
+	const [isOpen, setIsOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [containerLayout, setContainerLayout] = useState({
+		width: 0,
+		x: 0,
+		y: 0,
+	});
 
-  return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      
-      <TouchableOpacity 
-        style={[
-          styles.selectContainer, 
-          isInvalid && styles.invalidContainer
-        ]} 
-        onPress={handleToggleModal}
-        activeOpacity={0.7}
-      >
-        <Text 
-          style={[
-            styles.selectText, 
-            !selectedOption && styles.placeholderText
-          ]}
-        >
-          {selectedOption ? selectedOption.label : placeholder}
-        </Text>
-        {isOpen ? (
-          <ArrowUpIcon stroke={Colors.inputText} />
-        ) : (
-          <ArrowDownIcon stroke={Colors.inputText} />
-        )}
-      </TouchableOpacity>
+	// Анимированные значения для выпадающего списка
+	const dropdownHeight = useRef(new Animated.Value(0)).current;
+	const dropdownOpacity = useRef(new Animated.Value(0)).current;
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <Pressable 
-          style={styles.modalOverlay} 
-          onPress={handleToggleModal}
-        >
-          <View style={styles.modalContainer}>
-            <FlatList
-              data={options}
-              keyExtractor={(item) => item.value}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[
-                    styles.optionItem,
-                    item.value === value && styles.selectedOption
-                  ]}
-                  onPress={() => handleSelect(item)}
-                >
-                  <Text 
-                    style={[
-                      styles.optionText,
-                      item.value === value && styles.selectedOptionText
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              )}
-              style={styles.optionsList}
-            />
-          </View>
-        </Pressable>
-      </Modal>
-    </View>
-  );
+	// Референс на поле ввода для фокуса
+	const inputRef = useRef<TextInput>(null);
+
+	// Находим выбранную опцию
+	const selectedOption = options.find(option => option.value === value);
+	
+	// Для отладки - проверяем входные параметры
+	// console.log('Select received value:', value);
+	// console.log('Selected option:', selectedOption);
+
+	// Фильтруем опции по поисковому запросу
+	const filteredOptions = options.filter(option =>
+		option.label.toLowerCase().includes(searchQuery.toLowerCase()),
+	);
+
+	/**
+	 * Скрываем выпадающий список при скрытии клавиатуры
+	 */
+	useEffect(() => {
+		const keyboardDidHideListener = Keyboard.addListener(
+			'keyboardDidHide',
+			closeDropdown,
+		);
+
+		return () => {
+			keyboardDidHideListener.remove();
+		};
+	}, []);
+
+	/**
+	 * Анимируем открытие/закрытие выпадающего списка
+	 */
+	useEffect(() => {
+		if (isOpen) {
+			// Высота списка в зависимости от количества элементов, но не более максимальной высоты
+			const calculatedHeight = Math.min(filteredOptions.length * 54, 161);
+			
+			// Открываем выпадающий список
+			Animated.parallel([
+				Animated.timing(dropdownHeight, {
+					toValue: calculatedHeight,
+					duration: 300,
+					useNativeDriver: false,
+				}),
+				Animated.timing(dropdownOpacity, {
+					toValue: 1,
+					duration: 200,
+					useNativeDriver: false,
+				}),
+			]).start();
+		} else {
+			// Закрываем выпадающий список
+			Animated.parallel([
+				Animated.timing(dropdownHeight, {
+					toValue: 0,
+					duration: 200,
+					useNativeDriver: false,
+				}),
+				Animated.timing(dropdownOpacity, {
+					toValue: 0,
+					duration: 150,
+					useNativeDriver: false,
+				}),
+			]).start();
+		}
+	}, [isOpen, filteredOptions.length]);
+
+	/**
+	 * Обработчик выбора опции из выпадающего списка
+	 */
+	const handleSelect = (option: SelectOption) => {
+		// Вызываем родительский обработчик с правильной опцией
+		if (option && option.value) {
+			console.log('Selected option:', option); // Для отладки
+			onSelect(option);
+		}
+		closeDropdown();
+	};
+
+	/**
+	 * Переключение состояния открытия/закрытия выпадающего списка
+	 */
+	const toggleDropdown = () => {
+		if (!isOpen) {
+			setSearchQuery('');
+			inputRef.current?.focus();
+		} else {
+			Keyboard.dismiss();
+		}
+		setIsOpen(!isOpen);
+	};
+
+	/**
+	 * Закрытие выпадающего списка
+	 */
+	const closeDropdown = () => {
+		setIsOpen(false);
+		setSearchQuery('');
+		Keyboard.dismiss();
+	};
+
+	/**
+	 * Обработчик события изменения размеров контейнера
+	 */
+	const handleContainerLayout = (event: LayoutChangeEvent) => {
+		const { width, x, y } = event.nativeEvent.layout;
+		setContainerLayout({ width, x, y });
+	};
+
+	return (
+		<View style={styles.container} onLayout={handleContainerLayout}>
+			{label && <Text style={styles.label}>{label}</Text>}
+
+			{/* Поле ввода/выбора */}
+			<SelectField
+				isOpen={isOpen}
+				searchQuery={searchQuery}
+				onSearchChange={setSearchQuery}
+				inputRef={inputRef}
+				selectedOption={selectedOption}
+				placeholder={placeholder}
+				isInvalid={!!isInvalid}
+				onToggle={toggleDropdown}
+			/>
+
+			{/* Выпадающий список с TouchableWithoutFeedback для предотвращения закрытия списка при нажатии внутри */}
+			<TouchableWithoutFeedback>
+				<View>
+					<DropdownList
+						filteredOptions={filteredOptions}
+						value={value}
+						dropdownHeight={dropdownHeight}
+						dropdownOpacity={dropdownOpacity}
+						containerWidth={containerLayout.width}
+						onSelect={handleSelect}
+					/>
+				</View>
+			</TouchableWithoutFeedback>
+		</View>
+	);
 };
 
+/**
+ * Стили основного компонента Select
+ */
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  label: {
-    fontFamily: Fonts.medium,
-    fontSize: Fonts.f16,
-    color: Colors.inputText,
-    marginLeft: 16,
-    marginBottom: 12,
-  },
-  selectContainer: {
-    height: 58,
-    width: '100%',
-    borderWidth: 1,
-    borderRadius: Radius.r15,
-    borderColor: Colors.inputBorder,
-    paddingHorizontal: 16,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexDirection: 'row',
-    backgroundColor: Colors.white,
-  },
-  invalidContainer: {
-    borderColor: Colors.error,
-  },
-  selectText: {
-    fontFamily: Fonts.regular,
-    fontSize: Fonts.f16,
-    color: Colors.inputText,
-  },
-  placeholderText: {
-    color: Colors.placeholderGray,
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContainer: {
-    backgroundColor: Colors.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingTop: 16,
-    paddingBottom: 30,
-    maxHeight: '70%',
-  },
-  optionsList: {
-    width: '100%',
-  },
-  optionItem: {
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.inputBorder,
-  },
-  selectedOption: {
-    backgroundColor: Colors.lightBackground,
-  },
-  optionText: {
-    fontFamily: Fonts.regular,
-    fontSize: Fonts.f16,
-    color: Colors.inputText,
-  },
-  selectedOptionText: {
-    fontFamily: Fonts.medium,
-    color: Colors.linkGreen,
-  },
+	container: {
+		width: '100%',
+		zIndex: 1, // Чтобы дропдаун был поверх других элементов
+	},
+	label: {
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f16,
+		color: Colors.inputText,
+		marginLeft: 16,
+		marginBottom: 12,
+	},
 });

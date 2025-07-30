@@ -8,12 +8,11 @@ import {
   Text,
   View,
   SafeAreaView,
-  TextInput,
   TouchableOpacity,
-  Pressable,
   StatusBar,
 } from 'react-native';
 import { BackButton } from '@/src/shared/ui/BackButton';
+import { CodeInput } from '@/src/shared/ui/CodeInput';
 
 export default function VerifyCode() {
   const [code, setCode] = useState('');
@@ -87,6 +86,7 @@ export default function VerifyCode() {
       <BackButton style={styles.backButton} />
       
       <View style={styles.container}>
+        
         <View style={styles.header}>
           <Text style={styles.title}>Код подтверждения</Text>
           <Text style={styles.subtitle}>
@@ -94,31 +94,14 @@ export default function VerifyCode() {
           </Text>
         </View>
 
-        <View style={styles.codeContainer}>
-          {[0, 1, 2, 3].map((index) => (
-            <View 
-              key={index} 
-              style={[
-                styles.codeBox, 
-                index < code.length ? styles.codeBoxFilled : null,
-                error ? styles.codeBoxError : null
-              ]}
-            >
-              {index < code.length && (
-                <Text style={styles.codeText}>{code[index]}</Text>
-              )}
-            </View>
-          ))}
-          
-          <TextInput
-            style={styles.hiddenInput}
-            value={code}
-            onChangeText={(text: string) => setCode(text.slice(0, 4))}
-            maxLength={4}
-            keyboardType="number-pad"
-            autoFocus
-          />
-        </View>
+        <CodeInput 
+          value={code}
+          onChangeText={setCode}
+          length={4}
+          autoFocus
+          isError={!!error}
+          style={styles.codeInput}
+        />
 
         <View style={styles.resendContainer}>
           <TouchableOpacity 
@@ -168,12 +151,12 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 69,
-    left: 26,
+    top: 16, // Ближе к верхнему краю
+    left: 16, // Ближе к левому краю
     zIndex: 10,
   },
   title: {
-    fontFamily: Fonts.semibold,
+    fontFamily: Fonts.bold, // Теперь смело используем bold после добавления шрифта
     fontSize: 32,
     color: Colors.inputText,
     marginBottom: 32,
@@ -185,41 +168,8 @@ const styles = StyleSheet.create({
     color: Colors.textGray,
     textAlign: 'center',
   },
-  codeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+  codeInput: {
     marginTop: 60,
-    position: 'relative',
-  },
-  codeBox: {
-    width: 54,
-    height: 54,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: Colors.inputBorder,
-    marginHorizontal: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
-  },
-  codeBoxFilled: {
-    borderColor: Colors.successGreen,
-  },
-  codeBoxError: {
-    borderColor: Colors.error,
-  },
-  codeText: {
-    fontFamily: Fonts.medium,
-    fontSize: 24,
-    color: Colors.inputText,
-  },
-  hiddenInput: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    opacity: 0,
   },
   resendContainer: {
     flexDirection: 'row',

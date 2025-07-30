@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   title: {
-    fontFamily: Fonts.semibold,
+    fontFamily: Fonts.bold,
     fontSize: 32,
     color: Colors.inputText,
     marginTop: 154,

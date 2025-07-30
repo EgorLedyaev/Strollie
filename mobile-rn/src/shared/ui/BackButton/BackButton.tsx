@@ -41,6 +41,5 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.regular,
     fontSize: 16,
     color: Colors.linkGreen,
-    fontWeight: '400',
   },
 });

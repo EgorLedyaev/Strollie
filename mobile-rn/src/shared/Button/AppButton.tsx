@@ -1,6 +1,6 @@
 import { Colors, Fonts, Radius } from '@/src/shared/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
 	ActivityIndicator,
 	GestureResponderEvent,
@@ -56,7 +56,13 @@ export const AppButton = ({
 		dimColor(GRADIENT_END),
 	] as const;
 	const disabledColors = [Colors.disabledGray, Colors.disabledGray] as const;
+	// Используем useMemo для обновления цветов при изменении disabled
 	const [currentColors, setCurrentColors] = useState(disabled ? disabledColors : gradientColors);
+	
+	// Обновляем цвета при изменении disabled
+	useEffect(() => {
+		setCurrentColors(disabled ? disabledColors : gradientColors);
+	}, [disabled]);
 
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
