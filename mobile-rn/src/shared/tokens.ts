@@ -15,6 +15,7 @@ export const Colors = {
 	grayMedium: '#C7C7C7', // Цвет текста для отключенных кнопок
 	disabledGray: '#EAEAEA', // Цвет фона для отключенных кнопок
 	lightBackground: '#F6F6F6',
+	grayIcon: '#626262',
 
 	// Цвета для форм и инпутов
 	inputBorder: '#E7E7E7',

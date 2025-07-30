@@ -84,6 +84,7 @@ const styles = StyleSheet.create({
         borderRadius: Radius.r15,
         shadowColor: Colors.black,
         shadowOffset: { width: 0, height: 1 },
+        gap: 1.5,
         shadowOpacity: 0.2,
         shadowRadius: 2,
         elevation: 3,
@@ -113,9 +114,10 @@ const styles = StyleSheet.create({
     },
     activeButton: { backgroundColor: Colors.greenPrimary },
     mapButtonText: {
-        fontSize: 16,
-        fontFamily: Fonts.regular,
-        color: Colors.black,
+        fontSize: 20,
+        fontFamily: Fonts.semibold,
+        color: Colors.grayIcon,
+        includeFontPadding: false,
     },
     activeButtonText: { color: Colors.white },
 });
