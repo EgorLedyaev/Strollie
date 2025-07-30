@@ -1,6 +1,6 @@
-import { useAuth } from '@/src/entities/auth/model/auth-context';
-import { AppButton } from '@/src/shared/Button/AppButton';
-import { Input } from '@/src/shared/Input/Input';
+import { useRegisterUser } from '@/src/features/register-user/model/use-register-user';
+import { AppButton } from '@/src/shared/ui';
+import { Input } from '@/src/shared/ui';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { BackButton } from '@/src/shared/ui/BackButton';
 import { Select, SelectOption } from '@/src/shared/ui/Select';
@@ -19,7 +19,7 @@ export default function UserData() {
 	>({});
 	const [formError, setFormError] = useState<string | null>(null);
 
-	const { register, isLoading, error } = useAuth();
+	const { register, isLoading, error } = useRegisterUser();
 
 	const cityOptions: SelectOption[] = [
 		{ label: 'г. Москва, Московская обл.', value: 'moscow' },

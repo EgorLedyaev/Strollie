@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
 import { Colors, Fonts, Radius } from '@/src/shared/tokens';
-import { AppButton } from '@/src/shared/Button/AppButton';
+import { AppButton } from '@/src/shared/ui/Button/AppButton';
 import { useNavigation } from 'expo-router';
 import { User } from '@/src/entities/user/model/user.model';
 import { ProfileField } from './ProfileField';

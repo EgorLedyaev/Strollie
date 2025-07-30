@@ -6,7 +6,7 @@ import { MenuItem } from '@/src/entities/layout/ui/MenuItem/MenuItem';
 import { loadProfileAtom } from '@/src/entities/user/model/user.state';
 import { UserMenu } from '@/src/entities/user/ui/UserMenu/UserMenu';
 import { CloseDrawer } from '@/src/features/layout/ui/CloseDrawer/CloseDrawer';
-import { CustomLink } from '@/src/shared/CustomLink/CustomLink';
+import { CustomLink } from '@/src/shared/ui/CustomLink/CustomLink';
 import { Colors } from '@/src/shared/tokens';
 import {
 	DrawerContentComponentProps,

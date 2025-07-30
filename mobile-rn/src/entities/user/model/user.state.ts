@@ -1,8 +1,7 @@
-import { authAtom } from '@/src/entities/auth/model/auth.state';
+import { sessionAtom } from '@/src/entities/session/model/session.state';
 import { API } from '@/src/entities/user/api/api';
 import { User } from '@/src/entities/user/model/user.model';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthStorage } from '@/src/entities/auth/model/auth-storage';
 import axios, { AxiosError } from 'axios';
 import { atom } from 'jotai';
 
@@ -38,15 +37,15 @@ export const loadProfileAtom = atom(
 			}
 			
 			// Если нет в хранилище - пытаемся загрузить с сервера
-			const { accessToken } = await get(authAtom);
+			const session = await get(sessionAtom);
 			
-			if (!accessToken) {
+			if (!session.refreshToken) {
 				throw new Error('Отсутствует токен авторизации');
 			}
 			
 			const { data } = await axios.get<{ data: User }>(API.profile, {
 				headers: {
-					Authorization: `Bearer ${accessToken}`,
+					Authorization: `Bearer ${session.refreshToken}`,
 				},
 			});
 			

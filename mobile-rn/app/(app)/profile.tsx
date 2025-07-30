@@ -4,16 +4,16 @@ import { Header } from '@/src/features/profile/ui/Header';
 import { ProfileInfo } from '@/src/features/profile/ui/ProfileInfo';
 import { ProfileMenuOverlay } from '@/src/features/profile/ui/ProfileMenuOverlay';
 import { EditProfileScreen, UserProfileData } from '@/src/features/profile/ui/EditProfileScreen';
-import { AppButton } from '@/src/shared/Button/AppButton';
+import { AppButton } from '@/src/shared/ui/Button/AppButton';
 import { Colors } from '@/src/shared/tokens';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { User } from '@/src/entities/user/model/user.model';
 import { router } from 'expo-router';
-import { AuthStorage } from '@/src/entities/auth/model/auth-storage';
-import { useAuth } from '@/src/entities/auth/model/auth-context';
+import { UserProfileStorage } from '@/src/entities/user/model/user-profile-storage';
+import { useLogout } from '@/src/features/logout/model/use-logout';
 
 export default function ProfilePage() {
 	const [profile, loadProfile] = useAtom(loadProfileAtom);
@@ -21,7 +21,7 @@ export default function ProfilePage() {
 	const [showEditProfile, setShowEditProfile] = useState(false);
 	const [userProfile, setUserProfile] = useState<UserProfileData | null>(null);
 	
-	const { logout } = useAuth();
+	const logout = useLogout();
 	
 	useEffect(() => {
 		const loadUserData = async () => {
@@ -29,7 +29,7 @@ export default function ProfilePage() {
 			await loadProfile();
 			
 			// Получаем данные для формы редактирования
-			const storedProfile = await AuthStorage.getUserProfile();
+			const storedProfile = await UserProfileStorage.getUserProfile();
 			if (storedProfile) {
 				setUserProfile({
 					firstName: storedProfile.firstName || '',
@@ -84,7 +84,7 @@ export default function ProfilePage() {
 			};
 			
 			// Сохраняем обновленный профиль локально
-			await AuthStorage.saveUserProfile(updatedProfile);
+			await UserProfileStorage.saveUserProfile(updatedProfile);
 			
 			// Перезагружаем профиль для обновления UI
 			loadProfile();

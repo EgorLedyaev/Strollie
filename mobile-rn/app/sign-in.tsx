@@ -1,27 +1,17 @@
-import { useAuth } from '@/src/entities/auth/model/auth-context';
-import { AppButton } from '@/src/shared/Button/AppButton';
-import { CustomLink } from '@/src/shared/CustomLink/CustomLink';
-import { Input } from '@/src/shared/Input/Input';
+import { useLogin } from '@/src/features/auth-by-email/model/use-login';
+import { AppButton } from '@/src/shared/ui';
+import { CustomLink } from '@/src/shared/ui';
+import { Input } from '@/src/shared/ui';
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
-  const { loginWithEmail, isLoading, error } = useAuth();
+  const { loginWithEmail, isLoading, error } = useLogin();
 
   const handleSignIn = async () => {
-    if (!email.trim()) return;
-    
-    try {
-      await loginWithEmail(email);
-      
-      // Для демонстрационных целей переходим сразу к проверке кода
-      router.push('/verify-code' as any);
-    } catch (err) {
-      console.error('Ошибка входа', err);
-    }
+    await loginWithEmail(email);
   };
 
   return (

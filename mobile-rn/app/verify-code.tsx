@@ -1,7 +1,7 @@
-import { useAuth } from '@/src/entities/auth/model/auth-context';
-import { AppButton } from '@/src/shared/Button/AppButton';
+import { useVerifyCode } from '@/src/features/verify-code/model/use-verify-code';
+import { useResendCode } from '@/src/features/resend-code/model/use-resend-code';
+import { AppButton } from '@/src/shared/ui/Button/AppButton';
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { router } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -13,15 +13,17 @@ import {
 } from 'react-native';
 import { BackButton } from '@/src/shared/ui/BackButton';
 import { CodeInput } from '@/src/shared/ui/CodeInput';
+import { router } from 'expo-router';
 
 export default function VerifyCode() {
   const [code, setCode] = useState('');
   const [timeLeft, setTimeLeft] = useState(60);
   const [canResend, setCanResend] = useState(false);
-  const { verifyCode, resendCode, isLoading, error, userInfo, isRegistrationFlow } = useAuth();
+  const { verifyCode, isLoading, error } = useVerifyCode();
+  const { resendCode, isLoading: isResending } = useResendCode();
   
-  // Email адрес из контекста аутентификации
-  const email = userInfo?.email || 'эл. почту';
+  // Email адрес (в реальном приложении можно хранить в параметрах навигации или в хранилище)
+  const email = 'эл. почту';
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval>;
@@ -51,27 +53,12 @@ export default function VerifyCode() {
     }
   };
 
-  const handleSubmit = async () => {
-    if (code.length < 4) return;
+  const handleVerifyCode = async () => {
+    if (!code || code.length < 4) return;
     
     try {
-      const success = await verifyCode(code);
-      if (success) {
-        // Проверяем, является ли текущая сессия регистрацией
-        const isRegistration = await isRegistrationFlow();
-        
-        console.log('Верификация успешна, тип потока:', isRegistration ? 'Регистрация' : 'Вход');
-        
-        if (isRegistration) {
-          // Если это регистрация, отправляем на заполнение данных
-          console.log('Перенаправляем на заполнение данных пользователя');
-          router.push('/user-data');
-        } else {
-          // Иначе переходим в приложение
-          console.log('Перенаправляем в приложение');
-          router.replace('/(app)');
-        }
-      }
+      await verifyCode(code);
+      // Маршрутизация происходит внутри хука useVerifyCode
     } catch (err) {
       console.error('Ошибка при проверке кода', err);
     }
@@ -128,7 +115,7 @@ export default function VerifyCode() {
         <View style={styles.buttonContainer}>
           <AppButton
             text="Далее"
-            onPress={handleSubmit}
+            onPress={handleVerifyCode}
             isLoading={isLoading}
             disabled={code.length < 4}
           />

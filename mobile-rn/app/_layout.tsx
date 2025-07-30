@@ -1,4 +1,3 @@
-import { AuthProvider } from '@/src/entities/auth/model/auth-context';
 import { Colors } from '@/src/shared/tokens';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
@@ -8,6 +7,7 @@ import {
 	SafeAreaProvider,
 	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import { Provider as JotaiProvider } from 'jotai';
 
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
@@ -26,7 +26,7 @@ export default function RootLayout() {
 	});
 
 	return (
-		<AuthProvider>
+		<JotaiProvider>
 			<SafeAreaProvider>
 				<StatusBar style='dark' translucent={true} />
 				<Stack
@@ -60,6 +60,6 @@ export default function RootLayout() {
 					/>
 				</Stack>
 			</SafeAreaProvider>
-		</AuthProvider>
+		</JotaiProvider>
 	);
 }

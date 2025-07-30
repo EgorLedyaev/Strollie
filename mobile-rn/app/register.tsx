@@ -1,25 +1,17 @@
-import { useAuth } from '@/src/entities/auth/model/auth-context';
-import { AppButton } from '@/src/shared/Button/AppButton';
-import { CustomLink } from '@/src/shared/CustomLink/CustomLink';
-import { Input } from '@/src/shared/Input/Input';
+import { useRegister } from '@/src/features/auth-by-email/model/use-register';
+import { AppButton } from '@/src/shared/ui/Button/AppButton';
+import { CustomLink } from '@/src/shared/ui/CustomLink/CustomLink';
+import { Input } from '@/src/shared/ui/Input/Input';
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar } from 'react-native';
 
 export default function Register() {
   const [email, setEmail] = useState('');
-  const { registerEmail, isLoading, error } = useAuth();
+  const { registerEmail, isLoading, error } = useRegister();
 
   const handleRegister = async () => {
-    if (!email.trim()) return;
-    
-    try {
-      await registerEmail(email);
-      router.push('/verify-code');
-    } catch (err) {
-      console.error('Ошибка регистрации', err);
-    }
+    await registerEmail(email);
   };
 
   return (

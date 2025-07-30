@@ -1,5 +1,5 @@
 import unmatched from '@/assets/images/unmatched.png';
-import { CustomLink } from '@/src/shared/CustomLink/CustomLink';
+import { CustomLink } from '@/src/shared/ui/CustomLink/CustomLink';
 import { Colors, Fonts, Gaps } from '@/src/shared/tokens';
 import { Image, StyleSheet, Text, View } from 'react-native';
 

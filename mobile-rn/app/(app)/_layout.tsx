@@ -1,5 +1,4 @@
-import { KeycloakService } from '@/src/entities/auth/api/keycloak.service';
-import { useAuth } from '@/src/entities/auth/model/auth-context';
+import { useAuthCheck } from '@/src/features/auth-check/model/use-auth-check';
 import { Colors } from '@/src/shared/tokens';
 import { Redirect, Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -11,7 +10,7 @@ import {
 } from 'react-native-safe-area-context';
 
 export default function AppLayout() {
-	const { isAuthenticated, isLoading, checkAuth } = useAuth();
+	const { isAuthenticated, isLoading, checkAuth } = useAuthCheck();
 	const insets = useSafeAreaInsets();
 	const redirectInProgress = useRef(false);
 
