@@ -104,8 +104,8 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: Colors.inputText,
 		flex: 1,
-    textAlignVertical: 'center', // Добавляем вертикальное выравнивание
-    includeFontPadding: false, // Убираем лишние отступы шрифта
+		textAlignVertical: 'center', // Добавляем вертикальное выравнивание
+		includeFontPadding: false, // Убираем лишние отступы шрифта
 	},
 	placeholderText: {
 		color: Colors.placeHolderInput,

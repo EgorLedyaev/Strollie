@@ -7,8 +7,8 @@ import {
 	StyleSheet,
 	Text,
 	TextInput,
-	View,
 	TouchableWithoutFeedback,
+	View,
 } from 'react-native';
 
 import { DropdownList, SelectField } from './components';
@@ -59,7 +59,7 @@ export const Select = ({
 
 	// Находим выбранную опцию
 	const selectedOption = options.find(option => option.value === value);
-	
+
 	// Фильтруем опции по поисковому запросу
 	const filteredOptions = options.filter(option =>
 		option.label.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -86,7 +86,7 @@ export const Select = ({
 		if (isOpen) {
 			// Высота списка в зависимости от количества элементов, но не более максимальной высоты
 			const calculatedHeight = Math.min(filteredOptions.length * 54, 161);
-			
+
 			// Открываем выпадающий список
 			Animated.parallel([
 				Animated.timing(dropdownHeight, {

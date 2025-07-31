@@ -64,4 +64,5 @@ app-example
 .docs
 .github
 
-android
+/android
+/ios

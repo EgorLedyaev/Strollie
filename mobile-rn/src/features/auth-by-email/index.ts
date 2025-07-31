@@ -1,10 +1,6 @@
 // Публичный API слайса auth-by-email
+import { useAuthCheck } from './model/use-auth-check';
 import { useLogin } from './model/use-login';
 import { useRegister } from './model/use-register';
-import { useAuthCheck } from './model/use-auth-check';
 
-export {
-  useLogin,
-  useRegister,
-  useAuthCheck
-};
+export { useLogin, useRegister, useAuthCheck };

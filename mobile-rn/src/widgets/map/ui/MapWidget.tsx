@@ -1,9 +1,10 @@
-import { mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
 import { MapStatusIndicator } from '@/src/shared/ui';
 import { useAtom, useSetAtom } from 'jotai';
 import React, { forwardRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import WebView from 'react-native-webview';
+
+import { mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
 
 interface MapWidgetProps {
 	onMessage: (event: any) => void;

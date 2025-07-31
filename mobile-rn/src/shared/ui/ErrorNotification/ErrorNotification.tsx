@@ -1,7 +1,8 @@
-import { ErrorNotificationProps } from './types';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { useEffect, useState } from 'react';
 import { Animated, Dimensions, StyleSheet, Text } from 'react-native';
+
+import { ErrorNotificationProps } from './types';
 
 export const ErrorNotification = ({ error }: ErrorNotificationProps) => {
 	const [isShown, setIsShown] = useState<boolean>(false);

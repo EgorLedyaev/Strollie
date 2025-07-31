@@ -2,6 +2,6 @@
 import { MapControls } from './ui/MapControls';
 
 export {
-  // Components
-  MapControls
+	// Components
+	MapControls,
 };

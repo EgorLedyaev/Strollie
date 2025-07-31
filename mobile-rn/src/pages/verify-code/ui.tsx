@@ -1,7 +1,5 @@
-import { useResendCode, useVerifyCode } from '@/src/features/verify-code';
-import { SessionStorage } from '@/src/entities/session';
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { BackButton, AppButton, CodeInput } from '@/src/shared/ui';
+import { AppButton, BackButton, CodeInput } from '@/src/shared/ui';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -12,6 +10,9 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
+
+import { useResendCode, useVerifyCode } from '@/src/features/verify-code';
+import { SessionStorage } from '@/src/entities/session';
 
 export function VerifyCodePage() {
 	const [code, setCode] = useState('');
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
 		left: 16, // Ближе к левому краю
 	},
 	title: {
-		fontFamily: Fonts.bold, 
+		fontFamily: Fonts.bold,
 		fontSize: 32,
 		color: Colors.inputText,
 		marginBottom: 32,

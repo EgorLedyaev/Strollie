@@ -1,6 +1,10 @@
-import { loadProfileAtom } from '@/src/entities/user';
-import { type User } from '@/src/entities/user';
-import { UserProfileStorage } from '@/src/entities/user';
+import { Colors } from '@/src/shared/tokens';
+import { router } from 'expo-router';
+import { useAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import { useLogout } from '@/src/features/logout';
 import {
 	EditProfileScreen,
@@ -10,12 +14,11 @@ import {
 	ProfileMenuOverlay,
 	UserProfileData,
 } from '@/src/features/profile';
-import { Colors } from '@/src/shared/tokens';
-import { router } from 'expo-router';
-import { useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+	loadProfileAtom,
+	UserProfileStorage,
+	type User,
+} from '@/src/entities/user';
 
 export const ProfilePage = () => {
 	const [profile, loadProfile] = useAtom(loadProfileAtom);

@@ -1,11 +1,11 @@
 // Публичный API слайса route-build
-import { BuildRouteButton } from './ui/BuildRouteButton';
 import { useRouteBuilder } from './model/use-route-builder';
+import { BuildRouteButton } from './ui/BuildRouteButton';
 
 export {
-  // Components
-  BuildRouteButton,
-  
-  // Hooks
-  useRouteBuilder
+	// Components
+	BuildRouteButton,
+
+	// Hooks
+	useRouteBuilder,
 };

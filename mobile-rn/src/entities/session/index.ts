@@ -1,13 +1,17 @@
 // Публичный API слайса session
-import { sessionAtom, isAuthenticatedAtom, logoutAtom } from './model/session.state';
 import { SessionStorage } from './model/session-storage';
+import {
+	isAuthenticatedAtom,
+	logoutAtom,
+	sessionAtom,
+} from './model/session.state';
 
 export {
-  // State
-  sessionAtom,
-  isAuthenticatedAtom,
-  logoutAtom,
-  
-  // Storage
-  SessionStorage
+	// State
+	sessionAtom,
+	isAuthenticatedAtom,
+	logoutAtom,
+
+	// Storage
+	SessionStorage,
 };

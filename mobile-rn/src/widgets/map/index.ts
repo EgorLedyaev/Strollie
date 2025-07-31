@@ -2,6 +2,6 @@
 import { MapWidget } from './ui/MapWidget';
 
 export {
-  // Components
-  MapWidget
+	// Components
+	MapWidget,
 };

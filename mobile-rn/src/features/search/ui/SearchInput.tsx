@@ -1,7 +1,4 @@
-import {
-	PlacesAPIResult,
-	geocodeAddress,
-} from '@/src/shared/api';
+import { geocodeAddress, PlacesAPIResult } from '@/src/shared/api';
 import { Colors, Fonts, Gaps, Radius } from '@/src/shared/tokens';
 import React, { useCallback, useState } from 'react';
 import {

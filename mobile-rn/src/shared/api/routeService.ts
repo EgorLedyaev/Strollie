@@ -1,5 +1,6 @@
 // routeService.ts
 import axios from 'axios';
+
 import apiClient from './client';
 
 export interface RouteRequestData {
@@ -61,7 +62,10 @@ export async function buildOptimalRoute(
 				`Сервер маршрутизации вернул ошибку: ${errorDetails}`,
 			);
 		} else {
-			throw new Error('Не удалось построить маршрут: ' + (error instanceof Error ? error.message : String(error)));
+			throw new Error(
+				'Не удалось построить маршрут: ' +
+					(error instanceof Error ? error.message : String(error)),
+			);
 		}
 	}
 }

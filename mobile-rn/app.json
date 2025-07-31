@@ -6,12 +6,13 @@
 		"orientation": "portrait",
 		"scheme": "ru.strollie",
 		"splash": {
-			"image": "./assets/images/icon_v2.png",
+			"image": "./assets/images/icon-inkscape.png",
 			"resizeMode": "contain",
 			"backgroundColor": "#1BF57E"
 		},
 		"androidStatusBar": {
-			"translucent": true
+			"translucent": true,
+			"backgroundColor": "#1BF57E"
 		},
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
@@ -25,7 +26,8 @@
 		"android": {
 			"package": "ru.strollie",
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/images/icon_v3.svg"
+				"foregroundImage": "./assets/images/icon-inkscape.png",
+				"backgroundColor": "#1BF57E"
 			}
 		},
 		"web": {
@@ -49,7 +51,7 @@
 			[
 				"expo-splash-screen",
 				{
-					"image": "./assets/images/icon_v3.svg",
+					"image": "./assets/images/icon-inkscape.png",
 					"resizeMode": "contain",
 					"backgroundColor": "#1BF57E",
 					"imageWidth": 200
@@ -61,10 +63,17 @@
 					"configureAndroidBackup": true,
 					"faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
 				}
-			]
+			],
+			"expo-web-browser"
 		],
 		"experiments": {
 			"typedRoutes": true
+		},
+		"extra": {
+			"router": {},
+			"eas": {
+				"projectId": "5cdb6535-2c58-4cb2-a7a9-361760d645bf"
+			}
 		}
 	}
 }

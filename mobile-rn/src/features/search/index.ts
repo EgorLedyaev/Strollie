@@ -2,6 +2,6 @@
 import { SearchInput } from './ui/SearchInput';
 
 export {
-  // Components
-  SearchInput
+	// Components
+	SearchInput,
 };

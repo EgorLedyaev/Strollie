@@ -2,7 +2,7 @@ import ActionIcon from '@/assets/icons/action';
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { useNavigation } from 'expo-router';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface HeaderProps {
 	email: string;
@@ -13,15 +13,15 @@ export function Header({ email, onMenuPress }: HeaderProps) {
 	const navigation = useNavigation();
 	return (
 		<View style={styles.header}>
-			<TouchableOpacity 
-				onPress={() => navigation.goBack()} 
+			<TouchableOpacity
+				onPress={() => navigation.goBack()}
 				style={styles.iconButton}
 				hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
 			>
 				<ArrowLeftIcon />
 			</TouchableOpacity>
 			<Text style={styles.text}>{email}</Text>
-			<TouchableOpacity 
+			<TouchableOpacity
 				onPress={onMenuPress}
 				style={styles.iconButton}
 				hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}

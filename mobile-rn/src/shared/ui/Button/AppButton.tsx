@@ -1,6 +1,6 @@
 import { Colors, Fonts, Radius } from '@/src/shared/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
 	GestureResponderEvent,
@@ -57,8 +57,10 @@ export const AppButton = ({
 	] as const;
 	const disabledColors = [Colors.disabledGray, Colors.disabledGray] as const;
 	// Используем useMemo для обновления цветов при изменении disabled
-	const [currentColors, setCurrentColors] = useState(disabled ? disabledColors : gradientColors);
-	
+	const [currentColors, setCurrentColors] = useState(
+		disabled ? disabledColors : gradientColors,
+	);
+
 	// Обновляем цвета при изменении disabled
 	useEffect(() => {
 		setCurrentColors(disabled ? disabledColors : gradientColors);
@@ -72,7 +74,7 @@ export const AppButton = ({
 
 	const handlePressIn = (e: GestureResponderEvent) => {
 		if (disabled) return;
-		
+
 		pressed.value = withTiming(1, { duration: 100 });
 		scale.value = withTiming(0.97, { duration: 100 });
 		setCurrentColors(dimmedGradientColors);
@@ -81,7 +83,7 @@ export const AppButton = ({
 
 	const handlePressOut = (e: GestureResponderEvent) => {
 		if (disabled) return;
-		
+
 		pressed.value = withTiming(0, { duration: 200 });
 		scale.value = withTiming(1, { duration: 200 });
 		setCurrentColors(gradientColors);
@@ -106,7 +108,16 @@ export const AppButton = ({
 						variant !== 'outline' ? styles.shadow : null,
 					]}
 				>
-					{!isLoading && <Text style={[styles.text, disabled && styles.disabledText]}>{text}</Text>}
+					{!isLoading && (
+						<Text
+							style={[
+								styles.text,
+								disabled && styles.disabledText,
+							]}
+						>
+							{text}
+						</Text>
+					)}
 					{isLoading && (
 						<ActivityIndicator
 							size='large'
@@ -161,7 +172,6 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		color: Colors.white,
 		includeFontPadding: false,
-		
 	},
 	disabledText: {
 		color: Colors.grayMedium,

@@ -1,10 +1,11 @@
 import BirthdayIcon from '@/assets/icons/BirthdayIcon';
 import LocationIcon from '@/assets/icons/map/LocationIcon';
 import OutLinePointerIcon from '@/assets/profile/OutlinePointerIcon';
-import { type User } from '@/src/entities/user';
-import { UserProfileData } from '@/src/features/profile/ui/EditProfileScreen';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { StyleSheet, Text, View } from 'react-native';
+
+import { UserProfileData } from '@/src/features/profile/ui/EditProfileScreen';
+import { type User } from '@/src/entities/user';
 
 interface ProfileInfoProps {
 	user: User;
@@ -12,10 +13,10 @@ interface ProfileInfoProps {
 }
 
 export function ProfileInfo({ user, profileData }: ProfileInfoProps) {
-	const fullName = profileData 
-		? `${profileData.firstName} ${profileData.lastName}` 
+	const fullName = profileData
+		? `${profileData.firstName} ${profileData.lastName}`
 		: 'Иван Иванов';
-		
+
 	const nickname = profileData?.nickname || user.email;
 	const birthDate = profileData?.birthDate || user.created_at;
 	const city = profileData?.city || 'Не указан';

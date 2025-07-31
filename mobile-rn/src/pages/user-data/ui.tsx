@@ -1,4 +1,3 @@
-import { useRegisterUser } from '@/src/features/register-user';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import {
 	AppButton,
@@ -11,6 +10,8 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useRegisterUser } from '@/src/features/register-user';
 
 export function UserDataPage() {
 	const [firstName, setFirstName] = useState('');
@@ -116,8 +117,8 @@ export function UserDataPage() {
 		setBirthdate(formatted);
 	};
 
-    const insets = useSafeAreaInsets();
-    const backButtonTop = insets.top + 16; 
+	const insets = useSafeAreaInsets();
+	const backButtonTop = insets.top + 16;
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
