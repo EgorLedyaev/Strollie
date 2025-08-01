@@ -22,7 +22,7 @@ export const useVerifyCode = () => {
 			// В реальном приложении здесь будет вызов API
 
 			// Простая проверка: код должен быть 4 цифры
-			if (code.length !== 4 || !/^\d{4}$/.test(code)) {
+			if (code.length !== 4 || !/^\d{4}$/.test(code) || code !== '1234') {
 				setError('Неверный код подтверждения.');
 				return false;
 			}
@@ -36,9 +36,9 @@ export const useVerifyCode = () => {
 			const isRegistration = await SessionStorage.getIsRegistration();
 
 			if (isRegistration) {
-				router.push('/user-data');
+				router.replace('/user-data');
 			} else {
-				router.push('/(app)');
+				router.replace('/(app)');
 			}
 
 			return true;

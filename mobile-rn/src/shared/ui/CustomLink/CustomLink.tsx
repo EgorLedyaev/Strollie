@@ -1,13 +1,14 @@
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { Link } from 'expo-router';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { CustomLinkProps } from './CustomLinkProps';
+import { AppText } from '../Text';
 
 export const CustomLink = ({ text, ...props }: CustomLinkProps) => {
 	return (
 		<Link {...props}>
-			<Text style={styles.link}>{text}</Text>
+			<AppText style={styles.link}>{text}</AppText>
 		</Link>
 	);
 };
@@ -17,5 +18,6 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f16,
 		color: Colors.greenLink,
 		fontFamily: Fonts.medium,
+		textDecorationLine: 'underline',
 	},
 });

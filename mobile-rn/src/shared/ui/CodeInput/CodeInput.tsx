@@ -1,17 +1,18 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ComponentRef, useEffect, useRef, useState } from 'react';
 import {
 	Animated,
 	NativeSyntheticEvent,
 	StyleProp,
 	StyleSheet,
-	Text,
-	TextInput,
 	TextInputKeyPressEventData,
 	TouchableOpacity,
 	View,
 	ViewStyle,
 } from 'react-native';
+
+import { Colors, Fonts } from '@/src/shared/tokens';
+
+import { AppTextInput } from '../Text';
 
 /**
  * Компонент для ввода кодов подтверждения.
@@ -61,7 +62,9 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 	isError = false,
 	style,
 }) => {
-	const inputsRef = useRef<Array<TextInput | null>>([]);
+	const inputsRef = useRef<Array<ComponentRef<typeof AppTextInput> | null>>(
+		[],
+	);
 	const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
 	const cursorOpacity = useRef(new Animated.Value(1)).current;
 
@@ -184,7 +187,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 							isError && styles.codeBoxError,
 						]}
 					>
-						<TextInput
+						<AppTextInput
 							ref={ref => {
 								inputsRef.current[i] = ref;
 							}}
@@ -206,8 +209,6 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 								style={[
 									styles.cursor,
 									{ opacity: cursorOpacity },
-									// Позиционируем курсор по центру поля
-									{ position: 'absolute' },
 								]}
 							/>
 						)}
@@ -280,14 +281,11 @@ const styles = StyleSheet.create({
 	 */
 	codeText: {
 		fontFamily: Fonts.medium,
-		fontSize: 24,
-		color: Colors.inputText,
+		fontSize: Fonts.f24,
 		textAlign: 'center',
 		height: '100%',
 		width: '100%',
 		paddingVertical: 0,
-		textAlignVertical: 'center', // Явно указываем вертикальное выравнивание
-		includeFontPadding: false, // Убираем лишние отступы шрифта
 	},
 	/**
 	 * Стиль мигающего курсора

@@ -1,4 +1,3 @@
-import { Colors, Fonts, Radius } from '@/src/shared/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import {
@@ -8,13 +7,16 @@ import {
 	Pressable,
 	PressableProps,
 	StyleSheet,
-	Text,
 } from 'react-native';
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 	withTiming,
 } from 'react-native-reanimated';
+
+import { Colors, Fonts, Radius } from '@/src/shared/tokens';
+
+import { AppText } from '../Text';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
@@ -109,14 +111,14 @@ export const AppButton = ({
 					]}
 				>
 					{!isLoading && (
-						<Text
+						<AppText
 							style={[
 								styles.text,
 								disabled && styles.disabledText,
 							]}
 						>
 							{text}
-						</Text>
+						</AppText>
 					)}
 					{isLoading && (
 						<ActivityIndicator

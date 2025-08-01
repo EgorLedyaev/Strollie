@@ -1,16 +1,16 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { ComponentRef, useEffect, useRef, useState } from 'react';
 import {
 	Animated,
 	Keyboard,
 	LayoutChangeEvent,
 	StyleSheet,
-	Text,
-	TextInput,
 	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
 
+import { Colors, Fonts } from '@/src/shared/tokens';
+
+import { AppText, AppTextInput } from '../Text';
 import { DropdownList, SelectField } from './components';
 import { SelectOption, SelectProps } from './types';
 
@@ -55,7 +55,7 @@ export const Select = ({
 	const dropdownOpacity = useRef(new Animated.Value(0)).current;
 
 	// Референс на поле ввода для фокуса
-	const inputRef = useRef<TextInput>(null);
+	const inputRef = useRef<ComponentRef<typeof AppTextInput>>(null);
 
 	// Находим выбранную опцию
 	const selectedOption = options.find(option => option.value === value);
@@ -160,7 +160,7 @@ export const Select = ({
 
 	return (
 		<View style={styles.container} onLayout={handleContainerLayout}>
-			{label && <Text style={styles.label}>{label}</Text>}
+			{label && <AppText style={styles.label}>{label}</AppText>}
 
 			{/* Поле ввода/выбора */}
 			<SelectField
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
 	label: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 		marginLeft: 16,
 		marginBottom: 12,
 	},

@@ -1,13 +1,13 @@
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
-import { Colors, Fonts } from '@/src/shared/tokens';
 import { router } from 'expo-router';
 import {
 	StyleSheet,
-	Text,
 	TouchableOpacity,
 	TouchableOpacityProps,
-	View,
 } from 'react-native';
+
+import { Colors } from '@/src/shared/tokens';
+import { AppText } from '../Text';
 
 interface BackButtonProps extends TouchableOpacityProps {
 	text?: string;
@@ -30,7 +30,7 @@ export const BackButton = ({
 				style={styles.backButtonIcon}
 				stroke={Colors.linkGreen}
 			/>
-			<Text style={styles.backLinkText}>{text}</Text>
+			<AppText style={styles.backLinkText}>{text}</AppText>
 		</TouchableOpacity>
 	);
 };
@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
 		width: 19,
 	},
 	backLinkText: {
-		fontFamily: Fonts.regular,
 		fontSize: 16,
 		color: Colors.linkGreen,
 	},

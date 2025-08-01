@@ -1,16 +1,17 @@
-import { SessionStorage } from '@/src/entities/session';
-import { Colors } from '@/src/shared/tokens';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as JotaiProvider } from 'jotai';
 import { useEffect } from 'react';
+import { View } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import {
 	SafeAreaProvider,
 	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import { View } from 'react-native';
+
+import { SessionStorage } from '@/src/entities/session';
+import { Colors } from '@/src/shared/tokens';
 
 // Предотвращаем автоскрытие сплеш-экрана
 SplashScreen.preventAutoHideAsync();
@@ -39,7 +40,6 @@ export default function RootLayout() {
 
 		initSession();
 	}, []);
-	const insets = useSafeAreaInsets();
 
 	const [fontsLoaded, fontError] = useFonts({
 		'SuisseIntl-Regular': require('../assets/fonts/SuisseIntl-Regular.otf'),

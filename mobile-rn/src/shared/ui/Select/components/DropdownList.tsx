@@ -1,6 +1,8 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
 import React from 'react';
-import { Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, ScrollView, StyleSheet, View } from 'react-native';
+
+import { Colors, Fonts } from '@/src/shared/tokens';
+import { AppText } from '@/src/shared/ui';
 
 import { SelectOption as SelectOptionType } from '../types';
 import { SelectOption } from './SelectOption';
@@ -56,7 +58,9 @@ export const DropdownList: React.FC<DropdownListProps> = ({
 				</ScrollView>
 			) : (
 				<View style={styles.noResultsContainer}>
-					<Text style={styles.noResultsText}>Ничего не найдено</Text>
+					<AppText style={styles.noResultsText}>
+						Ничего не найдено
+					</AppText>
 				</View>
 			)}
 

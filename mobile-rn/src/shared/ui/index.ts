@@ -10,4 +10,4 @@ export { CustomLink } from './CustomLink';
 export { ErrorNotification } from './ErrorNotification';
 export { Input } from './Input';
 export { MapStatusIndicator } from './MapStatusIndicator';
-export { MenuItem } from './MenuItem';
+export { AppText, AppTextInput } from './Text';

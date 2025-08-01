@@ -1,14 +1,17 @@
 import EyeClosedIcon from '@/assets/icons/eye-closed';
 import EyeOpenedIcon from '@/assets/icons/eye-opened';
-import { Colors, Fonts, Radius } from '@/src/shared/tokens';
 import { useState } from 'react';
 import {
+	NativeSyntheticEvent,
 	Pressable,
 	StyleSheet,
-	TextInput,
+	TextInputFocusEventData,
 	TextInputProps,
 	View,
 } from 'react-native';
+
+import { Colors } from '@/src/shared/tokens';
+import { AppTextInput } from '../Text';
 
 export const Input = ({
 	isPassword,
@@ -20,14 +23,14 @@ export const Input = ({
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 
 	// Функции для обработки фокуса и его потери
-	const handleFocus = (e: any) => {
+	const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
 		setIsFocused(true);
 		if (props.onFocus) {
 			props.onFocus(e);
 		}
 	};
 
-	const handleBlur = (e: any) => {
+	const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
 		setIsFocused(false);
 		if (props.onBlur) {
 			props.onBlur(e);
@@ -36,7 +39,7 @@ export const Input = ({
 
 	return (
 		<View style={styles.container}>
-			<TextInput
+			<AppTextInput
 				placeholderTextColor={Colors.placeHolderInput}
 				style={[
 					styles.input,
@@ -71,13 +74,9 @@ const styles = StyleSheet.create({
 		borderRadius: 16,
 		paddingHorizontal: 16,
 		backgroundColor: Colors.white,
-		fontSize: 16,
-		color: Colors.inputText,
-		fontFamily: Fonts.regular,
 		borderWidth: 1,
 		borderColor: Colors.inputBorder,
 		textAlignVertical: 'center',
-		includeFontPadding: false,
 	},
 	inputInvalid: {
 		borderColor: Colors.error,

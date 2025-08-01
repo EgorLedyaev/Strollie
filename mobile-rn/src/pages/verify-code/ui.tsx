@@ -1,5 +1,3 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppButton, BackButton, CodeInput } from '@/src/shared/ui';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
@@ -10,9 +8,12 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useResendCode, useVerifyCode } from '@/src/features/verify-code';
 import { SessionStorage } from '@/src/entities/session';
+import { Colors, Fonts } from '@/src/shared/tokens';
+import { AppButton, BackButton, CodeInput } from '@/src/shared/ui';
 
 export function VerifyCodePage() {
 	const [code, setCode] = useState('');
@@ -76,6 +77,9 @@ export function VerifyCodePage() {
 		return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 	};
 
+	const insets = useSafeAreaInsets();
+	const backButtonTop = insets.top + 16;
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<StatusBar
@@ -83,7 +87,7 @@ export function VerifyCodePage() {
 				backgroundColor={Colors.lightBackground}
 			/>
 
-			<BackButton style={styles.backButton} />
+			<BackButton style={[styles.backButton, { top: backButtonTop }]} />
 
 			<View style={styles.container}>
 				<View style={styles.header}>
@@ -145,6 +149,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		paddingHorizontal: 16,
+		paddingTop: 80,
 		alignItems: 'center',
 	},
 	header: {
@@ -160,7 +165,7 @@ const styles = StyleSheet.create({
 	title: {
 		fontFamily: Fonts.bold,
 		fontSize: 32,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 		marginBottom: 32,
 		textAlign: 'center',
 	},
@@ -190,7 +195,6 @@ const styles = StyleSheet.create({
 	},
 	buttonContainer: {
 		width: '100%',
-		paddingHorizontal: 16,
 		marginTop: 32,
 	},
 	errorText: {

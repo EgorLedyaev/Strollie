@@ -1,6 +1,8 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+
+import { Colors, Fonts } from '@/src/shared/tokens';
+import { AppText } from '@/src/shared/ui';
 
 export const ZoomButtons = ({
 	onZoomIn,
@@ -11,11 +13,11 @@ export const ZoomButtons = ({
 }) => (
 	<View style={styles.container}>
 		<TouchableOpacity style={styles.button} onPress={onZoomIn}>
-			<Text style={styles.text}>+</Text>
+			<AppText style={styles.text}>+</AppText>
 		</TouchableOpacity>
 		<View style={styles.separator} />
 		<TouchableOpacity style={styles.button} onPress={onZoomOut}>
-			<Text style={styles.text}>-</Text>
+			<AppText style={styles.text}>-</AppText>
 		</TouchableOpacity>
 	</View>
 );

@@ -1,13 +1,15 @@
-import { useAuthCheck } from '@/src/features/auth-by-email';
-import { Colors } from '@/src/shared/tokens';
-import { Redirect, Stack, router } from 'expo-router';
+import { Redirect, router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import {
 	SafeAreaProvider,
 	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+
+import { useAuthCheck } from '@/src/features/auth-by-email';
+import { Colors } from '@/src/shared/tokens';
+import { AppText } from '@/src/shared/ui';
 
 export default function AppLayout() {
 	const { isAuthenticated, isLoading, checkAuth } = useAuthCheck();
@@ -36,16 +38,13 @@ export default function AppLayout() {
 	if (isLoading) {
 		return (
 			<View style={styles.loadingContainer}>
-				<Text>Загрузка...</Text>
+				<AppText>Загрузка...</AppText>
 			</View>
 		);
 	}
 	return (
 		<>
-			<StatusBar
-				style='dark'
-				translucent={true}
-			/>
+			<StatusBar style='dark' translucent={true} />
 			<Stack
 				screenOptions={{
 					headerShown: false,

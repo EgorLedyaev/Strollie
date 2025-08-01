@@ -1,9 +1,8 @@
-// src/components/MapStatusIndicator.tsx (создайте этот файл)
 import { Colors } from '@/src/shared/tokens';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { AppText } from '../Text';
 
-// Убедитесь, что путь верный
 
 interface MapStatusIndicatorProps {
 	mapReady: boolean;
@@ -21,10 +20,10 @@ export const MapStatusIndicator: React.FC<MapStatusIndicatorProps> = ({
 	return (
 		<View style={styles.loader}>
 			<ActivityIndicator size='large' color={Colors.greenPrimary} />
-			<Text style={styles.loaderText}>
+			<AppText style={styles.loaderText}>
 				{mapError ? 'Ошибка карты' : 'Загрузка карты...'}
-			</Text>
-			{mapError && <Text style={styles.errorText}>{mapError}</Text>}
+			</AppText>
+			{mapError && <AppText style={styles.errorText}>{mapError}</AppText>}
 		</View>
 	);
 };
@@ -32,7 +31,7 @@ export const MapStatusIndicator: React.FC<MapStatusIndicatorProps> = ({
 const styles = StyleSheet.create({
 	loader: {
 		...StyleSheet.absoluteFillObject,
-		backgroundColor: 'rgba(255,255,255,0.8)',
+		backgroundColor: Colors.backgroundMapStatus,
 		justifyContent: 'center',
 		alignItems: 'center',
 		zIndex: 10,

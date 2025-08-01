@@ -1,17 +1,18 @@
+import { useState } from 'react';
+import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useRegisterUser } from '@/src/features/register-user';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import {
 	AppButton,
+	AppText,
 	BackButton,
 	Input,
 	Select,
 	SelectOption,
 } from '@/src/shared/ui';
-import { router } from 'expo-router';
-import { useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { useRegisterUser } from '@/src/features/register-user';
 
 export function UserDataPage() {
 	const [firstName, setFirstName] = useState('');
@@ -128,80 +129,89 @@ export function UserDataPage() {
 			/>
 
 			<BackButton style={[styles.backButton, { top: backButtonTop }]} />
+			<KeyboardAwareScrollView
+				contentContainerStyle={styles.scrollContainer}
+				showsVerticalScrollIndicator={false}
+				keyboardShouldPersistTaps='handled'
+			>
+				<View style={styles.container}>
+					<View style={styles.formContainer}>
+						<View style={styles.inputGroup}>
+							<AppText style={styles.label}>Имя</AppText>
+							<Input
+								placeholder='Введите ваше имя'
+								value={firstName}
+								onChangeText={setFirstName}
+								isInvalid={validationErrors.firstName}
+								maxLength={50}
+							/>
+						</View>
 
-			<View style={styles.container}>
-				<View style={styles.formContainer}>
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>Имя</Text>
-						<Input
-							placeholder='Введите ваше имя'
-							value={firstName}
-							onChangeText={setFirstName}
-							isInvalid={validationErrors.firstName}
-							maxLength={50}
-						/>
+						<View style={styles.inputGroup}>
+							<AppText style={styles.label}>Фамилия</AppText>
+							<Input
+								placeholder='Введите вашу фамилию'
+								value={lastName}
+								onChangeText={setLastName}
+								isInvalid={validationErrors.lastName}
+								maxLength={50}
+							/>
+						</View>
+
+						<View style={styles.inputGroup}>
+							<AppText style={styles.label}>Город</AppText>
+							<Select
+								options={cityOptions}
+								value={city}
+								onSelect={handleCitySelect}
+								placeholder='Выберите город'
+								isInvalid={validationErrors.city}
+							/>
+						</View>
+
+						<View style={styles.inputGroup}>
+							<AppText style={styles.label}>
+								Дата рождения
+							</AppText>
+							<Input
+								placeholder='DD.MM.YYYY'
+								value={birthdate}
+								onChangeText={handleBirthdateChange}
+								keyboardType='numeric'
+								maxLength={10}
+								isInvalid={validationErrors.birthdate}
+							/>
+						</View>
+
+						<View style={styles.inputGroup}>
+							<AppText style={styles.label}>Ник</AppText>
+							<Input
+								placeholder='Введите ваш ник'
+								value={nickname}
+								onChangeText={setNickname}
+								isInvalid={validationErrors.nickname}
+								autoCapitalize='none'
+								maxLength={30}
+							/>
+						</View>
 					</View>
 
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>Фамилия</Text>
-						<Input
-							placeholder='Введите вашу фамилию'
-							value={lastName}
-							onChangeText={setLastName}
-							isInvalid={validationErrors.lastName}
-							maxLength={50}
-						/>
-					</View>
+					{(formError || error) && (
+						<AppText style={styles.errorText}>
+							{formError || error}
+						</AppText>
+					)}
 
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>Город</Text>
-						<Select
-							options={cityOptions}
-							value={city}
-							onSelect={handleCitySelect}
-							placeholder='Выберите город'
-							isInvalid={validationErrors.city}
-						/>
-					</View>
-
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>Дата рождения</Text>
-						<Input
-							placeholder='DD.MM.YYYY'
-							value={birthdate}
-							onChangeText={handleBirthdateChange}
-							keyboardType='numeric'
-							maxLength={10}
-							isInvalid={validationErrors.birthdate}
-						/>
-					</View>
-
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>Ник</Text>
-						<Input
-							placeholder='Введите ваш ник'
-							value={nickname}
-							onChangeText={setNickname}
-							isInvalid={validationErrors.nickname}
-							autoCapitalize='none'
-							maxLength={30}
+					<View style={styles.buttonContainer}>
+						<AppButton
+							text='Завершить регистрацию'
+							onPress={handleRegister}
+							isLoading={isLoading}
+							disabled={!isFormValid || isLoading}
 						/>
 					</View>
 				</View>
-
-				{(formError || error) && (
-					<Text style={styles.errorText}>{formError || error}</Text>
-				)}
-
-				<View style={styles.buttonContainer}>
-					<AppButton
-						text='Завершить регистрацию'
-						onPress={handleRegister}
-						isLoading={isLoading}
-						disabled={!isFormValid || isLoading}
-					/>
-				</View>
-			</View>
+			</KeyboardAwareScrollView>
 		</SafeAreaView>
 	);
 }
@@ -211,34 +221,22 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.lightBackground,
 	},
+	scrollContainer: {
+		flexGrow: 1,
+		paddingHorizontal: 16,
+	},
 	container: {
 		flex: 1,
-		paddingHorizontal: 16,
-		paddingTop: 80,
+		paddingVertical: 80,
+		justifyContent: 'center',
 	},
-	header: {
-		alignItems: 'center',
-		marginTop: 70,
-		marginBottom: 60,
-	},
+
 	backButton: {
 		position: 'absolute',
 		top: 16,
 		left: 16,
 	},
-	title: {
-		fontFamily: Fonts.bold,
-		fontSize: 24,
-		color: Colors.inputText,
-		marginBottom: 16,
-		textAlign: 'center',
-	},
-	subtitle: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f16,
-		color: Colors.textGray,
-		textAlign: 'center',
-	},
+
 	formContainer: {
 		gap: 12,
 		marginBottom: 20,
@@ -249,7 +247,7 @@ const styles = StyleSheet.create({
 	label: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 		marginLeft: 16,
 	},
 	buttonContainer: {

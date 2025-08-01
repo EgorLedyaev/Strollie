@@ -1,20 +1,10 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppButton, CustomLink, Input } from '@/src/shared/ui';
 import { useState } from 'react';
-import {
-	Keyboard,
-	KeyboardAvoidingView,
-	Platform,
-	SafeAreaView,
-	ScrollView,
-	StatusBar,
-	StyleSheet,
-	Text,
-	TouchableWithoutFeedback,
-	View,
-} from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 import { useRegister } from '@/src/features/auth-by-email';
+import { Colors, Fonts } from '@/src/shared/tokens';
+import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
 
 export function RegisterPage() {
 	const [email, setEmail] = useState('');
@@ -30,47 +20,46 @@ export function RegisterPage() {
 				barStyle='dark-content'
 				backgroundColor={Colors.lightBackground}
 			/>
-			<KeyboardAvoidingView
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={styles.keyboardAvoiding}
+			<KeyboardAwareScrollView
+				contentContainerStyle={styles.scrollContainer}
+				showsVerticalScrollIndicator={false}
+				keyboardShouldPersistTaps='handled'
 			>
-				<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-					<ScrollView
-						contentContainerStyle={styles.scrollContainer}
-						style={styles.contentContainer}
-						keyboardShouldPersistTaps='handled'
-						showsVerticalScrollIndicator={false}
-					>
-						<View style={styles.headerBlock}>
-							<Text style={styles.title}>Регистрация</Text>
-						</View>
-						<View style={styles.formContainer}>
-							<View style={styles.inputGroup}>
-								<Text style={styles.label}>E-mail</Text>
-								<Input
-									placeholder='Введите свою эл.почту'
-									value={email}
-									onChangeText={setEmail}
-									keyboardType='email-address'
-									autoCapitalize='none'
-								/>
-							</View>
-
-							<AppButton
-								text='Далее'
-								onPress={handleRegister}
-								isLoading={isLoading}
+				<View style={styles.content}>
+					<View style={styles.headerBlock}>
+						<AppText variant='h1' style={styles.title}>
+							Регистрация
+						</AppText>
+					</View>
+					<View style={styles.formContainer}>
+						<View style={styles.inputGroup}>
+							<AppText style={styles.label}>E-mail</AppText>
+							<Input
+								placeholder='Введите свою эл.почту'
+								value={email}
+								onChangeText={setEmail}
+								keyboardType='email-address'
+								autoCapitalize='none'
 							/>
 						</View>
 
-						{error && <Text style={styles.errorText}>{error}</Text>}
-					</ScrollView>
-				</TouchableWithoutFeedback>
-			</KeyboardAvoidingView>
-			<View style={styles.footer}>
-				<Text style={styles.footerText}>Уже зарегистрированы?</Text>
-				<CustomLink href='/sign-in' text='Войти' replace />
-			</View>
+						<AppButton
+							text='Далее'
+							onPress={handleRegister}
+							isLoading={isLoading}
+						/>
+					</View>
+					{error && (
+						<AppText style={styles.errorText}>{error}</AppText>
+					)}
+				</View>
+				<View style={styles.footer}>
+					<AppText style={styles.footerText}>
+						Уже зарегистрированы?
+					</AppText>
+					<CustomLink href='/sign-in' text='Войти' replace />
+				</View>
+			</KeyboardAwareScrollView>
 		</SafeAreaView>
 	);
 }
@@ -80,25 +69,21 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.lightBackground,
 	},
-	keyboardAvoiding: {
-		flex: 1,
-	},
+
 	scrollContainer: {
 		flexGrow: 1,
-		justifyContent: 'center',
-	},
-	contentContainer: {
 		paddingHorizontal: 16,
 	},
+	content: {
+		flex: 1,
+		justifyContent: 'center',
+	},
 	headerBlock: {
-		marginBottom: 120,
+		alignItems: 'center',
+		marginBottom: 60,
 	},
 	title: {
-		fontFamily: Fonts.bold,
-		fontSize: 32,
-		color: Colors.inputText,
 		marginTop: 30,
-		alignSelf: 'center',
 	},
 	formContainer: {
 		gap: 32,
@@ -109,7 +94,7 @@ const styles = StyleSheet.create({
 	label: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 		marginLeft: 16,
 	},
 	errorText: {
@@ -125,6 +110,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 10,
 		paddingBottom: 40,
+		marginTop: 'auto',
 	},
 	footerText: {
 		fontFamily: Fonts.regular,

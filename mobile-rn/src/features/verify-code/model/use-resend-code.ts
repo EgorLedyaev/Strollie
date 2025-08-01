@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-import { SessionStorage } from '@/src/entities/session';
-
 export const useResendCode = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);

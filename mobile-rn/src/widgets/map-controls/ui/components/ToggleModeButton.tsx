@@ -1,6 +1,8 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+
+import { Colors, Fonts } from '@/src/shared/tokens';
+import { AppText } from '@/src/shared/ui';
 
 export const ToggleModeButton = ({
 	is3D,
@@ -16,7 +18,7 @@ export const ToggleModeButton = ({
 		onPress={onPress}
 		disabled={disabled}
 	>
-		<Text style={styles.text}>{is3D ? '2D' : '3D'}</Text>
+		<AppText style={styles.text}>{is3D ? '2D' : '3D'}</AppText>
 	</TouchableOpacity>
 );
 

@@ -20,7 +20,7 @@
     "^@/src/widgets/(.*)$",
     "^@/src/features/(.*)$",
     "^@/src/entities/(.*)$",
-    "^@/srt/shared/(.*)$",
+    "^@/src/shared/(.*)$",
     "",
     "^[./]"
   ],

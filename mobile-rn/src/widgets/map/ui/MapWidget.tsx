@@ -1,10 +1,10 @@
-import { MapStatusIndicator } from '@/src/shared/ui';
 import { useAtom, useSetAtom } from 'jotai';
 import React, { forwardRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import WebView from 'react-native-webview';
 
 import { mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
+import { AppText, MapStatusIndicator } from '@/src/shared/ui';
 
 interface MapWidgetProps {
 	onMessage: (event: any) => void;
@@ -19,9 +19,9 @@ export const MapWidget = forwardRef<WebView, MapWidgetProps>(
 		if (!webviewUrl) {
 			return (
 				<View style={styles.errorView}>
-					<Text style={styles.errorText}>
+					<AppText style={styles.errorText}>
 						URL для WebView не настроен
-					</Text>
+					</AppText>
 				</View>
 			);
 		}

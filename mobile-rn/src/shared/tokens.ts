@@ -20,7 +20,7 @@ export const Colors = {
 
 	// Цвета для форм и инпутов
 	inputBorder: '#E7E7E7',
-	inputText: '#484848', // Цвет текста в инпутах и в заголовках
+	headerAndInputText: '#484848', // Цвет текста в инпутах и в заголовках
 	placeholderGray: '#B2B2B2',
 	placeHolderInput: '#B3B3B3', // Цвет плейсхолдера в инпутах
 	searchDivider: '#D7D7D7', // Цвет разделителя в поле поиска
@@ -32,6 +32,7 @@ export const Colors = {
 
 	// Цвета выделения
 	optionHighlight: 'rgba(31, 31, 31, 0.1)', // Цвет выделения опции в выпадающем списке
+	backgroundMapStatus: 'rgba(255,255,255,0.8)',
 
 	// Зеленые оттенки
 	linkGreen: '#1EB18C',
@@ -69,6 +70,8 @@ export const Fonts = {
 	f16: 16,
 	f18: 18,
 	f20: 20,
+	f24: 24,
+	f32: 32,
 	regular: 'SuisseIntl-Regular',
 	semibold: 'SuisseIntl-SemiBold',
 	medium: 'SuisseIntl-Medium',

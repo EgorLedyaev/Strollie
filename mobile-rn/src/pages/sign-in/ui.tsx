@@ -1,16 +1,10 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppButton, CustomLink, Input } from '@/src/shared/ui';
 import { useState } from 'react';
-import {
-	SafeAreaView,
-	StatusBar,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 import { useLogin } from '@/src/features/auth-by-email';
+import { Colors, Fonts } from '@/src/shared/tokens';
+import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
 
 export function SignInPage() {
 	const [email, setEmail] = useState('');
@@ -26,74 +20,79 @@ export function SignInPage() {
 				barStyle='dark-content'
 				backgroundColor={Colors.lightBackground}
 			/>
-			<View style={styles.container}>
-				<Text style={styles.title}>Вход</Text>
-
-				<View style={styles.formContainer}>
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>E-mail</Text>
-						<Input
-							placeholder='Введите свою эл.почту'
-							value={email}
-							onChangeText={setEmail}
-							keyboardType='email-address'
-							autoCapitalize='none'
+			<KeyboardAwareScrollView
+				contentContainerStyle={styles.scrollContainer}
+				showsVerticalScrollIndicator={false}
+				keyboardShouldPersistTaps='handled'
+			>
+				<View style={styles.content}>
+					<View style={styles.headerBlock}>
+						<AppText style={styles.title}>Вход</AppText>
+					</View>
+					<View style={styles.formContainer}>
+						<View style={styles.inputGroup}>
+							<AppText style={styles.label}>E-mail</AppText>
+							<Input
+								placeholder='Введите свою эл.почту'
+								value={email}
+								onChangeText={setEmail}
+								keyboardType='email-address'
+								autoCapitalize='none'
+							/>
+						</View>
+						<AppButton
+							text='Войти'
+							onPress={handleSignIn}
+							isLoading={isLoading}
 						/>
 					</View>
-
-					<AppButton
-						text='Войти'
-						onPress={handleSignIn}
-						isLoading={isLoading}
-					/>
+					{error && (
+						<AppText style={styles.errorText}>{error}</AppText>
+					)}
 				</View>
-
-				{error && <Text style={styles.errorText}>{error}</Text>}
-
 				<View style={styles.footer}>
-					<Text style={styles.footerText}>Нет аккаунта?</Text>
+					<AppText style={styles.footerText}>Нет аккаунта?</AppText>
 					<CustomLink
 						href='/register'
 						text='Зарегистрироваться'
 						replace
 					/>
 				</View>
-			</View>
+			</KeyboardAwareScrollView>
 		</SafeAreaView>
 	);
 }
+
+// 	</View>
+
+// </View>
 
 const styles = StyleSheet.create({
 	safeArea: {
 		flex: 1,
 		backgroundColor: Colors.lightBackground,
 	},
-	keyboardAvoiding: {
-		flex: 1,
-	},
+
 	scrollContainer: {
 		flexGrow: 1,
+		paddingHorizontal: 16,
+	},
+	content: {
+		flex: 1,
 		justifyContent: 'center',
 	},
-	contentContainer: {
-		paddingHorizontal: 16,
+	headerBlock: {
+		alignItems: 'center',
+		marginBottom: 60,
 	},
 	title: {
-		fontFamily: Fonts.semibold,
+		fontFamily: Fonts.bold,
 		fontSize: 32,
-		color: Colors.inputText,
-		marginTop: 95,
-		alignSelf: 'center',
-	},
-	container: {
-		flex: 1,
-		paddingHorizontal: 16,
-		paddingBottom: 20,
+		color: Colors.headerAndInputText,
+		marginTop: 30,
 	},
 	formContainer: {
 		gap: 32,
-		// marginBottom: 20,
-		marginTop: 147,
 	},
 	inputGroup: {
 		gap: 12,
@@ -101,7 +100,7 @@ const styles = StyleSheet.create({
 	label: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 		marginLeft: 16,
 	},
 	errorText: {
@@ -111,18 +110,13 @@ const styles = StyleSheet.create({
 		marginTop: 16,
 		textAlign: 'center',
 	},
-	separator: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		paddingHorizontal: 20,
-		paddingVertical: 32,
-	},
 	footer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
 		alignItems: 'center',
 		gap: 10,
 		paddingBottom: 40,
+		marginTop: 'auto',
 	},
 	footerText: {
 		fontFamily: Fonts.regular,

@@ -3,35 +3,39 @@ import RouteIcon from '@/assets/profile/route';
 import SavedRouteIcon from '@/assets/profile/saved-route';
 import TicketsIcon from '@/assets/profile/tickets';
 import TravelsIcon from '@/assets/profile/travels';
+import { StyleSheet, View } from 'react-native';
+
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { StyleSheet, Text, View } from 'react-native';
+import { AppText } from '@/src/shared/ui';
 
 export function Grid() {
 	return (
 		<View style={styles.gridContainer}>
 			<View style={styles.gridRow}>
 				<View style={styles.gridItem}>
-					<Text style={styles.gridText}>Мои билеты</Text>
+					<AppText style={styles.gridText}>Мои билеты</AppText>
 					<TicketsIcon style={styles.icon} />
 				</View>
 				<View style={styles.gridItem}>
-					<Text style={styles.gridText}>Мои поездки</Text>
+					<AppText style={styles.gridText}>Мои поездки</AppText>
 					<TravelsIcon style={styles.icon} />
 				</View>
 			</View>
 			<View style={styles.gridRow}>
 				<View style={styles.gridItem}>
-					<Text style={styles.gridText}>История маршрутов</Text>
+					<AppText style={styles.gridText}>История маршрутов</AppText>
 					<RouteIcon style={styles.icon} />
 				</View>
 				<View style={styles.gridItem}>
-					<Text style={styles.gridText}>Сохраненные маршруты</Text>
+					<AppText style={styles.gridText}>
+						Сохраненные маршруты
+					</AppText>
 					<SavedRouteIcon style={styles.icon} />
 				</View>
 			</View>
 			<View style={styles.gridRow}>
 				<View style={styles.gridItemFull}>
-					<Text style={styles.gridText}>Календарь</Text>
+					<AppText style={styles.gridText}>Календарь</AppText>
 					<CalendarIcon style={styles.icon} />
 				</View>
 			</View>

@@ -1,8 +1,10 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+
+import { Colors, Fonts } from '@/src/shared/tokens';
 
 import { SelectOption as SelectOptionType } from '../types';
+import { AppText } from '../../Text';
 
 interface SelectOptionProps {
 	item: SelectOptionType;
@@ -38,14 +40,14 @@ export const SelectOption: React.FC<SelectOptionProps> = ({
 			delayPressIn={0}
 			hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
 		>
-			<Text
+			<AppText
 				style={[
 					styles.optionText,
 					isSelected && styles.selectedOptionText,
 				]}
 			>
 				{item.label}
-			</Text>
+			</AppText>
 		</TouchableOpacity>
 	);
 };
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
 	optionText: {
 		fontFamily: Fonts.regular,
 		fontSize: 16,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 	},
 	selectedOptionText: {
 		fontFamily: Fonts.medium,

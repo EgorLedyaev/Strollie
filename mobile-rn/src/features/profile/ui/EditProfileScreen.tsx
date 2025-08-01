@@ -1,18 +1,13 @@
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
-import { Colors, Fonts, Radius } from '@/src/shared/tokens';
-import { AppButton, Select, type SelectOption } from '@/src/shared/ui';
 import { useNavigation } from 'expo-router';
 import React, { useState } from 'react';
-import {
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { type User } from '@/src/entities/user';
+import { Colors, Fonts, Radius } from '@/src/shared/tokens';
+import { AppButton, Select, type SelectOption } from '@/src/shared/ui';
 
 import { ProfileField } from './ProfileField';
 
@@ -118,7 +113,7 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 				<View style={styles.avatar}></View>
 			</View>
 
-			<ScrollView style={styles.formContainer}>
+			<KeyboardAwareScrollView style={styles.formContainer}>
 				<View style={styles.formContent}>
 					<ProfileField
 						label='Имя'
@@ -206,7 +201,7 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 						numberOfLines={4}
 					/>
 				</View>
-			</ScrollView>
+			</KeyboardAwareScrollView>
 
 			<View style={styles.buttonContainer}>
 				<AppButton text='Сохранить изменения' onPress={handleSave} />

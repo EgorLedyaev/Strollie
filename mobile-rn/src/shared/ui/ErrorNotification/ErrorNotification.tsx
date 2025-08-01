@@ -1,8 +1,9 @@
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { useEffect, useState } from 'react';
-import { Animated, Dimensions, StyleSheet, Text } from 'react-native';
+import { Animated, Dimensions, StyleSheet } from 'react-native';
 
 import { ErrorNotificationProps } from './types';
+import { AppText } from '../Text';
 
 export const ErrorNotification = ({ error }: ErrorNotificationProps) => {
 	const [isShown, setIsShown] = useState<boolean>(false);
@@ -38,7 +39,7 @@ export const ErrorNotification = ({ error }: ErrorNotificationProps) => {
 				}}
 				onLayout={onEnter}
 			>
-				<Text style={styles.errorText}>{error}</Text>
+				<AppText style={styles.errorText}>{error}</AppText>
 			</Animated.View>
 		</>
 	);

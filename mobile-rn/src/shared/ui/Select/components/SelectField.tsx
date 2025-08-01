@@ -1,14 +1,13 @@
 import ArrowDownIcon from '@/assets/icons/arrow-down';
 import ArrowUpIcon from '@/assets/icons/arrow-up';
-import { Colors, Fonts } from '@/src/shared/tokens';
-import React from 'react';
+import React, { ComponentRef } from 'react';
 import {
 	StyleSheet,
-	Text,
-	TextInput,
 	TouchableOpacity,
-	View,
 } from 'react-native';
+
+import { Colors, Fonts } from '@/src/shared/tokens';
+import { AppText, AppTextInput } from '@/src/shared/ui';
 
 import { SelectOption } from '../types';
 
@@ -16,7 +15,7 @@ interface SelectFieldProps {
 	isOpen: boolean;
 	searchQuery: string;
 	onSearchChange: (text: string) => void;
-	inputRef: React.RefObject<TextInput | null>;
+	inputRef: React.RefObject<ComponentRef<typeof AppTextInput> | null>;
 	selectedOption?: SelectOption;
 	placeholder: string;
 	isInvalid: boolean;
@@ -47,7 +46,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 			activeOpacity={0.7}
 		>
 			{isOpen ? (
-				<TextInput
+				<AppTextInput
 					ref={inputRef}
 					style={styles.searchInput}
 					value={searchQuery}
@@ -57,20 +56,20 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 					autoFocus={true}
 				/>
 			) : (
-				<Text
+				<AppText
 					style={[
 						styles.selectText,
 						!selectedOption && styles.placeholderText,
 					]}
 				>
 					{selectedOption ? selectedOption.label : placeholder}
-				</Text>
+				</AppText>
 			)}
 
 			{isOpen ? (
-				<ArrowUpIcon stroke={Colors.inputText} />
+				<ArrowUpIcon stroke={Colors.headerAndInputText} />
 			) : (
-				<ArrowDownIcon stroke={Colors.inputText} />
+				<ArrowDownIcon stroke={Colors.headerAndInputText} />
 			)}
 		</TouchableOpacity>
 	);
@@ -102,7 +101,7 @@ const styles = StyleSheet.create({
 	selectText: {
 		fontFamily: Fonts.regular,
 		fontSize: 16,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 		flex: 1,
 		textAlignVertical: 'center', // Добавляем вертикальное выравнивание
 		includeFontPadding: false, // Убираем лишние отступы шрифта
@@ -113,7 +112,7 @@ const styles = StyleSheet.create({
 	searchInput: {
 		fontFamily: Fonts.regular,
 		fontSize: 16,
-		color: Colors.inputText,
+		color: Colors.headerAndInputText,
 		flex: 1,
 		height: '100%',
 		padding: 0,

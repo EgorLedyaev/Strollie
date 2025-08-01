@@ -1,7 +1,9 @@
 import unmatched from '@/assets/images/unmatched.png';
-import { CustomLink } from '@/src/shared/ui/CustomLink/CustomLink';
+import { Image, StyleSheet, View } from 'react-native';
+
 import { Colors, Fonts, Gaps } from '@/src/shared/tokens';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { CustomLink } from '@/src/shared/ui/CustomLink/CustomLink';
+import { AppText } from '@/src/shared/ui/Text/AppText';
 
 export default function NotFoundScreen() {
 	return (
@@ -13,10 +15,10 @@ export default function NotFoundScreen() {
 						resizeMode='contain'
 						style={styles.image}
 					/>
-					<Text style={styles.text}>
+					<AppText style={styles.text}>
 						Ооо... Что-то пошло не так. Попробуйте вернуться на
 						главный экран приложения
-					</Text>
+					</AppText>
 					<CustomLink href='/' text='На главный экран' />
 				</View>
 			</View>
