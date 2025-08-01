@@ -94,7 +94,9 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 				>
 					<ArrowLeftIcon />
 				</TouchableOpacity>
-				<AppText style={styles.title}>Редактирование</AppText>
+				<AppText variant='header' style={styles.title}>
+					Редактирование
+				</AppText>
 				<View style={styles.placeholder} />
 			</View>
 
@@ -198,14 +200,15 @@ const styles = StyleSheet.create({
 	},
 	backButton: {
 		padding: 5,
+		backgroundColor: Colors.white,
 	},
 	placeholder: {
 		width: 24,
 	},
 	title: {
-		fontFamily: Fonts.bold,
-		fontSize: 16,
-		color: Colors.black,
+		// fontFamily: Fonts.bold,
+		// fontSize: 16,
+		// color: Colors.black,
 	},
 	avatarContainer: {
 		alignItems: 'center',

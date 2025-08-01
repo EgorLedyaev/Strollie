@@ -67,8 +67,8 @@ export const Fonts = {
 	f20: 20,
 	f24: 24,
 	f32: 32,
-	regular: 'SuisseIntl-Regular',
-	semibold: 'SuisseIntl-SemiBold',
-	medium: 'SuisseIntl-Medium',
-	bold: 'SuisseIntl-Bold',
+	regular: 'SuisseIntl-Regular', // weight 400
+	semibold: 'SuisseIntl-SemiBold', // weight 600
+	medium: 'SuisseIntl-Medium', // weight 500
+	bold: 'SuisseIntl-Bold', // weight 700
 };

@@ -4,7 +4,7 @@ import { StyleSheet, Text, TextProps } from 'react-native';
 
 import { Colors, Fonts } from '@/src/shared/tokens';
 
-type AppTextVariant = 'body' | 'h1' | 'h2' | 'caption' | 'button';
+type AppTextVariant = 'body' | 'h1' | 'h2' | 'caption' | 'button' | 'header';
 
 interface AppTextProps extends TextProps {
 	variant?: AppTextVariant;
@@ -51,4 +51,9 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f18,
 		color: Colors.white,
 	},
+
+	header: {
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
+	}
 });
