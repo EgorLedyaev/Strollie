@@ -1,8 +1,8 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
+import IconLogo from '@/assets/icons/logo';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { Image, StatusBar, StyleSheet, View } from 'react-native';
+import {  StatusBar, StyleSheet, View } from 'react-native';
 
 export default function Splash() {
 	const router = useRouter();
@@ -10,7 +10,7 @@ export default function Splash() {
 		// Автоматический переход на экран входа после таймаута
 		const timer = setTimeout(() => {
 			router.replace('/sign-in');
-		}, 2000); // 2 секунды на отображение заставки
+		}, 200); // 2 секунды на отображение заставки
 
 		return () => clearTimeout(timer);
 	}, [router]);
@@ -28,11 +28,7 @@ export default function Splash() {
 				start={{ x: 0.5, y: 0 }}
 				end={{ x: 0.5, y: 1 }}
 			>
-				<Image
-					source={require('../assets/splash-strollie.png')}
-					style={styles.logo}
-					resizeMode='contain'
-				/>
+				<IconLogo style={styles.logo} />
 			</LinearGradient>
 		</View>
 	);

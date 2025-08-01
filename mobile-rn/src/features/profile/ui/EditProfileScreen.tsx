@@ -1,13 +1,19 @@
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
 import { useNavigation } from 'expo-router';
-import React, { useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useAtom, useSetAtom } from 'jotai';
+import { useEffect, useState } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import {
+	citiesAtom,
+	citiesIsLoadingAtom,
+	fetchCitiesAtom,
+} from '@/src/entities/city';
 import { type User } from '@/src/entities/user';
 import { Colors, Fonts, Radius } from '@/src/shared/tokens';
-import { AppButton, Select, type SelectOption } from '@/src/shared/ui';
+import { AppButton, AppText, Select, type SelectOption } from '@/src/shared/ui';
 
 import { ProfileField } from './ProfileField';
 
@@ -19,11 +25,9 @@ interface EditProfileProps {
 export interface UserProfileData {
 	firstName: string;
 	lastName: string;
-	middleName: string;
 	nickname: string;
 	city: string;
 	birthDate: string;
-	aboutMe?: string;
 }
 
 export const EditProfileScreen: React.FC<EditProfileProps> = ({
@@ -32,35 +36,21 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 }) => {
 	const navigation = useNavigation();
 
-	// Опции для выбора города
-	const cityOptions: SelectOption[] = [
-		{ label: 'Калининград', value: 'kaliningrad' },
-		{ label: 'Москва', value: 'moscow' },
-		{ label: 'г. Санкт-Петербург, Ленинградская обл.', value: 'spb' },
-		{ label: 'г. Екатеринбург, Свердловская обл.', value: 'ekb' },
-		{ label: 'Казань', value: 'kazan' },
-		{ label: 'Нижний Новгород', value: 'nizhny-novgorod' },
-		{ label: 'Челябинск', value: 'chelyabinsk' },
-		{ label: 'Самара', value: 'samara' },
-		{ label: 'Омск', value: 'omsk' },
-		{ label: 'Ростов-на-Дону', value: 'rostov-on-don' },
-		{ label: 'Уфа', value: 'ufa' },
-		{ label: 'Красноярск', value: 'krasnoyarsk' },
-		{ label: 'Новосибирск', value: 'novosibirsk' },
-		{ label: 'Пермь', value: 'perm' },
-		{ label: 'Воронеж', value: 'voronezh' },
-		{ label: 'Волгоград', value: 'volgograd' },
-	];
+	const [cityOptions] = useAtom(citiesAtom);
+	const [isLoadingCities] = useAtom(citiesIsLoadingAtom);
+	const fetchCities = useSetAtom(fetchCitiesAtom);
+
+	useEffect(() => {
+		fetchCities();
+	}, [fetchCities]);
 
 	// Начальные данные из пользовательского профиля или заглушка
 	const [userData, setUserData] = useState<UserProfileData>({
 		firstName: user.firstName || '',
 		lastName: user.lastName || '',
-		middleName: user.middleName || '',
 		nickname: user.nickname || user.email || '',
 		city: user.city || '',
 		birthDate: user.birthDate || '',
-		aboutMe: user.aboutMe || '',
 	});
 
 	const handleChange = (field: keyof UserProfileData, value: string) => {
@@ -85,7 +75,6 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 			userData,
 		);
 		onSave(userData);
-		// Не используем navigation.goBack() так как onSave сам переключает состояние на экране профиля
 	};
 
 	const handleGoBack = () => {
@@ -105,7 +94,7 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 				>
 					<ArrowLeftIcon />
 				</TouchableOpacity>
-				<Text style={styles.title}>Редактирование</Text>
+				<AppText style={styles.title}>Редактирование</AppText>
 				<View style={styles.placeholder} />
 			</View>
 
@@ -128,21 +117,13 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 					/>
 
 					<ProfileField
-						label='Отчество'
-						value={userData.middleName}
-						onChangeText={value =>
-							handleChange('middleName', value)
-						}
-					/>
-
-					<ProfileField
 						label='Никнейм'
 						value={userData.nickname}
 						onChangeText={value => handleChange('nickname', value)}
 					/>
 
 					<View style={styles.cityFieldContainer}>
-						<Text style={styles.cityLabel}>Город</Text>
+						<AppText style={styles.cityLabel}>Город</AppText>
 						<Select
 							options={cityOptions}
 							value={currentCityValue}
@@ -191,14 +172,6 @@ export const EditProfileScreen: React.FC<EditProfileProps> = ({
 						placeholder='ДД.ММ.ГГГГ'
 						keyboardType='numeric'
 						maxLength={10}
-					/>
-
-					<ProfileField
-						label='О себе'
-						value={userData.aboutMe || ''}
-						onChangeText={value => handleChange('aboutMe', value)}
-						multiline
-						numberOfLines={4}
 					/>
 				</View>
 			</KeyboardAwareScrollView>

@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 
 import { Colors } from '@/src/shared/tokens';
+
 import { AppText } from '../Text';
 
 interface BackButtonProps extends TouchableOpacityProps {
@@ -28,7 +29,7 @@ export const BackButton = ({
 		>
 			<ArrowLeftIcon
 				style={styles.backButtonIcon}
-				stroke={Colors.linkGreen}
+				stroke={Colors.greenLink}
 			/>
 			<AppText style={styles.backLinkText}>{text}</AppText>
 		</TouchableOpacity>
@@ -48,6 +49,6 @@ const styles = StyleSheet.create({
 	},
 	backLinkText: {
 		fontSize: 16,
-		color: Colors.linkGreen,
+		color: Colors.greenLink,
 	},
 });

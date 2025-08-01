@@ -35,16 +35,11 @@ export const Colors = {
 	backgroundMapStatus: 'rgba(255,255,255,0.8)',
 
 	// Зеленые оттенки
-	linkGreen: '#1EB18C',
 	successGreen: '#45CD86',
 	greenLink: '#1EB18C',
 	greenPrimary: '#1FD975',
 	greenSecondary: '#1CC4C4',
 	greenHover: '#027962',
-
-	// Фиолетовые оттенки
-	violetDark: '#2E2D3D',
-	primary: '#1FD975', // Основной цвет приложения
 
 	// Другие цвета
 	red: '#CC384E',

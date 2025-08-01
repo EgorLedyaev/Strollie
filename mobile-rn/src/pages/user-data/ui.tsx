@@ -1,18 +1,19 @@
-import { useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+
+
 import { useRegisterUser } from '@/src/features/register-user';
-import { Colors, Fonts } from '@/src/shared/tokens';
-import {
-	AppButton,
-	AppText,
-	BackButton,
-	Input,
-	Select,
-	SelectOption,
-} from '@/src/shared/ui';
+import { citiesAtom, citiesIsLoadingAtom, fetchCitiesAtom } from '@/src/entities/city';
+import { Colors, Fonts, Gaps } from '@/src/shared/tokens';
+import { AppButton, AppText, BackButton, Input, Select, SelectOption } from '@/src/shared/ui';
+
+
+
+
 
 export function UserDataPage() {
 	const [firstName, setFirstName] = useState('');
@@ -25,17 +26,15 @@ export function UserDataPage() {
 	>({});
 	const [formError, setFormError] = useState<string | null>(null);
 
+	const [cityOptions] = useAtom(citiesAtom);
+	const [isLoadingCities] = useAtom(citiesIsLoadingAtom);
+	const fetchCities = useSetAtom(fetchCitiesAtom);
+
 	const { register, isLoading, error } = useRegisterUser();
 
-	const cityOptions: SelectOption[] = [
-		{ label: 'г. Москва, Московская обл.', value: 'moscow' },
-		{ label: 'г. Санкт-Петербург, Ленинградская обл.', value: 'spb' },
-		{ label: 'г. Екатеринбург, Свердловская обл.', value: 'ekb' },
-		{ label: 'г. Новосибирск, Новосибирская обл.', value: 'nsk' },
-		{ label: 'г. Казань, Республика Татарстан', value: 'kazan' },
-		{ label: 'г. Самара, Самарская обл.', value: 'samara' },
-		{ label: 'г. Саратов, Саратовская обл.', value: 'saratov' },
-	];
+	useEffect(() => {
+		fetchCities();
+	}, [fetchCities]);
 
 	const handleRegister = async () => {
 		try {
@@ -235,14 +234,15 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		top: 16,
 		left: 16,
+		zIndex: 1,
 	},
 
 	formContainer: {
-		gap: 12,
+		gap: Gaps.g16,
 		marginBottom: 20,
 	},
 	inputGroup: {
-		// gap: 0,
+		gap: Gaps.g8,
 	},
 	label: {
 		fontFamily: Fonts.medium,

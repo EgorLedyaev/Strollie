@@ -75,7 +75,7 @@ export const useRegisterUser = () => {
 			});
 
 			// Перенаправляем на главный экран приложения
-			router.push('/(app)');
+			router.replace('/(app)');
 		} catch (err) {
 			console.error('Ошибка регистрации пользователя', err);
 			setError('Не удалось зарегистрировать пользователя.');

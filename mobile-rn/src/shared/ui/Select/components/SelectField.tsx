@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppText, AppTextInput } from '@/src/shared/ui';
+import { AppText, AppTextInput } from '../../Text';
 
 import { SelectOption } from '../types';
 

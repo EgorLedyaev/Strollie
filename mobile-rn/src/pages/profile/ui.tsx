@@ -1,5 +1,4 @@
 import { Colors } from '@/src/shared/tokens';
-import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -17,7 +16,6 @@ import {
 import {
 	loadProfileAtom,
 	UserProfileStorage,
-	type User,
 } from '@/src/entities/user';
 
 export const ProfilePage = () => {
@@ -41,11 +39,9 @@ export const ProfilePage = () => {
 				setUserProfile({
 					firstName: storedProfile.firstName || '',
 					lastName: storedProfile.lastName || '',
-					middleName: storedProfile.middleName || '',
 					nickname: storedProfile.nickname || '',
 					city: storedProfile.city || '',
 					birthDate: storedProfile.birthDate || '',
-					aboutMe: storedProfile.aboutMe || '',
 				});
 			}
 		};
@@ -92,7 +88,6 @@ export const ProfilePage = () => {
 	const handleLogout = async () => {
 		setMenuVisible(false);
 		await logout();
-		router.replace('/sign-in');
 	};
 
 	if (showEditProfile) {

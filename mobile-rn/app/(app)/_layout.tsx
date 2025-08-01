@@ -13,7 +13,6 @@ import { AppText } from '@/src/shared/ui';
 
 export default function AppLayout() {
 	const { isAuthenticated, isLoading, checkAuth } = useAuthCheck();
-	const insets = useSafeAreaInsets();
 	const redirectInProgress = useRef(false);
 
 	// Проверка авторизации
@@ -43,7 +42,7 @@ export default function AppLayout() {
 		);
 	}
 	return (
-		<>
+		<SafeAreaProvider>
 			<StatusBar style='dark' translucent={true} />
 			<Stack
 				screenOptions={{
@@ -57,7 +56,7 @@ export default function AppLayout() {
 				<Stack.Screen name='index' />
 				<Stack.Screen name='profile' />
 			</Stack>
-		</>
+		</SafeAreaProvider>
 	);
 }
 

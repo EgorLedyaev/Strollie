@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
 		color: Colors.placeholderGray,
 	},
 	activeResendText: {
-		color: Colors.linkGreen,
+		color: Colors.greenLink,
 	},
 	buttonContainer: {
 		width: '100%',

@@ -86,12 +86,12 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 				Animated.sequence([
 					Animated.timing(cursorOpacity, {
 						toValue: 0,
-						duration: 500,
+						duration: 1000,
 						useNativeDriver: true,
 					}),
 					Animated.timing(cursorOpacity, {
 						toValue: 1,
-						duration: 500,
+						duration: 1000,
 						useNativeDriver: true,
 					}),
 				]).start(animateCursor);
