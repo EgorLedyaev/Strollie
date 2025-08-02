@@ -1,17 +1,46 @@
-import { useState } from 'react';
+import { router } from 'expo-router';
+import { useAtom, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
-import { useRegister } from '@/src/features/auth-by-email';
+import {
+	registrationErrorAtom,
+	registrationIsLoadingAtom,
+	registrationStateAtom,
+} from '@/src/features/auth-by-email';
+import { checkEmailAndProceedAtom } from '@/src/features/auth-by-email';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
 
+/**
+ * Страница регистрации пользователя по email.
+ * Позволяет ввести email и перейти к следующему шагу регистрации.
+ */
 export function RegisterPage() {
-	const [email, setEmail] = useState('');
-	const { registerEmail, isLoading, error } = useRegister();
+	const [regState, setRegState] = useAtom(registrationStateAtom);
+	const [isLoading] = useAtom(registrationIsLoadingAtom);
+	const [error, setError] = useAtom(registrationErrorAtom);
+	const checkEmailAndProceed = useSetAtom(checkEmailAndProceedAtom);
 
-	const handleRegister = async () => {
-		await registerEmail(email);
+	// Очищаем ошибку при входе на экран
+	useEffect(() => {
+		setError(null);
+	}, [setError]);
+
+	const handleNext = () => {
+		checkEmailAndProceed({
+			onSuccess: () => {
+				router.push('/user-data');
+			},
+		});
+	};
+
+	const setEmail = (email: string) => {
+		setRegState(prev => ({ ...prev, email }));
+		if (error) {
+			setError(null);
+		}
 	};
 
 	return (
@@ -36,16 +65,17 @@ export function RegisterPage() {
 							<AppText style={styles.label}>E-mail</AppText>
 							<Input
 								placeholder='Введите свою эл.почту'
-								value={email}
+								value={regState.email}
 								onChangeText={setEmail}
 								keyboardType='email-address'
 								autoCapitalize='none'
+								isInvalid={!!error}
 							/>
 						</View>
 
 						<AppButton
 							text='Далее'
-							onPress={handleRegister}
+							onPress={handleNext}
 							isLoading={isLoading}
 						/>
 					</View>
@@ -93,8 +123,6 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontFamily: Fonts.medium,
-		fontSize: Fonts.f16,
-		color: Colors.headerAndInputText,
 		marginLeft: 16,
 	},
 	errorText: {
@@ -113,8 +141,7 @@ const styles = StyleSheet.create({
 		marginTop: 'auto',
 	},
 	footerText: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f16,
+		fontFamily: Fonts.medium,
 		color: Colors.textGray,
 	},
 });

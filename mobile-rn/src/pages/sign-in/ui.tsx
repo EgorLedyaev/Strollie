@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
@@ -6,12 +7,25 @@ import { useLogin } from '@/src/features/auth-by-email';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
 
+/**
+ * Страница входа в систему по email.
+ * Позволяет пользователю ввести email и перейти к верификации.
+ */
 export function SignInPage() {
 	const [email, setEmail] = useState('');
-	const { loginWithEmail, isLoading, error } = useLogin();
+	const [error, setError] = useState<string | null>(null);
+	const { loginWithEmail, isLoading } = useLogin();
 
-	const handleSignIn = async () => {
-		await loginWithEmail(email);
+	const handleSignIn = () => {
+		setError(null);
+		loginWithEmail(email, {
+			onSuccess: () => {
+				router.push('/verify-code');
+			},
+			onError: message => {
+				setError(message);
+			},
+		});
 	};
 
 	return (
@@ -27,7 +41,9 @@ export function SignInPage() {
 			>
 				<View style={styles.content}>
 					<View style={styles.headerBlock}>
-						<AppText style={styles.title}>Вход</AppText>
+						<AppText variant='h1' style={styles.title}>
+							Вход
+						</AppText>
 					</View>
 					<View style={styles.formContainer}>
 						<View style={styles.inputGroup}>
@@ -38,6 +54,7 @@ export function SignInPage() {
 								onChangeText={setEmail}
 								keyboardType='email-address'
 								autoCapitalize='none'
+								isInvalid={!!error}
 							/>
 						</View>
 						<AppButton
@@ -63,10 +80,6 @@ export function SignInPage() {
 	);
 }
 
-// 	</View>
-
-// </View>
-
 const styles = StyleSheet.create({
 	safeArea: {
 		flex: 1,
@@ -86,9 +99,6 @@ const styles = StyleSheet.create({
 		marginBottom: 60,
 	},
 	title: {
-		fontFamily: Fonts.bold,
-		fontSize: 32,
-		color: Colors.headerAndInputText,
 		marginTop: 30,
 	},
 	formContainer: {
@@ -99,12 +109,9 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontFamily: Fonts.medium,
-		fontSize: Fonts.f16,
-		color: Colors.headerAndInputText,
 		marginLeft: 16,
 	},
 	errorText: {
-		fontFamily: Fonts.regular,
 		fontSize: Fonts.f14,
 		color: Colors.error,
 		marginTop: 16,
@@ -119,8 +126,7 @@ const styles = StyleSheet.create({
 		marginTop: 'auto',
 	},
 	footerText: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f16,
+		fontFamily: Fonts.medium,
 		color: Colors.textGray,
 	},
 });

@@ -1,9 +1,7 @@
 import { type User } from '@/src/shared/lib';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios, { AxiosError } from 'axios';
 import { atom } from 'jotai';
-
-import { API } from '@/src/entities/user/api/api';
+import { fetchUserProfile } from '../api/userApi';
 
 export const profileAtom = atom<UserState>({
 	profile: null,
@@ -12,20 +10,12 @@ export const profileAtom = atom<UserState>({
 });
 
 export const loadProfileAtom = atom(
-	async get => {
-		return get(profileAtom);
-	},
+	(get) => get(profileAtom),
 	async (get, set) => {
-		set(profileAtom, {
-			profile: null,
-			isLoading: true,
-			error: null,
-		});
+		set(profileAtom, (prev) => ({ ...prev, isLoading: true, error: null }));
 		try {
 			// Сначала пытаемся загрузить из AsyncStorage
-			const storedProfile =
-				await AsyncStorage.getItem('auth:userProfile');
-
+			const storedProfile = await AsyncStorage.getItem('auth:userProfile');
 			if (storedProfile) {
 				const profileData = JSON.parse(storedProfile);
 				console.log('Loaded profile from storage', profileData);
@@ -37,54 +27,26 @@ export const loadProfileAtom = atom(
 				return;
 			}
 
-			// Если нет в хранилище - пытаемся загрузить с сервера
-			// Получаем токен напрямую из AsyncStorage
-			const tokenData = await AsyncStorage.getItem('auth:tokens');
-			if (!tokenData) {
-				throw new Error('Отсутствует токен авторизации');
-			}
-
-			const tokens = JSON.parse(tokenData);
-			if (!tokens.refreshToken) {
-				throw new Error('Отсутствует токен авторизации');
-			}
-
-			const { data } = await axios.get<{ data: User }>(API.profile, {
-				headers: {
-					Authorization: `Bearer ${tokens.refreshToken}`,
-				},
-			});
+			// Если нет в хранилище - вызываем функцию из api
+			const data = await fetchUserProfile();
 
 			// Сохраняем в AsyncStorage
-			await AsyncStorage.setItem(
-				'auth:userProfile',
-				JSON.stringify(data.data),
-			);
+			await AsyncStorage.setItem('auth:userProfile', JSON.stringify(data));
 
 			console.log('data from API', data);
 			set(profileAtom, {
 				isLoading: false,
-				profile: data.data,
+				profile: data,
 				error: null,
 			});
 		} catch (error) {
 			console.error('Error loading profile', error);
-			if (error instanceof AxiosError) {
-				set(profileAtom, {
-					isLoading: false,
-					profile: null,
-					error: error.response?.data?.message || error.message,
-				});
-			} else {
-				set(profileAtom, {
-					isLoading: false,
-					profile: null,
-					error:
-						error instanceof Error
-							? error.message
-							: 'Неизвестная ошибка',
-				});
-			}
+			const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+			set(profileAtom, {
+				isLoading: false,
+				profile: null,
+				error: errorMessage,
+			});
 		}
 	},
 );

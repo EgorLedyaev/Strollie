@@ -1,121 +1,106 @@
+import { router } from 'expo-router';
 import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-
-
-import { useRegisterUser } from '@/src/features/register-user';
-import { citiesAtom, citiesIsLoadingAtom, fetchCitiesAtom } from '@/src/entities/city';
+import {
+	registrationErrorAtom,
+	registrationIsLoadingAtom,
+	registrationStateAtom,
+} from '@/src/features/auth-by-email';
+import { submitUserDataAtom } from '@/src/features/auth-by-email/model/action';
+import { UserInfo } from '@/src/features/auth-by-email/model/use-register-user';
+import { citiesAtom, fetchCitiesAtom } from '@/src/entities/city';
 import { Colors, Fonts, Gaps } from '@/src/shared/tokens';
-import { AppButton, AppText, BackButton, Input, Select, SelectOption } from '@/src/shared/ui';
-
-
-
-
+import {
+	AppButton,
+	AppText,
+	BackButton,
+	Input,
+	Select,
+	SelectOption,
+} from '@/src/shared/ui';
 
 export function UserDataPage() {
-	const [firstName, setFirstName] = useState('');
-	const [lastName, setLastName] = useState('');
-	const [city, setCity] = useState('');
-	const [birthdate, setBirthdate] = useState('');
-	const [nickname, setNickname] = useState('');
+	const [regState, setRegState] = useAtom(registrationStateAtom);
+	const [isLoading] = useAtom(registrationIsLoadingAtom);
+	const [formError, setFormError] = useAtom(registrationErrorAtom);
+
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, boolean>
 	>({});
-	const [formError, setFormError] = useState<string | null>(null);
 
 	const [cityOptions] = useAtom(citiesAtom);
-	const [isLoadingCities] = useAtom(citiesIsLoadingAtom);
 	const fetchCities = useSetAtom(fetchCitiesAtom);
-
-	const { register, isLoading, error } = useRegisterUser();
+	const submitUserData = useSetAtom(submitUserDataAtom);
 
 	useEffect(() => {
 		fetchCities();
-	}, [fetchCities]);
+		// Очищаем ошибку при входе на экран
+		setFormError(null);
+	}, [fetchCities, setFormError]);
 
-	const handleRegister = async () => {
-		try {
-			// Сбрасываем предыдущие ошибки
-			setValidationErrors({});
-			setFormError(null);
+	const handleProceedToVerification = () => {
+		// Сбрасываем предыдущие ошибки
+		setValidationErrors({});
+		setFormError(null);
 
-			// Проверка заполненности обязательных полей
-			const errors: Record<string, boolean> = {};
-			if (!firstName.trim()) errors.firstName = true;
-			if (!lastName.trim()) errors.lastName = true;
-			if (!city) errors.city = true;
-			if (!birthdate.trim()) errors.birthdate = true;
-			if (!nickname.trim()) errors.nickname = true;
+		// Проверка заполненности обязательных полей
+		const errors: Record<string, boolean> = {};
+		if (!regState.firstName?.trim()) errors.firstName = true;
+		if (!regState.lastName?.trim()) errors.lastName = true;
+		if (!regState.city) errors.city = true;
+		if (!regState.birthdate?.trim()) errors.birthdate = true;
+		if (!regState.nickname?.trim()) errors.nickname = true;
 
-			if (Object.keys(errors).length > 0) {
-				setValidationErrors(errors);
-				setFormError('Пожалуйста, заполните обязательные поля');
-				return;
-			}
-
-			// Валидация формата даты (DD.MM.YYYY)
-			const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
-			if (!dateRegex.test(birthdate)) {
-				setValidationErrors({ birthdate: true });
-				setFormError(
-					'Некорректный формат даты. Используйте DD.MM.YYYY',
-				);
-				return;
-			}
-
-			// Отправляем данные
-			await register({
-				firstName: firstName.trim(),
-				lastName: lastName.trim(),
-				city,
-				birthdate: birthdate.trim(),
-				nickname: nickname.trim(),
-			});
-
-			// Навигация произойдет через хук после успешной регистрации
-		} catch (error: any) {
-			console.error('Ошибка регистрации:', error);
-			setFormError(
-				error.message || 'Ошибка при регистрации пользователя',
-			);
+		if (Object.keys(errors).length > 0) {
+			setValidationErrors(errors);
+			setFormError('Пожалуйста, заполните обязательные поля');
+			return;
 		}
+
+		// Проверка формата даты рождения
+		const datePattern = /^\d{2}\.\d{2}\.\d{4}$/;
+		if (!datePattern.test(regState.birthdate ?? '')) {
+			setValidationErrors(prev => ({ ...prev, birthdate: true }));
+			setFormError('Введите дату в формате ДД.ММ.ГГГГ');
+			return;
+		}
+
+		submitUserData({
+			onSuccess: () => {
+				router.push('/verify-code');
+			},
+		});
+	};
+
+	const handleChange = (field: keyof UserInfo, value: string) => {
+		setRegState(prev => ({ ...prev, [field]: value }));
 	};
 
 	const handleCitySelect = (option: SelectOption) => {
-		setCity(option.value);
+		setRegState(prev => ({ ...prev, city: option.value }));
+	};
+
+	const formatBirthdate = (text: string) => {
+		const cleaned = text.replace(/\D/g, '');
+		if (cleaned.length <= 2) return cleaned;
+		if (cleaned.length <= 4)
+			return `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
+		return `${cleaned.slice(0, 2)}.${cleaned.slice(2, 4)}.${cleaned.slice(
+			4,
+			8,
+		)}`;
 	};
 
 	const isFormValid =
-		firstName.trim() &&
-		lastName.trim() &&
-		city &&
-		birthdate.trim() &&
-		nickname.trim();
-
-	const formatBirthdate = (text: string) => {
-		// Удаляем все, кроме цифр
-		const cleaned = text.replace(/\D/g, '');
-
-		// Добавляем точки автоматически
-		if (cleaned.length <= 2) {
-			return cleaned;
-		} else if (cleaned.length <= 4) {
-			return `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
-		} else {
-			return `${cleaned.slice(0, 2)}.${cleaned.slice(2, 4)}.${cleaned.slice(
-				4,
-				8,
-			)}`;
-		}
-	};
-
-	const handleBirthdateChange = (text: string) => {
-		const formatted = formatBirthdate(text);
-		setBirthdate(formatted);
-	};
+		regState.firstName?.trim() &&
+		regState.lastName?.trim() &&
+		regState.city &&
+		regState.birthdate?.trim() &&
+		regState.nickname?.trim();
 
 	const insets = useSafeAreaInsets();
 	const backButtonTop = insets.top + 16;
@@ -139,8 +124,10 @@ export function UserDataPage() {
 							<AppText style={styles.label}>Имя</AppText>
 							<Input
 								placeholder='Введите ваше имя'
-								value={firstName}
-								onChangeText={setFirstName}
+								value={regState.firstName}
+								onChangeText={value =>
+									handleChange('firstName', value)
+								}
 								isInvalid={validationErrors.firstName}
 								maxLength={50}
 							/>
@@ -150,8 +137,10 @@ export function UserDataPage() {
 							<AppText style={styles.label}>Фамилия</AppText>
 							<Input
 								placeholder='Введите вашу фамилию'
-								value={lastName}
-								onChangeText={setLastName}
+								value={regState.lastName}
+								onChangeText={value =>
+									handleChange('lastName', value)
+								}
 								isInvalid={validationErrors.lastName}
 								maxLength={50}
 							/>
@@ -161,7 +150,7 @@ export function UserDataPage() {
 							<AppText style={styles.label}>Город</AppText>
 							<Select
 								options={cityOptions}
-								value={city}
+								value={regState.city}
 								onSelect={handleCitySelect}
 								placeholder='Выберите город'
 								isInvalid={validationErrors.city}
@@ -174,8 +163,13 @@ export function UserDataPage() {
 							</AppText>
 							<Input
 								placeholder='DD.MM.YYYY'
-								value={birthdate}
-								onChangeText={handleBirthdateChange}
+								value={regState.birthdate}
+								onChangeText={text =>
+									handleChange(
+										'birthdate',
+										formatBirthdate(text),
+									)
+								}
 								keyboardType='numeric'
 								maxLength={10}
 								isInvalid={validationErrors.birthdate}
@@ -186,8 +180,10 @@ export function UserDataPage() {
 							<AppText style={styles.label}>Ник</AppText>
 							<Input
 								placeholder='Введите ваш ник'
-								value={nickname}
-								onChangeText={setNickname}
+								value={regState.nickname}
+								onChangeText={value =>
+									handleChange('nickname', value)
+								}
 								isInvalid={validationErrors.nickname}
 								autoCapitalize='none'
 								maxLength={30}
@@ -195,16 +191,14 @@ export function UserDataPage() {
 						</View>
 					</View>
 
-					{(formError || error) && (
-						<AppText style={styles.errorText}>
-							{formError || error}
-						</AppText>
+					{formError && (
+						<AppText style={styles.errorText}>{formError}</AppText>
 					)}
 
 					<View style={styles.buttonContainer}>
 						<AppButton
-							text='Завершить регистрацию'
-							onPress={handleRegister}
+							text='Зарегистрироваться'
+							onPress={handleProceedToVerification}
 							isLoading={isLoading}
 							disabled={!isFormValid || isLoading}
 						/>
@@ -246,8 +240,6 @@ const styles = StyleSheet.create({
 	},
 	label: {
 		fontFamily: Fonts.medium,
-		fontSize: Fonts.f16,
-		color: Colors.headerAndInputText,
 		marginLeft: 16,
 	},
 	buttonContainer: {
@@ -255,10 +247,10 @@ const styles = StyleSheet.create({
 		paddingBottom: 20,
 	},
 	errorText: {
-		fontFamily: Fonts.regular,
 		fontSize: Fonts.f14,
 		color: Colors.error,
 		marginTop: 16,
 		textAlign: 'center',
 	},
 });
+

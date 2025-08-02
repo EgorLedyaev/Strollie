@@ -1,2 +1,2 @@
 // Публичный API страницы profile
-export { ProfilePage as default } from './ui';
+export { ProfilePage as default } from './ui/ProfilePage';

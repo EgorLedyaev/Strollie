@@ -30,6 +30,7 @@ import { NavBar } from '@/src/features/navigation';
 import { ServiceTabs } from '@/src/features/service-tabs';
 import { WeatherWidget } from '@/src/features/weather';
 import { type PlacedMarkerData } from '@/src/entities/marker';
+import { BottomNavBar } from '@/src/widgets/bottom-nav-bar';
 
 export function MapPage() {
 	const webViewRef = useRef<WebView>(null);
@@ -271,17 +272,7 @@ export function MapPage() {
 		console.log(`Selected service tab: ${id}`);
 	};
 
-	const handleNavProfilePress = () => {
-		console.log('Profile button pressed');
-	};
 
-	const handleNavRoutePress = () => {
-		handleBuildRouteThroughPlaced();
-	};
-
-	const handleNavChatPress = () => {
-		console.log('Chat button pressed');
-	};
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -300,22 +291,7 @@ export function MapPage() {
 				<WeatherWidget temperature={temperature} />
 			</View>
 			<View style={styles.bottomPanel}>
-				<View style={styles.servicesContainer}>
-					<ServiceTabs
-						tabs={serviceTabs}
-						onSelect={handleServiceTabSelect}
-					/>
-				</View>
-				<View style={styles.navBarContainer}>
-					<NavBar
-						leftComponent={<ProfileIcon />}
-						centerComponent={<PlayRouteIcon />}
-						rightComponent={<ChatIcon />}
-						onPressLeft={handleNavProfilePress}
-						onPressCenter={handleNavRoutePress}
-						onPressRight={handleNavChatPress}
-					/>
-				</View>
+				<BottomNavBar/>
 			</View>
 		</SafeAreaView>
 	);
@@ -337,26 +313,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		backgroundColor: 'transparent',
+		marginTop: 'auto',
 	},
-	servicesContainer: {
-		backgroundColor: Colors.white,
-		borderTopLeftRadius: 20,
-		borderTopRightRadius: 20,
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: -2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 3,
-		elevation: 5,
-	},
-	navBarContainer: {
-		marginBottom: Platform.OS === 'ios' ? 20 : 10,
-	},
-	buildRouteButtonContainer: {
-		position: 'absolute',
-		bottom: 30,
-		left: 20,
-		right: 20,
-		alignItems: 'center',
-		pointerEvents: 'box-none',
-	},
+
 });

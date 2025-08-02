@@ -1,69 +1,53 @@
-import { Redirect, router, Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef } from 'react';
+import { useAtomValue } from 'jotai';
 import { StyleSheet, View } from 'react-native';
-import {
-	SafeAreaProvider,
-	useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { useAuthCheck } from '@/src/features/auth-by-email';
+import { sessionAtom } from '@/src/entities/session';
 import { Colors } from '@/src/shared/tokens';
-import { AppText } from '@/src/shared/ui';
 
 export default function AppLayout() {
-	const { isAuthenticated, isLoading, checkAuth } = useAuthCheck();
-	const redirectInProgress = useRef(false);
+	// Мы используем синхронный атом, чтобы избежать "моргания"
+	const session = useAtomValue(sessionAtom);
 
-	// Проверка авторизации
-	useEffect(() => {
-		const checkUserAuth = async () => {
-			if (isLoading || redirectInProgress.current) return;
-			if (!isAuthenticated) {
-				console.log(
-					'AppLayout: Пользователь не авторизован, перенаправление на /sign-in',
-				);
-				redirectInProgress.current = true;
-				router.replace('/sign-in');
-			} else {
-				console.log(
-					'AppLayout: Пользователь авторизован, доступ разрешен',
-				);
-			}
-		};
-		checkUserAuth();
-	}, [isAuthenticated, isLoading, checkAuth]);
-
-	if (isLoading) {
-		return (
-			<View style={styles.loadingContainer}>
-				<AppText>Загрузка...</AppText>
-			</View>
+	// Если пользователь не авторизован, перенаправляем его на экран входа.
+	// Redirect позаботится о том, чтобы очистить историю навигации.
+	if (!session.isAuthenticated) {
+		console.log(
+			'AppLayout: Пользователь не авторизован, перенаправление на /sign-in',
 		);
+		return <Redirect href='/sign-in' />;
 	}
 	return (
 		<SafeAreaProvider>
-			<StatusBar style='dark' translucent={true} />
-			<Stack
-				screenOptions={{
-					headerShown: false,
-					contentStyle: {
-						backgroundColor: Colors.lightBackground,
-						// paddingTop: insets.top,
-					},
-				}}
-			>
-				<Stack.Screen name='index' />
-				<Stack.Screen name='profile' />
-			</Stack>
+			<StatusBar style='dark' />
+			<View style={styles.container}>
+				<Stack
+					screenOptions={{
+						headerShown: false,
+						contentStyle: {
+							backgroundColor: Colors.lightBackground,
+						},
+					}}
+				>
+					<Stack.Screen name='index' />
+					<Stack.Screen name='profile/index' />
+					<Stack.Screen name='profile/edit' />
+					<Stack.Screen name='calendar/index' />
+					<Stack.Screen name='trips/index' />
+					<Stack.Screen name='trips/[id]' />
+					<Stack.Screen name='tickets/index' />
+					<Stack.Screen name='routes/history' />
+					<Stack.Screen name='routes/saved' />
+				</Stack>
+			</View>
 		</SafeAreaProvider>
 	);
 }
 
 const styles = StyleSheet.create({
-	loadingContainer: {
+	container: {
 		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 });

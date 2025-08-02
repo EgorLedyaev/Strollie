@@ -4,23 +4,23 @@ import {
 	SafeAreaView,
 	StatusBar,
 	StyleSheet,
-	Text,
 	TouchableOpacity,
 	View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useResendCode, useVerifyCode } from '@/src/features/verify-code';
+import { useResendCode, useVerifyCode } from '@/src/features/auth-by-email';
 import { SessionStorage } from '@/src/entities/session';
 import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppButton, BackButton, CodeInput } from '@/src/shared/ui';
+import { AppButton, AppText, BackButton, CodeInput } from '@/src/shared/ui';
 
 export function VerifyCodePage() {
 	const [code, setCode] = useState('');
+	const [error, setError] = useState<string | null>(null);
 	const [timeLeft, setTimeLeft] = useState(60);
 	const [canResend, setCanResend] = useState(false);
 	const [email, setEmail] = useState('');
-	const { verifyCode, isLoading, error } = useVerifyCode();
+	const { verifyCode, isLoading } = useVerifyCode();
 	const { resendCode, isLoading: isResending } = useResendCode();
 
 	// Загружаем email из хранилища
@@ -49,26 +49,34 @@ export function VerifyCodePage() {
 	}, [timeLeft]);
 
 	const handleResendCode = async () => {
-		if (!canResend) return;
-
-		try {
-			await resendCode();
+		if (!canResend || !isResending) return;
+		setError(null);
+		const success = await resendCode();
+		if (success) {
 			setTimeLeft(60);
 			setCanResend(false);
-		} catch (err) {
-			console.error('Ошибка при повторной отправке кода', err);
+		} else {
+			setError('Не удалось отправить код повторно.');
 		}
 	};
 
 	const handleVerifyCode = async () => {
-		if (!code || code.length < 4) return;
+		// 1. Очищаем старые ошибки
+		setError(null);
 
-		try {
-			await verifyCode(code);
-			// Маршрутизация происходит внутри хука useVerifyCode
-		} catch (err) {
-			console.error('Ошибка при проверке кода', err);
-		}
+		// 2. Вызываем фичу, передавая ей данные и КОЛЛБЭКИ
+		verifyCode(code, {
+			onSuccess: () => {
+				// 3. Фича сказала "успех". Страница решает, что делать:
+				// Стереть историю навигации и отправить пользователя в приложение.
+				router.replace('/(app)');
+			},
+			onError: message => {
+				// 4. Фича сказала "провал". Страница решает, что делать:
+				// Показать пользователю сообщение об ошибке.
+				setError(message);
+			},
+		});
 	};
 
 	const formatTime = (seconds: number) => {
@@ -91,10 +99,10 @@ export function VerifyCodePage() {
 
 			<View style={styles.container}>
 				<View style={styles.header}>
-					<Text style={styles.title}>Код подтверждения</Text>
-					<Text style={styles.subtitle}>
+					<AppText variant='h1' style={styles.title}>Код подтверждения</AppText>
+					<AppText style={styles.subtitle}>
 						Введите код, отправленный на {email || 'эл. почту'}
-					</Text>
+					</AppText>
 				</View>
 
 				<CodeInput
@@ -105,26 +113,28 @@ export function VerifyCodePage() {
 					isError={!!error}
 					style={styles.codeInput}
 				/>
+				{error && <AppText style={styles.errorText}>{error}</AppText>}
+
 				<View style={styles.resendContainer}>
 					<TouchableOpacity
 						disabled={!canResend}
 						onPress={handleResendCode}
 						activeOpacity={0.7}
 					>
-						<Text
+						<AppText
 							style={[
 								styles.resendText,
 								canResend && styles.activeResendText,
 							]}
 						>
-							Отправить снова
-						</Text>
+							{isResending ? 'Отправка...' : 'Отправить снова'}
+						</AppText>
 					</TouchableOpacity>
 
 					{!canResend && (
-						<Text style={styles.resendText}>
+						<AppText style={styles.resendText}>
 							через {formatTime(timeLeft)}
-						</Text>
+						</AppText>
 					)}
 				</View>
 
@@ -133,7 +143,7 @@ export function VerifyCodePage() {
 						text='Далее'
 						onPress={handleVerifyCode}
 						isLoading={isLoading}
-						disabled={code.length < 4}
+						disabled={code.length < 4 || isLoading}
 					/>
 				</View>
 			</View>
@@ -163,15 +173,9 @@ const styles = StyleSheet.create({
 		left: 16, // Ближе к левому краю
 	},
 	title: {
-		fontFamily: Fonts.bold,
-		fontSize: 32,
-		color: Colors.headerAndInputText,
 		marginBottom: 32,
-		textAlign: 'center',
 	},
 	subtitle: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f16,
 		color: Colors.textGray,
 		textAlign: 'center',
 	},
@@ -186,9 +190,7 @@ const styles = StyleSheet.create({
 		marginTop: 24,
 	},
 	resendText: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f16,
-		color: Colors.placeholderGray,
+
 	},
 	activeResendText: {
 		color: Colors.greenLink,
