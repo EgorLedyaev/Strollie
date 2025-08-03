@@ -1,9 +1,8 @@
+import { Colors } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
 import { router } from 'expo-router';
 import React from 'react';
 import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
-
-import { Colors } from '@/src/shared/tokens';
-import { AppText } from '@/src/shared/ui';
 
 interface ProfileMenuProps {
 	visible: boolean;

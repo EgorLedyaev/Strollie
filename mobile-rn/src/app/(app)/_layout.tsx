@@ -1,13 +1,12 @@
+import { Colors } from '@/shared/tokens';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { Colors } from '@/src/shared/tokens';
-
 export default function AuthLayout() {
 	return (
 		<SafeAreaProvider>
-			<StatusBar style='dark'  />
+			<StatusBar style='dark' />
 			<Stack
 				screenOptions={{
 					headerShown: false,

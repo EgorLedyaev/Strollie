@@ -1,7 +1,8 @@
 import AvatarIcon from '@/assets/icons/avatar';
-import { Colors } from '@/src/shared/tokens';
 import { Link, LinkProps } from 'expo-router';
 import { StyleSheet, View, ViewProps } from 'react-native';
+
+import { Colors } from '@/shared/tokens';
 
 type ProfileButtonProps = LinkProps & {
 	pointerEvents?: ViewProps['pointerEvents'];

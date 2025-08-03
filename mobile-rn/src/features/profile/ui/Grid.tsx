@@ -5,8 +5,8 @@ import TicketsIcon from '@/assets/profile/tickets';
 import TravelsIcon from '@/assets/profile/travels';
 import { StyleSheet, View } from 'react-native';
 
-import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppText } from '@/src/shared/ui';
+import { Colors, Fonts } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
 
 export function Grid() {
 	return (

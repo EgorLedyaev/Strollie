@@ -1,11 +1,11 @@
 import BirthdayIcon from '@/assets/icons/BirthdayIcon';
 import LocationIcon from '@/assets/icons/map/LocationIcon';
 import OutLinePointerIcon from '@/assets/profile/OutlinePointerIcon';
-import { Colors, Fonts } from '@/src/shared/tokens';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { UserProfileData } from '@/src/features/profile/ui/EditProfileScreen';
-import { type User } from '@/src/entities/user';
+import { UserProfileData } from '@/features/profile/ui/EditProfileScreen';
+import { type User } from '@/entities/user';
+import { Colors, Fonts } from '@/shared/tokens';
 
 interface ProfileInfoProps {
 	user: User;

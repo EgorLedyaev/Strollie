@@ -1,4 +1,4 @@
-import { SavedRoutesPage } from '@/src/pages/routes';
+import { SavedRoutesPage } from '@/pages/routes';
 
 export default function Page() {
 	return <SavedRoutesPage />;

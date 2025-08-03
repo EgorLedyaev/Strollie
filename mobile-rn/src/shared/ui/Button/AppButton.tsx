@@ -1,3 +1,4 @@
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
 import {
@@ -13,8 +14,6 @@ import Animated, {
 	useSharedValue,
 	withTiming,
 } from 'react-native-reanimated';
-
-import { Colors, Fonts, Radius } from '@/src/shared/tokens';
 
 import { AppText } from '../Text';
 

@@ -1,25 +1,17 @@
+import { Colors } from '@/shared/tokens';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-	EditableProfileForm,
-	UserProfileData,
-} from '@/src/widgets/editable-profile-form';
-import {
-	loadProfileAtom,
-	UserProfileStorage,
-	type User,
-} from '@/src/entities/user';
-import { Colors } from '@/src/shared/tokens';
+import { EditableProfileForm } from './EditableProfileForm';
 
 export const EditProfilePage: React.FC = () => {
-	const [, loadProfile] = useAtom(loadProfileAtom);
-	const [userProfile, setUserProfile] = useState<UserProfileData | null>(
-		null,
-	);
+	// const [, loadProfile] = useAtom(loadProfile);
+	// const [userProfile, setUserProfile] = useState<UserProfileData | null>(
+	// 	null,
+	// );
 
 	useEffect(() => {
 		const loadUserData = async () => {
@@ -27,37 +19,27 @@ export const EditProfilePage: React.FC = () => {
 			await loadProfile();
 
 			// Получаем данные для формы редактирования
-			const storedProfile = await UserProfileStorage.getUserProfile();
-			if (storedProfile) {
-				setUserProfile({
-					firstName: storedProfile.firstName || '',
-					lastName: storedProfile.lastName || '',
-					nickname: storedProfile.nickname || '',
-					city: storedProfile.city || '',
-					birthDate: storedProfile.birthDate || '',
-				});
-			}
 		};
 
 		loadUserData();
 	}, []);
 
-	// Если данные не загружены, показываем пустой экран
-	if (!userProfile) {
-		return (
-			<SafeAreaView style={styles.container}>
-				<View style={styles.content} />
-			</SafeAreaView>
-		);
-	}
+	// // Если данные не загружены, показываем пустой экран
+	// if (!userProfile) {
+	// 	return (
+	// 		<SafeAreaView style={styles.container}>
+	// 			<View style={styles.content} />
+	// 		</SafeAreaView>
+	// 	);
+	// }
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				<EditableProfileForm
+				{/* <EditableProfileForm
 					initialData={userProfile}
 					onCancel={() => router.back()}
-				/>
+				/> */}
 			</View>
 		</SafeAreaView>
 	);

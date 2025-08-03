@@ -1,4 +1,4 @@
-import { EditProfilePage } from '@/src/pages/profile/edit';
+import { EditProfilePage } from '@/pages/profile';
 
 export default function Page() {
 	return <EditProfilePage />;

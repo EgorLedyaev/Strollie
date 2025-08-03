@@ -1,4 +1,4 @@
-import { TicketListPage } from '@/src/pages/tickets';
+import { TicketListPage } from '@/pages/tickets';
 
 export default function Page() {
 	return <TicketListPage />;

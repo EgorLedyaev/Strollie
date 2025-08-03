@@ -1,9 +1,8 @@
 import unmatched from '@/assets/images/unmatched.png';
+import { Colors, Fonts, Gaps } from '@/shared/tokens';
+import { CustomLink } from '@/shared/ui/CustomLink/CustomLink';
+import { AppText } from '@/shared/ui/Text/AppText';
 import { Image, StyleSheet, View } from 'react-native';
-
-import { Colors, Fonts, Gaps } from '@/src/shared/tokens';
-import { CustomLink } from '@/src/shared/ui/CustomLink/CustomLink';
-import { AppText } from '@/src/shared/ui/Text/AppText';
 
 export default function NotFoundScreen() {
 	return (

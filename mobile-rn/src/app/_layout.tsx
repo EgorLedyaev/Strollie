@@ -7,8 +7,8 @@ import { View } from 'react-native';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { Colors } from '@/src/shared/tokens';
-import { SessionProvider } from '@/src/app/providers/with-session';
+import { SessionProvider } from '@/app/providers/with-session';
+import { Colors } from '@/shared/tokens';
 
 // Предотвращаем автоскрытие сплеш-экрана
 SplashScreen.preventAutoHideAsync();
@@ -31,10 +31,10 @@ export default function RootLayout() {
 
 function Root() {
 	const [fontsLoaded, fontError] = useFonts({
-		'SuisseIntl-Regular': require('../assets/fonts/SuisseIntl-Regular.otf'),
-		'SuisseIntl-SemiBold': require('../assets/fonts/SuisseIntl-SemiBold.otf'),
-		'SuisseIntl-Bold': require('../assets/fonts/SuisseIntl-Bold.otf'),
-		'SuisseIntl-Medium': require('../assets/fonts/SuisseIntl-Medium.otf'),
+		'SuisseIntl-Regular': require('@/assets/fonts/SuisseIntl-Regular.otf'),
+		'SuisseIntl-SemiBold': require('@/assets/fonts/SuisseIntl-SemiBold.otf'),
+		'SuisseIntl-Bold': require('@/assets/fonts/SuisseIntl-Bold.otf'),
+		'SuisseIntl-Medium': require('@/assets/fonts/SuisseIntl-Medium.otf'),
 	});
 
 	useEffect(() => {

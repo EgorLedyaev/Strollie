@@ -1,8 +1,7 @@
+import { Colors, Fonts } from '@/shared/tokens';
 import { forwardRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { StyleSheet, Text, TextProps } from 'react-native';
-
-import { Colors, Fonts } from '@/src/shared/tokens';
 
 type AppTextVariant = 'body' | 'h1' | 'h2' | 'caption' | 'button' | 'header';
 
@@ -55,5 +54,5 @@ const styles = StyleSheet.create({
 	header: {
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f20,
-	}
+	},
 });

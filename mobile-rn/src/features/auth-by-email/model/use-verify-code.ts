@@ -1,8 +1,8 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useState } from 'react';
 
-import { setSessionAtom } from '@/src/entities/session';
-import { userApi, type User } from '@/src/entities/user';
+import { setSessionAtom } from '@/entities/session';
+import { userApi, type User } from '@/entities/user';
 
 import { registrationStateAtom, verifyCodeErrorAtom } from './state';
 

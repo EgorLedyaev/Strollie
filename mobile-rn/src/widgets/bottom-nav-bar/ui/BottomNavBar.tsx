@@ -6,8 +6,6 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 export const BottomNavBar: React.FC = () => {
-
-
 	const handleNavNotificationPress = () => {
 		console.log('Notification button pressed');
 	};

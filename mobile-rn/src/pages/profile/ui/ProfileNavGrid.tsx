@@ -8,8 +8,10 @@ import { Link } from 'expo-router';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Colors } from '@/src/shared/tokens';
-import { AppText, Card } from '@/src/shared/ui';
+import { Colors } from '@/shared/tokens';
+import { AppText, Card } from '@/shared/ui';
+
+// import TravelsIcon from '@/assets/profile/travels';
 
 interface NavItem {
 	id: string;

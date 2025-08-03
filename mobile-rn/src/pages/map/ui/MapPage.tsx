@@ -1,3 +1,6 @@
+import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/entities/map';
+import { placedMarkersAtom } from '@/entities/marker';
+import { useLocationTracking } from '@/shared/lib';
 import { useAtom, useSetAtom } from 'jotai';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -8,24 +11,19 @@ import {
 	View,
 } from 'react-native';
 
-import {
-	useRouteBuilder,
-} from '@/src/pages/map/features/route-build';
 import { MapControls } from './map-controls';
 import { MapWidget } from './map-widget';
-import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
-import { placedMarkersAtom } from '@/src/entities/marker';
-import { useLocationTracking } from '@/src/shared/lib';
 
 import 'react-native-get-random-values';
 
+import { type PlacedMarkerData } from '@/entities/marker';
+import { BottomNavBar } from '@/widgets/bottom-nav-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { v4 as uuidv4 } from 'uuid';
 
+import { useRouteBuilder } from '../model/use-route-builder';
 import { WeatherWidget } from './WeatherWidget';
-import { BottomNavBar } from '@/src/widgets/bottom-nav-bar';
-import { type PlacedMarkerData } from '@/src/entities/marker';
 
 export function MapPage() {
 	const webViewRef = useRef<WebView>(null);
@@ -255,8 +253,6 @@ export function MapPage() {
 	);
 
 	const [temperature, setTemperature] = useState(16);
-	
-
 
 	return (
 		<SafeAreaView style={styles.container}>

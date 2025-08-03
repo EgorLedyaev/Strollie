@@ -1,8 +1,8 @@
-import { Colors } from '@/src/shared/tokens';
+import { Colors } from '@/shared/tokens';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { AppText } from '../Text';
 
+import { AppText } from '../Text';
 
 interface MapStatusIndicatorProps {
 	mapReady: boolean;

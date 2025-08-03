@@ -1,6 +1,6 @@
 import { useAtom, useSetAtom } from 'jotai';
 
-import { userApi } from '@/src/entities/user';
+import { userApi } from '@/entities/user';
 
 import {
 	authErrorAtom,

@@ -1,8 +1,7 @@
+import { sessionAtom } from '@/entities/session';
 import { useRouter, useSegments } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useEffect } from 'react';
-
-import { sessionAtom } from '@/src/entities/session';
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
 	const session = useAtomValue(sessionAtom);
@@ -31,8 +30,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 		else if (!session.isAuthenticated && inAppGroup) {
 			console.log(
 				'SessionProvider: Пользователь не авторизован, но в (app). Перенаправление на /sign-in.',
-            );
-            // ПЕРЕНАПРАВИТЬ НА СТРАНИЦУ ВХОДА.
+			);
+			// ПЕРЕНАПРАВИТЬ НА СТРАНИЦУ ВХОДА.
 			router.replace('/sign-in');
 		}
 	}, [session.isAuthenticated, session.refreshToken, segments, router]);
@@ -41,3 +40,5 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 	// Это либо Stack.Screen из app/_layout, либо индикатор загрузки из Suspense.
 	return <>{children}</>;
 }
+
+export default SessionProvider;

@@ -1,3 +1,11 @@
+import {
+	registrationStateAtom,
+	useResendCode,
+	useVerifyCode,
+	verifyCodeErrorAtom,
+} from '@/features/auth-by-email';
+import { Colors, Fonts } from '@/shared/tokens';
+import { AppButton, AppText, BackButton, CodeInput } from '@/shared/ui';
 import { router } from 'expo-router';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useEffect, useState } from 'react';
@@ -9,15 +17,6 @@ import {
 	View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import {
-	registrationStateAtom,
-	useResendCode,
-	useVerifyCode,
-	verifyCodeErrorAtom,
-} from '@/src/features/auth-by-email';
-import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppButton, AppText, BackButton, CodeInput } from '@/src/shared/ui';
 
 export function VerifyCodePage() {
 	const [code, setCode] = useState('');

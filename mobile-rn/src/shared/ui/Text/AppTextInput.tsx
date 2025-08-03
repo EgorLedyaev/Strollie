@@ -1,8 +1,7 @@
+import { Colors, Fonts } from '@/shared/tokens';
 import { forwardRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { StyleSheet, TextInput, TextInputProps } from 'react-native';
-
-import { Colors, Fonts } from '@/src/shared/tokens';
 
 export const AppTextInput = forwardRef<TextInput, TextInputProps>(
 	({ style, ...props }, ref) => {

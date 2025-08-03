@@ -1,5 +1,5 @@
 // mapService.ts
-// import apiClient from '@/src/pages/MapScreen/appClient'; // TODO: Fix import
+// import apiClient from '@/pages/MapScreen/appClient'; // TODO: Fix import
 
 export async function loadMapHtml() {
 	try {

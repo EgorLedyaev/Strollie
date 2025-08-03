@@ -1,4 +1,4 @@
-import { TripDetailsPage } from '@/src/pages/trips';
+import { TripDetailsPage } from '@/pages/trips';
 
 export default function Page() {
 	return <TripDetailsPage />;

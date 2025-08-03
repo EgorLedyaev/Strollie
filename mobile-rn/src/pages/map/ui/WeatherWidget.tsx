@@ -1,4 +1,4 @@
-import { Colors, Fonts, Radius } from '@/src/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 

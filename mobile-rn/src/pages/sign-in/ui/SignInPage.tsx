@@ -1,13 +1,11 @@
+import { authErrorAtom, useLogin } from '@/features/auth-by-email';
+import { Colors, Fonts } from '@/shared/tokens';
+import { AppButton, AppText, CustomLink, Input } from '@/shared/ui';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-
-import { useLogin } from '@/src/features/auth-by-email';
-import { authErrorAtom } from '@/src/features/auth-by-email';
-import { Colors, Fonts } from '@/src/shared/tokens';
-import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
 
 /**
  * Страница входа в систему по email.

@@ -1,11 +1,10 @@
+import { profileAtom, UserProfileStorage } from '@/entities/user';
+import { SaveProfileButton } from '@/features/edit-profile';
+import { Colors } from '@/shared/tokens';
+import { AppButton, AppText, Input } from '@/shared/ui';
 import { useAtom } from 'jotai';
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-
-import { SaveProfileButton } from '@/src/features/edit-profile';
-import { profileAtom, UserProfileStorage } from '@/src/entities/user';
-import { Colors } from '@/src/shared/tokens';
-import { AppButton, AppText, Input } from '@/src/shared/ui';
 
 // Определяем интерфейс локально вместо импорта из pages
 export interface UserProfileData {

@@ -2,8 +2,8 @@ import EditPhotoIcon from '@/assets/icons/EditPhotoIcon';
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Colors } from '@/src/shared/tokens';
-import { Avatar } from '@/src/shared/ui';
+import { Colors } from '@/shared/tokens';
+import { Avatar } from '@/shared/ui';
 
 import { useUploadAvatar } from '../model';
 

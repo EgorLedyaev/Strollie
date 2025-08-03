@@ -1,4 +1,4 @@
-import { RouteHistoryPage } from '@/src/pages/routes';
+import { RouteHistoryPage } from '@/pages/routes';
 
 export default function Page() {
 	return <RouteHistoryPage />;
