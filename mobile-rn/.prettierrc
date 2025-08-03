@@ -1,7 +1,6 @@
 {
   "plugins": [
-    "@trivago/prettier-plugin-sort-imports",
-    "prettier-plugin-style-order"
+    "@ianvs/prettier-plugin-sort-imports"
   ],
   "trailingComma": "all",
   "tabWidth": 4,
@@ -11,14 +10,21 @@
   "jsxSingleQuote": true,
   "arrowParens": "avoid",
   "importOrder": [
+    "<BUILTIN_MODULES>",
+    "",
     "<THIRD_PARTY_MODULES>",
-    "^@components/(.*)$",
-    "^@hooks/(.*)$",
-    "^@services/(.*)$",
-    "^@assets/(.*)$",
-    "^@providers/(.*)$",
+    "",
+    "^@/src/app/(.*)$",
+    "^@/src/processes/(.*)$",
+    "^@/src/pages/(.*)$",
+    "^@/src/widgets/(.*)$",
+    "^@/src/features/(.*)$",
+    "^@/src/entities/(.*)$",
+    "^@/src/shared/(.*)$",
+    "",
     "^[./]"
   ],
-  "importOrderSeparation": true,
-  "importOrderSortSpecifiers": true
+  "importOrderTypeScriptVersion": "5.0.0",
+  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+  "importOrderCaseSensitive": false
 }

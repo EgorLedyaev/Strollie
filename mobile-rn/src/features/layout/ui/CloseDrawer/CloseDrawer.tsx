@@ -1,8 +1,12 @@
 import CloseIcon from '@/assets/icons/close';
-import { DrawerNavigationHelpers } from '@react-navigation/drawer/src/types';
+import { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-export const CloseDrawer = (navigation: DrawerNavigationHelpers) => {
+interface CloseDrawerProps {
+	navigation: DrawerContentComponentProps['navigation'];
+}
+
+export const CloseDrawer = ({ navigation }: CloseDrawerProps) => {
 	return (
 		<>
 			<Pressable onPress={() => navigation.closeDrawer()}>

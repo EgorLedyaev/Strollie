@@ -60,3 +60,9 @@ app-example
 .idea/**/libraries
 
 .env
+
+.docs
+.github
+
+/android
+/ios

@@ -1,73 +1,31 @@
-import { KeycloakService } from '@/src/entities/auth/api/keycloak.service';
-import { useAuth } from '@/src/entities/auth/model/auth-context';
-import { Colors } from '@/src/shared/tokens';
-import { Redirect, Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import {
-	SafeAreaProvider,
-	useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-export default function AppLayout() {
-	const { isAuthenticated, isLoading, checkAuth } = useAuth();
-	const insets = useSafeAreaInsets();
-	const redirectInProgress = useRef(false);
+import { Colors } from '@/src/shared/tokens';
 
-	// Проверка авторизации
-	useEffect(() => {
-		const checkUserAuth = async () => {
-			if (isLoading || redirectInProgress.current) return;
-			if (!isAuthenticated) {
-				console.log(
-					'AppLayout: Пользователь не авторизован, перенаправление на /sign-in',
-				);
-				redirectInProgress.current = true;
-				router.replace('/sign-in');
-			} else {
-				console.log(
-					'AppLayout: Пользователь авторизован, доступ разрешен',
-				);
-			}
-		};
-		checkUserAuth();
-	}, [isAuthenticated, isLoading, checkAuth]);
-
-	if (isLoading) {
-		return (
-			<View style={styles.loadingContainer}>
-				<Text>Загрузка...</Text>
-			</View>
-		);
-	}
+export default function AuthLayout() {
 	return (
 		<SafeAreaProvider>
-			<StatusBar
-				style='dark'
-				translucent={true}
-				backgroundColor='transparent'
-			/>
+			<StatusBar style='dark'  />
 			<Stack
 				screenOptions={{
 					headerShown: false,
 					contentStyle: {
 						backgroundColor: Colors.lightBackground,
-						// paddingTop: insets.top,
 					},
 				}}
 			>
 				<Stack.Screen name='index' />
-				<Stack.Screen name='profile' />
+				<Stack.Screen name='profile/index' />
+				<Stack.Screen name='profile/edit' />
+				<Stack.Screen name='calendar/index' />
+				<Stack.Screen name='trips/index' />
+				<Stack.Screen name='trips/[id]' />
+				<Stack.Screen name='tickets/index' />
+				<Stack.Screen name='routes/history' />
+				<Stack.Screen name='routes/saved' />
 			</Stack>
 		</SafeAreaProvider>
 	);
 }
-
-const styles = StyleSheet.create({
-	loadingContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-});

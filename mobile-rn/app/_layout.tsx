@@ -1,45 +1,92 @@
-import { AuthProvider } from '@/src/entities/auth/model/auth-context';
-import { Colors } from '@/src/shared/tokens';
+import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import {
-	SafeAreaProvider,
-	useSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import { Provider as JotaiProvider } from 'jotai';
+import { Suspense, useEffect } from 'react';
+import { View } from 'react-native';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { Colors } from '@/src/shared/tokens';
+import { SessionProvider } from '@/src/app/providers/with-session';
+
+// Предотвращаем автоскрытие сплеш-экрана
 SplashScreen.preventAutoHideAsync();
-export default function RootLayout() {
-	useEffect(() => {
-		setTimeout(() => {
-			SplashScreen.hideAsync();
-		}, 3000); // 3 секунды задержки
-	}, []);
-	const insets = useSafeAreaInsets();
 
+// Экспортируем функцию по умолчанию
+export default function RootLayout() {
 	return (
-		<AuthProvider>
-			<SafeAreaProvider>
-				<StatusBar
-					style='dark'
-					translucent={true}
-					backgroundColor='transparent'
+		<JotaiProvider>
+			<KeyboardProvider>
+				<SafeAreaProvider>
+					<Suspense fallback={null}>
+						<StatusBar style='dark' />
+						<Root />
+					</Suspense>
+				</SafeAreaProvider>
+			</KeyboardProvider>
+		</JotaiProvider>
+	);
+}
+
+function Root() {
+	const [fontsLoaded, fontError] = useFonts({
+		'SuisseIntl-Regular': require('../assets/fonts/SuisseIntl-Regular.otf'),
+		'SuisseIntl-SemiBold': require('../assets/fonts/SuisseIntl-SemiBold.otf'),
+		'SuisseIntl-Bold': require('../assets/fonts/SuisseIntl-Bold.otf'),
+		'SuisseIntl-Medium': require('../assets/fonts/SuisseIntl-Medium.otf'),
+	});
+
+	useEffect(() => {
+		if (fontsLoaded || fontError) {
+			console.log(
+				'Гидратация и загрузка шрифтов завершены. Скрываем сплэш-экран.',
+			);
+			SplashScreen.hideAsync();
+		}
+	}, [fontsLoaded, fontError]);
+
+	// Если шрифты не загрузились, возвращаем пустой контейнер,
+	// чтобы приложение не пыталось рендерить до загрузки шрифтов
+	if (!fontsLoaded && !fontError) {
+		return <View />; // Пустой контейнер вместо null
+	}
+
+	// После загрузки шрифтов рендерим основной интерфейс
+	return (
+		<SessionProvider>
+			<Stack
+				screenOptions={{
+					headerShown: false,
+					contentStyle: {
+						backgroundColor: Colors.lightBackground,
+					},
+				}}
+			>
+				<Stack.Screen
+					name='index'
+					options={{ title: 'Splash', headerShown: false }}
 				/>
-				<Stack
-					screenOptions={{
+				<Stack.Screen
+					name='sign-in'
+					options={{ title: 'Sign In', headerShown: false }}
+				/>
+				<Stack.Screen
+					name='register'
+					options={{ title: 'Register', headerShown: false }}
+				/>
+				<Stack.Screen
+					name='verify-code'
+					options={{
+						title: 'Verify Code',
 						headerShown: false,
-						contentStyle: {
-							backgroundColor: Colors.lightBackground,
-							// paddingTop: insets.top,
-						},
 					}}
-				>
-					<Stack.Screen
-						name='sign-in'
-						options={{ title: 'Sign In', headerShown: false }}
-					/>
-				</Stack>
-			</SafeAreaProvider>
-		</AuthProvider>
+				/>
+				<Stack.Screen
+					name='user-data'
+					options={{ title: 'User Data', headerShown: false }}
+				/>
+			</Stack>
+		</SessionProvider>
 	);
 }
