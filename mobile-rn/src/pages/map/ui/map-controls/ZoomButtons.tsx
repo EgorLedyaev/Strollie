@@ -1,7 +1,14 @@
-import { Colors, Fonts } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
+import { MinusIcon, PlusIcon } from '@/assets/icons/map';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+
+
+
+import { Colors, Radius } from '@/shared/tokens';
+
+
+
+
 
 export const ZoomButtons = ({
 	onZoomIn,
@@ -11,12 +18,17 @@ export const ZoomButtons = ({
 	onZoomOut: () => void;
 }) => (
 	<View style={styles.container}>
-		<TouchableOpacity style={styles.button} onPress={onZoomIn}>
-			<AppText style={styles.text}>+</AppText>
+		<TouchableOpacity
+			style={{ ...styles.button, ...styles.plusIcon }}
+			onPress={onZoomIn}
+		>
+			<PlusIcon />
 		</TouchableOpacity>
-		<View style={styles.separator} />
-		<TouchableOpacity style={styles.button} onPress={onZoomOut}>
-			<AppText style={styles.text}>-</AppText>
+		<TouchableOpacity
+			style={{ ...styles.button, ...styles.minusIcon }}
+			onPress={onZoomOut}
+		>
+			<MinusIcon />
 		</TouchableOpacity>
 	</View>
 );
@@ -24,27 +36,26 @@ export const ZoomButtons = ({
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: 'column',
-		backgroundColor: Colors.white,
-		borderRadius: 8,
-		elevation: 3,
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.2,
-		shadowRadius: 1.41,
+		gap: 3,
 	},
 	button: {
-		paddingHorizontal: 15,
-		paddingVertical: 10,
 		alignItems: 'center',
 		justifyContent: 'center',
+		backgroundColor: Colors.white,
+		elevation: 4,
+		shadowColor: Colors.black,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 8,
+		width: 46,
+		height: 46,
 	},
-	text: {
-		fontFamily: Fonts.semibold,
-		fontSize: 20,
-		color: Colors.black,
+	plusIcon: {
+		borderTopStartRadius: Radius.r16,
+		borderTopEndRadius: Radius.r16,
 	},
-	separator: {
-		height: 1,
-		backgroundColor: Colors.lightGray,
+	minusIcon: {
+		borderBottomStartRadius: Radius.r16,
+		borderBottomEndRadius: Radius.r16,
 	},
 });

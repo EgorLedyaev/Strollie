@@ -1,7 +1,14 @@
-import { Colors, Fonts } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
+
+
+
+import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
+
+
+
+
 
 export const ToggleModeButton = ({
 	is3D,
@@ -17,28 +24,32 @@ export const ToggleModeButton = ({
 		onPress={onPress}
 		disabled={disabled}
 	>
-		<AppText style={styles.text}>{is3D ? '2D' : '3D'}</AppText>
+		<AppText style={styles.text} allowFontScaling={false}>
+			{is3D ? '2D' : '3D'}
+		</AppText>
 	</TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
 	button: {
+		alignItems: 'center',
+		justifyContent: 'center',
 		backgroundColor: Colors.white,
-		paddingHorizontal: 15,
-		paddingVertical: 10,
-		borderRadius: 8,
-		elevation: 3,
+		borderRadius: Radius.r16,
+		elevation: 4,
 		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.2,
-		shadowRadius: 1.41,
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.25,
+		shadowRadius: 8,
+		width: 46,
+		height: 46,
 	},
 	disabled: {
 		backgroundColor: Colors.gray,
 	},
 	text: {
-		fontFamily: Fonts.semibold,
-		fontSize: 16,
-		color: Colors.black,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f20,
+		color: Colors.grayIcon,
 	},
 });

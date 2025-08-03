@@ -1,29 +1,40 @@
+import { useAtom, useSetAtom } from 'jotai';
+import React, { useCallback, useRef, useState } from 'react';
+import { ActionSheetIOS, Alert, Platform, StyleSheet, View } from 'react-native';
+
+
+
 import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/entities/map';
 import { placedMarkersAtom } from '@/entities/marker';
 import { useLocationTracking } from '@/shared/lib';
-import { useAtom, useSetAtom } from 'jotai';
-import React, { useCallback, useRef, useState } from 'react';
-import {
-	ActionSheetIOS,
-	Alert,
-	Platform,
-	StyleSheet,
-	View,
-} from 'react-native';
+
+
 
 import { MapControls } from './map-controls';
 import { MapWidget } from './map-widget';
 
+
+
 import 'react-native-get-random-values';
 
-import { type PlacedMarkerData } from '@/entities/marker';
-import { BottomNavBar } from '@/widgets/bottom-nav-bar';
+
+
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { v4 as uuidv4 } from 'uuid';
 
+
+
+import { BottomNavBar } from '@/widgets/bottom-nav-bar';
+import { type PlacedMarkerData } from '@/entities/marker';
+import { Colors } from '@/shared/tokens';
+
+
+
 import { useRouteBuilder } from '../model/use-route-builder';
 import { WeatherWidget } from './WeatherWidget';
+
 
 export function MapPage() {
 	const webViewRef = useRef<WebView>(null);
@@ -255,7 +266,8 @@ export function MapPage() {
 	const [temperature, setTemperature] = useState(16);
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<>
+			<StatusBar style='dark' backgroundColor={Colors.optionHighlight} />
 			<MapWidget ref={webViewRef} onMessage={handleWebViewMessage} />
 			<MapControls
 				onZoomIn={handleZoomIn}
@@ -270,29 +282,18 @@ export function MapPage() {
 			<View style={styles.weatherContainer}>
 				<WeatherWidget temperature={temperature} />
 			</View>
-			<View style={styles.bottomPanel}>
-				<BottomNavBar />
-			</View>
-		</SafeAreaView>
+
+			<BottomNavBar />
+		</>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
+
 	weatherContainer: {
 		position: 'absolute',
 		top: Platform.OS === 'ios' ? 120 : 100,
 		right: 20,
 		zIndex: 10,
-	},
-	bottomPanel: {
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
-		right: 0,
-		backgroundColor: 'transparent',
-		marginTop: 'auto',
 	},
 });

@@ -1,6 +1,7 @@
-import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
+
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 
 import { CenterOnUserButton } from './CenterOnUserButton';
 import { ProfileButton } from './ProfileButton';
@@ -39,19 +40,18 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 				</View>
 			</View>
 			{/* Компонент погоды перенесен в основной экран */}
-			<View style={styles.mapControlsWrapper} pointerEvents='auto'>
+			<View style={styles.mapControlsWrapper} pointerEvents='box-none'>
 				<View style={styles.zoomAndModeContainer}>
-					<View style={styles.mapControls}>
-						<ZoomButtons
-							onZoomIn={props.onZoomIn}
-							onZoomOut={props.onZoomOut}
-						/>
-					</View>
+					<ZoomButtons
+						onZoomIn={props.onZoomIn}
+						onZoomOut={props.onZoomOut}
+					/>
 					<ToggleModeButton
 						is3D={props.is3DMode}
 						onPress={props.onToggleMode}
 						disabled={!props.mapReady}
 					/>
+					<View/>
 					<CenterOnUserButton
 						onPress={props.onNavigate}
 						disabled={!props.mapReady || !props.isLocationAvailable}
@@ -81,30 +81,17 @@ const styles = StyleSheet.create({
 		width: 45,
 		height: 45,
 	},
-	weatherWrapper: {
-		position: 'absolute',
-		top: Platform.OS === 'ios' ? 120 : 100,
-		left: 16,
-	},
 	mapControlsWrapper: {
 		position: 'absolute',
-		top: 280,
 		right: 16,
-		alignItems: 'flex-end',
+		top: 0,
+		bottom: 0,
+		justifyContent: 'center',
 	},
 	zoomAndModeContainer: {
-		gap: Gaps.g16,
-		alignItems: 'flex-end',
-	},
-	mapControls: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 1 },
-		gap: 1.5,
-		shadowOpacity: 0.2,
-		shadowRadius: 2,
-		elevation: 3,
+		gap: Gaps.g8,
+		pointerEvents: 'auto',
+		
 	},
 	mapButton: {
 		width: 46,
@@ -112,7 +99,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
+		borderRadius: Radius.r16,
 		shadowColor: Colors.black,
 		shadowOffset: { width: 0, height: 1 },
 		shadowOpacity: 0.2,

@@ -5,6 +5,10 @@ import NotificationIcon from '@/assets/icons/NotificationIcon';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+
+
+
+
 export const BottomNavBar: React.FC = () => {
 	const handleNavNotificationPress = () => {
 		console.log('Notification button pressed');
@@ -41,7 +45,13 @@ export const BottomNavBar: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-	container: {},
+	container: {
+			position: 'absolute',
+			bottom: 0,
+			left: 0,
+			right: 0,
+			marginTop: 'auto',
+	},
 	navBarIcon: {
 		flexDirection: 'row',
 		// position: 'absolute',

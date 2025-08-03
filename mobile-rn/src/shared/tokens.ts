@@ -33,6 +33,7 @@ export const Colors = {
 	// Цвета выделения
 	optionHighlight: 'rgba(31, 31, 31, 0.1)', // Цвет выделения опции в выпадающем списке
 	backgroundMapStatus: 'rgba(255,255,255,0.8)',
+	shadowButton: 'rgba(169, 169, 169, 0.25)',
 
 	// Зеленые оттенки
 	successGreen: '#45CD86',
@@ -44,6 +45,8 @@ export const Colors = {
 	// Другие цвета
 	red: '#CC384E',
 	error: '#CC384E', // Alias for red for error messages
+
+	transparent: 'transparent',
 };
 
 export const Gaps = {
@@ -57,7 +60,7 @@ export const Gaps = {
 export const Radius = {
 	r10: 10,
 	r20: 20,
-	r15: 15,
+	r16: 16,
 };
 
 export const Fonts = {

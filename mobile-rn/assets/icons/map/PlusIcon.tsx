@@ -1,16 +1,18 @@
 import * as React from 'react';
-import Svg, { Path, G, SvgProps } from 'react-native-svg';
+import Svg, { Rect, SvgProps } from 'react-native-svg';
 
+/* SVGR has dropped some elements not supported by react-native-svg: filter */
 const PlusIcon = (props: SvgProps) => (
-    <Svg
-      width={22}
-      height={22}
-      viewBox="0 0 22 22"
-      fill="none"
-      {...props}
-    >
-      <Path d="M9 2a2 2 0 014 0v18a2 2 0 01-4 0V2z" fill="#626262" />
-      <Path d="M2 13a2 2 0 110-4h18a2 2 0 010 4H2z" fill="#626262" />
-    </Svg>
+	<Svg width={22} height={22} fill='none' {...props}>
+		<Rect width={4} height={22} x={9} fill='#626262' rx={2} />
+		<Rect
+			width={4}
+			height={22}
+			y={13}
+			fill='#626262'
+			rx={2}
+			transform='rotate(-90 0 13)'
+		/>
+	</Svg>
 );
 export default PlusIcon;
