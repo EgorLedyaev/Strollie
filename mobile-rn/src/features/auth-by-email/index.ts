@@ -1,22 +1,25 @@
 // Публичный API слайса auth-by-email
-import { checkEmailAndProceedAtom } from './model/action';
+import { checkEmailAndProceedAtom, submitUserDataAtom } from './model/action';
 import {
+	RegistrationData,
 	registrationErrorAtom,
 	registrationIsLoadingAtom,
 	registrationStateAtom,
+	verifyCodeErrorAtom
 } from './model/state';
-import { useAuthCheck } from './model/use-auth-check';
 import { useLogin } from './model/use-login';
 import { useResendCode } from './model/use-resend-code';
 import { useVerifyCode } from './model/use-verify-code';
 
 export {
 	useLogin,
-	useAuthCheck,
 	useVerifyCode,
 	useResendCode,
+	RegistrationData,
 	registrationStateAtom,
 	registrationIsLoadingAtom,
 	registrationErrorAtom,
 	checkEmailAndProceedAtom,
+	submitUserDataAtom,
+	verifyCodeErrorAtom,
 };

@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
+import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 import { useLogin } from '@/src/features/auth-by-email';
+import { authErrorAtom } from '@/src/features/auth-by-email/model/state';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
 
@@ -13,7 +15,7 @@ import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
  */
 export function SignInPage() {
 	const [email, setEmail] = useState('');
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useAtom(authErrorAtom);
 	const { loginWithEmail, isLoading } = useLogin();
 
 	const handleSignIn = () => {
@@ -21,9 +23,6 @@ export function SignInPage() {
 		loginWithEmail(email, {
 			onSuccess: () => {
 				router.push('/verify-code');
-			},
-			onError: message => {
-				setError(message);
 			},
 		});
 	};

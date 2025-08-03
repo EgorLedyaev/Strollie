@@ -53,6 +53,24 @@ export default defineConfig([
 								'Use AppText and AppTextInput from @/src/shared/ui instead',
 						},
 					],
+					patterns: [
+						{
+							group: ['../assets/fonts/*'],
+							message:
+								'User require() for fonts assets instead of import',
+						},
+					],
+				},
+			],
+			'@typescript-eslint/no-require-imports': [
+				'error',
+				{
+					allow: [
+						'\\.otf$', // разрешаем .otf файлы
+						'\\.ttf$', // разрешаем .ttf файлы
+						'\\.woff$', // разрешаем .woff файлы
+						'\\.woff2$', // разрешаем .woff2 файлы
+					],
 				},
 			],
 		},

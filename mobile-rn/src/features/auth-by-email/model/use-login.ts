@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
 
-import { SessionStorage } from '@/src/entities/session';
+import { userApi } from '@/src/entities/user';
+
+import {
+	authErrorAtom,
+	authIsLoadingAtom,
+	registrationStateAtom,
+} from './state';
 
 interface LoginCallbacks {
 	onSuccess: () => void;
-	onError: (message: string) => void;
 }
 
 /**
@@ -12,51 +17,48 @@ interface LoginCallbacks {
  * @returns
  */
 export const useLogin = () => {
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useAtom(authIsLoadingAtom);
+	const setError = useSetAtom(authErrorAtom);
+	const setRegState = useSetAtom(registrationStateAtom);
 
-	const loginWithEmail = async (email: string, callbacks: LoginCallbacks) => {
+	const loginWithEmail = async (email: string, { onSuccess }: LoginCallbacks) => {
+		console.log(`Попытка входа с email: ${email} email trim is ${!email.trim()}`);
+		
 		if (!email.trim()) {
-			callbacks.onError('Введите email');
+			setError('Введите email.');
 			return;
 		}
 
 		setIsLoading(true);
+		setError(null);
 		try {
 			// Шаг 1: Просто проверяем, есть ли такой пользователь в "базе данных".
-			const isRegistered = await SessionStorage.isUserRegistered(email);
+			const isRegistered = await userApi.isUserRegistered(email);
 			console.log(
 				`Вход в систему с email: ${email}, зарегистрирован: ${isRegistered}`,
 			);
 
 			if (!isRegistered) {
-				callbacks.onError(
+				throw new Error(
 					'Пользователь не найден. Пожалуйста, зарегистрируйтесь.',
 				);
-				return;
 			}
-			// Шаг 2: Если пользователь есть, мы просто сохраняем его email для следующего шага
-			// и помечаем, что это не новый процесс регистрации.
-			await SessionStorage.setEmail(email);
-			await SessionStorage.setIsRegistration(false);
-
-			const userProfile = await SessionStorage.loadUserProfile(email);
-			if (userProfile) {
-				console.log(`Восстановлен профиль для ${email}:`, userProfile);
-			} else {
-				console.log(
-					`Профиль для ${email} не найден, будет создан после верификации`,
-				);
-			}
+			// Шаг 2: Сохраняем email в состояние фичи и помечаем, что это НЕ регистрация
+			setRegState(prev => ({
+				...prev,
+				email,
+				isRegistering: false, // Указываем, что это не регистрация
+			}));
 
 			// Шаг 3: Передаем управление наверх (странице), чтобы она сделала навигацию на экран верификации.
-			callbacks.onSuccess();
+			onSuccess();
 		} catch (err) {
 			console.error('Ошибка входа', err);
 			const message =
 				err instanceof Error
 					? err.message
-					: 'Не удалось отправить код.';
-			callbacks.onError(message);
+					: 'Не удалось войти.';
+			setError(message);
 		} finally {
 			setIsLoading(false);
 		}

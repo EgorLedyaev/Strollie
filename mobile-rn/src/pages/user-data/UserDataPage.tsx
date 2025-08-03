@@ -6,12 +6,12 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
+	RegistrationData,
 	registrationErrorAtom,
 	registrationIsLoadingAtom,
 	registrationStateAtom,
+	submitUserDataAtom,
 } from '@/src/features/auth-by-email';
-import { submitUserDataAtom } from '@/src/features/auth-by-email/model/action';
-import { UserInfo } from '@/src/features/auth-by-email/model/use-register-user';
 import { citiesAtom, fetchCitiesAtom } from '@/src/entities/city';
 import { Colors, Fonts, Gaps } from '@/src/shared/tokens';
 import {
@@ -76,7 +76,7 @@ export function UserDataPage() {
 		});
 	};
 
-	const handleChange = (field: keyof UserInfo, value: string) => {
+	const handleChange = (field: keyof RegistrationData, value: string) => {
 		setRegState(prev => ({ ...prev, [field]: value }));
 	};
 
@@ -253,4 +253,3 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 });
-

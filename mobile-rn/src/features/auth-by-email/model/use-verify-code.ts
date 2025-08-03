@@ -1,40 +1,45 @@
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useState } from 'react';
 
-import { registrationStateAtom } from '@/src/features/auth-by-email';
-import { sessionAtom, SessionStorage } from '@/src/entities/session';
-import { profileAtom, type User } from '@/src/entities/user';
+import { setSessionAtom } from '@/src/entities/session';
+import { userApi, type User } from '@/src/entities/user';
+
+import { registrationStateAtom, verifyCodeErrorAtom } from './state';
 
 interface VerifyCodeCallbacks {
 	onSuccess: () => void;
-	onError: (message: string) => void;
 }
 
 export const useVerifyCode = () => {
 	const [isLoading, setIsLoading] = useState(false);
-	const setSession = useSetAtom(sessionAtom);
+	const setSession = useSetAtom(setSessionAtom);
 	const regState = useAtomValue(registrationStateAtom);
-	const setProfile = useSetAtom(profileAtom);
-	const setRegistrationState = useSetAtom(registrationStateAtom);
+	const setRegState = useSetAtom(registrationStateAtom);
+	const setError = useSetAtom(verifyCodeErrorAtom);
 
-	const verifyCode = async (code: string, callbacks: VerifyCodeCallbacks) => {
+	const verifyCode = async (
+		code: string,
+		{ onSuccess }: VerifyCodeCallbacks,
+	) => {
 		setIsLoading(true);
 		try {
+			// В реальном API мы бы отправили { email, code } и получили бы токен и профиль
 			if (code.length !== 4 || !/^\d{4}$/.test(code) || code !== '1234') {
 				throw new Error('Неверный код подтверждения.');
 			}
 
-			const isRegistration = await SessionStorage.getIsRegistration();
-			const email = await SessionStorage.getEmail();
-			if (!email) {
+			if (!regState.email) {
 				throw new Error('Сессия истекла, email не найден.');
 			}
 
-			if (isRegistration) {
+			let userProfile: User | null;
+			const mockToken = 'mock-refresh-token-' + Date.now();
+
+			if (regState.isRegistering) {
 				// Финализация регистрации: создаем профиль
-				const userProfile: User = {
+				const newUser: User = {
 					user_id: 'user-' + Date.now(),
-					email: email,
+					email: regState.email,
 					created_at: new Date().toISOString(),
 					firstName: regState.firstName || '',
 					lastName: regState.lastName || '',
@@ -42,29 +47,28 @@ export const useVerifyCode = () => {
 					city: regState.city || '',
 					birthDate: regState.birthdate || '',
 				};
-				await SessionStorage.addRegisteredUser(email);
-				await SessionStorage.saveUserProfile(email, userProfile);
-				setProfile({
-					profile: userProfile,
-					isLoading: false,
-					error: null,
-				});
-				// Очищаем состояние регистрации после успеха
-				setRegistrationState({});
+				userProfile = await userApi.saveUserProfile(newUser);
+			} else {
+				// Вход существующего пользователя: загружаем профиль
+				userProfile = await userApi.loadUserProfile(regState.email);
 			}
 
-			// Создаем сессию в обоих случаях (логин и регистрация)
-			const mockToken = 'mock-token-' + Date.now();
-			await SessionStorage.setToken(mockToken);
-			setSession({ isAuthenticated: true, refreshToken: mockToken });
+			if (!userProfile) {
+				throw new Error('Не удалось получить данные пользователя.');
+			}
 
-			callbacks.onSuccess();
+			// Устанавливаем сессию
+			setSession({ refreshToken: mockToken, userProfile });
+
+			// Очищаем состояние регистрации
+			setRegState({ isRegistering: false });
+			onSuccess();
 		} catch (err) {
 			const message =
 				err instanceof Error
 					? err.message
 					: 'Ошибка при проверке кода.';
-			callbacks.onError(message);
+			setError(message);
 		} finally {
 			setIsLoading(false);
 		}

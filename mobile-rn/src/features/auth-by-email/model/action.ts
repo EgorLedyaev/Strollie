@@ -1,6 +1,6 @@
-import { atom, type Setter, type Getter } from 'jotai';
+import { atom, type Getter, type Setter } from 'jotai';
 
-import { SessionStorage } from '@/src/entities/session';
+import { userApi } from '@/src/entities/user';
 
 import {
 	registrationErrorAtom,
@@ -8,12 +8,11 @@ import {
 	registrationStateAtom,
 } from './state';
 
-
 /**
  * Экшен для завершения регистрации пользователя.
  */
 interface SubmitUserDataArgs {
-	onSuccess: () => void; 
+	onSuccess: () => void;
 }
 
 /**
@@ -99,14 +98,15 @@ const checkEmailAndProceedAction = async (
 		// 2. Проверка на уникальность (имитация API-запроса)
 		// Имитируем задержку сети для реалистичности
 		await new Promise(resolve => setTimeout(resolve, 500));
-		const isAlreadyRegistered =
-			await SessionStorage.isUserRegistered(email);
+		const isAlreadyRegistered = await userApi.isUserRegistered(email);
 		if (isAlreadyRegistered) {
-			throw new Error('Этот email уже зарегистрирован. Попробуйте войти.');
+			throw new Error(
+				'Этот email уже зарегистрирован. Попробуйте войти.',
+			);
 		}
 
 		// Все проверки пройдены
-		await SessionStorage.setIsRegistration(true); // Устанавливаем флаг, что мы в процессе регистрации
+		state.isRegistering = true; // Устанавливаем состояние регистрации
 		onSuccess();
 	} catch (err) {
 		const message =
@@ -124,4 +124,3 @@ const checkEmailAndProceedAction = async (
  * Write-only атом для проверки email и перехода к следующему шагу регистрации.
  */
 export const checkEmailAndProceedAtom = atom(null, checkEmailAndProceedAction);
-

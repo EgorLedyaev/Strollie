@@ -1,1 +1,1 @@
-export { UserDataPage } from './ui';
+export { UserDataPage } from './UserDataPage';

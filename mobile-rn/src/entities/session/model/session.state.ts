@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { atom } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
-import { SessionStorage } from './session-storage';
+import { User } from '@/src/entities/user/@x/session';
 
 /**
  * Тип для состояния сессии.
@@ -11,6 +11,7 @@ import { SessionStorage } from './session-storage';
 interface Session {
 	isAuthenticated: boolean;
 	refreshToken: string | null;
+	userProfile: User | null;
 }
 
 /**
@@ -20,6 +21,7 @@ interface Session {
 const INITIAL_STATE: Session = {
 	isAuthenticated: false,
 	refreshToken: null,
+	userProfile: null,
 };
 /**
  * Хранилище для состояния сессии.
@@ -28,23 +30,43 @@ const INITIAL_STATE: Session = {
 const storage = createJSONStorage<Session>(() => AsyncStorage);
 
 /**
- * Атом для хранения состояния сессии.
+ * Базовый атом для хранения состояния сессии. Он взаимодействует с AsyncStorage.
+ * Мы не будем экспортировать его напрямую, чтобы избежать случайного использования
+ * без Suspense.
  */
-export const sessionAtom = atomWithStorage('session', INITIAL_STATE, storage);
+const sessionAtomWithStorage = atomWithStorage(
+	'session',
+	INITIAL_STATE,
+	storage,
+);
 
 /**
- * Атом для проверки аутентификации пользователя (read-only).
+ * Экспортируемый атом сессии, который поддерживает Suspense.
+ * Когда компонент попытается прочитать этот атом до того, как данные загрузятся
+ * из AsyncStorage, Jotai "выбросит" промис, который будет перехвачен
+ * ближайшим <Suspense> boundary.
  */
-export const isAuthenticatedAtom = atom(async get => {
-	const session = await get(sessionAtom);
-	return session.isAuthenticated;
-});
+export const sessionAtom = atom(get => get(sessionAtomWithStorage));
+
+/**
+ * Атом для ПРЯМОЙ установки новой сессии.
+ * Используется после успешной верификации.
+ * ЭТО write-only атом.
+ */
+export const setSessionAtom = atom(
+	null,
+	(get, set, newSessionData: { refreshToken: string; userProfile: User }) => {
+		const newSession: Session = {
+			isAuthenticated: true,
+			...newSessionData,
+		};
+		set(sessionAtomWithStorage, newSession);
+	},
+);
 
 /**
  * Атом для выхода из системы (write-only).
- * При вызове этого атома будет очищено состояние сессии и удалены все данные из хранилища.
  */
 export const logoutAtom = atom(null, async (_get, set) => {
-	await SessionStorage.clearAll();
-	set(sessionAtom, INITIAL_STATE);
+	set(sessionAtomWithStorage, INITIAL_STATE);
 });

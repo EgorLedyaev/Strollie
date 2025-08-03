@@ -1,25 +1,10 @@
 // Публичный API слайса user
-import { type User } from '@/src/shared/lib';
-
-import { fetchUserProfile, updateUserProfile } from './api/userApi';
-import { UserProfileStorage } from './model/user-profile-storage';
-import { loadProfileAtom, profileAtom } from './model/user.state';
-import { UserMenu } from './ui/UserMenu/UserMenu';
+import { userApi } from './api/api';
+import { User } from './model/user.model';
 
 export {
-	// State
-	profileAtom,
-	loadProfileAtom,
-
 	// API
-	fetchUserProfile,
-	updateUserProfile,
-
-	// Storage
-	UserProfileStorage,
-
-	// Components
-	UserMenu,
+	userApi,
 
 	// Types
 	type User,

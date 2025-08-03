@@ -1,4 +1,5 @@
 import { router } from 'expo-router';
+import { useAtom, useAtomValue } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import {
 	SafeAreaView,
@@ -9,28 +10,24 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useResendCode, useVerifyCode } from '@/src/features/auth-by-email';
-import { SessionStorage } from '@/src/entities/session';
+import {
+	registrationStateAtom,
+	useResendCode,
+	useVerifyCode,
+	verifyCodeErrorAtom,
+} from '@/src/features/auth-by-email';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { AppButton, AppText, BackButton, CodeInput } from '@/src/shared/ui';
 
 export function VerifyCodePage() {
 	const [code, setCode] = useState('');
-	const [error, setError] = useState<string | null>(null);
+	const [error, setError] = useAtom(verifyCodeErrorAtom);
 	const [timeLeft, setTimeLeft] = useState(60);
 	const [canResend, setCanResend] = useState(false);
-	const [email, setEmail] = useState('');
 	const { verifyCode, isLoading } = useVerifyCode();
 	const { resendCode, isLoading: isResending } = useResendCode();
-
-	// Загружаем email из хранилища
-	useEffect(() => {
-		const loadEmail = async () => {
-			const storedEmail = await SessionStorage.getEmail();
-			setEmail(storedEmail || '');
-		};
-		loadEmail();
-	}, []);
+	const state = useAtomValue(registrationStateAtom);
+	const email = state.email;
 
 	useEffect(() => {
 		let timer: ReturnType<typeof setInterval>;
@@ -61,20 +58,13 @@ export function VerifyCodePage() {
 	};
 
 	const handleVerifyCode = async () => {
-		// 1. Очищаем старые ошибки
 		setError(null);
 
-		// 2. Вызываем фичу, передавая ей данные и КОЛЛБЭКИ
 		verifyCode(code, {
 			onSuccess: () => {
-				// 3. Фича сказала "успех". Страница решает, что делать:
 				// Стереть историю навигации и отправить пользователя в приложение.
+				router.dismissAll();
 				router.replace('/(app)');
-			},
-			onError: message => {
-				// 4. Фича сказала "провал". Страница решает, что делать:
-				// Показать пользователю сообщение об ошибке.
-				setError(message);
 			},
 		});
 	};
@@ -99,7 +89,9 @@ export function VerifyCodePage() {
 
 			<View style={styles.container}>
 				<View style={styles.header}>
-					<AppText variant='h1' style={styles.title}>Код подтверждения</AppText>
+					<AppText variant='h1' style={styles.title}>
+						Код подтверждения
+					</AppText>
 					<AppText style={styles.subtitle}>
 						Введите код, отправленный на {email || 'эл. почту'}
 					</AppText>
@@ -189,9 +181,7 @@ const styles = StyleSheet.create({
 		gap: 4,
 		marginTop: 24,
 	},
-	resendText: {
-
-	},
+	resendText: {},
 	activeResendText: {
 		color: Colors.greenLink,
 	},

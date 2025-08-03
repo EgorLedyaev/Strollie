@@ -12,3 +12,8 @@ declare module '*.html' {
 	const content: string;
 	export default content;
 }
+
+declare module '*.otf' {
+	const value: never;
+	export default value;
+}
