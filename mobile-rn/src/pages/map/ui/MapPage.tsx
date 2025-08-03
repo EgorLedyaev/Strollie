@@ -11,7 +11,7 @@ import {
 import {
 	useRouteBuilder,
 } from '@/src/pages/map/features/route-build';
-import { MapControls } from '@./map-controls';
+import { MapControls } from './map-controls';
 import { MapWidget } from './map-widget';
 import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
 import { placedMarkersAtom } from '@/src/entities/marker';
@@ -255,16 +255,8 @@ export function MapPage() {
 	);
 
 	const [temperature, setTemperature] = useState(16);
+	
 
-	const serviceTabs = [
-		{ id: 'feed', title: 'Лента' },
-		{ id: 'events', title: 'Афиша' },
-		{ id: 'settings', title: 'Настройки' },
-	];
-
-	const handleServiceTabSelect = (id: string) => {
-		console.log(`Selected service tab: ${id}`);
-	};
 
 	return (
 		<SafeAreaView style={styles.container}>

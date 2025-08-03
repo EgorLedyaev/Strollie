@@ -124,22 +124,4 @@ const styles = StyleSheet.create({
 		shadowRadius: 2,
 		elevation: 3,
 	},
-	mapButtonPlus: {
-		borderBottomRightRadius: 0,
-		borderBottomLeftRadius: 0,
-	},
-	mapButtonMinus: {
-		borderTopRightRadius: 0,
-		borderTopLeftRadius: 0,
-		borderTopWidth: 1,
-		borderTopColor: Colors.gray,
-	},
-	activeButton: { backgroundColor: Colors.greenPrimary },
-	mapButtonText: {
-		fontSize: 20,
-		fontFamily: Fonts.semibold,
-		color: Colors.grayIcon,
-		includeFontPadding: false,
-	},
-	activeButtonText: { color: Colors.white },
 });

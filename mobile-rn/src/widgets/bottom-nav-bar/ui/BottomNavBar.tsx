@@ -1,24 +1,15 @@
-import NavBar, {
-	BottomNavBarWithCutout,
-} from '@/assets/icons/BottomNavBarWithCutout';
-import { ActiveRouteIcon, StartRouteIcon } from '@/assets/icons/map';
+import { BottomNavBarWithCutout } from '@/assets/icons/BottomNavBarWithCutout';
+import { StartRouteIcon } from '@/assets/icons/map';
 import MessengerIcon from '@/assets/icons/MessengerIcon';
 import NotificationIcon from '@/assets/icons/NotificationIcon';
-// import Colors from your shared tokens module
-import { Colors } from '@/shared/tokens';
-import { usePathname } from 'expo-router';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 export const BottomNavBar: React.FC = () => {
-	const pathname = usePathname();
 
-	const isActive = (path: string) => {
-		if (path === '/' && pathname === '/(app)') return true;
-		return pathname.startsWith(path);
-	};
-	const handleNavProfilePress = () => {
-		console.log('Profile button pressed');
+
+	const handleNavNotificationPress = () => {
+		console.log('Notification button pressed');
 	};
 
 	const handleBuildRouteThroughPlaced = () => {
@@ -36,10 +27,15 @@ export const BottomNavBar: React.FC = () => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.navBarIcon}>
-				<MessengerIcon />
-				{/* <StartRouteIcon /> */}
-				<StartRouteIcon />
-				<NotificationIcon />
+				<Pressable onPress={handleNavChatPress}>
+					<MessengerIcon />
+				</Pressable>
+				<Pressable onPress={handleNavRoutePress}>
+					<StartRouteIcon />
+				</Pressable>
+				<Pressable onPress={handleNavNotificationPress}>
+					<NotificationIcon />
+				</Pressable>
 			</View>
 			<BottomNavBarWithCutout />
 		</View>

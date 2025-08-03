@@ -6,7 +6,7 @@ import { mapReadyAtom } from '@/src/entities/map';
 import { placedMarkersAtom } from '@/src/entities/marker';
 import { useLocationTracking } from '@/src/shared/lib';
 
-type SendMessageToWebView = (message: any) => void;
+type SendMessageToWebView = (message: unknown) => void;
 
 export const useRouteBuilder = (sendMessageToWebView: SendMessageToWebView) => {
 	const [mapReady] = useAtom(mapReadyAtom);

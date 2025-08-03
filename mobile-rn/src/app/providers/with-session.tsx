@@ -31,8 +31,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 		else if (!session.isAuthenticated && inAppGroup) {
 			console.log(
 				'SessionProvider: Пользователь не авторизован, но в (app). Перенаправление на /sign-in.',
-			);
-			// ПЕРЕНАПРАВИТЬ НА СТРАНИЦУ ВХОДА.
+            );
+            // ПЕРЕНАПРАВИТЬ НА СТРАНИЦУ ВХОДА.
 			router.replace('/sign-in');
 		}
 	}, [session.isAuthenticated, session.refreshToken, segments, router]);
