@@ -56,7 +56,7 @@ export const ProfileNavGrid: React.FC = () => {
 		<View style={styles.container}>
 			<Card style={styles.grid}>
 				{navItems.map(item => (
-					<Link key={item.id} href='/user-data' asChild>
+					<Link key={item.id} href={item.path} asChild>
 						<TouchableOpacity style={styles.navItem}>
 							<View style={styles.iconContainer}>
 								{item.icon}

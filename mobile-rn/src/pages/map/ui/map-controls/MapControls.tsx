@@ -1,21 +1,17 @@
-import { Colors, Fonts, Gaps, Radius } from '@/src/shared/tokens';
 import React from 'react';
 import {
 	Platform,
 	StyleSheet,
-	Text,
-	TouchableOpacity,
 	View,
 } from 'react-native';
 
+import { SearchInput } from '../SearchInput';
 import { ProfileButton } from '@/src/features/layout';
-import { SearchInput } from '@/src/features/search';
+import { Colors, Fonts, Gaps, Radius } from '@/src/shared/tokens';
+import { ZoomButtons } from './ZoomButtons';
+import { ToggleModeButton } from './ToggleModeButton';
+import { CenterOnUserButton } from './CenterOnUserButton';
 
-import {
-	CenterOnUserButton,
-	ToggleModeButton,
-	ZoomButtons,
-} from './components';
 
 interface MapControlsProps {
 	onZoomIn: () => void;

@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ProfileHeader } from '@/src/widgets/profile-header';
 import { ProfileNavGrid } from '@/src/widgets/profile-nav-grid';
 import { Colors } from '@/src/shared/tokens';
+import { BottomNavBar } from '@/src/widgets/bottom-nav-bar';
 
 export const ProfilePage: React.FC = () => {
 	return (
@@ -13,6 +14,7 @@ export const ProfilePage: React.FC = () => {
 				<ProfileHeader />
 			</View>
 			<ProfileNavGrid />
+			<BottomNavBar/>
 		</SafeAreaView>
 	);
 };

@@ -5,7 +5,7 @@ import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 import { useLogin } from '@/src/features/auth-by-email';
-import { authErrorAtom } from '@/src/features/auth-by-email/model/state';
+import { authErrorAtom } from '@/src/features/auth-by-email';
 import { Colors, Fonts } from '@/src/shared/tokens';
 import { AppButton, AppText, CustomLink, Input } from '@/src/shared/ui';
 

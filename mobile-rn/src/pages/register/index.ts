@@ -1,1 +1,1 @@
-export { RegisterPage } from './ui';
+export { RegisterPage } from './ui/RegisterPage';

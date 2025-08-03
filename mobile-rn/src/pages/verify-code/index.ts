@@ -1,1 +1,1 @@
-export { VerifyCodePage } from './VerifyCodePage';
+export { VerifyCodePage } from './ui/VerifyCodePage';

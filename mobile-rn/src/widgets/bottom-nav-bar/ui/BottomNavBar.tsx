@@ -1,15 +1,14 @@
-import NavBar, { BottomNavBarWithCutout } from '@/assets/icons/BottomNavBarWithCutout';
+import NavBar, {
+	BottomNavBarWithCutout,
+} from '@/assets/icons/BottomNavBarWithCutout';
 import { ActiveRouteIcon, StartRouteIcon } from '@/assets/icons/map';
 import MessengerIcon from '@/assets/icons/MessengerIcon';
 import NotificationIcon from '@/assets/icons/NotificationIcon';
+// import Colors from your shared tokens module
+import { Colors } from '@/shared/tokens';
 import { usePathname } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
-
-
-
-
 
 export const BottomNavBar: React.FC = () => {
 	const pathname = usePathname();
@@ -20,6 +19,10 @@ export const BottomNavBar: React.FC = () => {
 	};
 	const handleNavProfilePress = () => {
 		console.log('Profile button pressed');
+	};
+
+	const handleBuildRouteThroughPlaced = () => {
+		console.log('Build route through placed called');
 	};
 
 	const handleNavRoutePress = () => {
@@ -35,7 +38,7 @@ export const BottomNavBar: React.FC = () => {
 			<View style={styles.navBarIcon}>
 				<MessengerIcon />
 				{/* <StartRouteIcon /> */}
-				<StartRouteIcon    />
+				<StartRouteIcon />
 				<NotificationIcon />
 			</View>
 			<BottomNavBarWithCutout />
@@ -44,13 +47,12 @@ export const BottomNavBar: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-	container: {
-	},
-    navBarIcon: {
-        flexDirection: 'row',
-        // position: 'absolute',
-        paddingHorizontal: 20,
-        justifyContent: 'space-around',
-        paddingBottom: -10,
+	container: {},
+	navBarIcon: {
+		flexDirection: 'row',
+		// position: 'absolute',
+		paddingHorizontal: 20,
+		justifyContent: 'space-around',
+		paddingBottom: 0,
 	},
 });

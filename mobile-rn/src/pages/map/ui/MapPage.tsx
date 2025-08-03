@@ -1,4 +1,3 @@
-import { useLocationTracking } from '@/src/shared/lib';
 import { useAtom, useSetAtom } from 'jotai';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -9,28 +8,24 @@ import {
 	View,
 } from 'react-native';
 
-import { MapWidget } from '@/src/widgets/map';
-import { MapControls } from '@/src/widgets/map-controls';
-import { BuildRouteButton, useRouteBuilder } from '@/src/features/route-build';
+import {
+	useRouteBuilder,
+} from '@/src/pages/map/features/route-build';
+import { MapControls } from '@./map-controls';
+import { MapWidget } from './map-widget';
 import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
 import { placedMarkersAtom } from '@/src/entities/marker';
-import { isBuildingRouteAtom } from '@/src/entities/route';
+import { useLocationTracking } from '@/src/shared/lib';
 
 import 'react-native-get-random-values';
 
-import { ChatIcon } from '@/assets/icons/nav/ChatIcon';
-import { PlayRouteIcon } from '@/assets/icons/nav/PlayRouteIcon';
-import { ProfileIcon } from '@/assets/icons/nav/ProfileIcon';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { v4 as uuidv4 } from 'uuid';
 
-import { NavBar } from '@/src/features/navigation';
-import { ServiceTabs } from '@/src/features/service-tabs';
-import { WeatherWidget } from '@/src/features/weather';
-import { type PlacedMarkerData } from '@/src/entities/marker';
+import { WeatherWidget } from './WeatherWidget';
 import { BottomNavBar } from '@/src/widgets/bottom-nav-bar';
+import { type PlacedMarkerData } from '@/src/entities/marker';
 
 export function MapPage() {
 	const webViewRef = useRef<WebView>(null);
@@ -38,7 +33,6 @@ export function MapPage() {
 	const [is3DMode, setIs3DMode] = useAtom(is3DModeAtom);
 	const setMapError = useSetAtom(mapErrorAtom);
 	const [placedMarkers, setPlacedMarkers] = useAtom(placedMarkersAtom);
-	const [isBuildingRoute] = useAtom(isBuildingRouteAtom);
 
 	const { location } = useLocationTracking(mapReady);
 
@@ -272,8 +266,6 @@ export function MapPage() {
 		console.log(`Selected service tab: ${id}`);
 	};
 
-
-
 	return (
 		<SafeAreaView style={styles.container}>
 			<MapWidget ref={webViewRef} onMessage={handleWebViewMessage} />
@@ -291,7 +283,7 @@ export function MapPage() {
 				<WeatherWidget temperature={temperature} />
 			</View>
 			<View style={styles.bottomPanel}>
-				<BottomNavBar/>
+				<BottomNavBar />
 			</View>
 		</SafeAreaView>
 	);
@@ -315,5 +307,4 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
 		marginTop: 'auto',
 	},
-
 });
