@@ -1,6 +1,7 @@
 import type { PressableProps } from 'react-native';
 
 import { AppButton } from './AppButton';
+import { IconButton } from './IconButton';
 
 // Экспортируем типы для использования в других компонентах
 export type ButtonVariant = 'primary' | 'secondary' | 'outline';
@@ -11,4 +12,4 @@ export interface AppButtonProps extends PressableProps {
 	disabled?: boolean;
 }
 
-export { AppButton };
+export { AppButton, IconButton };

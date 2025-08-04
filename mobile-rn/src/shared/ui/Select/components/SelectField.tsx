@@ -1,14 +1,11 @@
 import ArrowDownIcon from '@/assets/icons/arrow-down';
 import ArrowUpIcon from '@/assets/icons/arrow-up';
 import React, { ComponentRef } from 'react';
-import {
-	StyleSheet,
-	TouchableOpacity,
-} from 'react-native';
+import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import { Colors, Fonts } from '@/src/shared/tokens';
+import { Colors, Fonts } from '@/shared/tokens';
+
 import { AppText, AppTextInput } from '../../Text';
-
 import { SelectOption } from '../types';
 
 interface SelectFieldProps {

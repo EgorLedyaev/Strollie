@@ -1,6 +1,6 @@
 import { useSetAtom } from 'jotai';
 
-import { logoutAtom } from '@/src/entities/session';
+import { logoutAtom } from '@/entities/session';
 
 export const useLogout = () => {
 	const logout = useSetAtom(logoutAtom);

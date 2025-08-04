@@ -1,1 +1,0 @@
-export { ProfileNavGrid } from './ProfileNavGrid';

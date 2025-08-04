@@ -1,9 +1,8 @@
+import { Colors, Fonts } from '@/shared/tokens';
 import React from 'react';
 import { Animated, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Colors, Fonts } from '@/src/shared/tokens';
 import { AppText } from '../../Text';
-
 import { SelectOption as SelectOptionType } from '../types';
 import { SelectOption } from './SelectOption';
 

@@ -10,10 +10,10 @@ import {
 	citiesAtom,
 	citiesIsLoadingAtom,
 	fetchCitiesAtom,
-} from '@/src/entities/city';
-import { type User } from '@/src/entities/user';
-import { Colors, Fonts, Radius } from '@/src/shared/tokens';
-import { AppButton, AppText, Select, type SelectOption } from '@/src/shared/ui';
+} from '@/entities/city';
+import { type User } from '@/entities/user';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { AppButton, AppText, Select, type SelectOption } from '@/shared/ui';
 
 import { ProfileField } from './ProfileField';
 

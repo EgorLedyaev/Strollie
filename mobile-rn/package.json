@@ -23,6 +23,7 @@
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/drawer": "^7.3.9",
     "@react-navigation/native": "^7.1.6",
+    "@shopify/react-native-skia": "^2.2.0",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "axios": "^1.11.0",
     "eslint-plugin-react": "^7.37.5",

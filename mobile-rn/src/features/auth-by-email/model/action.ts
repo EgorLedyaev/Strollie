@@ -1,6 +1,6 @@
 import { atom, type Getter, type Setter } from 'jotai';
 
-import { userApi } from '@/src/entities/user';
+import { userApi } from '@/entities/user';
 
 import {
 	registrationErrorAtom,

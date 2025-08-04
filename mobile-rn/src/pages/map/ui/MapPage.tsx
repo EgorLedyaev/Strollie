@@ -1,36 +1,40 @@
-import { useLocationTracking } from '@/src/shared/lib';
 import { useAtom, useSetAtom } from 'jotai';
 import React, { useCallback, useRef, useState } from 'react';
-import {
-	ActionSheetIOS,
-	Alert,
-	Platform,
-	StyleSheet,
-	View,
-} from 'react-native';
+import { ActionSheetIOS, Alert, Platform, StyleSheet, View } from 'react-native';
 
-import { MapWidget } from '@/src/widgets/map';
-import { MapControls } from '@/src/widgets/map-controls';
-import { BuildRouteButton, useRouteBuilder } from '@/src/features/route-build';
-import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/src/entities/map';
-import { placedMarkersAtom } from '@/src/entities/marker';
-import { isBuildingRouteAtom } from '@/src/entities/route';
+
+
+import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/entities/map';
+import { placedMarkersAtom } from '@/entities/marker';
+import { useLocationTracking } from '@/shared/lib';
+
+
+
+import { MapControls } from './map-controls';
+import { MapWidget } from './map-widget';
+
+
 
 import 'react-native-get-random-values';
 
-import { ChatIcon } from '@/assets/icons/nav/ChatIcon';
-import { PlayRouteIcon } from '@/assets/icons/nav/PlayRouteIcon';
-import { ProfileIcon } from '@/assets/icons/nav/ProfileIcon';
+
+
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { v4 as uuidv4 } from 'uuid';
 
-import { NavBar } from '@/src/features/navigation';
-import { ServiceTabs } from '@/src/features/service-tabs';
-import { WeatherWidget } from '@/src/features/weather';
-import { type PlacedMarkerData } from '@/src/entities/marker';
-import { BottomNavBar } from '@/src/widgets/bottom-nav-bar';
+
+
+import { BottomNavBar } from '@/widgets/bottom-nav-bar';
+import { type PlacedMarkerData } from '@/entities/marker';
+import { Colors } from '@/shared/tokens';
+
+
+
+import { useRouteBuilder } from '../model/use-route-builder';
+import { WeatherWidget } from './map-widget/WeatherWidget';
+
 
 export function MapPage() {
 	const webViewRef = useRef<WebView>(null);
@@ -38,7 +42,6 @@ export function MapPage() {
 	const [is3DMode, setIs3DMode] = useAtom(is3DModeAtom);
 	const setMapError = useSetAtom(mapErrorAtom);
 	const [placedMarkers, setPlacedMarkers] = useAtom(placedMarkersAtom);
-	const [isBuildingRoute] = useAtom(isBuildingRouteAtom);
 
 	const { location } = useLocationTracking(mapReady);
 
@@ -262,20 +265,9 @@ export function MapPage() {
 
 	const [temperature, setTemperature] = useState(16);
 
-	const serviceTabs = [
-		{ id: 'feed', title: 'Лента' },
-		{ id: 'events', title: 'Афиша' },
-		{ id: 'settings', title: 'Настройки' },
-	];
-
-	const handleServiceTabSelect = (id: string) => {
-		console.log(`Selected service tab: ${id}`);
-	};
-
-
-
 	return (
-		<SafeAreaView style={styles.container}>
+		<>
+			<StatusBar style='dark' backgroundColor={Colors.optionHighlight} />
 			<MapWidget ref={webViewRef} onMessage={handleWebViewMessage} />
 			<MapControls
 				onZoomIn={handleZoomIn}
@@ -288,32 +280,19 @@ export function MapPage() {
 				onSearchResultSelect={handleSearchResultSelect}
 			/>
 			<View style={styles.weatherContainer}>
-				<WeatherWidget temperature={temperature} />
+				<WeatherWidget temperature={16} />
 			</View>
-			<View style={styles.bottomPanel}>
-				<BottomNavBar/>
-			</View>
-		</SafeAreaView>
+
+			<BottomNavBar />
+		</>
 	);
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
+
 	weatherContainer: {
 		position: 'absolute',
 		top: Platform.OS === 'ios' ? 120 : 100,
-		right: 20,
-		zIndex: 10,
+		right: 18,
 	},
-	bottomPanel: {
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
-		right: 0,
-		backgroundColor: 'transparent',
-		marginTop: 'auto',
-	},
-
 });

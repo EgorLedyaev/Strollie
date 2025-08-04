@@ -1,4 +1,4 @@
-import { Colors, Fonts } from '@/src/shared/tokens';
+import { Colors, Fonts } from '@/shared/tokens';
 import React from 'react';
 import {
 	StyleSheet,

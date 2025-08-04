@@ -1,23 +1,26 @@
 import EyeClosedIcon from '@/assets/icons/eye-closed';
 import EyeOpenedIcon from '@/assets/icons/eye-opened';
 import { useState } from 'react';
-import { NativeSyntheticEvent, Pressable, StyleSheet, TextInputFocusEventData, TextInputProps, View } from 'react-native';
+import {
+	NativeSyntheticEvent,
+	Pressable,
+	StyleSheet,
+	TextInputFocusEventData,
+	TextInputProps,
+	View,
+} from 'react-native';
 
+import { Colors } from '@/shared/tokens';
 
-
-import { Colors } from '@/src/shared/tokens';
-
-
-
+import { InputProps } from '.';
 import { AppTextInput } from '../Text';
-
 
 export const Input = ({
 	isPassword,
 	isInvalid,
 	style,
 	...props
-}: TextInputProps & { isPassword?: boolean; isInvalid?: boolean }) => {
+}: TextInputProps & InputProps) => {
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 

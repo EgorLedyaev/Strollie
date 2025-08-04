@@ -1,10 +1,9 @@
+import { Colors, Fonts } from '@/shared/tokens';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import { Colors, Fonts } from '@/src/shared/tokens';
-
-import { SelectOption as SelectOptionType } from '../types';
 import { AppText } from '../../Text';
+import { SelectOption as SelectOptionType } from '../types';
 
 interface SelectOptionProps {
 	item: SelectOptionType;

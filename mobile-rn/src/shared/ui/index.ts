@@ -2,7 +2,7 @@
 export { BackButton } from './BackButton';
 export { Select } from './Select';
 export type { SelectOption, SelectProps } from './Select';
-export { AppButton } from './Button';
+export { AppButton, IconButton } from './Button';
 export type { ButtonVariant, AppButtonProps } from './Button';
 export { CodeInput } from './CodeInput';
 export type { CodeInputProps } from './CodeInput';

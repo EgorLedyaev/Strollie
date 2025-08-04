@@ -1,4 +1,4 @@
-import { SelectOption } from "@/src/shared/ui";
+import { SelectOption } from "@/shared/ui";
 
 const MOCKED_CITIES: SelectOption[] = [
 	{ label: 'Калининград', value: 'kaliningrad' },

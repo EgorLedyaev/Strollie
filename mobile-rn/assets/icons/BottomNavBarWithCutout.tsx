@@ -3,10 +3,10 @@ import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import Svg, { Defs, Mask, Path, Rect, SvgProps } from 'react-native-svg';
 
 // --- КОНСТАНТЫ ИЗ ОРИГИНАЛЬНОГО SVG ---
-// Ширина выреза в пикселях. Не трогай.
-const CUTOUT_WIDTH = 120.348;
-// Высота самого бара. Можешь поменять, если нужно.
-const BAR_HEIGHT = 72;
+// Ширина выреза в пикселях. Не трогать.
+export const CUTOUT_WIDTH = 120.348;
+// Высота самого бара. Можно поменять, если нужно.
+export const BAR_HEIGHT = 72;
 // Вертикальная позиция "линии" бара, откуда начинается вырез.
 const BAR_TOP_Y = 0;
 // Радиус скругления для нижних углов.
@@ -83,17 +83,7 @@ export const BottomNavBarWithCutout = (props: SvgProps) => {
 };
 
 const styles = StyleSheet.create({
-	// eslint-disable-next-line react-native/no-color-literals
 	container: {
 		height: BAR_HEIGHT,
-		shadowColor: '#C6C6C6',
-		marginTop: 'auto',
-		shadowOffset: {
-			width: 0,
-			height: -3,
-		},
-		shadowOpacity: 0.25,
-		shadowRadius: 8,
-		elevation: 10, // для Android
 	},
 });

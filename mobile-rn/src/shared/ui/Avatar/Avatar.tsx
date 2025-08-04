@@ -1,8 +1,8 @@
+// Используем статический импорт вместо require
+import defaultAvatar from '@/assets/images/avatar.png';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-// Используем статический импорт вместо require
-import defaultAvatar from '../../../../assets/images/avatar.png';
 import { Colors } from '../../tokens';
 
 interface AvatarProps {

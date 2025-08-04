@@ -1,3 +1,4 @@
+import { Colors, Fonts } from '@/shared/tokens';
 import React, { ComponentRef, useEffect, useRef, useState } from 'react';
 import {
 	Animated,
@@ -7,8 +8,6 @@ import {
 	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
-
-import { Colors, Fonts } from '@/src/shared/tokens';
 
 import { AppText, AppTextInput } from '../Text';
 import { DropdownList, SelectField } from './components';

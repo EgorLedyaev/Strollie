@@ -1,8 +1,9 @@
 import ActionIcon from '@/assets/icons/action';
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
-import { Colors, Fonts } from '@/src/shared/tokens';
 import { useNavigation } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 interface HeaderProps {
 	email: string;

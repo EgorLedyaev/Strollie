@@ -50,7 +50,7 @@ export default defineConfig([
 							name: 'react-native',
 							importNames: ['Text', 'TextInput'],
 							message:
-								'Use AppText and AppTextInput from @/src/shared/ui instead',
+								'Use AppText and AppTextInput from @/shared/ui instead',
 						},
 					],
 					patterns: [

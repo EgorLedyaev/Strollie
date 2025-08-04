@@ -1,4 +1,4 @@
-import { type SelectOption } from '@/src/shared/ui';
+import { type SelectOption } from '@/shared/ui';
 import { atom } from 'jotai';
 
 import { getCities } from '../api/api';

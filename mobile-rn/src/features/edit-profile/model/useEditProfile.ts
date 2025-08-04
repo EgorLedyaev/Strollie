@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAtom } from 'jotai';
-import { profileAtom, User } from '@/src/entities/user';
+import { profileAtom, User } from '@/entities/user';
 
 interface EditProfileParams {
   firstName?: string;

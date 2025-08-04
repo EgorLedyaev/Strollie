@@ -1,7 +1,6 @@
+import { AppButton } from '@/shared/ui';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-
-import { AppButton } from '@/src/shared/ui';
 
 import { useEditProfile } from '../model';
 

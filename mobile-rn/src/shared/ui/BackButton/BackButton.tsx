@@ -6,8 +6,9 @@ import {
 	TouchableOpacityProps,
 } from 'react-native';
 
-import { Colors } from '@/src/shared/tokens';
+import { Colors } from '@/shared/tokens';
 
+// import ArrowLeftIcon from '@/assets/icons/arrow-left';
 import { AppText } from '../Text';
 
 interface BackButtonProps extends TouchableOpacityProps {

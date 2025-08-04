@@ -1,5 +1,5 @@
 // src/shared/api/geocoder.service.ts
-import { EXPO_PUBLIC_2GIS_API_KEY } from '@/src/shared/config/api';
+import { EXPO_PUBLIC_2GIS_API_KEY } from '@/shared/config/api';
 import axios from 'axios';
 
 const API_KEY = EXPO_PUBLIC_2GIS_API_KEY;

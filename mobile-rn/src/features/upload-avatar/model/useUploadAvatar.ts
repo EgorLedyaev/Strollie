@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAtom } from 'jotai';
 import * as ImagePicker from 'expo-image-picker';
-import { profileAtom } from '@/src/entities/user';
+import { profileAtom } from '@/entities/user';
 
 export const useUploadAvatar = () => {
   const [profile, setProfile] = useAtom(profileAtom);

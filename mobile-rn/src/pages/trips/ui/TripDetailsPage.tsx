@@ -1,10 +1,9 @@
+import { Colors } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { Colors } from '@/src/shared/tokens';
-import { AppText } from '@/src/shared/ui';
 
 export const TripDetailsPage: React.FC = () => {
 	const { id } = useLocalSearchParams();
