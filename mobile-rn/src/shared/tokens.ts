@@ -17,6 +17,9 @@ export const Colors = {
 	lightBackground: '#F6F6F6',
 	grayIcon: '#626262',
 	overlayBackground: '#F1F1F1', // Цвет фона для оверлея
+	grayBackground: '#F4F4F4', // Цвет фона для серых блоков
+	grayText: '#626262', // Цвет текста в серых блоках
+	backgroundBetweenNavbarAndPanel: '#F6F6F6', // Цвет фона между навбаром и панелью
 
 	// Цвета для форм и инпутов
 	inputBorder: '#E7E7E7',
@@ -59,11 +62,13 @@ export const Gaps = {
 
 export const Radius = {
 	r10: 10,
-	r20: 20,
+	r15: 15,
 	r16: 16,
+	r20: 20,
 };
 
 export const Fonts = {
+	f12: 12,
 	f14: 14,
 	f16: 16,
 	f18: 18,

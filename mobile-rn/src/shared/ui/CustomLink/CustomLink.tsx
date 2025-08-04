@@ -1,7 +1,8 @@
-import { Colors, Fonts } from '@/shared/tokens';
 import { Link } from 'expo-router';
 import { JSX } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppText } from '../Text';
 import { CustomLinkProps } from './CustomLinkProps';

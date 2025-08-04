@@ -1,8 +1,9 @@
-import AvatarIcon from '@/assets/icons/avatar';
+import AvatarIcon from '@/assets/icons/AvatarIcon';
 import { Link, LinkProps } from 'expo-router';
-import { StyleSheet, View, ViewProps } from 'react-native';
+import { StyleSheet, ViewProps } from 'react-native';
 
-import { Colors } from '@/shared/tokens';
+import { Colors, Radius } from '@/shared/tokens';
+import { IconButton } from '@/shared/ui';
 
 type ProfileButtonProps = LinkProps & {
 	pointerEvents?: ViewProps['pointerEvents'];
@@ -14,23 +15,22 @@ export const ProfileButton = ({
 }: ProfileButtonProps) => {
 	return (
 		<>
-			<Link {...linkProps}>
-				<View
+			<Link {...linkProps} asChild>
+				<IconButton
 					style={styles.iconContainer}
 					pointerEvents={pointerEvents}
 				>
 					<AvatarIcon />
-				</View>
+				</IconButton>
 			</Link>
 		</>
 	);
 };
 const styles = StyleSheet.create({
 	iconContainer: {
-		width: 50,
-		aspectRatio: 1,
-		height: 50,
-		borderRadius: 20,
+		width: 45,
+		height: 45,
+		borderRadius: Radius.r20,
 		backgroundColor: Colors.white,
 		justifyContent: 'center',
 		alignItems: 'center',

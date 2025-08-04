@@ -1,26 +1,28 @@
-import { geocodeAddress, PlacesAPIResult } from '@/shared/api';
-import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import React, { useCallback, useState } from 'react';
 import {
 	ActivityIndicator,
 	FlatList,
 	Platform,
 	StyleSheet,
-	Text,
-	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native';
+
+import { geocodeAddress, PlacesAPIResult } from '@/shared/api';
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
+import { AppText, AppTextInput } from '@/shared/ui';
 
 export interface SearchInputProps {
 	onSearchResultSelect: (
 		coordinates: [number, number], // [lon, lat]
 		addressText: string,
 	) => void;
+	style?: any; // Дополнительные стили для кастомизации
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({
 	onSearchResultSelect,
+	style,
 }) => {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [searchResults, setSearchResults] = useState<PlacesAPIResult[]>([]);
@@ -65,7 +67,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 
 	return (
 		<View style={styles.searchContainer}>
-			<TextInput
+			<AppTextInput
 				style={styles.searchInput}
 				placeholder='Поиск и выбор мест'
 				placeholderTextColor={Colors.lightGray}
@@ -96,16 +98,16 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 							onPress={() => handleSelectResult(item)}
 							style={styles.searchResultItem}
 						>
-							<Text style={styles.searchResultName}>
+							<AppText style={styles.searchResultName}>
 								{item.name}
-							</Text>
+							</AppText>
 							{item.address_name && (
-								<Text
+								<AppText
 									style={styles.searchResultDescription}
 									numberOfLines={1}
 								>
 									{item.address_name}
-								</Text>
+								</AppText>
 							)}
 						</TouchableOpacity>
 					)}
@@ -115,7 +117,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 			)}
 			{searchError && !isSearching && searchQuery.length >= 3 && (
 				<View style={styles.searchResultsList}>
-					<Text style={styles.searchErrorText}>{searchError}</Text>
+					<AppText style={styles.searchErrorText}>
+						{searchError}
+					</AppText>
 				</View>
 			)}
 		</View>
@@ -140,7 +144,7 @@ const styles = StyleSheet.create({
 		shadowOpacity: 0.1,
 		shadowRadius: 2,
 		elevation: 2,
-		includeFontPadding: false,
+		height: 45,
 	},
 	searchLoader: {
 		position: 'absolute',

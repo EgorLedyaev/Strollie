@@ -3,7 +3,8 @@ import { SplashScreen, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as JotaiProvider } from 'jotai';
 import { Suspense, useEffect } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -16,16 +17,18 @@ SplashScreen.preventAutoHideAsync();
 // Экспортируем функцию по умолчанию
 export default function RootLayout() {
 	return (
-		<JotaiProvider>
-			<KeyboardProvider>
-				<SafeAreaProvider>
-					<Suspense fallback={null}>
-						<StatusBar style='dark' />
-						<Root />
-					</Suspense>
-				</SafeAreaProvider>
-			</KeyboardProvider>
-		</JotaiProvider>
+		<GestureHandlerRootView style={style.container}>
+			<JotaiProvider>
+				<KeyboardProvider>
+					<SafeAreaProvider>
+						<Suspense fallback={null}>
+							<StatusBar style='dark' />
+							<Root />
+						</Suspense>
+					</SafeAreaProvider>
+				</KeyboardProvider>
+			</JotaiProvider>
+		</GestureHandlerRootView>
 	);
 }
 
@@ -90,3 +93,9 @@ function Root() {
 		</SessionProvider>
 	);
 }
+
+const style = StyleSheet.create({
+	container: {
+		flex: 1,
+	},
+});

@@ -33,7 +33,7 @@ import { Colors } from '@/shared/tokens';
 
 
 import { useRouteBuilder } from '../model/use-route-builder';
-import { WeatherWidget } from './WeatherWidget';
+import { WeatherWidget } from './map-widget/WeatherWidget';
 
 
 export function MapPage() {
@@ -280,7 +280,7 @@ export function MapPage() {
 				onSearchResultSelect={handleSearchResultSelect}
 			/>
 			<View style={styles.weatherContainer}>
-				<WeatherWidget temperature={temperature} />
+				<WeatherWidget temperature={16} />
 			</View>
 
 			<BottomNavBar />
@@ -293,7 +293,6 @@ const styles = StyleSheet.create({
 	weatherContainer: {
 		position: 'absolute',
 		top: Platform.OS === 'ios' ? 120 : 100,
-		right: 20,
-		zIndex: 10,
+		right: 18,
 	},
 });

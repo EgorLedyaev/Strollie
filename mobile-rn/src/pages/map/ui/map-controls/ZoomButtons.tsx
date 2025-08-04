@@ -5,6 +5,7 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 
 import { Colors, Radius } from '@/shared/tokens';
+import { IconButton } from '@/shared/ui';
 
 
 
@@ -18,18 +19,18 @@ export const ZoomButtons = ({
 	onZoomOut: () => void;
 }) => (
 	<View style={styles.container}>
-		<TouchableOpacity
+		<IconButton
 			style={{ ...styles.button, ...styles.plusIcon }}
 			onPress={onZoomIn}
 		>
 			<PlusIcon />
-		</TouchableOpacity>
-		<TouchableOpacity
+		</IconButton>
+		<IconButton
 			style={{ ...styles.button, ...styles.minusIcon }}
 			onPress={onZoomOut}
 		>
 			<MinusIcon />
-		</TouchableOpacity>
+		</IconButton>
 	</View>
 );
 

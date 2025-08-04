@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 
 
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
+import { AppText, IconButton } from '@/shared/ui';
 
 
 
@@ -19,7 +19,7 @@ export const ToggleModeButton = ({
 	onPress: () => void;
 	disabled: boolean;
 }) => (
-	<TouchableOpacity
+	<IconButton
 		style={[styles.button, disabled && styles.disabled]}
 		onPress={onPress}
 		disabled={disabled}
@@ -27,7 +27,7 @@ export const ToggleModeButton = ({
 		<AppText style={styles.text} allowFontScaling={false}>
 			{is3D ? '2D' : '3D'}
 		</AppText>
-	</TouchableOpacity>
+	</IconButton>
 );
 
 const styles = StyleSheet.create({

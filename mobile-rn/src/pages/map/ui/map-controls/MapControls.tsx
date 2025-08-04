@@ -28,12 +28,11 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 		<View style={styles.overlayContainer} pointerEvents='box-none'>
 			<View style={styles.header} pointerEvents='box-none'>
 				<View style={styles.searchBarContainer}>
-					<View style={styles.searchIconContainer}>
-						<ProfileButton
-							href={'/profile'}
-							pointerEvents={'auto'}
-						/>
-					</View>
+					<ProfileButton
+						href={'/profile'}
+						pointerEvents={'auto'}
+						style={styles.profileButton}
+					/>
 					<SearchInput
 						onSearchResultSelect={props.onSearchResultSelect}
 					/>
@@ -51,7 +50,7 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 						onPress={props.onToggleMode}
 						disabled={!props.mapReady}
 					/>
-					<View/>
+					<View />
 					<CenterOnUserButton
 						onPress={props.onNavigate}
 						disabled={!props.mapReady || !props.isLocationAvailable}
@@ -70,14 +69,14 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		paddingHorizontal: 16,
-		paddingTop: Platform.OS === 'ios' ? 50 : 40, // Адаптивный отступ сверху
+		paddingTop: Platform.OS === 'ios' ? 50 : 45, // Адаптивный отступ сверху
 	},
 	searchBarContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 10,
 	},
-	searchIconContainer: {
+	profileButton: {
 		width: 45,
 		height: 45,
 	},
@@ -91,7 +90,6 @@ const styles = StyleSheet.create({
 	zoomAndModeContainer: {
 		gap: Gaps.g8,
 		pointerEvents: 'auto',
-		
 	},
 	mapButton: {
 		width: 46,

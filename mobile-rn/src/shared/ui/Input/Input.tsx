@@ -12,6 +12,7 @@ import {
 
 import { Colors } from '@/shared/tokens';
 
+import { InputProps } from '.';
 import { AppTextInput } from '../Text';
 
 export const Input = ({
@@ -19,7 +20,7 @@ export const Input = ({
 	isInvalid,
 	style,
 	...props
-}: TextInputProps & { isPassword?: boolean; isInvalid?: boolean }) => {
+}: TextInputProps & InputProps) => {
 	const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 	const [isFocused, setIsFocused] = useState<boolean>(false);
 
