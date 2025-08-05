@@ -1,40 +1,33 @@
 import { useAtom, useSetAtom } from 'jotai';
 import React, { useCallback, useRef, useState } from 'react';
-import { ActionSheetIOS, Alert, Platform, StyleSheet, View } from 'react-native';
-
-
+import {
+	ActionSheetIOS,
+	Alert,
+	Platform,
+	StyleSheet,
+	View,
+} from 'react-native';
 
 import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from '@/entities/map';
 import { placedMarkersAtom } from '@/entities/marker';
 import { useLocationTracking } from '@/shared/lib';
 
-
-
 import { MapControls } from './map-controls';
 import { MapWidget } from './map-widget';
 
-
-
 import 'react-native-get-random-values';
-
-
 
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { v4 as uuidv4 } from 'uuid';
 
-
-
 import { BottomNavBar } from '@/widgets/bottom-nav-bar';
 import { type PlacedMarkerData } from '@/entities/marker';
-import { Colors } from '@/shared/tokens';
-
-
+import { Colors, Shadows } from '@/shared/tokens';
 
 import { useRouteBuilder } from '../model/use-route-builder';
-import { WeatherWidget } from './map-widget/WeatherWidget';
-
+import { SHADOW_PADDING, WeatherWidget } from './map-widget/WeatherWidget';
 
 export function MapPage() {
 	const webViewRef = useRef<WebView>(null);
@@ -44,6 +37,8 @@ export function MapPage() {
 	const [placedMarkers, setPlacedMarkers] = useAtom(placedMarkersAtom);
 
 	const { location } = useLocationTracking(mapReady);
+
+	const rightForWeatherWidget = { right: 16 - SHADOW_PADDING };
 
 	const sendMessageToWebView = useCallback((message: any) => {
 		if (webViewRef.current) {
@@ -279,20 +274,16 @@ export function MapPage() {
 				isLocationAvailable={!!location}
 				onSearchResultSelect={handleSearchResultSelect}
 			/>
-			<View style={styles.weatherContainer}>
-				<WeatherWidget temperature={16} />
+			<View style={[styles.weatherContainer, rightForWeatherWidget]}>
+				<WeatherWidget temperature={temperature} />
 			</View>
-
-			<BottomNavBar />
 		</>
 	);
 }
 
 const styles = StyleSheet.create({
-
 	weatherContainer: {
 		position: 'absolute',
 		top: Platform.OS === 'ios' ? 120 : 100,
-		right: 18,
 	},
 });

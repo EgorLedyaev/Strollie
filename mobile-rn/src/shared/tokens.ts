@@ -77,8 +77,14 @@ export const Fonts = {
 	f32: 32,
 	regular: 'SuisseIntl-Regular', // weight 400
 	// weight 450
-	
+
 	medium: 'SuisseIntl-Medium', // weight 500
 	semibold: 'SuisseIntl-SemiBold', // weight 600
 	bold: 'SuisseIntl-Bold', // weight 700
+};
+
+export const Shadows = {
+	boxShadow:
+		'-2px -4px 6px rgba(169,169,169,0.25), 2px  4px 6px rgba(169,169,169,0.25)',
+	boxShadow_elev2: '0px 1px 3px rgba(0,0,0,0.2)',
 };

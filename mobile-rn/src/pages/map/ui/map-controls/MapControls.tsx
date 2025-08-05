@@ -1,7 +1,7 @@
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
-import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
+import { Colors, Gaps, Radius, Shadows } from '@/shared/tokens';
 
 import { CenterOnUserButton } from './CenterOnUserButton';
 import { ProfileButton } from './ProfileButton';
@@ -27,16 +27,14 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 	return (
 		<View style={styles.overlayContainer} pointerEvents='box-none'>
 			<View style={styles.header} pointerEvents='box-none'>
-				<View style={styles.searchBarContainer}>
-					<ProfileButton
-						href={'/profile'}
-						pointerEvents={'auto'}
-						style={styles.profileButton}
-					/>
-					<SearchInput
-						onSearchResultSelect={props.onSearchResultSelect}
-					/>
-				</View>
+				<ProfileButton
+					href={'/profile'}
+					pointerEvents={'auto'}
+					style={styles.profileButton}
+				/>
+				<SearchInput
+					onSearchResultSelect={props.onSearchResultSelect}
+				/>
 			</View>
 			{/* Компонент погоды перенесен в основной экран */}
 			<View style={styles.mapControlsWrapper} pointerEvents='box-none'>
@@ -70,8 +68,6 @@ const styles = StyleSheet.create({
 	header: {
 		paddingHorizontal: 16,
 		paddingTop: Platform.OS === 'ios' ? 50 : 45, // Адаптивный отступ сверху
-	},
-	searchBarContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 10,
@@ -79,6 +75,7 @@ const styles = StyleSheet.create({
 	profileButton: {
 		width: 45,
 		height: 45,
+		boxShadow: Shadows.boxShadow,
 	},
 	mapControlsWrapper: {
 		position: 'absolute',
@@ -98,10 +95,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r16,
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.2,
-		shadowRadius: 2,
-		elevation: 3,
+		boxShadow: Shadows.boxShadow,
 	},
 });

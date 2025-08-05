@@ -21,8 +21,7 @@ const PLAY_ICON_PATH =
 	'M41.9773 34.7326C38.4318 32.7065 34 35.2392 34 39.2914V47.7076C34 51.7599 38.4318 54.2926 41.9773 52.2664L49.3409 48.0583C52.8864 46.0322 52.8864 40.9669 49.3409 38.9407L41.9773 34.7326Z';
 const GRADIENT_COLORS = ['#1BF57E', '#1CC4C4'];
 const GRADIENT_POSITIONS = [0.165793, 1];
-const SHADOW_COLOR_1 = 'rgba(169, 169, 169, 0.25)';
-const SHADOW_COLOR_2 = 'rgba(170, 170, 170, 0.25)';
+const SHADOW_COLOR = 'rgba(169, 169, 169, 0.25)';
 const PRESSED_OVERLAY_COLOR = 'rgba(31, 31, 31, 0.2)';
 
 interface RouteToggleButtonProps extends ViewProps {
@@ -34,8 +33,8 @@ const renderBase = () => (
 	<Group
 		layer={
 			<Paint>
-				<Shadow dx={2} dy={4} blur={3} color={SHADOW_COLOR_1} />
-				<Shadow dx={-2} dy={-4} blur={3} color={SHADOW_COLOR_2} />
+				<Shadow dx={2} dy={4} blur={6} color={SHADOW_COLOR} />
+				<Shadow dx={-2} dy={-4} blur={6} color={SHADOW_COLOR} />
 			</Paint>
 		}
 	>

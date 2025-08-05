@@ -2,14 +2,8 @@ import { MinusIcon, PlusIcon } from '@/assets/icons/map';
 import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-
-
-import { Colors, Radius } from '@/shared/tokens';
+import { Colors, Radius, Shadows } from '@/shared/tokens';
 import { IconButton } from '@/shared/ui';
-
-
-
-
 
 export const ZoomButtons = ({
 	onZoomIn,
@@ -43,13 +37,9 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		justifyContent: 'center',
 		backgroundColor: Colors.white,
-		elevation: 4,
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.25,
-		shadowRadius: 8,
 		width: 46,
 		height: 46,
+		boxShadow: Shadows.boxShadow,
 	},
 	plusIcon: {
 		borderTopStartRadius: Radius.r16,

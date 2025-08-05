@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Colors } from '../../tokens';
+import { Colors, Shadows } from '../../tokens';
 
 interface CardProps {
 	children: React.ReactNode;
@@ -17,13 +17,6 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 		borderRadius: 16,
 		padding: 16,
-		shadowColor: Colors.black,
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 2,
+		...Shadows.shadow1
 	},
 });

@@ -59,7 +59,7 @@ export function useLocationTracking(isEnabled: boolean = true) {
 					},
 					newLocation => {
 						if (isMounted) {
-							console.log('Location update:', newLocation.coords); // Для отладки
+							// console.log('Location update:', newLocation.coords); // Для отладки
 							setLocation(newLocation.coords);
 							setLocationError(null); // Сбрасываем ошибку при успехе
 						}

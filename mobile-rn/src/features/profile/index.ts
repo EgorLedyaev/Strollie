@@ -4,7 +4,7 @@ import {
 	type UserProfileData,
 } from './ui/EditProfileScreen';
 import { Grid } from './ui/Grid';
-import { Header } from './ui/Header';
+import { ProfileHeader } from './ui/ProfileHeader';
 import { ProfileInfo } from './ui/ProfileInfo';
 import { ProfileMenuOverlay } from './ui/ProfileMenuOverlay';
 
@@ -13,7 +13,7 @@ export {
 	EditProfileScreen,
 	ProfileInfo,
 	Grid,
-	Header,
+	ProfileHeader,
 	ProfileMenuOverlay,
 
 	// Types
