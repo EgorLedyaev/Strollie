@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Colors } from '../../tokens';
+import { Colors, Shadows } from '../../tokens';
 import { AppText } from '../Text';
 
 interface DialogProps {
@@ -61,14 +61,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 		borderRadius: 16,
 		padding: 20,
-		shadowColor: Colors.black,
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		shadowOpacity: 0.25,
-		shadowRadius: 4,
-		elevation: 5,
+		...Shadows.shadow3,
 	},
 	title: {
 		fontSize: 18,

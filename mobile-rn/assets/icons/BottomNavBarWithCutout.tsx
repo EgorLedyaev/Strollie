@@ -1,89 +1,107 @@
+import {
+	Canvas,
+	Path,
+	PathOp,
+	processTransform2d,
+	Shadow,
+	Skia,
+} from '@shopify/react-native-skia';
 import * as React from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import Svg, { Defs, Mask, Path, Rect, SvgProps } from 'react-native-svg';
+import { useDerivedValue } from 'react-native-reanimated';
 
-// --- КОНСТАНТЫ ИЗ ОРИГИНАЛЬНОГО SVG ---
-// Ширина выреза в пикселях. Не трогать.
-export const CUTOUT_WIDTH = 120.348;
-// Высота самого бара. Можно поменять, если нужно.
+// --- КОНСТАНТЫ ---
+const CUTOUT_WIDTH = 120.348;
 export const BAR_HEIGHT = 72;
-// Вертикальная позиция "линии" бара, откуда начинается вырез.
-const BAR_TOP_Y = 0;
-// Радиус скругления для нижних углов.
 const CORNER_RADIUS = 20;
 
-// Это данные для кривой выреза, нормализованные для использования в маске.
-// Они рисуют кривую от правого края к левому.
+// Параметры тени
+const SHADOW_OFFSET_Y = 1;
+const SHADOW_BLUR = 3;
+const SHADOW_COLOR = 'rgba(0,0,0,0.2)';
+
+// Вычисляем вертикальный отступ, чтобы тень не обрезалась.
+// Нужен отступ сверху для верхнего размытия и снизу для смещения + нижнего размытия.
+// Возьмем максимальное значение для простоты и добавим небольшой запас.
+export const VERTICAL_PADDING = SHADOW_BLUR * 5 + Math.abs(SHADOW_OFFSET_Y);
+
+// Новая общая высота контейнера
+const TOTAL_HEIGHT = BAR_HEIGHT + VERTICAL_PADDING;
+
 const CUTOUT_CURVE_COMMANDS =
 	'C 109.702,0 101.687,8.4003 100.327,18.959 ' +
 	'C 98.133,36.0019 90.214,56.3774 59.732,56.3774 ' +
 	'C 28.557,56.3774 21.271,35.8003 19.506,18.7736 ' +
 	'C 18.417,8.2666 10.564,0 0,0';
 
-// Создаем замкнутый путь для маски.
-const MASK_CUTOUT_PATH = `M ${CUTOUT_WIDTH},0 ${CUTOUT_CURVE_COMMANDS} L 0,0 Z`;
+const CUTOUT_SHAPE_PATH_COMMANDS = `M ${CUTOUT_WIDTH},0 ${CUTOUT_CURVE_COMMANDS} L 0,0 Z`;
 
-export const BottomNavBarWithCutout = (props: SvgProps) => {
-	// Получаем реальную ширину экрана
+export const BottomNavBarWithCutout = () => {
 	const { width } = useWindowDimensions();
 
-	// Вычисляем X-координату для начала выреза, чтобы он был идеально по центру
-	const cutoutX = (width - CUTOUT_WIDTH) / 2;
+	const finalPath = useDerivedValue(() => {
+		// --- Все пути создаются относительно y=0 ---
+
+		const mainPath = Skia.Path.Make();
+		mainPath.addRRect(
+			Skia.RRectXY(
+				Skia.XYWHRect(0, 0, width, BAR_HEIGHT),
+				CORNER_RADIUS,
+				CORNER_RADIUS,
+			),
+		);
+
+		const cutoutPath = Skia.Path.MakeFromSVGString(
+			CUTOUT_SHAPE_PATH_COMMANDS,
+		);
+
+		if (!cutoutPath) {
+			console.warn('Skia cutout path could not be created.');
+			return mainPath;
+		}
+
+		const cutoutX = (width - CUTOUT_WIDTH) / 2;
+		cutoutPath.transform(processTransform2d([{ translateX: cutoutX }]));
+
+		const combinedPath = Skia.Path.MakeFromOp(
+			mainPath,
+			cutoutPath,
+			PathOp.Difference,
+		);
+
+		// --- А вот здесь мы смещаем ИТОГОВУЮ фигуру вниз, чтобы освободить место для тени СВЕРХУ ---
+		if (combinedPath) {
+			combinedPath.transform(
+				processTransform2d([{ translateY: VERTICAL_PADDING / 2 }]),
+			);
+		}
+
+		return combinedPath ?? mainPath;
+	}, [width]);
 
 	return (
-		// 1. Контейнер View для позиционирования и тени
+		// Контейнер теперь выше, чтобы вместить тень
 		<View style={[styles.container, { width }]}>
-			<Svg
-				width={width} // Растягиваем на всю ширину
-				height={BAR_HEIGHT} // Фиксированная высота
-				// НИКАКОГО viewBox! Мы работаем в абсолютных координатах.
-				{...props} // Передаем остальные пропсы, если нужно
-			>
-				{/* 2. Определяем маску (наш трафарет) */}
-				<Defs>
-					<Mask id='mask'>
-						{/* Сначала рисуем белый фон - это то, что будет видно */}
-						<Rect
-							x='0'
-							y='0'
-							width={width}
-							height={BAR_HEIGHT}
-							fill='white'
-						/>
-
-						{/*
-						  Теперь поверх белого фона рисуем наш вырез, но ЧЕРНЫМ цветом.
-						  Черный цвет в маске означает "сделать эту область прозрачной".
-						  Мы используем transform, чтобы сдвинуть наш заранее заготовленный
-						  путь точно в центр верхнего края.
-						*/}
-						<Path
-							d={MASK_CUTOUT_PATH}
-							fill='black'
-							transform={`translate(${cutoutX}, ${BAR_TOP_Y})`}
-						/>
-					</Mask>
-				</Defs>
-
-				{/* 3. Рисуем финальную фигуру */}
-				{/* Это простой белый прямоугольник во всю ширину с закруглениями */}
-				<Rect
-					x='0'
-					y='0'
-					width='100%'
-					height='100%'
-					fill='white'
-					rx={CORNER_RADIUS} // Скругляем углы
-					// 4. Применяем нашу маску к этому прямоугольнику
-					mask='url(#mask)'
-				/>
-			</Svg>
+			<Canvas style={styles.canvas}>
+				<Path path={finalPath} color='white'>
+					<Shadow
+						dx={0}
+						dy={SHADOW_OFFSET_Y}
+						blur={SHADOW_BLUR}
+						color={SHADOW_COLOR}
+					/>
+				</Path>
+			</Canvas>
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
-		height: BAR_HEIGHT,
+		// Высота теперь учитывает отступ для тени
+		height: TOTAL_HEIGHT,
+	},
+	canvas: {
+		flex: 1,
 	},
 });

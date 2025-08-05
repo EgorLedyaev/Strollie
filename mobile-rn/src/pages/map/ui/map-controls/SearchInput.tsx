@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import { geocodeAddress, PlacesAPIResult } from '@/shared/api';
-import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
+import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
 import { AppText, AppTextInput } from '@/shared/ui';
 
 export interface SearchInputProps {
@@ -139,12 +139,8 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f14,
 		fontFamily: Fonts.regular,
 		color: Colors.black,
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 1 },
-		shadowOpacity: 0.1,
-		shadowRadius: 2,
-		elevation: 2,
 		height: 45,
+		boxShadow: Shadows.boxShadow,
 	},
 	searchLoader: {
 		position: 'absolute',
@@ -162,7 +158,6 @@ const styles = StyleSheet.create({
 		borderColor: Colors.gray,
 		borderWidth: 1,
 		zIndex: 100,
-		elevation: 3,
 	},
 	searchResultItem: {
 		paddingHorizontal: Gaps.g16,
