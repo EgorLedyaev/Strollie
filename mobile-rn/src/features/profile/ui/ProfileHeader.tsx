@@ -1,58 +1,64 @@
 import ActionIcon from '@/assets/icons/action';
 import ArrowLeftIcon from '@/assets/icons/arrow-left';
 import { useNavigation } from 'expo-router';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Colors, Fonts } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
+import { User } from '@/entities/user';
+import { Colors, Fonts, Shadows } from '@/shared/tokens';
+import { AppText, IconButton } from '@/shared/ui';
+
+import { ProfileInfo } from './ProfileInfo';
 
 interface HeaderProps {
-	email: string;
+	user: User;
 	onMenuPress: () => void;
 }
 
-export function ProfileHeader({ email, onMenuPress }: HeaderProps) {
+const HIT_SLOP = { top: 15, bottom: 15, left: 15, right: 15 };
+export function ProfileHeader({ user, onMenuPress }: HeaderProps) {
 	const navigation = useNavigation();
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<TouchableOpacity
+				<IconButton
 					onPress={() => navigation.goBack()}
-					style={styles.iconButton}
-					hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+					hitSlop={HIT_SLOP}
+					feedback='opacity'
 				>
 					<ArrowLeftIcon />
-				</TouchableOpacity>
-				<AppText style={styles.text}>{email}</AppText>
-				<TouchableOpacity
+				</IconButton>
+				<AppText style={styles.text}>@{user?.email}</AppText>
+				<IconButton
 					onPress={onMenuPress}
-					style={styles.iconButton}
-					hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+					hitSlop={HIT_SLOP}
+					feedback='opacity'
 				>
 					<ActionIcon />
-				</TouchableOpacity>
+				</IconButton>
 			</View>
+			<ProfileInfo user={user} />
 		</View>
 	);
 }
 
 const styles = StyleSheet.create({
 	container: {
-		// width: '100%',
 		height: 160,
+		justifyContent: 'space-between',
+		padding: 16,
+		backgroundColor: Colors.white,
+		borderRadius: 20,
+		marginBottom: 20,
+		boxShadow: Shadows.boxShadow_elev2,
 	},
 	header: {
+		// flex: 1,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginTop: -5,
 	},
 	text: {
 		color: Colors.darkGray,
 		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f16,
-	},
-	iconButton: {
-		padding: 5, // Увеличиваем область кнопки
 	},
 });

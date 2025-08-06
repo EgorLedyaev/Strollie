@@ -1,38 +1,35 @@
 import BirthdayIcon from '@/assets/icons/BirthdayIcon';
-import LocationIcon from '@/assets/icons/map/LocationIcon';
 import OutLinePointerIcon from '@/assets/profile/OutlinePointerIcon';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { UserProfileData } from '@/features/profile/ui/EditProfileScreen';
 import { type User } from '@/entities/user';
 import { Colors, Fonts } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
 
 interface ProfileInfoProps {
-	user: User;
-	profileData?: UserProfileData;
+	user?: User;
 }
 
-export function ProfileInfo({ user, profileData }: ProfileInfoProps) {
-	const fullName = profileData
-		? `${profileData.firstName} ${profileData.lastName}`
+export function ProfileInfo({ user }: ProfileInfoProps) {
+	const fullName = user
+		? `${user.firstName} ${user.lastName}`
 		: 'Иван Иванов';
 
-	const nickname = profileData?.nickname || user.email;
-	const birthDate = profileData?.birthDate || user.created_at;
-	const city = profileData?.city || 'Не указан';
+	const birthDate = user?.birthDate || 'Не указана';
+	const city = user?.city || 'Не указан';
 
 	return (
 		<View style={styles.profile}>
 			<View style={styles.avatar}></View>
 			<View style={styles.description}>
-				<Text style={styles.info}>{fullName}</Text>
+				<AppText style={styles.info}>{fullName}</AppText>
 				<View style={styles.infoRow}>
 					<OutLinePointerIcon />
-					<Text style={styles.text}>{city}</Text>
+					<AppText style={styles.text}>{city}</AppText>
 				</View>
 				<View style={styles.infoRow}>
 					<BirthdayIcon />
-					<Text style={styles.text}>{birthDate}</Text>
+					<AppText style={styles.text}>{birthDate}</AppText>
 				</View>
 			</View>
 		</View>
@@ -41,7 +38,7 @@ export function ProfileInfo({ user, profileData }: ProfileInfoProps) {
 
 const styles = StyleSheet.create({
 	profile: {
-		alignItems: 'flex-end',
+		alignItems: 'center',
 		flexDirection: 'row',
 		gap: 20,
 	},
@@ -49,19 +46,17 @@ const styles = StyleSheet.create({
 		width: 100,
 		height: 100,
 		borderRadius: 50,
-		backgroundColor: Colors.gray,
+		backgroundColor: Colors.grayAvatar,
 	},
 	infoRow: {
 		flexDirection: 'row',
-		alignItems: 'center',
 		gap: 5,
 	},
 	text: {
-		color: Colors.black,
+		fontSize: Fonts.f14,
 	},
 	info: {
 		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f16,
 	},
-	description: { gap: 1 },
+	description: { gap: 9 },
 });

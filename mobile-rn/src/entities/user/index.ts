@@ -1,11 +1,2 @@
-// Публичный API слайса user
-import { userApi } from './api/api';
-import { User } from './model/user.model';
-
-export {
-	// API
-	userApi,
-
-	// Types
-	type User,
-};
+export { userApi } from './api/api';
+export type { User } from './model/user.model';

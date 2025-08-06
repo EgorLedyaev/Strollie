@@ -4,11 +4,11 @@
 export const Colors = {
 	// Основные цвета
 	black: '#000000',
-	blackLight: '#2E2D3D', // Темно-серый как у violetDark
 	white: '#FFFFFF',
 
 	// Серые оттенки
 	gray: '#E5E5E5',
+	grayAvatar: '#B1B1B1', // Цвет фона аватара
 	darkGray: '#606060',
 	lightGray: '#919191',
 	textGray: '#6D6D6D',
@@ -77,8 +77,6 @@ export const Fonts = {
 	f24: 24,
 	f32: 32,
 	regular: 'SuisseIntl-Regular', // weight 400
-	// weight 450
-
 	medium: 'SuisseIntl-Medium', // weight 500
 	semibold: 'SuisseIntl-SemiBold', // weight 600
 	bold: 'SuisseIntl-Bold', // weight 700

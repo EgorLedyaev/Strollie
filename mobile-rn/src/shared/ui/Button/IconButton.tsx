@@ -12,24 +12,25 @@ import Animated, {
 	withTiming,
 } from 'react-native-reanimated';
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 interface IconButtonProps extends Omit<PressableProps, 'children'> {
 	style?: View['props']['style'];
 	children: ReactNode | ((state: PressableStateCallbackType) => ReactNode);
+	feedback?: 'overlay' | 'opacity';
+	opacity?: number; // Прозрачность для эффекта "opacity"
 }
+
 export const IconButton: React.FC<IconButtonProps> = ({
 	style,
 	onPress,
 	children,
 	disabled = false,
+	feedback = 'overlay', // По умолчанию - затемнение
+	opacity = 0.3,
 	...props
 }) => {
 	const pressProgress = useSharedValue(0);
-
-	const animatedStyle = useAnimatedStyle(() => {
-		return {
-			backgroundColor: `rgba(0, 0, 0, ${pressProgress.value * 0.25})`,
-		};
-	});
 
 	const handlePressIn = () => {
 		pressProgress.value = withTiming(1, { duration: 100 });
@@ -39,13 +40,32 @@ export const IconButton: React.FC<IconButtonProps> = ({
 		pressProgress.value = withTiming(0, { duration: 200 });
 	};
 
+	// Анимированный стиль для оверлея
+	const overlayAnimatedStyle = useAnimatedStyle(() => {
+		return {
+			backgroundColor: `rgba(0, 0, 0, ${pressProgress.value * 0.25})`,
+		};
+	});
+
+	// Анимированный стиль для прозрачности контента
+	const animatedStyle = useAnimatedStyle(() => {
+		if (feedback === 'opacity') {
+			return {
+				opacity: 1 - pressProgress.value * (1 - opacity),
+			};
+		} else {
+			// Для overlay режима возвращаем пустой объект
+			return {};
+		}
+	});
+
 	return (
-		<Pressable
-			style={[styles.button, style]}
+		<AnimatedPressable
 			onPress={onPress}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
 			disabled={disabled}
+			style={[styles.button, style, animatedStyle]}
 			{...props}
 		>
 			{(pressableState: PressableStateCallbackType) => (
@@ -53,13 +73,15 @@ export const IconButton: React.FC<IconButtonProps> = ({
 					{typeof children === 'function'
 						? children(pressableState)
 						: children}
-					<Animated.View
-						style={[styles.overlay, animatedStyle]}
-						pointerEvents='none'
-					/>
+					{feedback === 'overlay' && (
+						<Animated.View
+							style={[styles.overlay, overlayAnimatedStyle]}
+							pointerEvents='none'
+						/>
+					)}
 				</>
 			)}
-		</Pressable>
+		</AnimatedPressable>
 	);
 };
 
@@ -67,10 +89,8 @@ const styles = StyleSheet.create({
 	button: {
 		justifyContent: 'center',
 		alignItems: 'center',
-		// overflow: 'hidden' нужен, чтобы overlay не вылезал за скругленные углы
 		overflow: 'hidden',
 	},
-
 	overlay: {
 		...StyleSheet.absoluteFillObject,
 	},

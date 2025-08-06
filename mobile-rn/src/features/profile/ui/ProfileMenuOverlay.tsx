@@ -1,6 +1,8 @@
-import { Colors, Fonts, Radius } from '@/shared/tokens';
 import React from 'react';
-import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, StyleSheet, View } from 'react-native';
+
+import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
+import { AppText, IconButton } from '@/shared/ui';
 
 interface ProfileMenuOverlayProps {
 	visible: boolean;
@@ -26,57 +28,63 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 			animationType='fade'
 			onRequestClose={onClose}
 		>
-			<TouchableOpacity
+			<IconButton
 				style={styles.overlay}
-				activeOpacity={1}
 				onPress={onClose}
+				feedback='opacity'
+				opacity={1}
 			>
 				<View
 					style={styles.menuContainer}
 					onStartShouldSetResponder={() => true}
 				>
-					<TouchableOpacity
+					<IconButton
 						style={styles.menuItem}
 						onPress={onEditProfile}
-						activeOpacity={0.7}
+						feedback='opacity'
 					>
-						<Text style={styles.menuText}>
+						<AppText style={styles.menuText}>
 							Редактировать профиль
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
+						</AppText>
+					</IconButton>
+					<IconButton
 						style={styles.menuItem}
 						onPress={onSettings}
-						activeOpacity={0.7}
+						feedback='opacity'
 					>
-						<Text style={styles.menuText}>Настройки</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
+						<AppText style={styles.menuText}>Настройки</AppText>
+					</IconButton>
+					<IconButton
 						style={styles.menuItem}
 						onPress={onHelp}
-						activeOpacity={0.7}
+						feedback='opacity'
 					>
-						<Text style={styles.menuText}>Помощь</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.menuItem, styles.logoutItem]}
-						onPress={() => {
-							// Закрываем меню перед выходом
-							onClose();
-							// Делаем небольшую паузу перед выходом
-							setTimeout(() => {
-								// Выполняем выход из аккаунта
-								onLogout();
-							}, 300);
-						}}
-						activeOpacity={0.7}
-					>
-						<Text style={[styles.menuText, styles.logoutText]}>
-							Выйти из аккаунта
-						</Text>
-					</TouchableOpacity>
+						<AppText style={styles.menuText}>Помощь</AppText>
+					</IconButton>
+					<View>
+						<View style={styles.divider} />
+						<IconButton
+							style={styles.menuItem}
+							onPress={() => {
+								// Закрываем меню перед выходом
+								onClose();
+								// Делаем небольшую паузу перед выходом
+								setTimeout(() => {
+									// Выполняем выход из аккаунта
+									onLogout();
+								}, 300);
+							}}
+							feedback='opacity'
+						>
+							<AppText
+								style={[styles.menuText, styles.logoutText]}
+							>
+								Выйти из аккаунта
+							</AppText>
+						</IconButton>
+					</View>
 				</View>
-			</TouchableOpacity>
+			</IconButton>
 		</Modal>
 	);
 };
@@ -84,40 +92,36 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 const styles = StyleSheet.create({
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.4)',
+		backgroundColor: Colors.shadowButton,
 		justifyContent: 'flex-start',
 		alignItems: 'flex-end',
 		paddingTop: 80,
-		paddingRight: 20,
+		paddingRight: 32,
 	},
 	menuContainer: {
 		width: 246,
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,
 		padding: 20,
-		shadowColor: Colors.black,
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
+		paddingLeft: 25,
+		boxShadow: Shadows.boxShadow,
+		gap: 20,
 	},
 	menuItem: {
-		paddingVertical: 14, // Увеличиваем вертикальный отступ
-		paddingHorizontal: 10, // Добавляем горизонтальный отступ
+		alignItems: 'flex-start',
 	},
 	menuText: {
-		fontFamily: Fonts.regular,
-		fontSize: 14,
+		fontSize: Fonts.f14,
 		color: Colors.black,
 	},
-	logoutItem: {
-		marginTop: 10,
-		borderTopWidth: 1,
-		borderTopColor: '#f0f0f0',
-		paddingTop: 20,
-	},
+
 	logoutText: {
-		color: '#E53935', // Красный цвет для кнопки выхода
+		color: Colors.red,
 		fontFamily: Fonts.medium,
+	},
+	divider: {
+		borderTopWidth: 1,
+		borderTopColor: Colors.gray,
+		marginBottom: 10
 	},
 });
