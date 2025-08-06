@@ -14,7 +14,6 @@ export { AppText, AppTextInput } from './Text';
 
 // Новые компоненты для FSD
 export { Avatar } from './Avatar';
-export { Card } from './Card';
 export { Dialog } from './Dialog';
 export { Tag } from './Tag';
 export { CalendarGrid } from './CalendarGrid';

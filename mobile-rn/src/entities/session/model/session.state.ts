@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { atom } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
-import { User } from '@/entities/user/@x/session';
+import type { User } from '@/entities/user/@x/session';
 
 /**
  * Тип для состояния сессии.

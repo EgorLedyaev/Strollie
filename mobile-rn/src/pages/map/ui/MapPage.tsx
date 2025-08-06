@@ -22,7 +22,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import { v4 as uuidv4 } from 'uuid';
 
-import { BottomNavBar } from '@/widgets/bottom-nav-bar';
 import { type PlacedMarkerData } from '@/entities/marker';
 import { Colors, Shadows } from '@/shared/tokens';
 

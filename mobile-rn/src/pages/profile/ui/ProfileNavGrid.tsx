@@ -1,33 +1,32 @@
-// Импортируем иконки для навигационной сетки
+import BecomeGuideIcon from '@/assets/icons/BecomeGuideIcon';
 import CalendarIcon from '@/assets/profile/calendar';
 import RouteIcon from '@/assets/profile/route';
 import SavedRouteIcon from '@/assets/profile/saved-route';
 import TicketsIcon from '@/assets/profile/tickets';
 import TravelsIcon from '@/assets/profile/travels';
-import { Link } from 'expo-router';
+import { Link, type LinkProps } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 
-import { Colors } from '@/shared/tokens';
-import { AppText, Card } from '@/shared/ui';
 
-// import TravelsIcon from '@/assets/profile/travels';
+
+import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
+import { AppText, IconButton } from '@/shared/ui';
+
+
+
+
 
 interface NavItem {
 	id: string;
 	title: string;
 	icon: React.ReactNode;
-	path: string;
+	path: LinkProps['href'];
 }
 
 export const ProfileNavGrid: React.FC = () => {
 	const navItems: NavItem[] = [
-		{
-			id: 'calendar',
-			title: 'Мой календарь',
-			icon: <CalendarIcon />,
-			path: '/calendar',
-		},
 		{
 			id: 'tickets',
 			title: 'Мои билеты',
@@ -41,64 +40,89 @@ export const ProfileNavGrid: React.FC = () => {
 			path: '/trips',
 		},
 		{
-			id: 'routes-history',
-			title: 'История маршрутов',
-			icon: <RouteIcon />,
-			path: '/routes/history',
-		},
-		{
 			id: 'saved-routes',
 			title: 'Сохраненные маршруты',
 			icon: <SavedRouteIcon />,
 			path: '/routes/saved',
 		},
+		{
+			id: 'routes-history',
+			title: 'История маршрутов',
+			icon: <RouteIcon />,
+			path: '/routes/history',
+		},
+
+		{
+			id: 'calendar',
+			title: 'Календарь',
+			icon: <CalendarIcon />,
+			path: '/calendar',
+		},
+		{
+			id: 'become-a-guide',
+			title: 'FAQ / Стать гидом',
+			icon: <BecomeGuideIcon />,
+			path: '/guide',
+		},
 	];
 
+	const chunkArray = (array: NavItem[], chunkSize: number): NavItem[][] => {
+		const chunks: NavItem[][] = [];
+		for (let i = 0; i < array.length; i += chunkSize) {
+			chunks.push(array.slice(i, i + chunkSize));
+		}
+		return chunks;
+	};
+
+	const navItemChunks = chunkArray(navItems, 2);
+
 	return (
-		<View style={styles.container}>
-			<Card style={styles.grid}>
-				{navItems.map(item => (
-					<Link key={item.id} href={item.path} asChild>
-						<TouchableOpacity style={styles.navItem}>
-							<View style={styles.iconContainer}>
-								{item.icon}
-							</View>
-							<AppText style={styles.navText}>
-								{item.title}
-							</AppText>
-						</TouchableOpacity>
-					</Link>
-				))}
-			</Card>
+		<View style={styles.gridContainer}>
+			{navItemChunks.map((chunk, rowIndex) => (
+				<View key={`row-${rowIndex}`} style={styles.gridRow}>
+					{chunk.map(item => (
+						<Link key={item.id} href={item.path} asChild>
+							<IconButton style={styles.gridItemContent}>
+								<AppText
+									style={styles.gridText}
+								>
+									{item.title}
+								</AppText>
+								<View style={styles.gridIcon}>{item.icon}</View>
+							</IconButton>
+						</Link>
+					))}
+				</View>
+			))}
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		marginHorizontal: 16,
-		marginTop: 8,
+	gridContainer: {
+		gap: Gaps.g15,
 	},
-	grid: {
+	gridRow: {
 		flexDirection: 'row',
-		flexWrap: 'wrap',
-		justifyContent: 'space-between',
-		padding: 16,
+		gap: Gaps.g15,
 	},
-	navItem: {
-		width: '48%',
-		backgroundColor: Colors.lightBackground,
-		borderRadius: 12,
-		padding: 16,
-		marginBottom: 16,
-		alignItems: 'center',
+	gridItemContent: {
+		flex: 1,
+		justifyContent: 'flex-start',
+		alignItems: 'flex-start',
+		backgroundColor: Colors.white,
+		height: 130,
+		borderRadius: Radius.r15,
+		boxShadow: Shadows.boxShadow_elev2,
+		padding: 24,
 	},
-	iconContainer: {
-		marginBottom: 12,
-	},
-	navText: {
-		fontSize: 14,
-		textAlign: 'center',
+	gridText: {
+		fontFamily: Fonts.semibold,
 		color: Colors.headerAndInputText,
+	},
+	gridIcon: {
+		position: 'absolute',
+		right: 16,
+		bottom: 16,
 	},
 });

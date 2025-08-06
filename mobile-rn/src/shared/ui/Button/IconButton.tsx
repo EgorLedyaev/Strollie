@@ -41,7 +41,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
 	return (
 		<Pressable
-			style={styles.container}
+			style={[styles.button, style]}
 			onPress={onPress}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
@@ -49,7 +49,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 			{...props}
 		>
 			{(pressableState: PressableStateCallbackType) => (
-				<View style={[styles.button, style]}>
+				<>
 					{typeof children === 'function'
 						? children(pressableState)
 						: children}
@@ -57,16 +57,13 @@ export const IconButton: React.FC<IconButtonProps> = ({
 						style={[styles.overlay, animatedStyle]}
 						pointerEvents='none'
 					/>
-				</View>
+				</>
 			)}
 		</Pressable>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		alignItems: 'center',
-	},
 	button: {
 		justifyContent: 'center',
 		alignItems: 'center',
