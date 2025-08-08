@@ -1,8 +1,9 @@
-import { AppButton } from '@/shared/ui';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { useEditProfile } from '../model';
+import { AppButton } from '@/shared/ui';
+
+import { useEditProfile } from '../model/useEditProfile';
 
 interface SaveProfileButtonProps {
 	onPress: () => Promise<void>;

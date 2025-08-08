@@ -3,3 +3,7 @@
 ```bash
 npx steiger ./src
 ```
+
+```bash
+eas build --platform android --profile preview --local
+```

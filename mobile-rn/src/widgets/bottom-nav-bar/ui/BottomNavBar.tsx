@@ -1,4 +1,7 @@
-import { BottomNavBarWithCutout, VERTICAL_PADDING as NAV_BAR_VERTICAL_PADDING } from '@/assets/icons/BottomNavBarWithCutout';
+import {
+	BottomNavBarWithCutout,
+	VERTICAL_PADDING as NAV_BAR_VERTICAL_PADDING,
+} from '@/assets/icons/BottomNavBarWithCutout';
 import FeedIcon from '@/assets/icons/FeedIcon';
 import MessengerIcon from '@/assets/icons/MessengerIcon';
 import NotificationIcon from '@/assets/icons/NotificationIcon';
@@ -7,17 +10,17 @@ import SettingsIcon from '@/assets/icons/SettingsIcon';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
-
-
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+	withTiming,
+} from 'react-native-reanimated';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
 
-
-
 import { RouteToggleButton } from './RouteToggleButton';
-
 
 // КОНСТАНТЫ
 const NAV_BAR_HEIGHT = 72;
@@ -152,6 +155,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 							<IconButton
 								style={styles.navBarButton}
 								children={<MessengerIcon />}
+								onPress={handleNavChatPress}
 							/>
 
 							<RouteToggleButton
@@ -161,7 +165,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 							/>
 							<IconButton
 								style={styles.navBarButton}
-								onPress={handleNavChatPress}
+								onPress={handleNavNotificationPress}
 								children={<NotificationIcon />}
 							/>
 						</View>
@@ -222,7 +226,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-evenly',
 		paddingTop: 16,
-		boxShadow: Shadows.boxShadow_elev2,
+		boxShadow: Shadows.boxShadow_elev1,
 	},
 	panelContent: {
 		alignItems: 'center',
@@ -244,7 +248,7 @@ const styles = StyleSheet.create({
 		height: 40,
 		borderRadius: Radius.r16,
 		backgroundColor: Colors.grayBackground,
-		boxShadow: Shadows.boxShadow_elev2,
+		boxShadow: Shadows.boxShadow_elev1,
 	},
 
 	centerButton: {
@@ -256,7 +260,7 @@ const styles = StyleSheet.create({
 		height: 50,
 		backgroundColor: Colors.grayBackground,
 		borderRadius: Radius.r16,
-		boxShadow: Shadows.boxShadow_elev2,
+		boxShadow: Shadows.boxShadow_elev1,
 	},
 	panelButtonText: {
 		color: Colors.grayText,

@@ -111,7 +111,7 @@ export function UserDataPage() {
 				backgroundColor={Colors.lightBackground}
 			/>
 
-			<BackButton style={[styles.backButton, { top: backButtonTop }]} />
+			<BackButton style={[styles.backButton, { top: backButtonTop }]} onPress={() => router.back()} />
 			<KeyboardAwareScrollView
 				contentContainerStyle={styles.scrollContainer}
 				showsVerticalScrollIndicator={false}

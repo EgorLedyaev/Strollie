@@ -1,40 +1,65 @@
 import ActionIcon from '@/assets/icons/action';
-import ArrowLeftIcon from '@/assets/icons/arrow-left';
-import { useNavigation } from 'expo-router';
+import ArrowLeftSmallIcon from '@/assets/icons/arrow/ArrowLeftSmallIcon';
+import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+
+
 import { User } from '@/entities/user';
-import { Colors, Fonts, Shadows } from '@/shared/tokens';
+import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
+
+
 
 import { ProfileInfo } from './ProfileInfo';
 
+
 interface HeaderProps {
 	user: User;
-	onMenuPress: () => void;
+	onBackPress: () => void;
+	// Передаем координаты якоря кнопки для позиционирования меню
+	onMenuPress: (anchor: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	}) => void;
 }
 
 const HIT_SLOP = { top: 15, bottom: 15, left: 15, right: 15 };
-export function ProfileHeader({ user, onMenuPress }: HeaderProps) {
-	const navigation = useNavigation();
+export function ProfileHeader({ user, onBackPress, onMenuPress }: HeaderProps) {
+	const menuBtnRef = useRef<View>(null);
+
+	const handleMenuPress = () => {
+		// Измеряем положение кнопки в координатах окна
+		menuBtnRef.current?.measureInWindow?.((x, y, width, height) => {
+			onMenuPress({ x, y, width, height });
+		});
+		
+	};
+	
+
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<IconButton
-					onPress={() => navigation.goBack()}
+					onPress={onBackPress}
 					hitSlop={HIT_SLOP}
 					feedback='opacity'
 				>
-					<ArrowLeftIcon />
+					<ArrowLeftSmallIcon />
 				</IconButton>
-				<AppText style={styles.text}>@{user?.email}</AppText>
-				<IconButton
-					onPress={onMenuPress}
-					hitSlop={HIT_SLOP}
-					feedback='opacity'
-				>
-					<ActionIcon />
-				</IconButton>
+				<AppText style={styles.text}>@{user?.nickname}</AppText>
+				{/* Оборачиваем кнопку меню во View с ref, чтобы измерить её позицию */}
+				<View ref={menuBtnRef} collapsable={false}>
+					<IconButton
+						onPress={handleMenuPress}
+						hitSlop={HIT_SLOP}
+						feedback='opacity'
+					>
+						<ActionIcon />
+					</IconButton>
+				</View>
 			</View>
 			<ProfileInfo user={user} />
 		</View>
@@ -47,12 +72,11 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		padding: 16,
 		backgroundColor: Colors.white,
-		borderRadius: 20,
+		borderRadius: Radius.r20,
 		marginBottom: 20,
-		boxShadow: Shadows.boxShadow_elev2,
+		boxShadow: Shadows.boxShadow_elev1,
 	},
 	header: {
-		// flex: 1,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',

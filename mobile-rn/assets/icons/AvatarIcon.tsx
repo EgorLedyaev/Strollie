@@ -2,7 +2,7 @@ import * as React from 'react';
 import Svg, { Circle, Path, SvgProps } from 'react-native-svg';
 
 const AvatarIcon = (props: SvgProps) => (
-	<Svg {...props} width={24} height={24} fill='none'>
+	<Svg width={24} height={24} fill='none' {...props}>
 		<Circle cx={12} cy={6} r={6} fill='#626262' />
 		<Path
 			fill='#626262'

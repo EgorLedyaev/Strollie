@@ -1,3 +1,4 @@
+
 /**
  * Цветовая палитра приложения
  */
@@ -20,6 +21,8 @@ export const Colors = {
 	grayBackground: '#F4F4F4', // Цвет фона для серых блоков
 	grayText: '#626262', // Цвет текста в серых блоках
 	backgroundBetweenNavbarAndPanel: '#F6F6F6', // Цвет фона между навбаром и панелью
+	grayTextButtonOverlay: '#A3A3A3', // Цвет текста кнопки в оверлее
+	grayTextOverlay: '#383838', // Цвет текста в оверлее
 
 	// Цвета для форм и инпутов
 	inputBorder: '#E7E7E7',
@@ -28,6 +31,7 @@ export const Colors = {
 	placeHolderInput: '#B3B3B3', // Цвет плейсхолдера в инпутах
 	searchDivider: '#D7D7D7', // Цвет разделителя в поле поиска
 	inputOptionBorder: '#F4F4F4', // Цвет бордера опций в выпадающем списке
+	divider: '#B1B1B1', // Цвет разделителя 
 
 	// Цвета для скроллбара
 	scrollbarTrack: '#DDDDDD', // Цвет фона скроллбара
@@ -36,7 +40,7 @@ export const Colors = {
 	// Цвета выделения
 	optionHighlight: 'rgba(31, 31, 31, 0.1)', // Цвет выделения опции в выпадающем списке
 	backgroundMapStatus: 'rgba(255,255,255,0.8)',
-	shadowButton: 'rgba(169, 169, 169, 0.25)',
+	shadowButton: 'rgba(169, 169, 169, 0.5)',
 
 	// Зеленые оттенки
 	successGreen: '#45CD86',
@@ -44,15 +48,18 @@ export const Colors = {
 	greenPrimary: '#1FD975',
 	greenSecondary: '#1CC4C4',
 	greenHover: '#027962',
+	greenIconLight: '#3DEA90', // Светлый зеленый для иконок
+	greenIconDark: '#1EB18C', // Темный зеленый для иконок
 
 	// Другие цвета
-	red: '#CC384E',
-	error: '#CC384E', // Alias for red for error messages
+	red: '#FF5858',
+	error: '#FF5858', 
 
 	transparent: 'transparent',
 };
 
 export const Gaps = {
+	g5: 5,
 	g8: 8,
 	g12: 12,
 	g15: 15,
@@ -62,6 +69,7 @@ export const Gaps = {
 };
 
 export const Radius = {
+	r8: 8,
 	r10: 10,
 	r15: 15,
 	r16: 16,
@@ -86,4 +94,11 @@ export const Shadows = {
 	boxShadow:
 		'-2px -4px 6px rgba(169,169,169,0.25), 2px  4px 6px rgba(169,169,169,0.25)',
 	boxShadow_elev2: '0px 1px 3px rgba(0,0,0,0.2)',
+	boxShadow_elev1: '0 2px 4px rgba(0, 0, 0, 0.01), 0 1px 2px rgba(0, 0, 0, 0.03)',
+};
+
+export const Sizes = {
+	button: {
+		sm: 32,
+	},
 };

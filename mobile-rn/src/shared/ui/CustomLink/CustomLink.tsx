@@ -6,6 +6,7 @@ import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppText } from '../Text';
 import { CustomLinkProps } from './CustomLinkProps';
+import { IconButton } from '../Button';
 
 /**
  * Компонент для создания кастомной ссылки с текстом.
@@ -20,9 +21,9 @@ export const CustomLink = ({
 }: CustomLinkProps): JSX.Element => {
 	return (
 		<Link {...props} asChild>
-			<TouchableOpacity>
+			<IconButton feedback='opacity'>
 				<AppText style={styles.link}>{text}</AppText>
-			</TouchableOpacity>
+			</IconButton>
 		</Link>
 	);
 };

@@ -1,21 +1,36 @@
 {
-  "cli": {
-    "version": ">= 16.17.4",
-    "appVersionSource": "remote"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
-    },
-    "production": {
-      "autoIncrement": true
-    }
-  },
-  "submit": {
-    "production": {}
-  }
+	"cli": {
+		"version": ">= 16.17.4",
+		"appVersionSource": "remote"
+	},
+	"build": {
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal"
+		},
+		"preview": {
+			"distribution": "internal",
+			"android": {
+				"buildType": "apk"
+			},
+			"cache": {
+				"env": {
+					"EAS_BUILD_DISABLE_MAVEN_CACHE": "0"
+				},
+				"paths": [
+					"android/.gradle",
+					"android/app/build",
+					"android/app/src/main/assets",
+					"android/app/src/main/res/drawable",
+					"android/app/src/main/res/mipmap"
+				]
+			}
+		},
+		"production": {
+			"autoIncrement": true
+		}
+	},
+	"submit": {
+		"production": {}
+	}
 }

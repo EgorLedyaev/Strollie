@@ -1,5 +1,5 @@
-import ArrowDownIcon from '@/assets/icons/arrow-down';
-import ArrowUpIcon from '@/assets/icons/arrow-up';
+import ArrowDownIcon from '@/assets/icons/arrow/arrow-down';
+import ArrowUpIcon from '@/assets/icons/arrow/arrow-up';
 import React, { ComponentRef } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 

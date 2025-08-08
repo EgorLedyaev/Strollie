@@ -1,11 +1,10 @@
 import EditPhotoIcon from '@/assets/icons/EditPhotoIcon';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Colors } from '@/shared/tokens';
-import { Avatar } from '@/shared/ui';
+import { Avatar, IconButton } from '@/shared/ui';
 
-import { useUploadAvatar } from '../model';
+import { useUploadAvatar } from '../model/useUploadAvatar';
 
 interface AvatarUploaderProps {
 	size?: number;
@@ -28,7 +27,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 
 	return (
 		<View style={styles.container}>
-			<TouchableOpacity
+			<IconButton
 				onPress={handleUpload}
 				disabled={isLoading}
 				style={styles.avatarContainer}
@@ -37,7 +36,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 				<View style={styles.iconContainer}>
 					<EditPhotoIcon />
 				</View>
-			</TouchableOpacity>
+			</IconButton>
 		</View>
 	);
 };
@@ -49,21 +48,11 @@ const styles = StyleSheet.create({
 	},
 	avatarContainer: {
 		position: 'relative',
+		borderRadius: 50,
 	},
 	iconContainer: {
-		position: 'absolute',
-		bottom: 0,
-		right: 0,
-		backgroundColor: Colors.white,
-		borderRadius: 12,
-		padding: 6,
-		shadowColor: Colors.black,
-		shadowOffset: {
-			width: 0,
-			height: 2,
-		},
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 2,
+		...StyleSheet.absoluteFillObject,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
 });

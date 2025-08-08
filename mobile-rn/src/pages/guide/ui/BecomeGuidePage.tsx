@@ -9,7 +9,7 @@ export function BecomeGuidePage() {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				<AppText variant='h2'>Стать гидом Strollie</AppText>
+				<AppText style={styles.title}>Стать гидом Strollie</AppText>
 				<AppText>
 					Здесь будет форма заявки или информация для будущих гидов.
 				</AppText>
@@ -29,7 +29,11 @@ const styles = StyleSheet.create({
 		borderRadius: 20,
 		padding: 16,
 		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'center',
+	},
+	title: {
+		fontSize: 20,
+		fontWeight: 'bold',
+		marginBottom: 16,
+		color: Colors.black,
 	},
 });

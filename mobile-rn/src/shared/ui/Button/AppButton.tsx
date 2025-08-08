@@ -1,21 +1,16 @@
-import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
-import {
-	ActivityIndicator,
-	GestureResponderEvent,
-	Platform,
-	Pressable,
-	PressableProps,
-	StyleSheet,
-} from 'react-native';
-import Animated, {
-	useAnimatedStyle,
-	useSharedValue,
-	withTiming,
-} from 'react-native-reanimated';
+import { ActivityIndicator, GestureResponderEvent, Pressable, PressableProps, StyleSheet } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+
+
+
+import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
+
+
 
 import { AppText } from '../Text';
+
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
@@ -23,18 +18,23 @@ interface AppButtonProps extends PressableProps {
 	text: string;
 	isLoading?: boolean;
 	variant?: ButtonVariant;
+	buttonColor?: string;
+	buttonBorderRadius?: number;
+	textColor?: string;
+	textFontSize?: number;
+	textFontFamily?: string;
+	dimFactor?: number;
+	sizeActivityIndicator?: number | 'large' | 'small' | undefined;
 }
 
 // Цвета градиента
-// Цвета градиента - обновлены в соответствии с макетом
 const GRADIENT_START = Colors.greenPrimary;
 const GRADIENT_END = Colors.greenSecondary;
 
-function dimColor(hex: string): string {
+function dimColor(hex: string, dimFactor = 0.75): string {
 	const r = parseInt(hex.slice(1, 3), 16);
 	const g = parseInt(hex.slice(3, 5), 16);
 	const b = parseInt(hex.slice(5, 7), 16);
-	const dimFactor = 0.5;
 	const dimR = Math.round(r * dimFactor);
 	const dimG = Math.round(g * dimFactor);
 	const dimB = Math.round(b * dimFactor);
@@ -46,26 +46,43 @@ export const AppButton = ({
 	isLoading,
 	variant = 'primary',
 	disabled,
+	buttonColor = Colors.grayBackground,
+	buttonBorderRadius = Radius.r20,
+	textColor = Colors.white,
+	textFontSize = Fonts.f18,
+	textFontFamily = Fonts.semibold,
+	dimFactor = 0.85,
+	sizeActivityIndicator = 'large',
+	style,
 	...props
 }: AppButtonProps) => {
-	const pressed = useSharedValue(0);
 	const scale = useSharedValue(1);
 
-	const gradientColors = [GRADIENT_START, GRADIENT_END] as const;
-	const dimmedGradientColors = [
+	const isSecondary = variant === 'secondary';
+
+	const primaryColors = [GRADIENT_START, GRADIENT_END] as const;
+	const dimmedPrimaryColors = [
 		dimColor(GRADIENT_START),
 		dimColor(GRADIENT_END),
 	] as const;
-	const disabledColors = [Colors.disabledGray, Colors.disabledGray] as const;
-	// Используем useMemo для обновления цветов при изменении disabled
-	const [currentColors, setCurrentColors] = useState(
-		disabled ? disabledColors : gradientColors,
-	);
+	const secondaryColors = [buttonColor, buttonColor] as const;
+	const dimmedSecondaryColors = [
+		dimColor(buttonColor, dimFactor),
+		dimColor(buttonColor, dimFactor),
+	] as const;
 
-	// Обновляем цвета при изменении disabled
+	const disabledColors = [Colors.disabledGray, Colors.disabledGray] as const;
+
+	const getInitialColors = () => {
+		if (disabled) return disabledColors;
+		return isSecondary ? secondaryColors : primaryColors;
+	};
+
+	const [currentColors, setCurrentColors] = useState(getInitialColors);
+
 	useEffect(() => {
-		setCurrentColors(disabled ? disabledColors : gradientColors);
-	}, [disabled]);
+		setCurrentColors(getInitialColors());
+	}, [disabled, variant]);
 
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
@@ -76,27 +93,35 @@ export const AppButton = ({
 	const handlePressIn = (e: GestureResponderEvent) => {
 		if (disabled) return;
 
-		pressed.value = withTiming(1, { duration: 100 });
 		scale.value = withTiming(0.97, { duration: 100 });
-		setCurrentColors(dimmedGradientColors);
+		setCurrentColors(
+			isSecondary ? dimmedSecondaryColors : dimmedPrimaryColors,
+		);
 		props.onPressIn?.(e);
 	};
 
 	const handlePressOut = (e: GestureResponderEvent) => {
 		if (disabled) return;
 
-		pressed.value = withTiming(0, { duration: 200 });
 		scale.value = withTiming(1, { duration: 200 });
-		setCurrentColors(gradientColors);
+		setCurrentColors(isSecondary ? secondaryColors : primaryColors);
 		props.onPressOut?.(e);
 	};
-
+	const textStyle = {
+		fontSize: textFontSize,
+		fontFamily: textFontFamily,
+		color: disabled
+			? Colors.grayMedium
+			: isSecondary
+				? textColor
+				: Colors.white,
+	};
 	return (
 		<Pressable
+			style={style}
 			{...props}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
-			style={styles.pressable}
 		>
 			<Animated.View style={[styles.buttonContainer, animatedStyle]}>
 				<LinearGradient
@@ -104,9 +129,13 @@ export const AppButton = ({
 					start={{ x: 0, y: 0 }}
 					end={{ x: 0, y: 1 }}
 					style={[
-						styles.button,
-						variant === 'outline' ? styles.outlineButton : null,
-						variant !== 'outline' ? styles.shadow : null,
+						styles.gradient,
+						variant !== 'outline' && !isSecondary
+							? styles.shadow
+							: null,
+						{
+							borderRadius: buttonBorderRadius,
+						},
 					]}
 				>
 					{!isLoading && (
@@ -114,6 +143,7 @@ export const AppButton = ({
 							style={[
 								styles.text,
 								disabled && styles.disabledText,
+								textStyle,
 							]}
 						>
 							{text}
@@ -121,7 +151,7 @@ export const AppButton = ({
 					)}
 					{isLoading && (
 						<ActivityIndicator
-							size='large'
+							size={sizeActivityIndicator}
 							color={
 								variant === 'outline'
 									? Colors.greenPrimary
@@ -136,43 +166,22 @@ export const AppButton = ({
 };
 
 const styles = StyleSheet.create({
-	pressable: {
-		width: '100%',
-	},
 	buttonContainer: {
 		width: '100%',
+		height: '100%',
 	},
-	button: {
+	gradient: {
+		flex: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
 		padding: 10,
-		borderRadius: Radius.r20,
-		height: 58,
 		overflow: 'hidden',
 	},
-	outlineButton: {
-		borderWidth: 1.5,
-		borderColor: Colors.greenPrimary,
-	},
 	shadow: {
-		...Platform.select({
-			ios: {
-				shadowColor: Colors.black,
-				shadowOffset: { width: 0, height: 2 },
-				shadowOpacity: 0.1,
-				shadowRadius: 4,
-			},
-			android: {
-				elevation: 3,
-			},
-		}),
+		boxShadow: Shadows.boxShadow_elev2,
 	},
 	text: {
-		fontSize: Fonts.f18,
-		fontFamily: Fonts.semibold,
 		textAlign: 'center',
-		color: Colors.white,
-		includeFontPadding: false,
 	},
 	disabledText: {
 		color: Colors.grayMedium,

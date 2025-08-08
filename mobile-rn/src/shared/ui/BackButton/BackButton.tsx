@@ -1,55 +1,70 @@
-import ArrowLeftIcon from '@/assets/icons/arrow-left';
-import { router } from 'expo-router';
-import {
-	StyleSheet,
-	TouchableOpacity,
-	TouchableOpacityProps,
-} from 'react-native';
+import ArrowLeftLargeIcon from '@/assets/icons/arrow/ArrowLeftLargeIcon';
+import ArrowLeftSmallIcon from '@/assets/icons/arrow/ArrowLeftSmallIcon';
+import { StyleSheet, TouchableOpacityProps } from 'react-native';
 
-import { Colors } from '@/shared/tokens';
+import { Colors, Gaps, Radius, Sizes } from '@/shared/tokens';
 
-// import ArrowLeftIcon from '@/assets/icons/arrow-left';
+import { IconButton } from '../Button';
 import { AppText } from '../Text';
 
-interface BackButtonProps extends TouchableOpacityProps {
+type BackButtonVariant = 'icon' | 'text';
+interface BackButtonProps extends Omit<TouchableOpacityProps, 'onPress'> {
 	text?: string;
-	onPress?: () => void;
+	onPress: () => void;
+	variant?: BackButtonVariant;
 }
 
 export const BackButton = ({
 	text = 'Вернуться',
-	onPress = () => router.back(),
+	onPress,
 	style,
+	variant = 'text',
 	...props
 }: BackButtonProps) => {
+	const isTextVariant = variant === 'text';
 	return (
-		<TouchableOpacity
-			style={[styles.backButton, style]}
+		<IconButton
+			style={[
+				style,
+				isTextVariant ? styles.textContainer : styles.iconContainer,
+			]}
 			onPress={onPress}
+			feedback={isTextVariant ? 'opacity' : 'overlay'}
 			{...props}
 		>
-			<ArrowLeftIcon
-				style={styles.backButtonIcon}
-				stroke={Colors.greenLink}
-			/>
-			<AppText style={styles.backLinkText}>{text}</AppText>
-		</TouchableOpacity>
+			{isTextVariant ? (
+				<>
+					<ArrowLeftLargeIcon
+						style={styles.largeIcon}
+						stroke={Colors.greenLink}
+					/>
+					<AppText style={styles.text}>{text}</AppText>
+				</>
+			) : (
+				<ArrowLeftSmallIcon />
+			)}
+		</IconButton>
 	);
 };
 
 const styles = StyleSheet.create({
-	backButton: {
+	textContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		width: 101,
-		height: 20,
 	},
-	backButtonIcon: {
-		marginRight: 5,
-		width: 19,
+	iconContainer: {
+		width: Sizes.button.sm,
+		height: Sizes.button.sm,
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r8,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
-	backLinkText: {
-		fontSize: 16,
+	// Стили для текстового варианта
+	largeIcon: {
+		marginRight: Gaps.g5,
+	},
+	text: {
 		color: Colors.greenLink,
 	},
 });

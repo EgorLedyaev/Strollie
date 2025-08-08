@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useAtomValue } from 'jotai';
-import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import {
 	SafeAreaView,
 	useSafeAreaInsets,
@@ -11,6 +11,7 @@ import {
 import { useLogout } from '@/features/logout';
 import { ProfileHeader, ProfileMenuOverlay } from '@/features/profile';
 import { sessionAtom } from '@/entities/session';
+import { loadUserProfileAtom, userProfileAtom } from '@/entities/user';
 import { Colors } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
@@ -18,10 +19,49 @@ import { ProfileNavGrid } from './ProfileNavGrid';
 
 export const ProfilePage: React.FC = () => {
 	const session = useAtomValue(sessionAtom);
-	const userProfile = session?.userProfile;
+	const [userState] = useAtom(userProfileAtom);
+	const loadProfile = useSetAtom(loadUserProfileAtom);
+
 	const [isMenuVisible, setMenuVisible] = useState(false);
+	const [menuAnchor, setMenuAnchor] = useState<{
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} | null>(null);
 	const logout = useLogout();
 	const insets = useSafeAreaInsets();
+
+	useEffect(() => {
+		// Загружаем профиль, только если его еще нет или если мы хотим обновить
+		if (session.userProfile?.email && !userState.profile) {
+			loadProfile(session.userProfile.email);
+		}
+	}, [session.userProfile, userState.profile, loadProfile]);
+
+	if (userState.isLoading) {
+		return (
+			<SafeAreaView style={styles.container}>
+				<View style={styles.centered}>
+					<ActivityIndicator
+						size='large'
+						color={Colors.greenPrimary}
+					/>
+				</View>
+			</SafeAreaView>
+		);
+	}
+	const userProfile = userState.profile;
+
+	if (userState.error) {
+		return (
+			<SafeAreaView style={styles.container}>
+				<View style={styles.centered}>
+					<AppText>Ошибка: {userState.error}</AppText>
+				</View>
+			</SafeAreaView>
+		);
+	}
 
 	if (!userProfile) {
 		return (
@@ -60,7 +100,11 @@ export const ProfilePage: React.FC = () => {
 			<StatusBar style='dark' backgroundColor={Colors.lightBackground} />
 			<ProfileHeader
 				user={userProfile}
-				onMenuPress={() => setMenuVisible(true)}
+				onBackPress={() => router.back()}
+				onMenuPress={anchor => {
+					setMenuAnchor(anchor);
+					setMenuVisible(true);
+				}}
 			/>
 			<ProfileNavGrid />
 			<ProfileMenuOverlay
@@ -70,6 +114,8 @@ export const ProfilePage: React.FC = () => {
 				onSettings={handleSettings}
 				onHelp={handleHelp}
 				onLogout={handleLogout}
+				anchor={menuAnchor ?? undefined}
+				offset={{ dx: menuAnchor?.width, dy: menuAnchor?.y }}
 			/>
 		</SafeAreaView>
 	);

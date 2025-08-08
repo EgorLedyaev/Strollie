@@ -5,7 +5,7 @@ const EditPhotoIcon = (props: SvgProps) => (
 	<Svg
 		width={16}
 		height={16}
-		fill='none'
+		
 		{...props}
 	>
 		<Path

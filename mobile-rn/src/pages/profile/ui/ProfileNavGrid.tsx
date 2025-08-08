@@ -1,22 +1,17 @@
-import BecomeGuideIcon from '@/assets/icons/BecomeGuideIcon';
-import CalendarIcon from '@/assets/profile/calendar';
-import RouteIcon from '@/assets/profile/route';
-import SavedRouteIcon from '@/assets/profile/saved-route';
-import TicketsIcon from '@/assets/profile/tickets';
-import TravelsIcon from '@/assets/profile/travels';
+import BecomeGuideIcon from '@/assets/profile/BecomeGuideIcon';
+import CalendarIcon from '@/assets/profile/CalendarIcon';
+import RouteIcon from '@/assets/profile/RouteIcon';
+import SavedRouteIcon from '@/assets/profile/SavedRouteIcon';
+import TicketsIcon from '@/assets/profile/TicketsIcon';
+import TravelsIcon from '@/assets/profile/TravelsIcon';
 import { Link, type LinkProps } from 'expo-router';
-import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-
-
+import React, { useState } from 'react';
+import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
 
-
-
-
+import { GridItemBackground } from './GridItemBackground';
 
 interface NavItem {
 	id: string;
@@ -24,6 +19,42 @@ interface NavItem {
 	icon: React.ReactNode;
 	path: LinkProps['href'];
 }
+
+// Отдельный компонент для элемента сетки, чтобы управлять его состоянием
+const GridItem: React.FC<{ item: NavItem }> = ({ item }) => {
+	const [layout, setLayout] = useState<{
+		width: number;
+		height: number;
+	} | null>(null);
+
+	const handleLayout = (event: LayoutChangeEvent) => {
+		const { width, height } = event.nativeEvent.layout;
+		setLayout({ width, height });
+	};
+
+	return (
+		<Link href={item.path} asChild>
+			<IconButton
+				style={styles.gridItemContainer}
+				onLayout={handleLayout}
+			>
+				{/* Слой Фона */}
+				{layout && (
+					<GridItemBackground
+						width={layout.width}
+						height={layout.height}
+					/>
+				)}
+
+				{/* Слой Контента */}
+				<View style={styles.gridItemContent}>
+					<AppText style={styles.gridText}>{item.title}</AppText>
+					<View style={styles.gridIcon}>{item.icon}</View>
+				</View>
+			</IconButton>
+		</Link>
+	);
+};
 
 export const ProfileNavGrid: React.FC = () => {
 	const navItems: NavItem[] = [
@@ -51,7 +82,6 @@ export const ProfileNavGrid: React.FC = () => {
 			icon: <RouteIcon />,
 			path: '/routes/history',
 		},
-
 		{
 			id: 'calendar',
 			title: 'Календарь',
@@ -66,6 +96,7 @@ export const ProfileNavGrid: React.FC = () => {
 		},
 	];
 
+	// ... (логика chunkArray остается без изменений)
 	const chunkArray = (array: NavItem[], chunkSize: number): NavItem[][] => {
 		const chunks: NavItem[][] = [];
 		for (let i = 0; i < array.length; i += chunkSize) {
@@ -73,7 +104,6 @@ export const ProfileNavGrid: React.FC = () => {
 		}
 		return chunks;
 	};
-
 	const navItemChunks = chunkArray(navItems, 2);
 
 	return (
@@ -81,16 +111,7 @@ export const ProfileNavGrid: React.FC = () => {
 			{navItemChunks.map((chunk, rowIndex) => (
 				<View key={`row-${rowIndex}`} style={styles.gridRow}>
 					{chunk.map(item => (
-						<Link key={item.id} href={item.path} asChild>
-							<IconButton style={styles.gridItemContent}>
-								<AppText
-									style={styles.gridText}
-								>
-									{item.title}
-								</AppText>
-								<View style={styles.gridIcon}>{item.icon}</View>
-							</IconButton>
-						</Link>
+						<GridItem key={item.id} item={item} />
 					))}
 				</View>
 			))}
@@ -106,14 +127,17 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: Gaps.g15,
 	},
-	gridItemContent: {
+	gridItemContainer: {
 		flex: 1,
+		height: 130,
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		boxShadow: Shadows.boxShadow_elev1,
+	},
+	gridItemContent: {
+		...StyleSheet.absoluteFillObject,
 		justifyContent: 'flex-start',
 		alignItems: 'flex-start',
-		backgroundColor: Colors.white,
-		height: 130,
-		borderRadius: Radius.r15,
-		boxShadow: Shadows.boxShadow_elev2,
 		padding: 24,
 	},
 	gridText: {

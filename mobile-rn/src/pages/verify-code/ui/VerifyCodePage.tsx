@@ -84,7 +84,7 @@ export function VerifyCodePage() {
 				backgroundColor={Colors.lightBackground}
 			/>
 
-			<BackButton style={[styles.backButton, { top: backButtonTop }]} />
+			<BackButton style={[styles.backButton, { top: backButtonTop }]} onPress={() => router.back()} />
 
 			<View style={styles.container}>
 				<View style={styles.header}>

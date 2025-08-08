@@ -1,60 +1,70 @@
-import { Colors } from '@/shared/tokens';
 import { router } from 'expo-router';
-import { useAtom } from 'jotai';
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useAtomValue } from 'jotai';
+import React from 'react';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { EditableProfileForm } from './EditableProfileForm';
+import { useEditProfile } from '@/features/profile/model/useEditProfile';
+import {
+	EditProfileForm,
+	type UserProfileData,
+} from '@/features/profile/ui/EditProfileForm';
+import { userProfileAtom } from '@/entities/user';
+import { Colors } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
 
 export const EditProfilePage: React.FC = () => {
-	// const [, loadProfile] = useAtom(loadProfile);
-	// const [userProfile, setUserProfile] = useState<UserProfileData | null>(
-	// 	null,
-	// );
+	const {
+		profile,
+		isLoading: isProfileLoading,
+		error: profileError,
+	} = useAtomValue(userProfileAtom);
+	const {
+		saveProfile,
+		isLoading: isSaving,
+	} = useEditProfile();
 
-	useEffect(() => {
-		const loadUserData = async () => {
-			// Загружаем профиль из хранилища или API
-			await loadProfile();
+	const handleSave = async (data: UserProfileData) => {
+		const success = await saveProfile(data);
+		if (success) {
+			router.back();
+		}
+	};
 
-			// Получаем данные для формы редактирования
-		};
+	if (isProfileLoading) {
+		return (
+			<SafeAreaView style={styles.centered}>
+				<ActivityIndicator size='large' color={Colors.greenPrimary} />
+			</SafeAreaView>
+		);
+	}
 
-		loadUserData();
-	}, []);
-
-	// // Если данные не загружены, показываем пустой экран
-	// if (!userProfile) {
-	// 	return (
-	// 		<SafeAreaView style={styles.container}>
-	// 			<View style={styles.content} />
-	// 		</SafeAreaView>
-	// 	);
-	// }
+	if (profileError || !profile) {
+		return (
+			<SafeAreaView style={styles.centered}>
+				<AppText>
+					Ошибка загрузки профиля:{' '}
+					{profileError || 'Профиль не найден'}
+				</AppText>
+			</SafeAreaView>
+		);
+	}
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.content}>
-				{/* <EditableProfileForm
-					initialData={userProfile}
-					onCancel={() => router.back()}
-				/> */}
-			</View>
-		</SafeAreaView>
+		<EditProfileForm
+			user={profile}
+			onSave={handleSave}
+			isSaving={isSaving}
+			onBackPress={router.back}
+		/>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
+	centered: {
 		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
 		backgroundColor: Colors.lightBackground,
-		paddingHorizontal: 10,
-	},
-	content: {
-		backgroundColor: Colors.white,
-		borderRadius: 20,
-		padding: 16,
-		flex: 1,
 	},
 });

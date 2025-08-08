@@ -1,10 +1,10 @@
-import BirthdayIcon from '@/assets/icons/BirthdayIcon';
+import BirthdayIcon from '@/assets/profile/BirthdayIcon';
 import OutLinePointerIcon from '@/assets/profile/OutlinePointerIcon';
 import { StyleSheet, View } from 'react-native';
 
 import { type User } from '@/entities/user';
-import { Colors, Fonts } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
+import { Fonts } from '@/shared/tokens';
+import { AppText, Avatar } from '@/shared/ui';
 
 interface ProfileInfoProps {
 	user?: User;
@@ -20,7 +20,7 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
 
 	return (
 		<View style={styles.profile}>
-			<View style={styles.avatar}></View>
+			<Avatar uri={user?.photo} />
 			<View style={styles.description}>
 				<AppText style={styles.info}>{fullName}</AppText>
 				<View style={styles.infoRow}>
@@ -42,12 +42,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: 20,
 	},
-	avatar: {
-		width: 100,
-		height: 100,
-		borderRadius: 50,
-		backgroundColor: Colors.grayAvatar,
-	},
+
 	infoRow: {
 		flexDirection: 'row',
 		gap: 5,
