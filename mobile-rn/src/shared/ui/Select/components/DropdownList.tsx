@@ -1,6 +1,7 @@
-import { Colors, Fonts } from '@/shared/tokens';
 import React from 'react';
 import { Animated, ScrollView, StyleSheet, View } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppText } from '../../Text';
 import { SelectOption as SelectOptionType } from '../types';
@@ -40,7 +41,7 @@ export const DropdownList: React.FC<DropdownListProps> = ({
 			{filteredOptions.length > 0 ? (
 				<ScrollView
 					nestedScrollEnabled
-					keyboardShouldPersistTaps='handled'
+					keyboardShouldPersistTaps='always'
 					showsVerticalScrollIndicator={true}
 					style={styles.optionsList}
 				>
@@ -62,8 +63,6 @@ export const DropdownList: React.FC<DropdownListProps> = ({
 					</AppText>
 				</View>
 			)}
-
-			{/* Полоса скроллинга справа (скрыта, т.к. FlatList имеет свой индикатор) */}
 		</Animated.View>
 	);
 };
@@ -82,33 +81,16 @@ const styles = StyleSheet.create({
 		borderBottomRightRadius: 16,
 		overflow: 'hidden',
 		zIndex: 999,
-		elevation: 5, // Для Android
-		shadowColor: Colors.black, // Для iOS
+		elevation: 6,
+		shadowColor: Colors.black,
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
 	},
 	optionsList: {
 		width: '100%',
-		height: 161, // Фиксированная высота из дизайна в Figma
+		height: 161,
 		flex: 1,
-	},
-	scrollIndicator: {
-		position: 'absolute',
-		right: 2,
-		top: 0,
-		bottom: 0,
-		width: 6,
-		backgroundColor: Colors.scrollbarTrack,
-		borderRadius: 100,
-		justifyContent: 'center',
-	},
-	scrollThumb: {
-		width: 4,
-		height: 32,
-		backgroundColor: Colors.scrollbarThumb,
-		borderRadius: 100,
-		alignSelf: 'center',
 	},
 	noResultsContainer: {
 		height: 54,

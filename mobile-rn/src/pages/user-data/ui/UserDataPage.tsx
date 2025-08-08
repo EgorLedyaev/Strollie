@@ -1,26 +1,20 @@
-import { citiesAtom, fetchCitiesAtom } from '@/entities/city';
-import {
-	RegistrationData,
-	registrationErrorAtom,
-	registrationIsLoadingAtom,
-	registrationStateAtom,
-	submitUserDataAtom,
-} from '@/features/auth-by-email';
-import { Colors, Fonts, Gaps } from '@/shared/tokens';
-import {
-	AppButton,
-	AppText,
-	BackButton,
-	Input,
-	Select,
-	SelectOption,
-} from '@/shared/ui';
 import { router } from 'expo-router';
 import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+
+
+import { RegistrationData, registrationErrorAtom, registrationIsLoadingAtom, registrationStateAtom, submitUserDataAtom } from '@/features/auth-by-email';
+import { citiesAtom, fetchCitiesAtom } from '@/entities/city';
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
+import { AppButton, AppText, BackButton, Input, Select, SelectOption } from '@/shared/ui';
+
+
+
+
 
 export function UserDataPage() {
 	const [regState, setRegState] = useAtom(registrationStateAtom);
@@ -200,6 +194,8 @@ export function UserDataPage() {
 							onPress={handleProceedToVerification}
 							isLoading={isLoading}
 							disabled={!isFormValid || isLoading}
+							style={styles.appButton}
+							buttonBorderRadius={Radius.r22}
 						/>
 					</View>
 				</View>
@@ -250,5 +246,8 @@ const styles = StyleSheet.create({
 		color: Colors.error,
 		marginTop: 16,
 		textAlign: 'center',
+	},
+	appButton: {
+		height: 54,
 	},
 });

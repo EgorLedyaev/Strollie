@@ -1,21 +1,27 @@
 import { useAtom, useSetAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
-
-import { citiesAtom, citiesIsLoadingAtom, fetchCitiesAtom } from '@/entities/city';
+import {
+	citiesAtom,
+	citiesIsLoadingAtom,
+	fetchCitiesAtom,
+} from '@/entities/city';
 import { type User } from '@/entities/user';
 import { Colors, Fonts, Gaps, Radius, Sizes } from '@/shared/tokens';
-import { AppButton, AppText, BackButton, Input, Select, type SelectOption } from '@/shared/ui';
-
-
+import {
+	AppButton,
+	AppText,
+	BackButton,
+	Input,
+	Select,
+	type SelectOption,
+} from '@/shared/ui';
 
 import { AvatarUploader } from './AvatarUploader';
 import { ProfileEditOverlay } from './ProfileEditOverlay';
-
 
 export interface UserProfileData {
 	firstName: string;
@@ -49,25 +55,24 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 		fetchCities();
 	}, [fetchCities]);
 
-	const [userData, setUserData] = useState<UserProfileData>({
-		firstName: user.firstName || '',
-		lastName: user.lastName || '',
-		nickname: user.nickname || '',
-		city: user.city || '',
-		birthDate: user.birthDate || '',
-		photo: user.photo,
-	});
-
-	useEffect(() => {
-		setUserData({
+	// Инициализируем локальное состояние из user один раз
+	const initialData = useMemo(
+		() => ({
 			firstName: user.firstName || '',
 			lastName: user.lastName || '',
 			nickname: user.nickname || '',
 			city: user.city || '',
 			birthDate: user.birthDate || '',
 			photo: user.photo,
-		});
-	}, [user]);
+		}),
+		[user.user_id],
+	);
+
+	const [userData, setUserData] = useState<UserProfileData>(initialData);
+
+	useEffect(() => {
+		setUserData(initialData);
+	}, [initialData]);
 
 	const handleChange = (field: keyof UserProfileData, value: string) => {
 		setUserData(prev => ({ ...prev, [field]: value }));
@@ -230,7 +235,7 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f14,
 		color: Colors.darkGray,
-		paddingLeft: 16
+		paddingLeft: 16,
 	},
 	footer: {
 		borderTopColor: Colors.gray,

@@ -50,7 +50,7 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 					onChangeText={onSearchChange}
 					placeholder={placeholder}
 					placeholderTextColor={Colors.placeHolderInput}
-					autoFocus={true}
+					// autoFocus удалён для стабильной работы с клавиатурой
 				/>
 			) : (
 				<AppText
@@ -100,8 +100,8 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: Colors.headerAndInputText,
 		flex: 1,
-		textAlignVertical: 'center', // Добавляем вертикальное выравнивание
-		includeFontPadding: false, // Убираем лишние отступы шрифта
+		textAlignVertical: 'center',
+		includeFontPadding: false,
 	},
 	placeholderText: {
 		color: Colors.placeHolderInput,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: '100%',
 		padding: 0,
-		textAlignVertical: 'center', // Добавляем вертикальное выравнивание
-		includeFontPadding: false, // Убираем лишние отступы шрифта
+		textAlignVertical: 'center',
+		includeFontPadding: false,
 	},
 });

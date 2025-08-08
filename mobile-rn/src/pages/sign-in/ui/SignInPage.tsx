@@ -1,11 +1,12 @@
-import { authErrorAtom, useLogin } from '@/features/auth-by-email';
-import { Colors, Fonts } from '@/shared/tokens';
-import { AppButton, AppText, CustomLink, Input } from '@/shared/ui';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+
+import { authErrorAtom, useLogin } from '@/features/auth-by-email';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { AppButton, AppText, CustomLink, Input } from '@/shared/ui';
 
 /**
  * Страница входа в систему по email.
@@ -58,6 +59,8 @@ export function SignInPage() {
 							text='Войти'
 							onPress={handleSignIn}
 							isLoading={isLoading}
+							style={styles.appButton}
+							buttonBorderRadius={Radius.r22}
 						/>
 					</View>
 					{error && (
@@ -125,5 +128,8 @@ const styles = StyleSheet.create({
 	footerText: {
 		fontFamily: Fonts.medium,
 		color: Colors.textGray,
+	},
+	appButton: {
+		height: 54,
 	},
 });

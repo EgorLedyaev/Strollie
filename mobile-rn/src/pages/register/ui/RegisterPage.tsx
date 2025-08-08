@@ -4,7 +4,7 @@ import {
 	registrationIsLoadingAtom,
 	registrationStateAtom,
 } from '@/features/auth-by-email';
-import { Colors, Fonts } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppButton, AppText, CustomLink, Input } from '@/shared/ui';
 import { router } from 'expo-router';
 import { useAtom, useSetAtom } from 'jotai';
@@ -76,6 +76,8 @@ export function RegisterPage() {
 							text='Далее'
 							onPress={handleNext}
 							isLoading={isLoading}
+							style={styles.appButton}
+							buttonBorderRadius={Radius.r22}
 						/>
 					</View>
 					{error && (
@@ -143,4 +145,7 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.medium,
 		color: Colors.textGray,
 	},
+	appButton: {
+		height: 54
+	}
 });

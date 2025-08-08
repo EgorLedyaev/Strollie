@@ -74,6 +74,7 @@ export const Radius = {
 	r15: 15,
 	r16: 16,
 	r20: 20,
+	r22: 22,
 };
 
 export const Fonts = {

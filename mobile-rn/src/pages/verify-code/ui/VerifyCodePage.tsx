@@ -1,22 +1,23 @@
+import { router } from 'expo-router';
+import { useAtom, useAtomValue } from 'jotai';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import {
 	registrationStateAtom,
 	useResendCode,
 	useVerifyCode,
 	verifyCodeErrorAtom,
 } from '@/features/auth-by-email';
-import { Colors, Fonts } from '@/shared/tokens';
-import { AppButton, AppText, BackButton, CodeInput } from '@/shared/ui';
-import { router } from 'expo-router';
-import { useAtom, useAtomValue } from 'jotai';
-import React, { useEffect, useState } from 'react';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import {
-	SafeAreaView,
-	StatusBar,
-	StyleSheet,
-	TouchableOpacity,
-	View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+	AppButton,
+	AppText,
+	BackButton,
+	CodeInput,
+	IconButton,
+} from '@/shared/ui';
 
 export function VerifyCodePage() {
 	const [code, setCode] = useState('');
@@ -84,7 +85,10 @@ export function VerifyCodePage() {
 				backgroundColor={Colors.lightBackground}
 			/>
 
-			<BackButton style={[styles.backButton, { top: backButtonTop }]} onPress={() => router.back()} />
+			<BackButton
+				style={[styles.backButton, { top: backButtonTop }]}
+				onPress={() => router.back()}
+			/>
 
 			<View style={styles.container}>
 				<View style={styles.header}>
@@ -107,10 +111,10 @@ export function VerifyCodePage() {
 				{error && <AppText style={styles.errorText}>{error}</AppText>}
 
 				<View style={styles.resendContainer}>
-					<TouchableOpacity
+					<IconButton
 						disabled={!canResend}
 						onPress={handleResendCode}
-						activeOpacity={0.7}
+						feedback='opacity'
 					>
 						<AppText
 							style={[
@@ -120,7 +124,7 @@ export function VerifyCodePage() {
 						>
 							{isResending ? 'Отправка...' : 'Отправить снова'}
 						</AppText>
-					</TouchableOpacity>
+					</IconButton>
 
 					{!canResend && (
 						<AppText style={styles.resendText}>
@@ -135,6 +139,8 @@ export function VerifyCodePage() {
 						onPress={handleVerifyCode}
 						isLoading={isLoading}
 						disabled={code.length < 4 || isLoading}
+						style={styles.appButton}
+						buttonBorderRadius={Radius.r22}
 					/>
 				</View>
 			</View>
@@ -194,5 +200,8 @@ const styles = StyleSheet.create({
 		color: Colors.error,
 		marginTop: 16,
 		textAlign: 'center',
+	},
+	appButton: {
+		height: 54,
 	},
 });

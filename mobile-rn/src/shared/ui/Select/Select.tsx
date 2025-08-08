@@ -1,13 +1,13 @@
-import { Colors, Fonts } from '@/shared/tokens';
 import React, { ComponentRef, useEffect, useRef, useState } from 'react';
 import {
 	Animated,
 	Keyboard,
 	LayoutChangeEvent,
 	StyleSheet,
-	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppText, AppTextInput } from '../Text';
 import { DropdownList, SelectField } from './components';
@@ -133,7 +133,8 @@ export const Select = ({
 	const toggleDropdown = () => {
 		if (!isOpen) {
 			setSearchQuery('');
-			inputRef.current?.focus();
+			// Убираем автоматический фокус для стабильной работы с клавиатурой
+			// inputRef.current?.focus();
 		} else {
 			Keyboard.dismiss();
 		}
@@ -173,19 +174,15 @@ export const Select = ({
 				onToggle={toggleDropdown}
 			/>
 
-			{/* Выпадающий список с TouchableWithoutFeedback для предотвращения закрытия списка при нажатии внутри */}
-			<TouchableWithoutFeedback>
-				<View>
-					<DropdownList
-						filteredOptions={filteredOptions}
-						value={value}
-						dropdownHeight={dropdownHeight}
-						dropdownOpacity={dropdownOpacity}
-						containerWidth={containerLayout.width}
-						onSelect={handleSelect}
-					/>
-				</View>
-			</TouchableWithoutFeedback>
+			{/* Выпадающий список */}
+			<DropdownList
+				filteredOptions={filteredOptions}
+				value={value}
+				dropdownHeight={dropdownHeight}
+				dropdownOpacity={dropdownOpacity}
+				containerWidth={containerLayout.width}
+				onSelect={handleSelect}
+			/>
 		</View>
 	);
 };

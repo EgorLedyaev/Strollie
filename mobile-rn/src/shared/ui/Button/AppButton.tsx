@@ -1,20 +1,25 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, GestureResponderEvent, Pressable, PressableProps, StyleSheet } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-
-
+import {
+	ActivityIndicator,
+	GestureResponderEvent,
+	Pressable,
+	PressableProps,
+	StyleSheet,
+} from 'react-native';
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withTiming,
+} from 'react-native-reanimated';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 
-
-
 import { AppText } from '../Text';
 
+export type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
-
-interface AppButtonProps extends PressableProps {
+export interface AppButtonProps extends PressableProps {
 	text: string;
 	isLoading?: boolean;
 	variant?: ButtonVariant;
@@ -59,6 +64,8 @@ export const AppButton = ({
 	const scale = useSharedValue(1);
 
 	const isSecondary = variant === 'secondary';
+	const isOutline = variant === 'outline';
+	const isDisabled = !!disabled || !!isLoading;
 
 	const primaryColors = [GRADIENT_START, GRADIENT_END] as const;
 	const dimmedPrimaryColors = [
@@ -74,7 +81,8 @@ export const AppButton = ({
 	const disabledColors = [Colors.disabledGray, Colors.disabledGray] as const;
 
 	const getInitialColors = () => {
-		if (disabled) return disabledColors;
+		if (isDisabled) return disabledColors;
+		if (isOutline) return ['transparent', 'transparent'] as const;
 		return isSecondary ? secondaryColors : primaryColors;
 	};
 
@@ -82,7 +90,7 @@ export const AppButton = ({
 
 	useEffect(() => {
 		setCurrentColors(getInitialColors());
-	}, [disabled, variant]);
+	}, [isDisabled, variant, buttonColor, dimFactor]);
 
 	const animatedStyle = useAnimatedStyle(() => {
 		return {
@@ -91,8 +99,7 @@ export const AppButton = ({
 	});
 
 	const handlePressIn = (e: GestureResponderEvent) => {
-		if (disabled) return;
-
+		if (isDisabled) return;
 		scale.value = withTiming(0.97, { duration: 100 });
 		setCurrentColors(
 			isSecondary ? dimmedSecondaryColors : dimmedPrimaryColors,
@@ -101,65 +108,94 @@ export const AppButton = ({
 	};
 
 	const handlePressOut = (e: GestureResponderEvent) => {
-		if (disabled) return;
-
+		if (isDisabled) return;
 		scale.value = withTiming(1, { duration: 200 });
 		setCurrentColors(isSecondary ? secondaryColors : primaryColors);
 		props.onPressOut?.(e);
 	};
+
 	const textStyle = {
 		fontSize: textFontSize,
 		fontFamily: textFontFamily,
-		color: disabled
+		color: isDisabled
 			? Colors.grayMedium
-			: isSecondary
-				? textColor
+			: isSecondary || isOutline
+				? (textColor ?? Colors.greenPrimary)
 				: Colors.white,
 	};
+
 	return (
 		<Pressable
 			style={style}
 			{...props}
+			disabled={isDisabled}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
+			accessibilityRole='button'
+			accessibilityState={{ disabled: isDisabled }}
 		>
 			<Animated.View style={[styles.buttonContainer, animatedStyle]}>
-				<LinearGradient
-					colors={currentColors}
-					start={{ x: 0, y: 0 }}
-					end={{ x: 0, y: 1 }}
-					style={[
-						styles.gradient,
-						variant !== 'outline' && !isSecondary
-							? styles.shadow
-							: null,
-						{
-							borderRadius: buttonBorderRadius,
-						},
-					]}
-				>
-					{!isLoading && (
-						<AppText
-							style={[
-								styles.text,
-								disabled && styles.disabledText,
-								textStyle,
-							]}
-						>
-							{text}
-						</AppText>
-					)}
-					{isLoading && (
-						<ActivityIndicator
-							size={sizeActivityIndicator}
-							color={
-								variant === 'outline'
-									? Colors.greenPrimary
-									: Colors.white
-							}
-						/>
-					)}
-				</LinearGradient>
+				{isOutline ? (
+					// Outline: прозрачный фон, рамка
+					<Animated.View
+						style={[
+							styles.outline,
+							{
+								borderRadius: buttonBorderRadius,
+								borderColor: Colors.greenPrimary,
+							},
+						]}
+					>
+						{!isLoading ? (
+							<AppText
+								style={[
+									styles.text,
+									isDisabled && styles.disabledText,
+									textStyle,
+								]}
+							>
+								{text}
+							</AppText>
+						) : (
+							<ActivityIndicator
+								size={sizeActivityIndicator}
+								color={Colors.greenPrimary}
+							/>
+						)}
+					</Animated.View>
+				) : (
+					<LinearGradient
+						colors={currentColors}
+						start={{ x: 0, y: 0 }}
+						end={{ x: 0, y: 1 }}
+						style={[
+							styles.gradient,
+							!isSecondary && !isOutline ? styles.shadow : null,
+							{ borderRadius: buttonBorderRadius },
+						]}
+					>
+						{!isLoading ? (
+							<AppText
+								style={[
+									styles.text,
+									isDisabled && styles.disabledText,
+									textStyle,
+								]}
+							>
+								{text}
+							</AppText>
+						) : (
+							<ActivityIndicator
+								size={sizeActivityIndicator}
+								color={
+									isOutline
+										? Colors.greenPrimary
+										: Colors.white
+								}
+							/>
+						)}
+					</LinearGradient>
+				)}
 			</Animated.View>
 		</Pressable>
 	);
@@ -176,6 +212,14 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		padding: 10,
 		overflow: 'hidden',
+	},
+	outline: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		padding: 10,
+		backgroundColor: Colors.transparent,
+		borderWidth: 1,
 	},
 	shadow: {
 		boxShadow: Shadows.boxShadow_elev2,
