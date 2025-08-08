@@ -5,9 +5,11 @@ export interface Ticket {
   qrCodeUrl?: string;
   from: string;
   to: string;
-  departureTime: Date;
-  arrivalTime: Date;
+  departureTime: string; // ISO string
+  arrivalTime: string; // ISO string
   seat?: string;
+  row?: string; // ряд (для кино/поезда)
+  hall?: string; // зал (для кино)
   carrierInfo?: {
     name: string;
     logo?: string;

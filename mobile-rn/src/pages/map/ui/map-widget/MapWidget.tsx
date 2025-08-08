@@ -1,13 +1,14 @@
-import { mapErrorAtom, mapReadyAtom } from '@/entities/map';
-import { Colors } from '@/shared/tokens';
-import { AppText, MapStatusIndicator } from '@/shared/ui';
 import { useAtom } from 'jotai';
 import React, { forwardRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import WebView from 'react-native-webview';
 
+import { mapErrorAtom, mapReadyAtom } from '@/entities/map';
+import { Colors } from '@/shared/tokens';
+import { AppText, MapStatusIndicator } from '@/shared/ui';
+
 interface MapWidgetProps {
-	onMessage: (event: unknown) => void;
+	onMessage: (event: { nativeEvent: { data: string } }) => void;
 }
 
 export const MapWidget = forwardRef<WebView, MapWidgetProps>(

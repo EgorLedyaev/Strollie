@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 		borderRadius: 16,
 		padding: 20,
-		...Shadows.shadow3,
+		boxShadow: Shadows.boxShadow_elev2,
 	},
 	title: {
 		fontSize: 18,
@@ -75,6 +75,6 @@ const styles = StyleSheet.create({
 	},
 	actions: {
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		justifyContent: 'center',
 	},
 });

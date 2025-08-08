@@ -3,7 +3,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 
 import { Colors, Gaps, Radius, Shadows } from '@/shared/tokens';
 
-import { CenterOnUserButton } from './CenterOnUserButton';
+import { NavigationModeButton, type FollowMode } from './NavigationModeButton';
 import { ProfileButton } from './ProfileButton';
 import { SearchInput } from './SearchInput';
 import { ToggleModeButton } from './ToggleModeButton';
@@ -13,7 +13,7 @@ interface MapControlsProps {
 	onZoomIn: () => void;
 	onZoomOut: () => void;
 	onToggleMode: () => void;
-	onNavigate: () => void;
+	onToggleFollowMode: () => void;
 	onSearchResultSelect: (
 		coordinates: [number, number],
 		addressText: string,
@@ -21,6 +21,7 @@ interface MapControlsProps {
 	is3DMode: boolean;
 	mapReady: boolean;
 	isLocationAvailable: boolean;
+	followMode: FollowMode;
 }
 
 export const MapControls: React.FC<MapControlsProps> = props => {
@@ -49,8 +50,9 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 						disabled={!props.mapReady}
 					/>
 					<View />
-					<CenterOnUserButton
-						onPress={props.onNavigate}
+					<NavigationModeButton
+						mode={props.followMode}
+						onPress={props.onToggleFollowMode}
 						disabled={!props.mapReady || !props.isLocationAvailable}
 						style={styles.mapButton}
 					/>

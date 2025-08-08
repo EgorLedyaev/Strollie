@@ -1,4 +1,3 @@
-
 /**
  * Цветовая палитра приложения
  */
@@ -31,7 +30,7 @@ export const Colors = {
 	placeHolderInput: '#B3B3B3', // Цвет плейсхолдера в инпутах
 	searchDivider: '#D7D7D7', // Цвет разделителя в поле поиска
 	inputOptionBorder: '#F4F4F4', // Цвет бордера опций в выпадающем списке
-	divider: '#B1B1B1', // Цвет разделителя 
+	divider: '#B1B1B1', // Цвет разделителя
 
 	// Цвета для скроллбара
 	scrollbarTrack: '#DDDDDD', // Цвет фона скроллбара
@@ -53,7 +52,7 @@ export const Colors = {
 
 	// Другие цвета
 	red: '#FF5858',
-	error: '#FF5858', 
+	error: '#FF5858',
 
 	transparent: 'transparent',
 };
@@ -95,7 +94,8 @@ export const Shadows = {
 	boxShadow:
 		'-2px -4px 6px rgba(169,169,169,0.25), 2px  4px 6px rgba(169,169,169,0.25)',
 	boxShadow_elev2: '0px 1px 3px rgba(0,0,0,0.2)',
-	boxShadow_elev1: '0 2px 4px rgba(0, 0, 0, 0.01), 0 1px 2px rgba(0, 0, 0, 0.03)',
+	boxShadow_elev1:
+		'0 2px 4px rgba(0, 0, 0, 0.01), 0 1px 2px rgba(0, 0, 0, 0.03)',
 };
 
 export const Sizes = {

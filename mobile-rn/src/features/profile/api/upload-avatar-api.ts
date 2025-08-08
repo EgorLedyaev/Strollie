@@ -1,6 +1,6 @@
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { MOCK_CDN_BASE, MOCK_UPLOAD_AVATAR_MODE, USE_MOCK_UPLOAD_AVATAR } from '@/shared/config/feature-flags';
+import { MOCK_CDN_BASE, MOCK_UPLOAD_AVATAR_MODE, USE_MOCK_UPLOAD_AVATAR } from '@/shared/config';
 
 /**
  * [API] Функция для загрузки аватара на сервер.

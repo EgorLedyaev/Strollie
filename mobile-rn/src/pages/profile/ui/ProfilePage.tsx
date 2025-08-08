@@ -8,8 +8,11 @@ import {
 	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import { useLogout } from '@/features/logout';
-import { ProfileHeader, ProfileMenuOverlay } from '@/features/profile';
+import {
+	ProfileHeader,
+	ProfileMenuOverlay,
+	useLogout,
+} from '@/features/profile';
 import { sessionAtom } from '@/entities/session';
 import { loadUserProfileAtom, userProfileAtom } from '@/entities/user';
 import { Colors } from '@/shared/tokens';

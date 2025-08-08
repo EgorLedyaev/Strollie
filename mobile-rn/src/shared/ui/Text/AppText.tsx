@@ -1,7 +1,8 @@
-import { Colors, Fonts } from '@/shared/tokens';
 import { forwardRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { StyleSheet, Text, TextProps } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 type AppTextVariant = 'body' | 'h1' | 'h2' | 'caption' | 'button' | 'header';
 

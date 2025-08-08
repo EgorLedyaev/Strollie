@@ -17,7 +17,7 @@ export default function AuthLayout() {
 
 	return (
 		<SafeAreaProvider>
-			<StatusBar style='dark'/>
+			<StatusBar style='dark' />
 			<View style={styles.container}>
 				<Stack
 					screenOptions={{
@@ -33,6 +33,7 @@ export default function AuthLayout() {
 					<Stack.Screen name='profile/edit' />
 					<Stack.Screen name='calendar/index' />
 					<Stack.Screen name='trips/index' />
+					<Stack.Screen name='trips/new' />
 					<Stack.Screen name='trips/[id]' />
 					<Stack.Screen name='tickets/index' />
 					<Stack.Screen name='routes/history' />

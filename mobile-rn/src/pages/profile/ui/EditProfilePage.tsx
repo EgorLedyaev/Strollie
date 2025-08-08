@@ -4,11 +4,11 @@ import React from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useEditProfile } from '@/features/profile/model/useEditProfile';
 import {
 	EditProfileForm,
+	useEditProfile,
 	type UserProfileData,
-} from '@/features/profile/ui/EditProfileForm';
+} from '@/features/profile';
 import { userProfileAtom } from '@/entities/user';
 import { Colors } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
@@ -19,10 +19,7 @@ export const EditProfilePage: React.FC = () => {
 		isLoading: isProfileLoading,
 		error: profileError,
 	} = useAtomValue(userProfileAtom);
-	const {
-		saveProfile,
-		isLoading: isSaving,
-	} = useEditProfile();
+	const { saveProfile, isLoading: isSaving } = useEditProfile();
 
 	const handleSave = async (data: UserProfileData) => {
 		const success = await saveProfile(data);
