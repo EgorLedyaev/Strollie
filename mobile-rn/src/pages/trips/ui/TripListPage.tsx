@@ -1,6 +1,7 @@
 import PlusIcon from '@/assets/icons/action/PlusIcon';
+import ArrowLeftMediumIcon from '@/assets/icons/arrow/ArrowLeftMediumIcon';
 import emptyImg from '@/assets/images/unmatched.png';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
 	ActivityIndicator,
@@ -12,15 +13,17 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { tripsApi } from '@/pages/trips/api';
-import { Ticket, ticketApi, TicketCard } from '@/entities/ticket';
+import { ticketApi } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { AppText, BackButton, IconButton } from '@/shared/ui';
 
 interface TripVm {
 	id: string;
-	title: string;
+	title: string; // исходное из API
 	period: string; // 18.06.2025–24.06.2025
 	ticketIds: string[];
+	// отображаемое имя на основе билета
+	displayTitle: string;
 }
 
 function pad2(n: number) {
@@ -31,9 +34,9 @@ function formatDate(d: Date) {
 }
 
 export const TripListPage: React.FC = () => {
+	const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [trips, setTrips] = useState<TripVm[]>([]);
-	const [ticketsMap, setTicketsMap] = useState<Record<string, Ticket>>({});
 
 	useEffect(() => {
 		(async () => {
@@ -42,16 +45,24 @@ export const TripListPage: React.FC = () => {
 				tripsApi.getMyTrips(),
 				ticketApi.getMyTickets(),
 			]);
-			const tripsVm: TripVm[] = trps.map(t => ({
-				id: t.id,
-				title: t.name,
-				period: `${formatDate(t.startDate)}–${formatDate(t.endDate)}`,
-				ticketIds: t.ticketIds,
-			}));
-			const map: Record<string, Ticket> = {};
-			for (const tk of tickets) map[tk.id] = tk;
+			const tMap: Record<string, { to: string }> = {};
+			for (const tk of tickets) tMap[tk.id] = { to: tk.to };
+			const tripsVm: TripVm[] = trps.map(t => {
+				const firstTicket = t.ticketIds[0]
+					? tMap[t.ticketIds[0]]
+					: undefined;
+				const displayTitle = firstTicket
+					? `Поездка в ${firstTicket.to}`
+					: t.name;
+				return {
+					id: t.id,
+					title: t.name,
+					displayTitle,
+					period: `${formatDate(t.startDate)}–${formatDate(t.endDate)}`,
+					ticketIds: t.ticketIds,
+				};
+			});
 			setTrips(tripsVm);
-			setTicketsMap(map);
 			setLoading(false);
 		})();
 	}, []);
@@ -83,7 +94,7 @@ export const TripListPage: React.FC = () => {
 						<View style={styles.tripCard}>
 							<View style={styles.tripHeader}>
 								<AppText style={styles.tripTitle}>
-									{item.title}
+									{item.displayTitle}
 								</AppText>
 								<Link href={`/trips/${item.id}`} asChild>
 									<IconButton
@@ -99,27 +110,18 @@ export const TripListPage: React.FC = () => {
 							<AppText style={styles.tripPeriod}>
 								{item.period}
 							</AppText>
-
-							{/* превью первого билета поездки, если есть */}
-							{item.ticketIds[0] &&
-							ticketsMap[item.ticketIds[0]] ? (
-								<View style={styles.ticketPreview}>
-									<TicketCard
-										ticket={ticketsMap[item.ticketIds[0]]}
-									/>
-								</View>
-							) : null}
 						</View>
 					);
 				}}
 			/>
 		);
-	}, [loading, trips, ticketsMap]);
+	}, [loading, trips]);
 
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
 				<View style={styles.headerRow}>
+					<BackButton onPress={() => router.back()} variant='icon' />
 					<AppText style={styles.title}>Мои поездки</AppText>
 					<Link href={'/trips/new'} asChild>
 						<IconButton feedback='opacity' opacity={0.6}>
@@ -140,7 +142,6 @@ const styles = StyleSheet.create({
 		padding: 16,
 	},
 	content: {
-		// фон прозрачный, карточки сами белые
 		flex: 1,
 	},
 	headerRow: {
@@ -192,5 +193,4 @@ const styles = StyleSheet.create({
 	},
 	emptyText: { fontSize: Fonts.f14, color: Colors.placeholderGray },
 	linkText: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
-	ticketPreview: { marginTop: 12 },
 });

@@ -7,3 +7,5 @@ npx steiger ./src
 ```bash
 eas build --platform android --profile preview --local
 ```
+
+npx expo run:android --variant release
