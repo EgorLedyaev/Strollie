@@ -1,20 +1,29 @@
 import { router } from 'expo-router';
 import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-
-
-import { RegistrationData, registrationErrorAtom, registrationIsLoadingAtom, registrationStateAtom, submitUserDataAtom } from '@/features/auth-by-email';
+import {
+	RegistrationData,
+	registrationErrorAtom,
+	registrationIsLoadingAtom,
+	registrationStateAtom,
+	submitUserDataAtom,
+} from '@/features/auth-by-email';
 import { citiesAtom, fetchCitiesAtom } from '@/entities/city';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
-import { AppButton, AppText, BackButton, Input, Select, SelectOption } from '@/shared/ui';
-
-
-
-
+import {
+	AppButton,
+	AppText,
+	BackButton,
+	Input,
+	Select,
+	SelectOption,
+} from '@/shared/ui';
+import { StatusBarBackground } from '@/shared/ui/StatusBarBackground';
 
 export function UserDataPage() {
 	const [regState, setRegState] = useAtom(registrationStateAtom);
@@ -100,12 +109,13 @@ export function UserDataPage() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<StatusBar
-				barStyle='dark-content'
-				backgroundColor={Colors.lightBackground}
-			/>
+			<StatusBarBackground color={Colors.lightBackground} />
+			<SystemBars style='dark' />
 
-			<BackButton style={[styles.backButton, { top: backButtonTop }]} onPress={() => router.back()} />
+			<BackButton
+				style={[styles.backButton, { top: backButtonTop }]}
+				onPress={() => router.back()}
+			/>
 			<KeyboardAwareScrollView
 				contentContainerStyle={styles.scrollContainer}
 				showsVerticalScrollIndicator={false}

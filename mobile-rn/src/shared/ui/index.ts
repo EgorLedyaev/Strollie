@@ -18,3 +18,4 @@ export { Dialog } from './Dialog';
 export { Tag } from './Tag';
 export { CalendarGrid } from './CalendarGrid';
 export type { CalendarDay } from './CalendarGrid';
+export { StatusBarBackground } from './StatusBarBackground';

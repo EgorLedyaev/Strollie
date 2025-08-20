@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 import { authErrorAtom, useLogin } from '@/features/auth-by-email';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppButton, AppText, CustomLink, Input } from '@/shared/ui';
+import { StatusBarBackground } from '@/shared/ui/StatusBarBackground';
 
 /**
  * Страница входа в систему по email.
@@ -28,10 +30,8 @@ export function SignInPage() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<StatusBar
-				barStyle='dark-content'
-				backgroundColor={Colors.lightBackground}
-			/>
+			<StatusBarBackground color={Colors.lightBackground} />
+			<SystemBars style='dark' />
 			<KeyboardAwareScrollView
 				contentContainerStyle={styles.scrollContainer}
 				showsVerticalScrollIndicator={false}

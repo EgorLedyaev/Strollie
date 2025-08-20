@@ -1,3 +1,10 @@
+import { router } from 'expo-router';
+import { useAtom, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+
 import {
 	checkEmailAndProceedAtom,
 	registrationErrorAtom,
@@ -6,11 +13,7 @@ import {
 } from '@/features/auth-by-email';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppButton, AppText, CustomLink, Input } from '@/shared/ui';
-import { router } from 'expo-router';
-import { useAtom, useSetAtom } from 'jotai';
-import { useEffect } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { StatusBarBackground } from '@/shared/ui/StatusBarBackground';
 
 /**
  * Страница регистрации пользователя по email.
@@ -44,10 +47,8 @@ export function RegisterPage() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<StatusBar
-				barStyle='dark-content'
-				backgroundColor={Colors.lightBackground}
-			/>
+			<StatusBarBackground color={Colors.lightBackground} />
+			<SystemBars style='dark' />
 			<KeyboardAwareScrollView
 				contentContainerStyle={styles.scrollContainer}
 				showsVerticalScrollIndicator={false}
@@ -146,6 +147,6 @@ const styles = StyleSheet.create({
 		color: Colors.textGray,
 	},
 	appButton: {
-		height: 54
-	}
+		height: 54,
+	},
 });

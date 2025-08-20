@@ -11,8 +11,7 @@
 			"backgroundColor": "#1BF57E"
 		},
 		"androidStatusBar": {
-			"translucent": true,
-			"backgroundColor": "#1BF57E"
+			"translucent": true
 		},
 		"userInterfaceStyle": "automatic",
 		"newArchEnabled": true,
@@ -28,7 +27,8 @@
 			"adaptiveIcon": {
 				"foregroundImage": "./assets/images/icon-inkscape.png",
 				"backgroundColor": "#1BF57E"
-			}
+			},
+			"edgeToEdgeEnabled": true
 		},
 		"web": {
 			"bundler": "metro",
@@ -64,7 +64,16 @@
 					"faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
 				}
 			],
-			"expo-web-browser"
+			"expo-web-browser",
+			[
+				"react-native-edge-to-edge",
+				{
+					"android": {
+						"parentTheme": "Default",
+						"enforceNavigationBarContrast": false
+					}
+				}
+			]
 		],
 		"experiments": {
 			"typedRoutes": true

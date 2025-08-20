@@ -1,9 +1,9 @@
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { Provider as JotaiProvider } from 'jotai';
 import { Suspense, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -22,7 +22,7 @@ export default function RootLayout() {
 				<KeyboardProvider>
 					<SafeAreaProvider>
 						<Suspense fallback={null}>
-							<StatusBar style='dark' />
+							<SystemBars style='dark' />
 							<Root />
 						</Suspense>
 					</SafeAreaProvider>

@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 import {
 	SafeAreaView,
 	useSafeAreaInsets,
@@ -17,6 +17,7 @@ import { sessionAtom } from '@/entities/session';
 import { loadUserProfileAtom, userProfileAtom } from '@/entities/user';
 import { Colors } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
+import { StatusBarBackground } from '@/shared/ui/StatusBarBackground';
 
 import { ProfileNavGrid } from './ProfileNavGrid';
 
@@ -100,7 +101,8 @@ export const ProfilePage: React.FC = () => {
 
 	return (
 		<SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-			<StatusBar style='dark' backgroundColor={Colors.lightBackground} />
+			<StatusBarBackground color={Colors.lightBackground} />
+			<SystemBars style='dark' />
 			<ProfileHeader
 				user={userProfile}
 				onBackPress={() => router.back()}

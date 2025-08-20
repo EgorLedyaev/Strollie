@@ -1,9 +1,8 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 import { useMapBridge } from '@/features/map-bridge';
-import { Colors } from '@/shared/tokens';
 
 import { MapControls } from './map-controls';
 import { MapWidget } from './map-widget';
@@ -31,7 +30,7 @@ export function MapPage() {
 
 	return (
 		<>
-			<StatusBar style='dark' backgroundColor={Colors.optionHighlight} />
+			<SystemBars style='dark' />
 			<MapWidget ref={webViewRef} onMessage={handleWebViewMessage} />
 			<MapControls
 				onZoomIn={handleZoomIn}

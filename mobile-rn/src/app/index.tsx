@@ -2,7 +2,8 @@ import IconLogo from '@/assets/icons/logo';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 
 export default function Splash() {
 	const router = useRouter();
@@ -17,11 +18,7 @@ export default function Splash() {
 
 	return (
 		<View style={styles.container}>
-			<StatusBar
-				barStyle='light-content'
-				translucent
-				backgroundColor='transparent'
-			/>
+			<SystemBars style='light' />
 			<LinearGradient
 				colors={['#1BF57E', '#1CC4C4']}
 				style={styles.gradient}

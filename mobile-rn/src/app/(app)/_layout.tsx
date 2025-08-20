@@ -1,6 +1,6 @@
 import { Stack, usePathname } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BottomNavBar } from '@/widgets/bottom-nav-bar';
@@ -17,7 +17,7 @@ export default function AuthLayout() {
 
 	return (
 		<SafeAreaProvider>
-			<StatusBar style='dark' />
+			<SystemBars style='dark' />
 			<View style={styles.container}>
 				<Stack
 					screenOptions={{

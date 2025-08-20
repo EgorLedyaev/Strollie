@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useAtom, useAtomValue } from 'jotai';
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { SystemBars } from 'react-native-edge-to-edge';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -18,6 +19,7 @@ import {
 	CodeInput,
 	IconButton,
 } from '@/shared/ui';
+import { StatusBarBackground } from '@/shared/ui/StatusBarBackground';
 
 export function VerifyCodePage() {
 	const [code, setCode] = useState('');
@@ -80,10 +82,8 @@ export function VerifyCodePage() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			<StatusBar
-				barStyle='dark-content'
-				backgroundColor={Colors.lightBackground}
-			/>
+			<StatusBarBackground color={Colors.lightBackground} />
+			<SystemBars style='dark' />
 
 			<BackButton
 				style={[styles.backButton, { top: backButtonTop }]}
