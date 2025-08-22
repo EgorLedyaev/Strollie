@@ -17,7 +17,6 @@ import { sessionAtom } from '@/entities/session';
 import { loadUserProfileAtom, userProfileAtom } from '@/entities/user';
 import { Colors } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
-import { StatusBarBackground } from '@/shared/ui/StatusBarBackground';
 
 import { ProfileNavGrid } from './ProfileNavGrid';
 
@@ -34,7 +33,6 @@ export const ProfilePage: React.FC = () => {
 		height: number;
 	} | null>(null);
 	const logout = useLogout();
-	const insets = useSafeAreaInsets();
 
 	useEffect(() => {
 		// Загружаем профиль, только если его еще нет или если мы хотим обновить
@@ -100,8 +98,7 @@ export const ProfilePage: React.FC = () => {
 	};
 
 	return (
-		<SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-			<StatusBarBackground color={Colors.lightBackground} />
+		<SafeAreaView style={styles.container}>
 			<SystemBars style='dark' />
 			<ProfileHeader
 				user={userProfile}
@@ -130,7 +127,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: Colors.lightBackground,
-		paddingHorizontal: 16,
+		padding: 16,
 	},
 	centered: {
 		flex: 1,
