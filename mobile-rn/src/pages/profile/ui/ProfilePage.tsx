@@ -5,7 +5,6 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 import {
 	SafeAreaView,
-	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
 import {

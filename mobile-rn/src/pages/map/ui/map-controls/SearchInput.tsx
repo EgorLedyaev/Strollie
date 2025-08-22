@@ -17,7 +17,7 @@ export interface SearchInputProps {
 		coordinates: [number, number], // [lon, lat]
 		addressText: string,
 	) => void;
-	style?: any; // Дополнительные стили для кастомизации
+	style?: object | undefined; // Дополнительные стили для кастомизации
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({
@@ -28,6 +28,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 	const [searchResults, setSearchResults] = useState<PlacesAPIResult[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
 	const [searchError, setSearchError] = useState<string | null>(null);
+	const [isFocused, setIsFocused] = useState(false);
 
 	const handleSearch = useCallback(async (query: string) => {
 		setSearchQuery(query);
@@ -66,7 +67,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 	};
 
 	return (
-		<View style={styles.searchContainer}>
+		<View style={[styles.searchContainer, style]}>
 			<AppTextInput
 				style={styles.searchInput}
 				placeholder='Поиск и выбор мест'
@@ -74,12 +75,18 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 				value={searchQuery}
 				onChangeText={handleSearch}
 				onFocus={() => {
+					setIsFocused(true);
 					if (
 						searchQuery.length >= 3 &&
 						searchResults.length === 0 &&
 						!isSearching
-					)
+					) {
 						handleSearch(searchQuery);
+					}
+				}}
+				onBlur={() => {
+					// Сворачиваем результаты при потере фокуса
+					setIsFocused(false);
 				}}
 			/>
 			{isSearching && (
@@ -89,7 +96,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 					color={Colors.greenPrimary}
 				/>
 			)}
-			{searchResults.length > 0 && (
+			{isFocused && searchResults.length > 0 && (
 				<FlatList
 					data={searchResults}
 					keyExtractor={item => item.id}
@@ -115,7 +122,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 					keyboardShouldPersistTaps='handled'
 				/>
 			)}
-			{searchError && !isSearching && searchQuery.length >= 3 && (
+			{isFocused && searchError && !isSearching && searchQuery.length >= 3 && (
 				<View style={styles.searchResultsList}>
 					<AppText style={styles.searchErrorText}>
 						{searchError}
