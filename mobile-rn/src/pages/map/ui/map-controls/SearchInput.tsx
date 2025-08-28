@@ -122,13 +122,16 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 					keyboardShouldPersistTaps='handled'
 				/>
 			)}
-			{isFocused && searchError && !isSearching && searchQuery.length >= 3 && (
-				<View style={styles.searchResultsList}>
-					<AppText style={styles.searchErrorText}>
-						{searchError}
-					</AppText>
-				</View>
-			)}
+			{isFocused &&
+				searchError &&
+				!isSearching &&
+				searchQuery.length >= 3 && (
+					<View style={styles.searchResultsList}>
+						<AppText style={styles.searchErrorText}>
+							{searchError}
+						</AppText>
+					</View>
+				)}
 		</View>
 	);
 };

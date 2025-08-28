@@ -50,7 +50,6 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 					onChangeText={onSearchChange}
 					placeholder={placeholder}
 					placeholderTextColor={Colors.placeHolderInput}
-					// autoFocus удалён для стабильной работы с клавиатурой
 				/>
 			) : (
 				<AppText

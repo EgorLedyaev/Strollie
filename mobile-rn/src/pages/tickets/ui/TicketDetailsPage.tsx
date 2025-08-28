@@ -4,7 +4,6 @@ import React from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import {
 	SafeAreaView,
-	useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
 import { ticketsAtom, type Ticket } from '@/entities/ticket';
@@ -21,8 +20,6 @@ export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 	const [tickets] = useAtom<Ticket[]>(ticketsAtom);
 	const ticket = tickets.find(t => t.id === ticketId);
 	const router = useRouter();
-	const insets = useSafeAreaInsets();
-	const backTop = insets.top + 16;
 
 	if (!ticket) {
 		return (
@@ -42,12 +39,12 @@ export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<BackButton
-				variant='icon'
-				style={[styles.backButton, { top: backTop }]}
-				onPress={() => router.back()}
-			/>
 			<ScrollView contentContainerStyle={styles.scrollContent}>
+				<BackButton
+					variant='icon'
+					style={styles.backButton}
+					onPress={() => router.back()}
+				/>
 				<View style={styles.card}>
 					{qrUri ? (
 						<Image
@@ -144,8 +141,9 @@ const styles = StyleSheet.create({
 	},
 	backButton: {
 		position: 'absolute',
+		top: 16,
 		left: 16,
-		zIndex: 10,
+		zIndex: 999,
 	},
 	scrollContent: {
 		paddingTop: 8,

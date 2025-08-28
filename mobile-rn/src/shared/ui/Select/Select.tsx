@@ -1,200 +1,107 @@
-import React, { ComponentRef, useEffect, useRef, useState } from 'react';
-import {
-	Animated,
-	Keyboard,
-	LayoutChangeEvent,
-	StyleSheet,
-	View,
-} from 'react-native';
-
+// Anchored bidirectional Select (auto up/down) with keyboard & safe-area awareness
+import ArrowDownIcon from '@/assets/icons/arrow/arrow-down';
+import ArrowUpIcon from '@/assets/icons/arrow/arrow-up';
+import React, { useMemo, useRef, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Colors, Fonts } from '@/shared/tokens';
-
 import { AppText, AppTextInput } from '../Text';
-import { DropdownList, SelectField } from './components';
-import { SelectOption, SelectProps } from './types';
+import { DropdownList } from './components';
+import type { SelectOption, SelectProps } from './types';
 
-/**
- * Компонент выпадающего списка (Select)
- *
- * Позволяет выбрать значение из списка опций с возможностью поиска.
- *
- * @example
- * ```tsx
- * <Select
- *   options={[
- *     { label: 'Опция 1', value: 'option1' },
- *     { label: 'Опция 2', value: 'option2' }
- *   ]}
- *   value={selectedValue}
- *   placeholder="Выберите опцию"
- *   onSelect={(option) => setSelectedValue(option.value)}
- *   label="Метка поля"
- * />
- * ```
- */
-export const Select = ({
+// Inline expanding Select (без Modal) – контейнер просто увеличивается
+const MAX_INLINE_HEIGHT = 300; // ограничение для списка
+
+export const Select: React.FC<SelectProps> = ({
 	options,
 	value,
-	placeholder = 'Выберите...',
+	placeholder = 'Введите город',
 	onSelect,
 	label,
 	isInvalid = false,
-}: SelectProps) => {
-	// Состояние компонента
-	const [isOpen, setIsOpen] = useState(false);
-	const [searchQuery, setSearchQuery] = useState('');
-	const [containerLayout, setContainerLayout] = useState({
-		width: 0,
-		x: 0,
-		y: 0,
-	});
+}) => {
+	const [open, setOpen] = useState(false);
+	const [query, setQuery] = useState('');
+				const inputRef = useRef<{ focus?: () => void } | null>(null);
 
-	// Анимированные значения для выпадающего списка
-	const dropdownHeight = useRef(new Animated.Value(0)).current;
-	const dropdownOpacity = useRef(new Animated.Value(0)).current;
-
-	// Референс на поле ввода для фокуса
-	const inputRef = useRef<ComponentRef<typeof AppTextInput>>(null);
-
-	// Находим выбранную опцию
-	const selectedOption = options.find(option => option.value === value);
-
-	// Фильтруем опции по поисковому запросу
-	const filteredOptions = options.filter(option =>
-		option.label.toLowerCase().includes(searchQuery.toLowerCase()),
+	const selected = useMemo(
+		() => options.find(o => o.value === value) || null,
+		[options, value],
 	);
 
-	/**
-	 * Скрываем выпадающий список при скрытии клавиатуры
-	 */
-	useEffect(() => {
-		const keyboardDidHideListener = Keyboard.addListener(
-			'keyboardDidHide',
-			closeDropdown,
-		);
+	const filtered = useMemo(() => {
+		const q = query.trim().toLowerCase();
+		if (!q) return options;
+		return options.filter(o => o.label.toLowerCase().includes(q));
+	}, [options, query]);
 
-		return () => {
-			keyboardDidHideListener.remove();
-		};
-	}, []);
-
-	/**
-	 * Анимируем открытие/закрытие выпадающего списка
-	 */
-	useEffect(() => {
-		if (isOpen) {
-			// Высота списка в зависимости от количества элементов, но не более максимальной высоты
-			const calculatedHeight = Math.min(filteredOptions.length * 54, 161);
-
-			// Открываем выпадающий список
-			Animated.parallel([
-				Animated.timing(dropdownHeight, {
-					toValue: calculatedHeight,
-					duration: 300,
-					useNativeDriver: false,
-				}),
-				Animated.timing(dropdownOpacity, {
-					toValue: 1,
-					duration: 200,
-					useNativeDriver: false,
-				}),
-			]).start();
+	const toggle = () => {
+		if (open) {
+			setOpen(false);
+			setQuery('');
 		} else {
-			// Закрываем выпадающий список
-			Animated.parallel([
-				Animated.timing(dropdownHeight, {
-					toValue: 0,
-					duration: 200,
-					useNativeDriver: false,
-				}),
-				Animated.timing(dropdownOpacity, {
-					toValue: 0,
-					duration: 150,
-					useNativeDriver: false,
-				}),
-			]).start();
+			setOpen(true);
+			// задержка чтобы input успел появиться
+			setTimeout(() => inputRef.current?.focus?.(), 30);
 		}
-	}, [isOpen, filteredOptions.length]);
-
-	/**
-	 * Обработчик выбора опции из выпадающего списка
-	 */
-	const handleSelect = (option: SelectOption) => {
-		// Вызываем родительский обработчик с правильной опцией
-		if (option && option.value) {
-			onSelect(option);
-		}
-		closeDropdown();
 	};
 
-	/**
-	 * Переключение состояния открытия/закрытия выпадающего списка
-	 */
-	const toggleDropdown = () => {
-		if (!isOpen) {
-			setSearchQuery('');
-			// Убираем автоматический фокус для стабильной работы с клавиатурой
-			// inputRef.current?.focus();
-		} else {
-			Keyboard.dismiss();
-		}
-		setIsOpen(!isOpen);
-	};
-
-	/**
-	 * Закрытие выпадающего списка
-	 */
-	const closeDropdown = () => {
-		setIsOpen(false);
-		setSearchQuery('');
-		Keyboard.dismiss();
-	};
-
-	/**
-	 * Обработчик события изменения размеров контейнера
-	 */
-	const handleContainerLayout = (event: LayoutChangeEvent) => {
-		const { width, x, y } = event.nativeEvent.layout;
-		setContainerLayout({ width, x, y });
+	const handleSelect = (opt: SelectOption) => {
+		onSelect(opt);
+		setOpen(false);
+		setQuery('');
 	};
 
 	return (
-		<View style={styles.container} onLayout={handleContainerLayout}>
+		<View style={styles.wrapper}>
 			{label && <AppText style={styles.label}>{label}</AppText>}
-
-			{/* Поле ввода/выбора */}
-			<SelectField
-				isOpen={isOpen}
-				searchQuery={searchQuery}
-				onSearchChange={setSearchQuery}
-				inputRef={inputRef}
-				selectedOption={selectedOption}
-				placeholder={placeholder}
-				isInvalid={!!isInvalid}
-				onToggle={toggleDropdown}
-			/>
-
-			{/* Выпадающий список */}
-			<DropdownList
-				filteredOptions={filteredOptions}
-				value={value}
-				dropdownHeight={dropdownHeight}
-				dropdownOpacity={dropdownOpacity}
-				containerWidth={containerLayout.width}
-				onSelect={handleSelect}
-			/>
+			<View style={[styles.container, open && styles.containerOpen, isInvalid && styles.invalid]}>        
+				<Pressable style={styles.fieldRow} onPress={toggle} accessibilityRole="button">
+					<AppText
+						style={[styles.valueText, !selected && styles.placeholder]}
+						numberOfLines={1}
+					>
+						{selected ? selected.label : placeholder}
+					</AppText>
+					{open ? (
+						<ArrowUpIcon stroke={Colors.placeHolderInput} />
+					) : (
+						<ArrowDownIcon stroke={Colors.placeHolderInput} />
+					)}
+				</Pressable>
+				{open && (
+					<View style={styles.dropdownArea}>
+						<View style={styles.searchRow}>
+																			<AppTextInput
+																				ref={node => {
+																					if (node) inputRef.current = node as unknown as { focus?: () => void };
+																				}}
+								value={query}
+								onChangeText={setQuery}
+								placeholder={placeholder}
+								placeholderTextColor={Colors.placeHolderInput}
+								style={styles.searchInput}
+								autoCapitalize="none"
+								autoCorrect={false}
+								returnKeyType="done"
+							/>
+						</View>
+						<View style={styles.listHolder}>
+							<DropdownList
+								filteredOptions={filtered}
+								value={value}
+								onSelect={handleSelect}
+							/>
+						</View>
+					</View>
+				)}
+				{open && <View pointerEvents="none" style={styles.activeOverlay} />}
+			</View>
 		</View>
 	);
 };
 
-/**
- * Стили основного компонента Select
- */
 const styles = StyleSheet.create({
-	container: {
-		width: '100%',
-		zIndex: 1, // Чтобы дропдаун был поверх других элементов
-	},
+	wrapper: {},
 	label: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
@@ -202,4 +109,59 @@ const styles = StyleSheet.create({
 		marginLeft: 16,
 		marginBottom: 12,
 	},
+	container: {
+		borderWidth: 1,
+		borderColor: Colors.inputBorder,
+		borderRadius: 16,
+		backgroundColor: Colors.white,
+		overflow: 'hidden',
+	},
+	containerOpen: {
+		// можно поменять цвет рамки при открытии
+		borderColor: Colors.inputBorder,
+	},
+	invalid: { borderColor: Colors.error },
+	fieldRow: {
+		height: 54,
+		paddingHorizontal: 16,
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	valueText: {
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f16,
+		color: Colors.headerAndInputText,
+		flex: 1,
+		marginRight: 8,
+	},
+	placeholder: { color: Colors.placeHolderInput },
+	dropdownArea: {
+		borderTopWidth: 1,
+		borderTopColor: Colors.inputOptionBorder,
+	},
+	searchRow: {
+		height: 54,
+		justifyContent: 'center',
+		paddingHorizontal: 16,
+		borderBottomWidth: 1,
+		borderBottomColor: Colors.inputOptionBorder,
+	},
+	searchInput: {
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f16,
+		color: Colors.headerAndInputText,
+		padding: 0,
+	},
+	listHolder: {
+		maxHeight: MAX_INLINE_HEIGHT,
+	},
+		activeOverlay: {
+			position: 'absolute',
+			top: 0,
+			left: 0,
+			right: 0,
+			height: 54,
+			backgroundColor: Colors.black + '08', // тонкий затемняющий слой
+		},
 });

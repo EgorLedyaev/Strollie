@@ -1,6 +1,7 @@
-import { Colors, Fonts } from '@/shared/tokens';
 import React from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppText } from '../../Text';
 import { SelectOption as SelectOptionType } from '../types';
@@ -23,21 +24,11 @@ export const SelectOption: React.FC<SelectOptionProps> = ({
 	isSelected,
 	onSelect,
 }) => {
-	// Создаем обработчик нажатия
-	const handlePress = () => {
-		// Явно передаем выбранную опцию в обработчик с небольшой задержкой для улучшения UX
-		setTimeout(() => {
-			onSelect(item);
-		}, 0);
-	};
-
 	return (
 		<TouchableOpacity
 			style={[styles.optionItem, isSelected && styles.selectedOption]}
-			onPress={handlePress}
+			onPress={() => onSelect(item)}
 			activeOpacity={0.5}
-			delayPressIn={0}
-			hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
 		>
 			<AppText
 				style={[
@@ -60,15 +51,11 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: Colors.inputOptionBorder,
 	},
-	selectedOption: {
-		backgroundColor: Colors.optionHighlight,
-	},
+	selectedOption: { backgroundColor: Colors.optionHighlight },
 	optionText: {
 		fontFamily: Fonts.regular,
 		fontSize: 16,
 		color: Colors.headerAndInputText,
 	},
-	selectedOptionText: {
-		fontFamily: Fonts.medium,
-	},
+	selectedOptionText: { fontFamily: Fonts.medium },
 });
