@@ -4,4 +4,5 @@ export {
 	userProfileAtom,
 	loadUserProfileAtom,
 	updateUserProfileAtom,
+	resetUserProfileAtom,
 } from './model/user.state';

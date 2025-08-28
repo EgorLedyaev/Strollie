@@ -106,3 +106,11 @@ export const updateUserProfileAtom = atom(
 		}));
 	},
 );
+
+/**
+ * Атом для полного сброса состояния профиля пользователя (write-only).
+ * Используется при выходе из аккаунта, чтобы не показывать профиль предыдущего пользователя.
+ */
+export const resetUserProfileAtom = atom(null, (_get, set) => {
+	set(userProfileAtomWithStorage, INITIAL_STATE);
+});

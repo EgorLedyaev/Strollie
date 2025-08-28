@@ -3,6 +3,7 @@ import { atom } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
 import type { User } from '@/entities/user/@x/session';
+import { resetUserProfileAtom } from '@/entities/user/@x/session';
 
 /**
  * Тип для состояния сессии.
@@ -67,6 +68,8 @@ export const setSessionAtom = atom(
 /**
  * Атом для выхода из системы (write-only).
  */
-export const logoutAtom = atom(null, async (_get, set) => {
+export const logoutAtom = atom(null, async (get, set) => {
+	// Сбросим профиль пользователя до очистки сессии, чтобы UI сразу отреагировал
+	set(resetUserProfileAtom);
 	set(sessionAtomWithStorage, INITIAL_STATE);
 });
