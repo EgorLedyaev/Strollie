@@ -55,6 +55,8 @@ export const Colors = {
 	error: '#FF5858',
 
 	transparent: 'transparent',
+
+	modalOverlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 export const Gaps = {

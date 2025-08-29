@@ -2,7 +2,14 @@
 import ArrowDownIcon from '@/assets/icons/arrow/arrow-down';
 import ArrowUpIcon from '@/assets/icons/arrow/arrow-up';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Dimensions, Modal, Pressable, StyleSheet, View, Keyboard } from 'react-native';
+import {
+	Dimensions,
+	Keyboard,
+	Modal,
+	Pressable,
+	StyleSheet,
+	View,
+} from 'react-native';
 
 import { Colors, Fonts } from '@/shared/tokens';
 
@@ -37,7 +44,9 @@ export const Select: React.FC<SelectProps> = ({
 		top: number; // абсолютный top
 		maxHeight: number; // суммарная высота карточки (search + list)
 	} | null>(null);
-	const [keyboardY, setKeyboardY] = useState<number>(Dimensions.get('window').height); // граница низа
+	const [keyboardY, setKeyboardY] = useState<number>(
+		Dimensions.get('window').height,
+	); // граница низа
 
 	const selected = useMemo(
 		() => options.find(o => o.value === value) || null,
@@ -79,7 +88,8 @@ export const Select: React.FC<SelectProps> = ({
 	// Keyboard listeners
 	useEffect(() => {
 		const show = Keyboard.addListener('keyboardDidShow', e => {
-			const y = e.endCoordinates?.screenY ?? Dimensions.get('window').height;
+			const y =
+				e.endCoordinates?.screenY ?? Dimensions.get('window').height;
 			setKeyboardY(y);
 			if (open) computePlacement(anchor, y);
 		});
@@ -88,7 +98,10 @@ export const Select: React.FC<SelectProps> = ({
 			setKeyboardY(h);
 			if (open) computePlacement(anchor, h);
 		});
-		return () => { show.remove(); hide.remove(); };
+		return () => {
+			show.remove();
+			hide.remove();
+		};
 	}, [open, anchor]);
 
 	// Orientation / window size changes
@@ -99,7 +112,9 @@ export const Select: React.FC<SelectProps> = ({
 			setKeyboardY(h);
 			measure(() => computePlacement(anchor, h));
 		});
-		return () => { sub.remove(); };
+		return () => {
+			sub.remove();
+		};
 	}, [open, anchor]);
 
 	const computePlacement = (anch: typeof anchor, kbY: number) => {
@@ -220,7 +235,12 @@ export const Select: React.FC<SelectProps> = ({
 									returnKeyType='done'
 								/>
 							</View>
-							<View style={[styles.listHolder, { maxHeight: placement.maxHeight - 54 }]}>
+							<View
+								style={[
+									styles.listHolder,
+									{ maxHeight: placement.maxHeight - 54 },
+								]}
+							>
 								<DropdownList
 									filteredOptions={filtered}
 									value={value}

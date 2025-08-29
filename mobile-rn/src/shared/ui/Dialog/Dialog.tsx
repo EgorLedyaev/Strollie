@@ -25,6 +25,7 @@ export const Dialog = ({
 			transparent
 			animationType='fade'
 			onRequestClose={onClose}
+			statusBarTranslucent
 		>
 			<TouchableOpacity
 				style={styles.overlay}
@@ -49,7 +50,7 @@ export const Dialog = ({
 const styles = StyleSheet.create({
 	overlay: {
 		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)', // Полупрозрачный оверлей
+		backgroundColor: Colors.modalOverlay, // Полупрозрачный оверлей
 		justifyContent: 'center',
 		alignItems: 'center',
 	},

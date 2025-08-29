@@ -10,6 +10,7 @@ export interface Ticket {
   seat?: string;
   row?: string; // ряд (для кино/поезда)
   hall?: string; // зал (для кино)
+  address?: string; // адрес площадки (для кино)
   carrierInfo?: {
     name: string;
     logo?: string;

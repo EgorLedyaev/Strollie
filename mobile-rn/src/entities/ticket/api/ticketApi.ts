@@ -21,7 +21,8 @@ export const ticketApi = {
 			to: 'Несокрушимый',
 			departureTime: `${y}-10-25T16:50:00+03:00`,
 			arrivalTime: `${y}-10-25T19:00:00+03:00`,
-			carrierInfo: { name: 'Синема Парк' },
+			carrierInfo: { name: 'Синема Парк' }, // для обратной совместимости карточек
+			address: 'ТРЦ Космопорт, Московское шоссе 17',
 			qrCodeUrl: qrUrl('tkt_cinema_322123133'),
 			type: 'other',
 			isUsed: false,

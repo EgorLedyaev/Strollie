@@ -5,6 +5,7 @@ import { SectionList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ShowTicketQrDialog } from '@/features/show-ticket-qr';
+import { TicketDetailsDialog } from '@/features/ticket-details';
 import {
 	ticketApi,
 	TicketCard,
@@ -18,6 +19,8 @@ export const TicketListPage: React.FC = () => {
 	const [tickets, setTickets] = useAtom(ticketsAtom);
 	const [qrVisible, setQrVisible] = useState(false);
 	const [qrUri, setQrUri] = useState<string | undefined>();
+	const [detailsVisible, setDetailsVisible] = useState(false);
+	const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
 
@@ -104,7 +107,8 @@ export const TicketListPage: React.FC = () => {
 										setQrVisible(true);
 									}}
 									onMorePress={() => {
-										router.push(`/tickets/${item.id}`);
+										setSelectedTicket(item);
+										setDetailsVisible(true);
 									}}
 								/>
 							</View>
@@ -118,6 +122,14 @@ export const TicketListPage: React.FC = () => {
 				onClose={() => setQrVisible(false)}
 				qrUri={qrUri}
 				title='QR код билета'
+			/>
+			<TicketDetailsDialog
+				visible={detailsVisible}
+				onClose={() => {
+					setDetailsVisible(false);
+					setSelectedTicket(null);
+				}}
+				ticket={selectedTicket}
 			/>
 		</SafeAreaView>
 	);
