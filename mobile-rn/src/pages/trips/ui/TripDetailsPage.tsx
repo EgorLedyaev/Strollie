@@ -5,10 +5,17 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+
+
 import { tripsApi } from '@/pages/trips/api';
 import { Ticket, ticketApi, TicketCard } from '@/entities/ticket';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText, BackButton, IconButton } from '@/shared/ui';
+import { PlusButton } from '@/shared/ui/PlusButton';
+
+
+
+
 
 function pad2(n: number) {
 	return n < 10 ? `0${n}` : `${n}`;
@@ -162,11 +169,7 @@ export const TripDetailsPage: React.FC = () => {
 								<AppText style={styles.sectionTitle}>
 									Билеты
 								</AppText>
-								<IconButton feedback='opacity' opacity={0.6}>
-									<View style={styles.smallSquareWhite}>
-										<PlusIcon />
-									</View>
-								</IconButton>
+								<PlusButton onPress={() => {}} />
 							</View>
 							{tickets.length > 0 ? (
 								<View style={styles.ticketsWrap}>
@@ -188,11 +191,7 @@ export const TripDetailsPage: React.FC = () => {
 								<AppText style={styles.sectionTitle}>
 									Места
 								</AppText>
-								<IconButton feedback='opacity' opacity={0.6}>
-									<View style={styles.smallSquareWhite}>
-										<PlusIcon />
-									</View>
-								</IconButton>
+								<PlusButton onPress={() => {}} />
 							</View>
 							<View style={styles.placesBox}>
 								<View style={styles.placesLine} />
@@ -334,14 +333,14 @@ export const TripDetailsPage: React.FC = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: Colors.lightBackground,
-		padding: 16,
+		paddingTop: 16,
+		paddingHorizontal: 16,
 	},
 	headerRow: {
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		marginBottom: 16,
+		paddingBottom: 14,
 	},
 	headerTitle: {
 		fontSize: Fonts.f16,
@@ -359,6 +358,7 @@ const styles = StyleSheet.create({
 
 	// Даты
 	sectionDates: {
+		marginTop: 20,
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,
 		paddingVertical: 20,
@@ -368,9 +368,9 @@ const styles = StyleSheet.create({
 		gap: 32,
 	},
 	dateBox: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-	dateLabel: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
+	dateLabel: { color: Colors.textGrayB7, fontSize: Fonts.f14 },
 	dateValue: {
-		color: Colors.headerAndInputText,
+		color: Colors.darkGrayText43,
 		fontSize: Fonts.f16,
 		fontFamily: Fonts.semibold,
 	},
@@ -378,6 +378,7 @@ const styles = StyleSheet.create({
 	// Общая секция
 	section: { rowGap: Gaps.g12 },
 	sectionHeaderRow: {
+		marginTop: 24,
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
@@ -429,9 +430,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		gap: 24,
-		marginBottom: 12,
+		marginBottom: 20,
 	},
-	placeDot: { width: 20, height: 20, borderRadius: 10 },
+	placeDot: { width: 20, height: 20, borderRadius: 10, },
 	placeDotActive: { backgroundColor: Colors.greenPrimary },
 	placeDotInactive: { backgroundColor: Colors.grayMedium },
 	placeText: { color: Colors.headerAndInputText, fontSize: Fonts.f14 },

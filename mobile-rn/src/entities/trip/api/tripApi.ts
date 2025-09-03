@@ -1,35 +1,52 @@
-import type { Trip } from '../model';
+import type { Trip, TripChecklistItem } from '../model/trip.model';
 
 const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-export const tripApi = {
-  async getMyTrips(): Promise<Trip[]> {
-    await sleep(300);
+// In-memory dataset (can be swapped with real backend service)
+const trips: Trip[] = [
+  {
+    id: 'trip_mock_future',
+    title: 'Летняя поездка',
+    startDate: '2025-06-18T00:00:00+04:00',
+    endDate: '2025-06-24T23:59:59+04:00',
+    ticketIds: [],
+    places: [],
+    routes: [],
+    checklist: [],
+    notes: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
 
-    // Две готовые поездки, синхронизированные с билетами
-    return [
-      {
-        id: 'trip_saratov',
-        name: 'Поездка в Саратов',
-        startDate: new Date('2025-06-18T00:00:00+04:00'),
-        endDate: new Date('2025-06-24T23:59:59+04:00'),
-        ticketIds: ['tkt_train_samara_saratov'],
-        routeIds: [],
-        checklistItems: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: 'trip_february',
-        name: 'Название поездки',
-        startDate: new Date('2025-02-18T00:00:00+03:00'),
-        endDate: new Date('2025-02-24T23:59:59+03:00'),
-        ticketIds: ['tkt_plane_mow_sochi'],
-        routeIds: [],
-        checklistItems: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
+export interface CreateTripInput {
+  startDate: string;
+  endDate: string;
+  ticketIds: string[];
+  places: string[];
+  routes: string[];
+  checklist: TripChecklistItem[];
+  notes?: string;
+  title?: string;
+}
+
+export const tripApi = {
+  async createTrip(data: CreateTripInput): Promise<Trip> {
+    await sleep(400);
+    const now = new Date().toISOString();
+    const trip: Trip = {
+      id: `trip_${Math.random().toString(36).slice(2, 10)}`,
+      createdAt: now,
+      updatedAt: now,
+      ...data,
+    };
+    trips.push(trip);
+    return trip;
+  },
+  async listTrips(): Promise<Trip[]> {
+    await sleep(200);
+    return [...trips];
   },
 };
+
+export type { Trip };

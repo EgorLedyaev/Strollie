@@ -1,26 +1,26 @@
-export interface Trip {
-  id: string;
-  name: string;
-  startDate: Date;
-  endDate: Date;
-  ticketIds: string[];
-  routeIds: string[];
-  checklistItems: ChecklistItem[];
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ChecklistItem {
+export interface TripChecklistItem {
   id: string;
   text: string;
-  isChecked: boolean;
+  done: boolean;
 }
 
-export const DEFAULT_CHECKLIST_ITEMS: Omit<ChecklistItem, 'id'>[] = [
-  { text: 'Паспорт', isChecked: false },
-  { text: 'Билеты', isChecked: false },
-  { text: 'Страховка', isChecked: false },
-  { text: 'Бронь жилья', isChecked: false },
-  { text: 'Лекарства', isChecked: false },
+export interface Trip {
+  id: string;
+  title?: string;
+  startDate: string; // ISO date string
+  endDate: string; // ISO date string
+  ticketIds: string[];
+  places: string[];
+  routes: string[];
+  checklist: TripChecklistItem[];
+  notes?: string;
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+}
+export const DEFAULT_CHECKLIST_ITEMS: Omit<TripChecklistItem, 'id' | 'done'>[] = [
+  { text: 'Паспорт' },
+  { text: 'Билеты' },
+  { text: 'Страховка' },
+  { text: 'Бронь жилья' },
+  { text: 'Лекарства' },
 ];

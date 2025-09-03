@@ -26,7 +26,9 @@ export const Colors = {
 	// Цвета для форм и инпутов
 	inputBorder: '#E7E7E7',
 	headerAndInputText: '#484848', // Цвет текста в инпутах и в заголовках
+	darkGrayText43: '#434343',
 	placeholderGray: '#B2B2B2',
+	textGrayB7: '#B7B7B7',
 	placeHolderInput: '#B3B3B3', // Цвет плейсхолдера в инпутах
 	searchDivider: '#D7D7D7', // Цвет разделителя в поле поиска
 	inputOptionBorder: '#F4F4F4', // Цвет бордера опций в выпадающем списке

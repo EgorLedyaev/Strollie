@@ -1,16 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-
-
+import { Image, StyleSheet, View } from 'react-native';
 
 import type { Ticket } from '@/entities/ticket';
 import { Colors, Fonts } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 import { Dialog } from '@/shared/ui/Dialog';
-
-
-
-
 
 interface Props {
 	visible: boolean;
@@ -50,31 +44,49 @@ export const TicketDetailsDialog: React.FC<Props> = ({
 							resizeMode='contain'
 						/>
 					) : null}
-					<AppText style={styles.ticketNumber}>{humanTicketNo(ticket.id)}</AppText>
+					<AppText style={styles.ticketNumber}>
+						{humanTicketNo(ticket.id)}
+					</AppText>
 					{/* Дата / время отправления */}
 					<View style={styles.dateTimeRow}>
-						<AppText style={styles.dateText}>{formatFullDate(new Date(ticket.departureTime))}</AppText>
-						<AppText style={styles.timeText}>{formatTime(new Date(ticket.departureTime))}</AppText>
+						<AppText style={styles.dateText}>
+							{formatFullDate(new Date(ticket.departureTime))}
+						</AppText>
+						<AppText style={styles.timeText}>
+							{formatTime(new Date(ticket.departureTime))}
+						</AppText>
 					</View>
 					{/* Зал / Ряд / Место (для кино или если данные присутствуют) */}
 					{(ticket.hall || ticket.row || ticket.seat) && (
 						<View style={styles.hrGroup}>
 							{ticket.hall ? (
 								<View style={styles.hrBlock}>
-									<AppText style={styles.hrLabel}>Зал</AppText>
-									<AppText style={styles.hrValue}>{ticket.hall}</AppText>
+									<AppText style={styles.hrLabel}>
+										Зал
+									</AppText>
+									<AppText style={styles.hrValue}>
+										{ticket.hall}
+									</AppText>
 								</View>
 							) : null}
 							{ticket.row ? (
 								<View style={styles.hrBlock}>
-									<AppText style={styles.hrLabel}>Ряд</AppText>
-									<AppText style={styles.hrValue}>{ticket.row}</AppText>
+									<AppText style={styles.hrLabel}>
+										Ряд
+									</AppText>
+									<AppText style={styles.hrValue}>
+										{ticket.row}
+									</AppText>
 								</View>
 							) : null}
 							{ticket.seat ? (
 								<View style={styles.hrBlock}>
-									<AppText style={styles.hrLabel}>Место</AppText>
-									<AppText style={styles.hrValue}>{ticket.seat}</AppText>
+									<AppText style={styles.hrLabel}>
+										Место
+									</AppText>
+									<AppText style={styles.hrValue}>
+										{ticket.seat}
+									</AppText>
 								</View>
 							) : null}
 						</View>
@@ -85,25 +97,44 @@ export const TicketDetailsDialog: React.FC<Props> = ({
 							<>
 								{renderField('Фильм', ticket.to)}
 								{renderField('Кинотеатр', ticket.from)}
-								{ticket.address ? renderField('Адрес', ticket.address) : null}
+								{ticket.address
+									? renderField('Адрес', ticket.address)
+									: null}
 							</>
 						) : (
 							<>
-								{renderField('Маршрут', `${ticket.from} — ${ticket.to}`)}
+								{renderField(
+									'Маршрут',
+									`${ticket.from} — ${ticket.to}`,
+								)}
 								{ticket.carrierInfo?.name
-									? renderField('Перевозчик', ticket.carrierInfo.name)
+									? renderField(
+											'Перевозчик',
+											ticket.carrierInfo.name,
+										)
 									: null}
-								{renderField('Отправление', formatDateTimeRange(ticket.departureTime))}
-								{renderField('Прибытие', formatDateTimeRange(ticket.arrivalTime))}
+								{renderField(
+									'Отправление',
+									formatDateTimeRange(ticket.departureTime),
+								)}
+								{renderField(
+									'Прибытие',
+									formatDateTimeRange(ticket.arrivalTime),
+								)}
 							</>
 						)}
 						{ticket.price != null
-							? renderField('Стоимость', formatPrice(ticket.price, ticket.currency))
+							? renderField(
+									'Стоимость',
+									formatPrice(ticket.price, ticket.currency),
+								)
 							: null}
 					</View>
 					{/* Вернуть билет (пока без логики) */}
 					<View style={styles.refundBtn}>
-						<AppText style={styles.refundText}>Вернуть билет</AppText>
+						<AppText style={styles.refundText}>
+							Вернуть билет
+						</AppText>
 					</View>
 				</View>
 			)}
@@ -151,7 +182,10 @@ function renderField(label: string, value: string) {
 
 function isCinema(ticket: Ticket) {
 	// Пока не введён отдельный тип для кино, эвристика: есть hall или row и type === 'other'
-	return ticket.type === 'other' && (!!ticket.hall || !!ticket.row || !!ticket.seat);
+	return (
+		ticket.type === 'other' &&
+		(!!ticket.hall || !!ticket.row || !!ticket.seat)
+	);
 }
 
 const styles = StyleSheet.create({
