@@ -17,12 +17,11 @@ const compat = new FlatCompat({
 });
 
 export default defineConfig([
+	...compat.extends(
+		'eslint:recommended',
+		'plugin:@typescript-eslint/recommended',
+	),
 	{
-		extends: compat.extends(
-			'eslint:recommended',
-			'plugin:@typescript-eslint/recommended',
-		),
-
 		plugins: {
 			prettier,
 			react,
@@ -37,6 +36,11 @@ export default defineConfig([
 			'react-native/no-raw-text': [2, { skip: ['AppText'] }],
 			'react-native/no-single-element-style-arrays': 2,
 			'react-hooks/exhaustive-deps': 'off',
+			'react-native/sort-styles': [
+				'error',
+				'asc',
+				{ ignoreClassNames: false, ignoreStyleProperties: false },
+			],
 			'@typescript-eslint/no-empty-function': ['off'],
 			'@typescript-eslint/interface-name-prefix': 'off',
 			'@typescript-eslint/ban-types': 'off',
@@ -60,6 +64,37 @@ export default defineConfig([
 								'User require() for fonts assets instead of import',
 						},
 					],
+				},
+			],
+			'no-restricted-syntax': [
+				'error',
+
+				{
+					selector: "Property[key.name='fontSize'] > Literal",
+					message:
+						'Используйте токен из Fonts (например, Fonts.f14) вместо сырого fontSize.',
+				},
+
+				// 2) fontFamily: запрет строк-литералов — использовать Fonts.bold/regular/...
+				{
+					selector: "Property[key.name='fontFamily'] > Literal",
+					message:
+						'Используйте токен из Fonts (например, Fonts.bold) вместо строкового fontFamily.',
+				},
+
+				// 3) fontWeight: запрет строк-литералов — использовать Fonts.bold/regular/...
+				{
+					selector: "Property[key.name='fontWeight']",
+					message:
+						"Не используйте fontWeight (например, '700'). Применяйте семейство из Fonts.* (bold/semibold/...).",
+				},
+
+				// 4) Любые радиусы: запрет числовых литералов — использовать Radius.*
+				{
+					selector:
+						'Property[key.name=/^border(?:Top|Bottom)?(?:Left|Right|Start|End)?Radius$|^borderRadius$/] > Literal',
+					message:
+						'Используйте токен из Radius (например, Radius.r15) вместо числового радиуса.',
 				},
 			],
 			'@typescript-eslint/no-require-imports': [

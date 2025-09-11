@@ -4,10 +4,15 @@ import TrainIcon from '@/assets/icons/tickets/TrainIcon';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
+
+
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
 
+
+
 import type { Ticket } from '../model';
+
 
 interface Props {
 	ticket: Ticket; // ожидается ticket.type === 'train'
@@ -142,86 +147,79 @@ export const TrainTicketCard: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
-	wrap: { flexDirection: 'row', gap: 0 },
-	leftBox: {
-		width: 120,
-		height: 200,
-		backgroundColor: Colors.white,
-		borderRightWidth: 1,
-		borderColor: Colors.inputBorder,
-		borderTopLeftRadius: Radius.r15,
-		borderBottomLeftRadius: Radius.r15,
-		alignItems: 'center',
-		justifyContent: 'center',
-		boxShadow: Shadows.boxShadow_elev1,
-		padding: 8,
-	},
-	qrPreview: {
-		width: 96,
-		height: 96,
-		borderRadius: 8,
-		borderWidth: 1,
-		borderColor: Colors.inputBorder,
-		backgroundColor: Colors.white,
-		marginBottom: 8,
-	},
+	arrowIcon: { marginTop: 6 },
+
+	block: { width: 61 },
+	blockMid: { alignItems: 'center', justifyContent: 'center', width: 60 },
 	card: {
-		flex: 1,
-		height: 200,
 		backgroundColor: Colors.white,
-		borderTopRightRadius: Radius.r15,
-		borderBottomRightRadius: Radius.r15,
-		padding: 16,
-		boxShadow: Shadows.boxShadow_elev1,
-		// Прижать футер вниз
+		borderRadius: Radius.r15,
+		flex: 1,
 		flexDirection: 'column',
+		padding: 24,
 	},
-	typeIconWrap: { position: 'absolute', right: 24, bottom: 24 },
+	duration: { color: Colors.darkGray, fontSize: Fonts.f12 },
+	footer: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 7,
+		marginTop: 'auto',
+	},
 	headerRow: { marginBottom: 8 },
+	infoMain: {fontSize: Fonts.f20 },
+	infoMinor: { color: Colors.textGray, fontSize: Fonts.f12 },
+	infoRow: {
+		alignItems: 'center',
+		borderColor: Colors.grayBackground,
+		borderWidth: 1,
+		flexDirection: 'row',
+		gap: 8,
+		justifyContent: 'space-between',
+		padding: 5,
+	},
+	infoSub: { color: Colors.placeholderGray, fontSize: Fonts.f12 },
+	leftBox: {
+		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		justifyContent: 'space-between',
+		paddingVertical: 24,
+		width: 120,
+	},
+
+	metaLabel: { color: Colors.grayText, fontSize: Fonts.f14 },
+	metaValue: { fontSize: Fonts.f14 },
+	more: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
+	qrPreview: {
+		backgroundColor: Colors.white,
+		height: 96,
+		width: 96,
+	},
+	seatRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 8,
+		marginTop: 8,
+	},
+
+	ticketDate: {
+		color: Colors.textAAA,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f14,
+	},
+	ticketNo: {
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f14,
+	},
+
 	title: {
-		fontSize: Fonts.f20,
 		color: Colors.headerAndInputText,
 		fontFamily: Fonts.medium,
+		fontSize: Fonts.f20,
 	},
-	infoRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		borderWidth: 1,
-		borderColor: Colors.grayBackground,
-		padding: 5,
-		justifyContent: 'space-between',
-		gap: 8,
-	},
-	block: { width: 61 },
-	blockMid: { justifyContent: 'center', alignItems: 'center', width: 60 },
-	infoMain: { fontSize: Fonts.f20, color: Colors.headerAndInputText },
-	infoSub: { fontSize: Fonts.f12, color: Colors.placeholderGray },
-	infoMinor: { fontSize: Fonts.f12, color: Colors.textGray },
-	duration: { color: Colors.darkGray, fontSize: Fonts.f12 },
-	// Горизонтальная «стрелка» под временем — SVG
-	arrowIcon: { marginTop: 6 },
-	seatRow: {
-		marginTop: 8,
-		flexDirection: 'row',
-		gap: 8,
-		alignItems: 'center',
-	},
-	metaLabel: { fontSize: Fonts.f14, color: Colors.grayText },
-	metaValue: { fontSize: Fonts.f14, color: Colors.headerAndInputText },
-	footer: {
-		marginTop: 'auto',
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 7,
-	},
-	more: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
-	ticketNo: {
-		fontSize: Fonts.f14,
-		// fontWeight заменен на fontFamily из токенов
-		fontFamily: Fonts.bold,
-		color: Colors.headerAndInputText,
-	},
-	ticketDate: { fontSize: Fonts.f14, color: Colors.placeholderGray },
+	typeIconWrap: { bottom: 24, position: 'absolute', right: 24 },
+
+	wrap: { flexDirection: 'row', gap: 1, height: 200 },
 });
 
 export default TrainTicketCard;

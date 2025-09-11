@@ -10,6 +10,10 @@ interface AppTextProps extends TextProps {
 	variant?: AppTextVariant;
 }
 
+/**
+ * Компонент для отображения текста с предустановленными стилями;
+ * по умолчанию размер шрифта 16 и стиль regular
+ */
 export const AppText = forwardRef<Text, AppTextProps>(
 	({ style, variant = 'body', ...props }, ref) => {
 		return (
@@ -25,13 +29,19 @@ export const AppText = forwardRef<Text, AppTextProps>(
 AppText.displayName = 'AppText';
 
 const styles = StyleSheet.create({
-	text: {
-		includeFontPadding: false, // Глобальное правило
-		color: Colors.headerAndInputText, // Базовый цвет текста
-	},
 	body: {
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f16,
+	},
+	button: {
+		color: Colors.white,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f18,
+	},
+	caption: {
+		color: Colors.textGray,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f14,
 	},
 	h1: {
 		fontFamily: Fonts.bold,
@@ -41,19 +51,13 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f24,
 	},
-	caption: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f14,
-		color: Colors.textGray,
-	},
-	button: {
-		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f18,
-		color: Colors.white,
-	},
-
 	header: {
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f20,
+	},
+
+	text: {
+		color: Colors.headerAndInputText, // Базовый цвет текста
+		includeFontPadding: false, // Глобальное правило
 	},
 });

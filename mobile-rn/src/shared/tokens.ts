@@ -22,6 +22,7 @@ export const Colors = {
 	backgroundBetweenNavbarAndPanel: '#F6F6F6', // Цвет фона между навбаром и панелью
 	grayTextButtonOverlay: '#A3A3A3', // Цвет текста кнопки в оверлее
 	grayTextOverlay: '#383838', // Цвет текста в оверлее
+	textAAA: '#AAAAAA', // 
 
 	// Цвета для форм и инпутов
 	inputBorder: '#E7E7E7',
