@@ -1,5 +1,7 @@
-import { TicketListPage } from '@/pages/tickets';
+// import { TicketListPage } from '@/pages/tickets';
+import { EmptyTicketsPage } from '@/pages/tickets-new';
 
 export default function Page() {
-	return <TicketListPage />;
+	// return <TicketListPage />;
+	return <EmptyTicketsPage />;
 }
