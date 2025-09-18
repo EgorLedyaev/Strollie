@@ -43,7 +43,7 @@ export const TicketsMainPage: React.FC = () => {
 				<View style={styles.headerRightStub} />
 			</View>
 
-			{!showEmpty ? (
+			{showEmpty ? (
 				<EmptyTicketsPage />
 			) : (
 				<ScrollView contentContainerStyle={styles.scrollContent}>
