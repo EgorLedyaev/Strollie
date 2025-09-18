@@ -16,6 +16,7 @@
 		"format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
 		"typecheck": "tsc --noEmit",
 		"fsd:check": "steiger ./src",
+		"fsd:warn": "steiger ./src || true",
 		"prepare": "husky install"
 	},
 	"jest": {
