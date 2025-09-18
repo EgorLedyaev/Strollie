@@ -1,5 +1,6 @@
 import AddTicketIcon from '@/assets/icons/tickets/AddTicketIcon';
 import tickets_empty from '@/assets/images/tickets-empty.png';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
@@ -7,8 +8,11 @@ import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 
 export const EmptyTicketsPage: React.FC = () => {
+	const router = useRouter();
+
 	const onAddTicket = () => {
-		console.log("'Добавить билет' pressed");
+		// Переход на экран добавления билета
+		router.push('/tickets/add');
 	};
 
 	return (
@@ -38,7 +42,9 @@ export const EmptyTicketsPage: React.FC = () => {
 			>
 				<View style={styles.addButtonContent}>
 					<AddTicketIcon />
-					<AppText variant='button' style={styles.addButtonText} >Добавить билет</AppText>
+					<AppText variant='button' style={styles.addButtonText}>
+						Добавить билет
+					</AppText>
 				</View>
 			</AppButton>
 		</View>
