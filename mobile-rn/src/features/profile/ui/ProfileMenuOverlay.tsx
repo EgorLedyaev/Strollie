@@ -112,35 +112,35 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 };
 
 const styles = StyleSheet.create({
-	overlay: {
-		flex: 1,
-		backgroundColor: Colors.shadowButton,
-		justifyContent: 'flex-start',
-		alignItems: 'stretch',
-		paddingHorizontal: 16,
+	divider: {
+		marginBottom: 10,
 	},
-	menuContainer: {
-		width: 246,
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		padding: 20,
-		paddingLeft: 25,
-		boxShadow: Shadows.boxShadow,
-		gap: 20,
-	},
-	menuItem: {
-		alignItems: 'flex-start',
-	},
-	menuText: {
-		fontSize: Fonts.f14,
-		color: Colors.black,
-	},
-
 	logoutText: {
 		color: Colors.red,
 		fontFamily: Fonts.medium,
 	},
-	divider: {
-		marginBottom: 10,
+	menuContainer: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		boxShadow: Shadows.boxShadow,
+		gap: 20,
+		padding: 20,
+		paddingLeft: 25,
+		width: 246,
+	},
+	menuItem: {
+		alignItems: 'flex-start',
+	},
+
+	menuText: {
+		color: Colors.black,
+		fontSize: Fonts.f14,
+	},
+	overlay: {
+		alignItems: 'stretch',
+		backgroundColor: Colors.shadowButton,
+		flex: 1,
+		justifyContent: 'flex-start',
+		paddingHorizontal: 16,
 	},
 });

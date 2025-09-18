@@ -16,6 +16,7 @@ export const Colors = {
 	disabledGray: '#EAEAEA', // Цвет фона для отключенных кнопок
 	lightBackground: '#F6F6F6',
 	grayIcon: '#626262',
+	noPhotoIconBackground: '#F3F3F3', // Цвет фона иконки "нет фото"
 	overlayBackground: '#F1F1F1', // Цвет фона для оверлея
 	grayBackground: '#F4F4F4', // Цвет фона для серых блоков
 	grayText: '#626262', // Цвет текста в серых блоках
@@ -60,6 +61,7 @@ export const Colors = {
 	transparent: 'transparent',
 
 	modalOverlay: 'rgba(0, 0, 0, 0.5)',
+	darkImageOverlay: '#1F1F1F73', // Полупрозрачный оверлей для аватаров/фото
 };
 
 export const Gaps = {
@@ -81,6 +83,7 @@ export const Radius = {
 	r16: 16,
 	r20: 20,
 	r22: 22,
+	r50: 50,
 };
 
 export const Fonts = {

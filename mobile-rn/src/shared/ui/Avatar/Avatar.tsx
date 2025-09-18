@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { Colors } from '../../tokens';
+import NoPhotoIcon from '@/assets/icons/NoPhotoIcon';
 
 interface AvatarProps {
 	uri?: string | null;
@@ -26,7 +27,9 @@ export const Avatar = ({ uri, size = 100, style }: AvatarProps) => {
 					resizeMode='cover'
 				/>
 			) : (
-				<View style={styles.iconContainer}></View>
+					<View style={styles.iconContainer}>
+						<NoPhotoIcon />
+				</View>
 			)}
 		</View>
 	);
@@ -35,14 +38,15 @@ export const Avatar = ({ uri, size = 100, style }: AvatarProps) => {
 const styles = StyleSheet.create({
 	container: {
 		overflow: 'hidden',
-		backgroundColor: Colors.lightBackground,
-	},
-	image: {
-		width: '100%',
-		height: '100%',
 	},
 	iconContainer: {
+		alignItems: 'center',
 		...StyleSheet.absoluteFillObject,
-		backgroundColor: Colors.grayAvatar, // Цвет фона, если аватар не загружен
+		backgroundColor: Colors.noPhotoIconBackground, // Цвет фона, если аватар не загружен
+		justifyContent: 'center',
+	},
+	image: {
+		height: '100%',
+		width: '100%',
 	},
 });

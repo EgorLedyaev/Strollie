@@ -27,6 +27,7 @@ export interface UserProfileData {
 	firstName: string;
 	lastName: string;
 	nickname: string;
+	email: string;
 	city: string;
 	birthDate: string;
 	photo?: string;
@@ -61,6 +62,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 			firstName: user.firstName || '',
 			lastName: user.lastName || '',
 			nickname: user.nickname || '',
+			email: user.email || '',
 			city: user.city || '',
 			birthDate: user.birthDate || '',
 			photo: user.photo,
@@ -118,9 +120,6 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 				showsVerticalScrollIndicator={false}
 			>
 				<AvatarUploader onAvatarChange={handleAvatarChange} />
-				<AppText style={styles.fullName}>
-					{user.firstName} {user.lastName}
-				</AppText>
 
 				<View style={styles.form}>
 					<View style={styles.field}>
@@ -148,6 +147,15 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 							onChangeText={value =>
 								handleChange('nickname', value)
 							}
+						/>
+					</View>
+					<View style={styles.field}>
+						<AppText style={styles.label}>
+							Электронная почта
+						</AppText>
+						<Input
+							value={userData.email}
+							onChangeText={value => handleChange('email', value)}
 						/>
 					</View>
 					<View style={styles.field}>
@@ -195,53 +203,49 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 };
 
 const styles = StyleSheet.create({
+	buttonContent: {
+		height: 44,
+	},
+
 	container: {
 		flex: 1,
 		paddingHorizontal: 16,
 	},
 
-	header: {
-		flexDirection: 'row',
-		paddingTop: 10,
-		paddingBottom: 20,
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-
-	placeHolder: {
-		width: Sizes.button.sm,
-	},
-
-	scrollContent: {
-		paddingBottom: 20,
-	},
-	fullName: {
-		textAlign: 'center',
-		fontSize: Fonts.f20,
-		fontFamily: Fonts.semibold,
-		marginTop: 10,
-		marginBottom: 20,
-	},
-	form: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		padding: 20,
-		gap: Gaps.g16,
-	},
 	field: {
 		gap: Gaps.g8,
 	},
-	label: {
-		fontFamily: Fonts.medium,
-		fontSize: Fonts.f14,
-		color: Colors.darkGray,
-		paddingLeft: 16,
-	},
+
 	footer: {
 		borderTopColor: Colors.gray,
-		paddingBottom: 40,
+		marginBottom: 40,
 	},
-	buttonContent: {
-		height: 44,
+
+	form: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		gap: Gaps.g20,
+		marginTop: 32,
+		paddingHorizontal: 16,
+		paddingVertical: 24
+	},
+	header: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 16,
+		marginTop: 10,
+	},
+	label: {
+		color: Colors.darkGray,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f14,
+		marginLeft: 16,
+	},
+	placeHolder: {
+		width: Sizes.button.sm,
+	},
+	scrollContent: {
+		paddingBottom: 20,
 	},
 });

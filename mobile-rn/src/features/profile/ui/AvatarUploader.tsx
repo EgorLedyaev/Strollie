@@ -1,10 +1,14 @@
 import EditPhotoIcon from '@/assets/icons/EditPhotoIcon';
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { useAtomValue, useSetAtom } from 'jotai';
+import React, { useState } from 'react';
+import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
 
+import { updateUserProfileAtom, userProfileAtom } from '@/entities/user';
+import { Colors } from '@/shared/tokens';
 import { Avatar, IconButton } from '@/shared/ui';
 
 import { useUploadAvatar } from '../model/useUploadAvatar';
+import { AvatarPhotoOptionsModal } from './AvatarPhotoOptionsModal';
 
 interface AvatarUploaderProps {
 	size?: number;
@@ -15,44 +19,94 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 	size = 100,
 	onAvatarChange,
 }) => {
-	const { uploadAvatar, isLoading, avatarUrl } = useUploadAvatar();
+	const { uploadAvatar, takePhoto, isLoading, avatarUrl } = useUploadAvatar();
+	const profileState = useAtomValue(userProfileAtom);
+	const updateUser = useSetAtom(updateUserProfileAtom);
+	const [optionsVisible, setOptionsVisible] = useState(false);
+	const [anchor, setAnchor] = useState<{
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} | null>(null);
 
-	const handleUpload = async () => {
+	const onAvatarLayout = (e: LayoutChangeEvent) => {
+		const { x, y, width, height } = e.nativeEvent.layout;
+		console.log('x, y, width, height', x, y, width, height);
+		
+		setAnchor({ x, y: y, width, height });
+	};
+
+	const openOptions = () => setOptionsVisible(true);
+	const closeOptions = () => setOptionsVisible(false);
+
+	const handlePickFromDevice = async () => {
 		const uri = await uploadAvatar();
+		if (onAvatarChange) onAvatarChange(uri);
+		closeOptions();
+	};
 
-		if (onAvatarChange) {
-			onAvatarChange(uri);
+	const handleTakePhoto = async () => {
+		const uri = await takePhoto();
+		if (onAvatarChange) onAvatarChange(uri);
+		closeOptions();
+	};
+
+	const handleRemove = () => {
+		if (profileState?.profile) {
+			updateUser({ ...profileState.profile, photo: undefined });
 		}
+		if (onAvatarChange) onAvatarChange(null);
+		closeOptions();
 	};
 
 	return (
 		<View style={styles.container}>
 			<IconButton
-				onPress={handleUpload}
+				onPress={openOptions}
 				disabled={isLoading}
-				style={styles.avatarContainer}
+				style={[styles.avatarContainer, { borderRadius: size / 2 }]}
+				onLayout={onAvatarLayout}
 			>
 				<Avatar uri={avatarUrl} size={size} />
-				<View style={styles.iconContainer}>
+				{/* Полупрозрачный overlay поверх аватара */}
+				<View
+					pointerEvents='none'
+					style={[
+						StyleSheet.absoluteFillObject,
+						styles.overlay,
+						{ borderRadius: size / 2 },
+					]}
+				/>
+				<View style={styles.iconContainer} pointerEvents='none'>
 					<EditPhotoIcon />
 				</View>
 			</IconButton>
+			<AvatarPhotoOptionsModal
+				visible={optionsVisible}
+				onClose={closeOptions}
+				onPickFromDevice={handlePickFromDevice}
+				onTakePhoto={handleTakePhoto}
+				onRemove={handleRemove}
+				anchor={anchor ?? undefined}
+			/>
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		alignItems: 'center',
-		marginVertical: 20,
-	},
 	avatarContainer: {
 		position: 'relative',
-		borderRadius: 50,
+	},
+	container: {
+		alignItems: 'center',
 	},
 	iconContainer: {
 		...StyleSheet.absoluteFillObject,
-		justifyContent: 'center',
 		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	overlay: {
+		backgroundColor: Colors.darkImageOverlay,
 	},
 });

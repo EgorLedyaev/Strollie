@@ -87,8 +87,8 @@ export const IconButton: React.FC<IconButtonProps> = ({
 
 const styles = StyleSheet.create({
 	button: {
-		justifyContent: 'center',
 		alignItems: 'center',
+		justifyContent: 'center',
 		overflow: 'hidden',
 	},
 	overlay: {

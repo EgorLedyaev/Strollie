@@ -3,9 +3,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
-import {
-	SafeAreaView,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
 	ProfileHeader,
@@ -123,14 +121,14 @@ export const ProfilePage: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.lightBackground,
-		padding: 16,
-	},
 	centered: {
+		alignItems: 'center',
 		flex: 1,
 		justifyContent: 'center',
-		alignItems: 'center',
+	},
+	container: {
+		backgroundColor: Colors.lightBackground,
+		flex: 1,
+		padding: 16,
 	},
 });
