@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Быстрый архитектурный и типовой контроль перед отправкой
+npm run typecheck || exit 1
+npm run fsd:check || exit 1
