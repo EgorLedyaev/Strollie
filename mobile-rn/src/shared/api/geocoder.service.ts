@@ -1,6 +1,7 @@
 // src/shared/api/geocoder.service.ts
-import { EXPO_PUBLIC_2GIS_API_KEY } from '@/shared/config/api';
 import axios from 'axios';
+
+import { EXPO_PUBLIC_2GIS_API_KEY } from '@/shared/config/api';
 
 const API_KEY = EXPO_PUBLIC_2GIS_API_KEY;
 const PLACES_API_URL = 'https://catalog.api.2gis.com/3.0/items';

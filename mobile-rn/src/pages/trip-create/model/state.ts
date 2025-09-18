@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+
 import type { TripChecklistItem } from '@/entities/trip';
 
 export const startDateAtom = atom<string>('');

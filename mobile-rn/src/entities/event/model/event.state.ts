@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+
 import type { Event, EventType } from './event.model';
 
 // Хранит все события пользователя

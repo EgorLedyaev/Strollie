@@ -1,6 +1,12 @@
 import 'react-native-get-random-values';
+
 import { v4 as uuidv4 } from 'uuid';
-import { MOCK_CDN_BASE, MOCK_UPLOAD_AVATAR_MODE, USE_MOCK_UPLOAD_AVATAR } from '@/shared/config';
+
+import {
+	MOCK_CDN_BASE,
+	MOCK_UPLOAD_AVATAR_MODE,
+	USE_MOCK_UPLOAD_AVATAR,
+} from '@/shared/config';
 
 /**
  * [API] Функция для загрузки аватара на сервер.
@@ -20,7 +26,9 @@ export const uploadAvatarApi = async (
 
 		if (MOCK_UPLOAD_AVATAR_MODE === 'local') {
 			// Возвращаем локальный URI, чтобы сразу видеть фото в UI
-			console.log('[API MOCK] Возвращаем локальный URI для предпросмотра');
+			console.log(
+				'[API MOCK] Возвращаем локальный URI для предпросмотра',
+			);
 			return imageUri;
 		}
 

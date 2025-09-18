@@ -13,7 +13,6 @@ export const ticketApi = {
 		await sleep(500);
 
 		const now = new Date();
-	
 
 		return [];
 	},

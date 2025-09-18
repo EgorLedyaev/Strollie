@@ -33,7 +33,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 	const onAvatarLayout = (e: LayoutChangeEvent) => {
 		const { x, y, width, height } = e.nativeEvent.layout;
 		console.log('x, y, width, height', x, y, width, height);
-		
+
 		setAnchor({ x, y: y, width, height });
 	};
 

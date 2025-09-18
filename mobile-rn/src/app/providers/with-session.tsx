@@ -1,7 +1,8 @@
-import { sessionAtom } from '@/entities/session';
 import { useRouter, useSegments } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useEffect } from 'react';
+
+import { sessionAtom } from '@/entities/session';
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
 	const session = useAtomValue(sessionAtom);

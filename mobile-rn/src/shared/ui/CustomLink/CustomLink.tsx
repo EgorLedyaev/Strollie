@@ -4,9 +4,9 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 
 import { Colors, Fonts } from '@/shared/tokens';
 
+import { IconButton } from '../Button';
 import { AppText } from '../Text';
 import { CustomLinkProps } from './CustomLinkProps';
-import { IconButton } from '../Button';
 
 /**
  * Компонент для создания кастомной ссылки с текстом.

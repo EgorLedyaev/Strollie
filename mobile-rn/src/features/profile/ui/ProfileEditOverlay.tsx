@@ -7,16 +7,16 @@ import { AppButton, AppText, IconButton } from '@/shared/ui';
 interface ProfileMenuOverlayProps {
 	visible: boolean;
 	onClose: () => void;
-    onSave: () => void;
-    isLoading: boolean;
+	onSave: () => void;
+	isLoading: boolean;
 	onCancel: () => void;
 }
 
 export const ProfileEditOverlay: React.FC<ProfileMenuOverlayProps> = ({
 	visible,
 	onClose,
-    onSave,
-    isLoading,
+	onSave,
+	isLoading,
 	onCancel,
 }) => {
 	return (
@@ -60,9 +60,9 @@ export const ProfileEditOverlay: React.FC<ProfileMenuOverlayProps> = ({
 							textFontFamily={Fonts.regular}
 							buttonColor={Colors.successGreen}
 							textFontSize={Fonts.f16}
-                            dimFactor={0.75}
-                            isLoading={isLoading}
-                            sizeActivityIndicator={'small'}
+							dimFactor={0.75}
+							isLoading={isLoading}
+							sizeActivityIndicator={'small'}
 						/>
 					</View>
 				</View>

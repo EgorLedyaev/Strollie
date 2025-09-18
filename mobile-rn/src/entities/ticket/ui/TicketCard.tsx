@@ -16,7 +16,7 @@ interface Props {
 /**
  * Компонент карточки билета
  * @param props - Свойства компонента TicketCard
- * @returns 
+ * @returns
  */
 export const TicketCard: React.FC<Props> = props => {
 	const { ticket } = props;

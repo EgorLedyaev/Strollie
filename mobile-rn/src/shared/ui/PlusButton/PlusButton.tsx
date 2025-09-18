@@ -1,9 +1,9 @@
+import PlusIcon from '@/assets/icons/action/PlusIcon';
 import { StyleSheet, TouchableOpacityProps } from 'react-native';
 
 import { Colors, Radius, Sizes } from '@/shared/tokens';
 
 import { IconButton } from '../Button';
-import PlusIcon from '@/assets/icons/action/PlusIcon';
 
 interface PlusButtonProps extends Omit<TouchableOpacityProps, 'onPress'> {
 	onPress: () => void;

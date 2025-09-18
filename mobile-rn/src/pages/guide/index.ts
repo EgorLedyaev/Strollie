@@ -1,2 +1,3 @@
-import { BecomeGuidePage } from './ui/BecomeGuidePage'
-export {BecomeGuidePage}
+import { BecomeGuidePage } from './ui/BecomeGuidePage';
+
+export { BecomeGuidePage };

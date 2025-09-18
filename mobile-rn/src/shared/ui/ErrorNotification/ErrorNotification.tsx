@@ -1,6 +1,7 @@
-import { Colors, Fonts } from '@/shared/tokens';
 import { useEffect, useState } from 'react';
 import { Animated, Dimensions, StyleSheet } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppText } from '../Text';
 import { ErrorNotificationProps } from './types';

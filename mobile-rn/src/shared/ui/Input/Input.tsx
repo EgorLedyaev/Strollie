@@ -1,17 +1,19 @@
 import EyeClosedIcon from '@/assets/icons/eye-closed';
 import EyeOpenedIcon from '@/assets/icons/eye-opened';
 import { useState } from 'react';
-import { NativeSyntheticEvent, Pressable, StyleSheet, TextInputFocusEventData, TextInputProps, View } from 'react-native';
-
-
+import {
+	NativeSyntheticEvent,
+	Pressable,
+	StyleSheet,
+	TextInputFocusEventData,
+	TextInputProps,
+	View,
+} from 'react-native';
 
 import { Colors, Shadows } from '@/shared/tokens';
 
-
-
 import { InputProps } from '.';
 import { AppTextInput } from '../Text';
-
 
 export const Input = ({
 	isPassword,

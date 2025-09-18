@@ -1,5 +1,6 @@
-import { type SelectOption } from '@/shared/ui';
 import { atom } from 'jotai';
+
+import { type SelectOption } from '@/shared/ui';
 
 import { getCities } from '../api/api';
 
@@ -23,7 +24,9 @@ export const fetchCitiesAtom = atom(null, async (get, set) => {
 		set(citiesAtom, cities);
 	} catch (error) {
 		const message =
-			error instanceof Error ? error.message : 'Не удалось загрузить города';
+			error instanceof Error
+				? error.message
+				: 'Не удалось загрузить города';
 		set(citiesErrorAtom, message);
 		console.error(message);
 	} finally {

@@ -1,8 +1,9 @@
-import { Colors } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { Colors } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
 
 export const CalendarPage: React.FC = () => {
 	return (

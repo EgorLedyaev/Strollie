@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
+
 import type { Trip } from './trip.model';
 
 // Хранит все поездки пользователя

@@ -2,9 +2,7 @@ import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
-import {
-	SafeAreaView,
-} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ticketsAtom, type Ticket } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';

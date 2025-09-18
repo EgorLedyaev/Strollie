@@ -18,7 +18,9 @@ export const useUploadAvatar = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const commonFlow = async (imageUri: string | null): Promise<string | null> => {
+	const commonFlow = async (
+		imageUri: string | null,
+	): Promise<string | null> => {
 		if (!imageUri) return null;
 		// Шаг 2: Вызываем API для загрузки изображения (api)
 		const uploadedUrl = await uploadAvatarApi(imageUri);

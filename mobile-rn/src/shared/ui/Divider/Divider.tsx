@@ -1,6 +1,7 @@
-import { Colors } from "@/shared/tokens";
-import { View, StyleSheet } from "react-native";
-import { ViewProps } from "react-native/Libraries/Components/View/ViewPropTypes";
+import { StyleSheet, View } from 'react-native';
+import { ViewProps } from 'react-native/Libraries/Components/View/ViewPropTypes';
+
+import { Colors } from '@/shared/tokens';
 
 interface DividerProps {
 	style?: ViewProps['style'];

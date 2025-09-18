@@ -3,16 +3,11 @@ import ArrowLeftSmallIcon from '@/assets/icons/arrow/ArrowLeftSmallIcon';
 import React, { useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-
-
 import { User } from '@/entities/user';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
 
-
-
 import { ProfileInfo } from './ProfileInfo';
-
 
 interface HeaderProps {
 	user: User;
@@ -35,9 +30,7 @@ export function ProfileHeader({ user, onBackPress, onMenuPress }: HeaderProps) {
 		menuBtnRef.current?.measureInWindow?.((x, y, width, height) => {
 			onMenuPress({ x, y, width, height });
 		});
-		
 	};
-	
 
 	return (
 		<View style={styles.container}>

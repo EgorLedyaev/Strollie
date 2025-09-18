@@ -1,8 +1,9 @@
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+
 import { EventType } from '@/entities/event';
 import { Colors } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { useCalendarFilter } from '../model';
 

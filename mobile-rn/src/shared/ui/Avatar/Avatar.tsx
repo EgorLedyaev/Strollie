@@ -1,8 +1,8 @@
+import NoPhotoIcon from '@/assets/icons/NoPhotoIcon';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { Colors } from '../../tokens';
-import NoPhotoIcon from '@/assets/icons/NoPhotoIcon';
 
 interface AvatarProps {
 	uri?: string | null;
@@ -17,7 +17,6 @@ export const Avatar = ({ uri, size = 100, style }: AvatarProps) => {
 		borderRadius: size / 2,
 	};
 
-
 	return (
 		<View style={[styles.container, containerStyle, style]}>
 			{uri ? (
@@ -27,8 +26,8 @@ export const Avatar = ({ uri, size = 100, style }: AvatarProps) => {
 					resizeMode='cover'
 				/>
 			) : (
-					<View style={styles.iconContainer}>
-						<NoPhotoIcon />
+				<View style={styles.iconContainer}>
+					<NoPhotoIcon />
 				</View>
 			)}
 		</View>

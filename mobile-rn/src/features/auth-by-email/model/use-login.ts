@@ -21,9 +21,14 @@ export const useLogin = () => {
 	const setError = useSetAtom(authErrorAtom);
 	const setRegState = useSetAtom(registrationStateAtom);
 
-	const loginWithEmail = async (email: string, { onSuccess }: LoginCallbacks) => {
-		console.log(`Попытка входа с email: ${email} email trim is ${!email.trim()}`);
-		
+	const loginWithEmail = async (
+		email: string,
+		{ onSuccess }: LoginCallbacks,
+	) => {
+		console.log(
+			`Попытка входа с email: ${email} email trim is ${!email.trim()}`,
+		);
+
 		if (!email.trim()) {
 			setError('Введите email.');
 			return;
@@ -55,9 +60,7 @@ export const useLogin = () => {
 		} catch (err) {
 			console.error('Ошибка входа', err);
 			const message =
-				err instanceof Error
-					? err.message
-					: 'Не удалось войти.';
+				err instanceof Error ? err.message : 'Не удалось войти.';
 			setError(message);
 		} finally {
 			setIsLoading(false);

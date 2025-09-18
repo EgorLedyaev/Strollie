@@ -1,4 +1,3 @@
-import { Colors, Fonts } from '@/shared/tokens';
 import React, { ComponentRef, useEffect, useRef, useState } from 'react';
 import {
 	Animated,
@@ -10,6 +9,8 @@ import {
 	View,
 	ViewStyle,
 } from 'react-native';
+
+import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppTextInput } from '../Text';
 

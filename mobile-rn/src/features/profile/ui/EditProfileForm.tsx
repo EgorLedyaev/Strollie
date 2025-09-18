@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
 		gap: Gaps.g20,
 		marginTop: 32,
 		paddingHorizontal: 16,
-		paddingVertical: 24
+		paddingVertical: 24,
 	},
 	header: {
 		alignItems: 'center',

@@ -1,6 +1,7 @@
-import { Colors } from '@/shared/tokens';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
+import { Colors } from '@/shared/tokens';
 
 import { AppText } from '../Text';
 

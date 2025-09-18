@@ -1,9 +1,5 @@
 // Публичный API слайса session
-import {
-	logoutAtom,
-	sessionAtom,
-	setSessionAtom,
-} from './model/session.state';
+import { logoutAtom, sessionAtom, setSessionAtom } from './model/session.state';
 
 export {
 	// State
