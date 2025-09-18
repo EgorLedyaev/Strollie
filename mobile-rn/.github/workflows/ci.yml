@@ -16,6 +16,7 @@ jobs:
             pull-requests: read
         outputs:
             android: ${{ steps.filter.outputs.android }}
+            native_impact: ${{ steps.filter.outputs.native_impact }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -32,12 +33,34 @@ jobs:
                         - 'package-lock.json'
                         - 'app.json'
                         - 'app.config.ts'
+                      native_impact:
+                        - 'app.json'
+                        - 'app.config.*'
+                        - 'plugins/**'
+                        - 'assets/**'
+                        - 'expo-env.d.ts'
 
     build-and-validate:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+
+            - name: Cache ESLint
+              uses: actions/cache@v4
+              with:
+                  path: .cache/eslint
+                  key: eslint-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.ts','src/**/*.tsx','src/**/*.js','src/**/*.jsx') }}
+                  restore-keys: |
+                      eslint-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+            - name: Cache Prettier
+              uses: actions/cache@v4
+              with:
+                  path: .cache/prettier
+                  key: prettier-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.ts','src/**/*.tsx','src/**/*.js','src/**/*.jsx','src/**/*.json') }}
+                  restore-keys: |
+                      prettier-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
 
             - name: Setup Node
               uses: actions/setup-node@v4
@@ -66,7 +89,7 @@ jobs:
             #   run: npm test -- --ci
 
     android-build:
-        name: Android Build (prebuild + release APK)
+        name: Android Build (release APK)
         needs: [build-and-validate, changes]
         if: ${{ needs.changes.outputs.android == 'true' }}
         runs-on: ubuntu-latest
@@ -93,8 +116,9 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Expo prebuild (android)
-              run: npx expo prebuild --non-interactive --platform android
+            - name: (Advisory) Native drift check
+              if: ${{ needs.changes.outputs.native_impact == 'true' }}
+              run: bash scripts/native-drift-check.sh || true
 
             - name: Validate Gradle Wrapper
               uses: gradle/wrapper-validation-action@v3

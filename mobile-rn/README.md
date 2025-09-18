@@ -434,3 +434,60 @@ npm run format:check && npm run lint && npm run typecheck && npm run fsd:check
 Структура ещё эволюционирует (много «одноразовых» слайсов). Жёсткая блокировка мешала бы частым маленьким коммитам. Как только стабилизируем основные домены (`ticket`, `trip`, `profile`, `map`), можно включить строгий режим.
 
 ---
+
+## 15. CI: производительность и стратегия native drift
+
+CI workflow (`.github/workflows/ci.yml`) оптимизирован под быстрые итерации мобильного приложения:
+
+### 15.1 Commit‑Stable Android Skeleton
+
+Директория `android/` закоммичена в репозиторий, чтобы:
+
+- Исключить дорогостоящий `expo prebuild` на каждом прогоне.
+- Сделать нативный слой детерминированным и кодо‑ревьюабельным.
+
+### 15.2 Advisory Native Drift Check
+
+Шаг `native-drift` запускается только если изменены файлы из группы `native_impact` (app.json, app.config.*, плагины, expo-env, некоторые assets). Скрипт `scripts/native-drift-check.sh`:
+
+1. Создаёт временную копию проекта (исключая build артефакты, `.gradle`, intermediates).
+2. Выполняет `npx expo prebuild --platform android --no-install`.
+3. Делает фильтрованный `diff -ru` с текущей `android/` (игнор служебных директорий).
+4. Печатает `NO_DRIFT` или `DRIFT_DETECTED` (не ломает сборку, пока режим advisory).
+
+Если зафиксирован `DRIFT_DETECTED` — нужно локально повторить `expo prebuild`, проанализировать различия и при необходимости закоммитить обновлённый нативный слой (отдельным осознанным PR).
+
+### 15.3 Текущие оптимизации
+
+- Gradle параллелизм: `org.gradle.parallel=true`, лимит воркеров (`org.gradle.workers.max=4`) для предсказуемости в CI.
+- ESLint / Prettier caching: директории `.cache/eslint` и `.cache/prettier` кэшируются через `actions/cache`.
+- Условная сборка Android: пропускается при отсутствии изменений в `android` и `native_impact`.
+- Линтер архитектуры (steiger) и drift check работают в advisory режиме (не блокируют быстрые фиче‑циклы).
+
+### 15.4 Возможные будущие улучшения
+
+- Удалённый Gradle build cache (shared cache server) / расширенная конфигурация.
+- Конфигурационный cache Gradle с устойчивым volume (приемлемо, когда структура стабилизируется).
+- Сжатие артефактов для последующих джоб (например распределение AAB / mapping.txt).
+- Прогрессивное ужесточение `--max-warnings` ESLint до 0 и снятие `continue-on-error`.
+- Отдельный workflow для подписанной релизной сборки (AAB) + подпись.
+
+### 15.5 Когда обновлять `android/`
+
+Обновляйте нативный слой только если:
+
+- Drift check показал значимые изменения (новые плагины, обновлённые Gradle файлы, изменения AndroidManifest, ресурсы).
+- Вручную выполнен `expo prebuild` после обновления SDK/плагина.
+- Требуется добавить/изменить нативный permission, service, intent‑filter.
+
+Не стоит коммитить временные изменения/авто‑мусор (intermediates, build, `.gradle` каталоги) — они отфильтрованы `.gitignore` и drift‑скриптом.
+
+### 15.6 Локальная проверка drift
+
+```bash
+./scripts/native-drift-check.sh
+```
+
+Если вывод `DRIFT_DETECTED` — изучите `diff` и примите решение о синхронизации.
+
+---
