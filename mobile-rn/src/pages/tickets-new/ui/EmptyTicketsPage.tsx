@@ -1,47 +1,47 @@
-import { useRouter } from 'expo-router';
+import AddTicketIcon from '@/assets/icons/tickets/AddTicketIcon';
+import tickets_empty from '@/assets/images/tickets-empty.png';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors, Fonts, Gaps, Radius, Sizes } from '@/shared/tokens';
-import { AppButton, AppText, BackButton } from '@/shared/ui';
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
+import { AppButton, AppText } from '@/shared/ui';
 
 export const EmptyTicketsPage: React.FC = () => {
-	const router = useRouter();
 	const onAddTicket = () => {
 		console.log("'Добавить билет' pressed");
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.header}>
-				<BackButton variant='icon' onPress={() => router.back()} />
-				<AppText style={styles.headerTitle}>Мои билеты</AppText>
-				<View
-					style={{ width: Sizes.button.sm, height: Sizes.button.sm }}
-				/>
-			</View>
-			<View style={styles.content}>
+		<View style={styles.content}>
+			<View>
+				<Image source={tickets_empty} style={styles.image} />
 				<Image
-					source={require('@/assets/images/tickets-empty.png')}
-					style={styles.image}
-				/>
-				<AppText style={styles.title}>Билетов пока нет</AppText>
-				<AppText style={styles.subtitle}>
-					Здесь можно хранить свои билеты на различные мероприятия или
-					рейсы
-				</AppText>
-
-				<AppButton
-					text='Добавить билет'
-					onPress={onAddTicket}
-					buttonBorderRadius={Radius.r16}
-					textFontSize={Fonts.f16}
-					textFontFamily={Fonts.medium}
-					style={styles.addButton}
+					source={tickets_empty}
+					style={[styles.image, styles.imageRotated]}
 				/>
 			</View>
-		</SafeAreaView>
+
+			<AppText style={styles.title} variant='header'>
+				Билетов пока нет
+			</AppText>
+			<AppText style={styles.subtitle} variant='body'>
+				Здесь можно хранить свои билеты на различные мероприятия или
+				рейсы
+			</AppText>
+
+			<AppButton
+				onPress={onAddTicket}
+				buttonBorderRadius={Radius.r16}
+				textFontSize={Fonts.f16}
+				textFontFamily={Fonts.medium}
+				style={styles.addButton}
+			>
+				<View style={styles.addButtonContent}>
+					<AddTicketIcon />
+					<AppText variant='button' style={styles.addButtonText} >Добавить билет</AppText>
+				</View>
+			</AppButton>
+		</View>
 	);
 };
 
@@ -50,28 +50,19 @@ const styles = StyleSheet.create({
 		height: 52,
 		width: '100%',
 	},
-	container: {
-		backgroundColor: Colors.grayBackground,
-		flex: 1,
-		padding: 16,
+	addButtonContent: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: Gaps.g8,
+	},
+	addButtonText: {
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f16,
 	},
 	content: {
 		alignItems: 'center',
 		flex: 1,
-		justifyContent: 'center',
-		padding: 30,
-	},
-
-	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
-	headerTitle: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f16,
-		textAlign: 'center',
+		marginTop: Gaps.g80,
 	},
 	image: {
 		alignSelf: 'center',
@@ -81,16 +72,16 @@ const styles = StyleSheet.create({
 		resizeMode: 'contain',
 		width: 237,
 	},
+	imageRotated: {
+		position: 'absolute',
+		transform: [{ rotate: '15deg' }],
+	},
 	subtitle: {
-		color: Colors.textGray,
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f16,
-		marginBottom: Gaps.g50,
+		color: Colors.secondaryText,
+		marginBottom: Gaps.g48,
 		textAlign: 'center',
 	},
 	title: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
 		fontSize: Fonts.f20,
 		marginBottom: Gaps.g16,
 	},

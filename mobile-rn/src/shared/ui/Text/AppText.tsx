@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f18,
 	},
 	caption: {
-		color: Colors.textGray,
+		color: Colors.secondaryText,
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f14,
 	},

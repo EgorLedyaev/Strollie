@@ -59,4 +59,31 @@ export const ticketApi = {
 
 		return [t1, t2, t3];
 	},
+
+	/**
+	 * Создание пользовательского билета (мокаем без backend)
+	 */
+	async createCustomTicket(data: {
+		title: string;
+		date: string; // ISO
+		imageUri?: string | null;
+		fileName?: string | null;
+		businessCategory: 'transport' | 'entertainment';
+	}): Promise<Ticket> {
+		await sleep(300);
+		const id = `custom_${Date.now()}`;
+		return {
+			id,
+			from: data.title,
+			to: data.title,
+			departureTime: data.date,
+			arrivalTime: data.date,
+			isUsed: false,
+			type: data.businessCategory === 'transport' ? 'train' : 'other',
+			businessCategory: data.businessCategory,
+			title: data.title,
+			imageUri: data.imageUri ?? undefined,
+			fileName: data.fileName ?? undefined,
+		};
+	},
 };

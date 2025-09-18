@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
 		gap: Gaps.g50,
 	},
 
+	image: {
+		height: 282,
+		width: 204,
+	},
 	text: {
 		color: Colors.white,
+		fontFamily: Fonts.regular,
 		fontSize: Fonts.f18,
 		textAlign: 'center',
-		fontFamily: Fonts.regular,
-	},
-	image: {
-		width: 204,
-		height: 282,
 	},
 });

@@ -4,15 +4,10 @@ import TrainIcon from '@/assets/icons/tickets/TrainIcon';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-
-
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
 
-
-
 import type { Ticket } from '../model';
-
 
 interface Props {
 	ticket: Ticket; // ожидается ticket.type === 'train'
@@ -166,8 +161,8 @@ const styles = StyleSheet.create({
 		marginTop: 'auto',
 	},
 	headerRow: { marginBottom: 8 },
-	infoMain: {fontSize: Fonts.f20 },
-	infoMinor: { color: Colors.textGray, fontSize: Fonts.f12 },
+	infoMain: { fontSize: Fonts.f20 },
+	infoMinor: { color: Colors.secondaryText, fontSize: Fonts.f12 },
 	infoRow: {
 		alignItems: 'center',
 		borderColor: Colors.grayBackground,

@@ -1,5 +1,5 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import {
 	ActivityIndicator,
 	GestureResponderEvent,
@@ -20,7 +20,8 @@ import { AppText } from '../Text';
 export type ButtonVariant = 'primary' | 'secondary' | 'outline';
 
 export interface AppButtonProps extends PressableProps {
-	text: string;
+	/** Текст кнопки. Если переданы children — опционален */
+	text?: string;
 	isLoading?: boolean;
 	variant?: ButtonVariant;
 	buttonColor?: string;
@@ -30,6 +31,8 @@ export interface AppButtonProps extends PressableProps {
 	textFontFamily?: string;
 	dimFactor?: number;
 	sizeActivityIndicator?: number | 'large' | 'small' | undefined;
+	/** Кастомный контент. При наличии полностью заменяет text/иконки */
+	children?: ReactNode;
 }
 
 // Цвета градиента
@@ -58,6 +61,7 @@ export const AppButton = ({
 	textFontFamily = Fonts.semibold,
 	dimFactor = 0.85,
 	sizeActivityIndicator = 'large',
+	children,
 	style,
 	...props
 }: AppButtonProps) => {
@@ -124,6 +128,24 @@ export const AppButton = ({
 				: Colors.white,
 	};
 
+	const renderInnerContent = () => {
+		if (children) {
+			return children;
+		}
+		// Базовый случай — только текст (как раньше)
+		return (
+			<AppText
+				style={[
+					styles.text,
+					isDisabled && styles.disabledText,
+					textStyle,
+				]}
+			>
+				{text}
+			</AppText>
+		);
+	};
+
 	return (
 		<Pressable
 			style={style}
@@ -147,15 +169,7 @@ export const AppButton = ({
 						]}
 					>
 						{!isLoading ? (
-							<AppText
-								style={[
-									styles.text,
-									isDisabled && styles.disabledText,
-									textStyle,
-								]}
-							>
-								{text}
-							</AppText>
+							renderInnerContent()
 						) : (
 							<ActivityIndicator
 								size={sizeActivityIndicator}
@@ -167,7 +181,7 @@ export const AppButton = ({
 					<LinearGradient
 						colors={currentColors}
 						start={{ x: 0, y: 0 }}
-						end={{ x: 0, y: 1 }}
+						end={{ x: 0, y: 1.2 }}
 						style={[
 							styles.gradient,
 							!isSecondary && !isOutline ? styles.shadow : null,
@@ -175,15 +189,7 @@ export const AppButton = ({
 						]}
 					>
 						{!isLoading ? (
-							<AppText
-								style={[
-									styles.text,
-									isDisabled && styles.disabledText,
-									textStyle,
-								]}
-							>
-								{text}
-							</AppText>
+							renderInnerContent()
 						) : (
 							<ActivityIndicator
 								size={sizeActivityIndicator}
@@ -203,31 +209,31 @@ export const AppButton = ({
 
 const styles = StyleSheet.create({
 	buttonContainer: {
-		width: '100%',
 		height: '100%',
+		width: '100%',
+	},
+	disabledText: {
+		color: Colors.grayMedium,
 	},
 	gradient: {
+		alignItems: 'center',
 		flex: 1,
 		justifyContent: 'center',
-		alignItems: 'center',
-		padding: 10,
 		overflow: 'hidden',
+		padding: 10,
 	},
 	outline: {
-		flex: 1,
-		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 10,
 		backgroundColor: Colors.transparent,
 		borderWidth: 1,
+		flex: 1,
+		justifyContent: 'center',
+		padding: 10,
 	},
 	shadow: {
 		boxShadow: Shadows.boxShadow_elev2,
 	},
 	text: {
 		textAlign: 'center',
-	},
-	disabledText: {
-		color: Colors.grayMedium,
 	},
 });

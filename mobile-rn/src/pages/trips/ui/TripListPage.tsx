@@ -1,5 +1,4 @@
 import PlusIcon from '@/assets/icons/action/PlusIcon';
-import ArrowLeftMediumIcon from '@/assets/icons/arrow/ArrowLeftMediumIcon';
 import emptyImg from '@/assets/images/unmatched.png';
 import { Link, useRouter } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -136,61 +135,61 @@ export const TripListPage: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+	center: { alignItems: 'center', flex: 1, justifyContent: 'center' },
 	container: {
-		flex: 1,
 		backgroundColor: Colors.lightBackground,
+		flex: 1,
 		padding: 16,
 	},
 	content: {
 		flex: 1,
 	},
-	headerRow: {
-		flexDirection: 'row',
+	emptyBox: {
 		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		justifyContent: 'center',
+		padding: 32,
+	},
+	emptyImage: { height: 120, marginBottom: 12, width: 120 },
+	emptyText: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
+	emptyTitle: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f16,
+		marginBottom: 6,
+	},
+	headerRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
 		justifyContent: 'space-between',
 		marginBottom: 16,
 	},
+	linkText: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
+	listContent: { gap: 12, paddingBottom: 24 },
 	title: {
-		fontSize: Fonts.f20,
-		fontFamily: Fonts.bold,
 		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
 	},
-	listContent: { paddingBottom: 24, gap: 12 },
 	tripCard: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,
 		padding: 16,
 	},
 	tripHeader: {
-		flexDirection: 'row',
 		alignItems: 'center',
+		flexDirection: 'row',
 		justifyContent: 'space-between',
 	},
-	tripTitle: {
-		fontSize: Fonts.f16,
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.semibold,
-	},
 	tripPeriod: {
-		marginTop: 6,
+		color: Colors.secondaryText,
 		fontSize: Fonts.f14,
-		color: Colors.textGray,
+		marginTop: 6,
 	},
-	center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-	emptyBox: {
-		alignItems: 'center',
-		justifyContent: 'center',
-		padding: 32,
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-	},
-	emptyImage: { width: 120, height: 120, marginBottom: 12 },
-	emptyTitle: {
-		fontSize: Fonts.f16,
-		fontFamily: Fonts.semibold,
+	tripTitle: {
 		color: Colors.headerAndInputText,
-		marginBottom: 6,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f16,
 	},
-	emptyText: { fontSize: Fonts.f14, color: Colors.placeholderGray },
-	linkText: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
 });

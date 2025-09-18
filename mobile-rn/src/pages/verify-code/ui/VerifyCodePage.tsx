@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
 		marginBottom: 32,
 	},
 	subtitle: {
-		color: Colors.textGray,
+		color: Colors.secondaryText,
 		textAlign: 'center',
 	},
 	codeInput: {

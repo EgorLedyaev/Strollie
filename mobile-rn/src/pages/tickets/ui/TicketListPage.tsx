@@ -1,3 +1,8 @@
+/**
+ * @deprecated ARCHIVED ("старый экран 'Мои билеты'")
+ * Не удалять: может понадобиться при возврате к секционному списку.
+ * Новый пустой экран: см. pages/tickets-new.
+ */
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -137,40 +142,34 @@ export const TicketListPage: React.FC = () => {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
 		backgroundColor: Colors.lightBackground,
+		flex: 1,
 		padding: 16,
-	},
-	header: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		marginBottom: 16,
-	},
-	headerTitle: {
-		fontSize: 16,
-		fontWeight: '700',
-		color: Colors.headerAndInputText ?? Colors.black,
-		textAlign: 'center',
 	},
 	content: {
 		// белыми остаются только карточки билетов
 		flex: 1,
 	},
-	sectionToday: {
-		color: Colors.greenLink,
-		fontSize: 20,
-		fontWeight: '700',
-		marginBottom: 8,
-		marginTop: 8,
+	header: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 16,
 	},
-	sectionFuture: {
-		color: Colors.grayText,
-		fontSize: 20,
-		fontWeight: '700',
-		marginBottom: 8,
-		marginTop: 24,
+	headerTitle: {
+		color: Colors.headerAndInputText ?? Colors.black,
+		textAlign: 'center',
 	},
 	listContent: { paddingBottom: 24 },
 	listItem: { marginBottom: 16 },
+	sectionFuture: {
+		color: Colors.grayText,
+		marginBottom: 8,
+		marginTop: 24,
+	},
+	sectionToday: {
+		color: Colors.greenLink,
+		marginBottom: 8,
+		marginTop: 8,
+	},
 });

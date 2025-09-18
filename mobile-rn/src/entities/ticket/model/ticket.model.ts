@@ -1,5 +1,8 @@
 export type TicketType = 'plane' | 'train' | 'bus' | 'other';
 
+// Бизнес‑категория для фильтрации на новом экране
+export type TicketBusinessCategory = 'transport' | 'entertainment';
+
 export interface Ticket {
   id: string;
   qrCodeUrl?: string;
@@ -11,6 +14,11 @@ export interface Ticket {
   row?: string; // ряд (для кино/поезда)
   hall?: string; // зал (для кино)
   address?: string; // адрес площадки (для кино)
+  // Кастомные поля для добавленных вручную билетов (новый UI)
+  title?: string; // Пользовательское название (если не хотим дробить на from/to)
+  imageUri?: string; // Локальный URI добавленного изображения билета
+  fileName?: string; // Имя выбранного файла / изображения
+  businessCategory?: TicketBusinessCategory; // 'transport' | 'entertainment'
   carrierInfo?: {
     name: string;
     logo?: string;

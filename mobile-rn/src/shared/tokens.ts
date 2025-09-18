@@ -11,7 +11,7 @@ export const Colors = {
 	grayAvatar: '#B1B1B1', // Цвет фона аватара
 	darkGray: '#606060',
 	lightGray: '#919191',
-	textGray: '#6D6D6D',
+	secondaryText: '#6D6D6D',
 	grayMedium: '#C7C7C7', // Цвет текста для отключенных кнопок
 	disabledGray: '#EAEAEA', // Цвет фона для отключенных кнопок
 	lightBackground: '#F6F6F6',
@@ -69,7 +69,9 @@ export const Gaps = {
 	g15: 15,
 	g16: 16,
 	g20: 20,
+	g48: 48,
 	g50: 50,
+	g80: 80,
 };
 
 export const Radius = {

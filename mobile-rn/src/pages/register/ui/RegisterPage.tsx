@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
 	},
 	footerText: {
 		fontFamily: Fonts.medium,
-		color: Colors.textGray,
+		color: Colors.secondaryText,
 	},
 	appButton: {
 		height: 54,

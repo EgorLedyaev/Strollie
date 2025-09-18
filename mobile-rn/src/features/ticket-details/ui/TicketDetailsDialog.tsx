@@ -189,87 +189,87 @@ function isCinema(ticket: Ticket) {
 }
 
 const styles = StyleSheet.create({
-	ticketCard: {
-		gap: 24,
-		alignItems: 'stretch',
+	closeBtn: { height: 43 },
+	dateText: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f16,
+		textAlign: 'center',
+	},
+	dateTimeRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 32,
+		justifyContent: 'center',
+	},
+	fieldLabel: {
+		color: Colors.secondaryText,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f16,
+	},
+	fieldRow: { gap: 4 },
+	fieldValue: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f16,
+	},
+	fieldsColumn: { gap: 16 },
+	hrBlock: { alignItems: 'flex-start', gap: 4 },
+	hrGroup: {
+		alignItems: 'flex-start',
+		flexDirection: 'row',
+		gap: 32,
+		justifyContent: 'center',
+	},
+	hrLabel: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f16,
+	},
+	hrValue: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f16,
 	},
 	qrImage: {
 		alignSelf: 'center',
-		width: 200,
-		height: 200,
+		backgroundColor: Colors.white,
+		borderColor: Colors.inputBorder,
 		borderRadius: 12,
 		borderWidth: 1,
-		borderColor: Colors.inputBorder,
-		backgroundColor: Colors.white,
+		height: 200,
 		marginTop: 8,
-	},
-	ticketNumber: {
-		marginTop: 12,
-		textAlign: 'center',
-		fontSize: Fonts.f20,
-		fontFamily: Fonts.bold,
-		color: Colors.headerAndInputText,
-	},
-	dateTimeRow: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: 32,
-	},
-	dateText: {
-		fontSize: Fonts.f16,
-		fontFamily: Fonts.medium,
-		color: Colors.headerAndInputText,
-		textAlign: 'center',
-	},
-	timeText: {
-		fontSize: Fonts.f20,
-		fontFamily: Fonts.bold,
-		color: Colors.headerAndInputText,
-		textAlign: 'center',
-	},
-	hrGroup: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'flex-start',
-		gap: 32,
-	},
-	hrBlock: { gap: 4, alignItems: 'flex-start' },
-	hrLabel: {
-		fontSize: Fonts.f16,
-		fontFamily: Fonts.semibold,
-		color: Colors.headerAndInputText,
-	},
-	hrValue: {
-		fontSize: Fonts.f16,
-		fontFamily: Fonts.regular,
-		color: Colors.headerAndInputText,
-	},
-	fieldsColumn: { gap: 16 },
-	fieldRow: { gap: 4 },
-	fieldLabel: {
-		fontSize: Fonts.f16,
-		fontFamily: Fonts.medium,
-		color: Colors.textGray,
-	},
-	fieldValue: {
-		fontSize: Fonts.f16,
-		fontFamily: Fonts.bold,
-		color: Colors.headerAndInputText,
+		width: 200,
 	},
 	refundBtn: {
 		alignSelf: 'center',
 		backgroundColor: Colors.grayBackground,
+		borderRadius: 10,
 		paddingHorizontal: 24,
 		paddingVertical: 12,
-		borderRadius: 10,
 	},
 	refundText: {
-		fontSize: Fonts.f16,
-		fontFamily: Fonts.regular,
 		color: Colors.red,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f16,
 	},
-	closeBtn: { height: 43 },
+	ticketCard: {
+		alignItems: 'stretch',
+		gap: 24,
+	},
+	ticketNumber: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
+		marginTop: 12,
+		textAlign: 'center',
+	},
+	timeText: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
+		textAlign: 'center',
+	},
 });
 
 export default TicketDetailsDialog;

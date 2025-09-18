@@ -26,7 +26,13 @@ export const ShowTicketQrDialog: React.FC<Props> = ({
 			onClose={onClose}
 			title={title}
 			actions={
-				<AppButton onPress={onClose} variant='outline' text='Закрыть' textColor=''  style={styles.appButton} />
+				<AppButton
+					onPress={onClose}
+					variant='outline'
+					text='Закрыть'
+					textColor=''
+					style={styles.appButton}
+				/>
 			}
 		>
 			<View style={styles.container}>
@@ -51,7 +57,7 @@ export const ShowTicketQrDialog: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
 	container: { gap: 12 },
-	subtitle: { color: Colors.textGray },
+	subtitle: { color: Colors.secondaryText },
 	qrWrap: {
 		alignItems: 'center',
 		justifyContent: 'center',
@@ -63,9 +69,9 @@ const styles = StyleSheet.create({
 		height: 240,
 		backgroundColor: Colors.gray,
 		borderRadius: 8,
-    },
-    
-    appButton: {
+	},
+
+	appButton: {
 		height: 43,
-    }
+	},
 });
