@@ -97,28 +97,39 @@ export function RegisterPage() {
 }
 
 const styles = StyleSheet.create({
-	safeArea: {
-		flex: 1,
-		backgroundColor: Colors.lightBackground,
+	appButton: {
+		height: 54,
 	},
 
-	scrollContainer: {
-		flexGrow: 1,
-		paddingHorizontal: 16,
-	},
 	content: {
 		flex: 1,
 		justifyContent: 'center',
 	},
-	headerBlock: {
-		alignItems: 'center',
-		marginBottom: 60,
+	errorText: {
+		color: Colors.error,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f14,
+		marginTop: 16,
+		textAlign: 'center',
 	},
-	title: {
-		marginTop: 30,
+	footer: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 10,
+		justifyContent: 'center',
+		marginTop: 'auto',
+		paddingBottom: 40,
+	},
+	footerText: {
+		color: Colors.secondaryText,
+		fontFamily: Fonts.medium,
 	},
 	formContainer: {
 		gap: 32,
+	},
+	headerBlock: {
+		alignItems: 'center',
+		marginBottom: 60,
 	},
 	inputGroup: {
 		gap: 12,
@@ -127,26 +138,15 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.medium,
 		marginLeft: 16,
 	},
-	errorText: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f14,
-		color: Colors.error,
-		marginTop: 16,
-		textAlign: 'center',
+	safeArea: {
+		backgroundColor: Colors.lightBackground,
+		flex: 1,
 	},
-	footer: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: 10,
-		paddingBottom: 40,
-		marginTop: 'auto',
+	scrollContainer: {
+		flexGrow: 1,
+		paddingHorizontal: 16,
 	},
-	footerText: {
-		fontFamily: Fonts.medium,
-		color: Colors.secondaryText,
-	},
-	appButton: {
-		height: 54,
+	title: {
+		marginTop: 30,
 	},
 });

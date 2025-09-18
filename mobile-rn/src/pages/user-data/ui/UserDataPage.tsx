@@ -215,27 +215,32 @@ export function UserDataPage() {
 }
 
 const styles = StyleSheet.create({
-	safeArea: {
-		flex: 1,
-		backgroundColor: Colors.lightBackground,
+	appButton: {
+		height: 54,
 	},
-	scrollContainer: {
-		flexGrow: 1,
-		paddingHorizontal: 16,
-	},
-	container: {
-		flex: 1,
-		paddingVertical: 80,
-		justifyContent: 'center',
-	},
-
 	backButton: {
+		left: 16,
 		position: 'absolute',
 		top: 16,
-		left: 16,
 		zIndex: 1,
 	},
+	buttonContainer: {
+		marginTop: 20,
+		paddingBottom: 20,
+	},
 
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+		paddingVertical: 80,
+	},
+
+	errorText: {
+		color: Colors.error,
+		fontSize: Fonts.f14,
+		marginTop: 16,
+		textAlign: 'center',
+	},
 	formContainer: {
 		gap: Gaps.g16,
 		marginBottom: 20,
@@ -247,17 +252,12 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.medium,
 		marginLeft: 16,
 	},
-	buttonContainer: {
-		marginTop: 20,
-		paddingBottom: 20,
+	safeArea: {
+		backgroundColor: Colors.lightBackground,
+		flex: 1,
 	},
-	errorText: {
-		fontSize: Fonts.f14,
-		color: Colors.error,
-		marginTop: 16,
-		textAlign: 'center',
-	},
-	appButton: {
-		height: 54,
+	scrollContainer: {
+		flexGrow: 1,
+		paddingHorizontal: 16,
 	},
 });

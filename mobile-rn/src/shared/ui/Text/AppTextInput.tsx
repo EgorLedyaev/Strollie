@@ -14,9 +14,9 @@ AppTextInput.displayName = 'AppTextInput';
 
 const styles = StyleSheet.create({
 	text: {
-		includeFontPadding: false,
+		color: Colors.headerAndInputText,
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f16,
-		color: Colors.headerAndInputText,
+		includeFontPadding: false,
 	},
 });

@@ -48,34 +48,34 @@ export const Dialog = ({
 };
 
 const styles = StyleSheet.create({
+	actions: {
+		flexDirection: 'row',
+		justifyContent: 'center',
+	},
+	container: {
+		maxWidth: 400,
+		width: '80%',
+	},
+	content: {
+		marginBottom: 24,
+	},
+	dialog: {
+		backgroundColor: Colors.white,
+		borderRadius: 16,
+		boxShadow: Shadows.boxShadow_elev2,
+		padding: 20,
+	},
 	overlay: {
 		flex: 1,
 		backgroundColor: Colors.modalOverlay, // Полупрозрачный оверлей
 		justifyContent: 'center',
 		alignItems: 'center',
 	},
-	container: {
-		width: '80%',
-		maxWidth: 400,
-	},
-	dialog: {
-		backgroundColor: Colors.white,
-		borderRadius: 16,
-		padding: 20,
-		boxShadow: Shadows.boxShadow_elev2,
-	},
 	title: {
+		color: Colors.headerAndInputText,
 		fontSize: 18,
 		fontWeight: '600',
 		marginBottom: 16,
-		color: Colors.headerAndInputText,
 		textAlign: 'center',
-	},
-	content: {
-		marginBottom: 24,
-	},
-	actions: {
-		flexDirection: 'row',
-		justifyContent: 'center',
 	},
 });

@@ -130,7 +130,7 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 		if (!/^\d*$/.test(text)) return;
 
 		// Создаем новое значение, заменяя символ в указанной позиции
-		let newValue = value.split('');
+		const newValue = value.split('');
 
 		if (text.length > 0) {
 			newValue[index] = text[text.length - 1];
@@ -237,25 +237,25 @@ const styles = StyleSheet.create({
 	 * Контейнер для полей ввода кода
 	 */
 	codeContainer: {
+		alignItems: 'center',
 		flexDirection: 'row',
 		justifyContent: 'center',
-		alignItems: 'center',
 		width: '100%',
 	},
 	/**
 	 * Стиль отдельного поля для ввода цифры
 	 */
 	codeBox: {
-		width: 54,
-		height: 54,
-		borderRadius: 16,
-		borderWidth: 1,
-		borderColor: Colors.inputBorder,
-		marginHorizontal: 8,
-		justifyContent: 'center',
 		alignItems: 'center',
 		backgroundColor: Colors.white,
+		borderColor: Colors.inputBorder,
+		borderRadius: 16,
+		borderWidth: 1,
+		height: 54,
+		justifyContent: 'center',
+		marginHorizontal: 8,
 		position: 'relative',
+		width: 54,
 	},
 	/**
 	 * Стиль поля с заполненной цифрой
@@ -281,19 +281,19 @@ const styles = StyleSheet.create({
 	codeText: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f24,
-		textAlign: 'center',
 		height: '100%',
-		width: '100%',
 		paddingVertical: 0,
+		textAlign: 'center',
+		width: '100%',
 	},
 	/**
 	 * Стиль мигающего курсора
 	 */
 	cursor: {
-		width: 2,
-		height: 27,
-		backgroundColor: Colors.successGreen,
-		position: 'absolute',
 		alignSelf: 'center',
+		backgroundColor: Colors.successGreen,
+		height: 27,
+		position: 'absolute',
+		width: 2,
 	},
 });

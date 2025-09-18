@@ -73,26 +73,15 @@ export const CalendarGrid = ({
 };
 
 const styles = StyleSheet.create({
+	activeDay: {
+		backgroundColor: Colors.black,
+		borderRadius: 100,
+	},
+	activeDayText: {
+		color: Colors.white,
+	},
 	container: {
 		width: '100%',
-	},
-	weekHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: 8,
-	},
-	weekHeaderItem: {
-		flex: 1,
-		alignItems: 'center',
-		padding: 4,
-	},
-	weekHeaderText: {
-		fontSize: 12,
-		color: Colors.lightGray,
-	},
-	daysGrid: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
 	},
 	dayContainer: {
 		width: '14.28%', // 7 дней в неделю
@@ -102,8 +91,20 @@ const styles = StyleSheet.create({
 		position: 'relative',
 	},
 	dayText: {
-		fontSize: 16,
 		color: Colors.black,
+		fontSize: 16,
+	},
+	daysGrid: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+	},
+	eventDot: {
+		backgroundColor: Colors.black,
+		borderRadius: 2,
+		bottom: '15%',
+		height: 4,
+		position: 'absolute',
+		width: 4,
 	},
 	notCurrentMonth: {
 		opacity: 0.4,
@@ -111,19 +112,18 @@ const styles = StyleSheet.create({
 	notCurrentMonthText: {
 		color: Colors.darkGray,
 	},
-	activeDay: {
-		backgroundColor: Colors.black,
-		borderRadius: 100,
+	weekHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 8,
 	},
-	activeDayText: {
-		color: Colors.white,
+	weekHeaderItem: {
+		alignItems: 'center',
+		flex: 1,
+		padding: 4,
 	},
-	eventDot: {
-		position: 'absolute',
-		bottom: '15%',
-		width: 4,
-		height: 4,
-		borderRadius: 2,
-		backgroundColor: Colors.black,
+	weekHeaderText: {
+		color: Colors.lightGray,
+		fontSize: 12,
 	},
 });

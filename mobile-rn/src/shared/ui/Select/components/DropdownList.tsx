@@ -47,17 +47,17 @@ export const DropdownList: React.FC<DropdownListProps> = ({
 };
 
 const styles = StyleSheet.create({
-	optionsList: {
-		width: '100%',
-	},
 	noResultsContainer: {
+		alignItems: 'center',
 		height: 54,
 		justifyContent: 'center',
-		alignItems: 'center',
 	},
 	noResultsText: {
+		color: Colors.placeHolderInput,
 		fontFamily: Fonts.regular,
 		fontSize: 16,
-		color: Colors.placeHolderInput,
+	},
+	optionsList: {
+		width: '100%',
 	},
 });

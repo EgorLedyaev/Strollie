@@ -49,16 +49,16 @@ export const BackButton = ({
 
 const styles = StyleSheet.create({
 	textContainer: {
-		flexDirection: 'row',
 		alignItems: 'center',
+		flexDirection: 'row',
 	},
 	iconContainer: {
-		width: Sizes.button.sm,
-		height: Sizes.button.sm,
+		alignItems: 'center',
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r8,
+		height: Sizes.button.sm,
 		justifyContent: 'center',
-		alignItems: 'center',
+		width: Sizes.button.sm,
 	},
 	// Стили для текстового варианта
 	largeIcon: {

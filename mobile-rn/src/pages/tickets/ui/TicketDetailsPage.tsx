@@ -134,96 +134,81 @@ export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: Colors.lightBackground,
-		padding: 16,
-	},
 	backButton: {
+		left: 16,
 		position: 'absolute',
 		top: 16,
-		left: 16,
 		zIndex: 999,
 	},
-	scrollContent: {
-		paddingTop: 8,
-		paddingBottom: 24,
-	},
 	card: {
+		alignItems: 'center',
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,
-		paddingVertical: 24,
 		paddingHorizontal: 24,
-		alignItems: 'center',
+		paddingVertical: 24,
 	},
-	emptyWrap: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-	qr: {
-		width: 201,
-		height: 201,
-		marginTop: 16,
-		marginBottom: 16,
-	},
-	ticketNo: {
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f20,
-		color: Colors.headerAndInputText,
-		marginBottom: 16,
-	},
-	dateTimeRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 32,
-		marginBottom: 16,
+	container: {
+		backgroundColor: Colors.lightBackground,
+		flex: 1,
+		padding: 16,
 	},
 	dateText: {
+		color: Colors.headerAndInputText,
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f20,
-		color: Colors.headerAndInputText,
 	},
-	timeText: {
+	dateTimeRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 32,
+		marginBottom: 16,
+	},
+	emptyWrap: { alignItems: 'center', flex: 1, justifyContent: 'center' },
+	infoBlock: {
+		gap: 16,
+		marginBottom: 24,
+		width: '100%',
+	},
+	infoLabel: {
+		color: Colors.grayText,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f20,
+	},
+	infoRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+	},
+	infoValue: {
+		color: Colors.headerAndInputText,
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f20,
-		color: Colors.headerAndInputText,
+	},
+	metaCol: {
+		alignItems: 'flex-start',
+		width: 60,
+	},
+	metaLabel: {
+		color: Colors.grayText,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f20,
 	},
 	metaTripRow: {
-		flexDirection: 'row',
 		alignItems: 'center',
+		flexDirection: 'row',
 		gap: 32,
 		marginBottom: 24,
 	},
-	metaCol: {
-		width: 60,
-		alignItems: 'flex-start',
-	},
-	metaLabel: {
-		fontFamily: Fonts.medium,
-		fontSize: Fonts.f20,
-		color: Colors.grayText,
-	},
 	metaValue: {
+		color: Colors.headerAndInputText,
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f20,
-		color: Colors.headerAndInputText,
 	},
-	infoBlock: {
-		width: '100%',
-		gap: 16,
-		marginBottom: 24,
-	},
-	infoRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-	},
-	infoLabel: {
-		fontFamily: Fonts.medium,
-		fontSize: Fonts.f20,
-		color: Colors.grayText,
-	},
-	infoValue: {
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f20,
-		color: Colors.headerAndInputText,
+	qr: {
+		height: 201,
+		marginBottom: 16,
+		marginTop: 16,
+		width: 201,
 	},
 	refundBtn: {
 		backgroundColor: Colors.grayBackground,
@@ -232,8 +217,23 @@ const styles = StyleSheet.create({
 		paddingVertical: 12,
 	},
 	refundText: {
+		color: Colors.error,
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f16,
-		color: Colors.error,
+	},
+	scrollContent: {
+		paddingBottom: 24,
+		paddingTop: 8,
+	},
+	ticketNo: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
+		marginBottom: 16,
+	},
+	timeText: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
 	},
 });

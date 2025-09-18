@@ -28,11 +28,11 @@ export const Tag = ({
 
 const styles = StyleSheet.create({
 	tag: {
-		paddingVertical: 4,
-		paddingHorizontal: 8,
-		borderWidth: 1,
-		borderRadius: 12,
 		alignSelf: 'flex-start',
+		borderRadius: 12,
+		borderWidth: 1,
+		paddingHorizontal: 8,
+		paddingVertical: 4,
 	},
 	text: {
 		fontSize: 12,

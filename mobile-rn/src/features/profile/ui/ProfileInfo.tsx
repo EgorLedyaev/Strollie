@@ -37,21 +37,21 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
 }
 
 const styles = StyleSheet.create({
+	description: { gap: 9 },
+
+	info: {
+		fontFamily: Fonts.semibold,
+	},
+	infoRow: {
+		flexDirection: 'row',
+		gap: 5,
+	},
 	profile: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		gap: 20,
 	},
-
-	infoRow: {
-		flexDirection: 'row',
-		gap: 5,
-	},
 	text: {
 		fontSize: Fonts.f14,
 	},
-	info: {
-		fontFamily: Fonts.semibold,
-	},
-	description: { gap: 9 },
 });

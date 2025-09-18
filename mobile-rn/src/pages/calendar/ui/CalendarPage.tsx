@@ -19,20 +19,20 @@ export const CalendarPage: React.FC = () => {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
 		backgroundColor: Colors.lightBackground,
+		flex: 1,
 		padding: 16,
 	},
 	content: {
 		backgroundColor: Colors.white,
 		borderRadius: 20,
-		padding: 16,
 		flex: 1,
+		padding: 16,
 	},
 	title: {
+		color: Colors.black,
 		fontSize: 20,
 		fontWeight: 'bold',
 		marginBottom: 16,
-		color: Colors.black,
 	},
 });

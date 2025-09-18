@@ -150,12 +150,12 @@ export const WeatherWidget: React.FC<WeatherWidgetProps> = ({
 };
 
 const styles = StyleSheet.create({
-	container: {
-		width: CANVAS_WIDTH,
-		height: CANVAS_HEIGHT,
-	},
 	canvas: {
-		width: '100%',
 		height: '100%',
+		width: '100%',
+	},
+	container: {
+		height: CANVAS_HEIGHT,
+		width: CANVAS_WIDTH,
 	},
 });

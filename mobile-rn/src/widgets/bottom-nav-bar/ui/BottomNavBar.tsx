@@ -212,68 +212,68 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 };
 
 const styles = StyleSheet.create({
-	container: {
-		position: 'absolute',
+	backgroundBetween: {
+		backgroundColor: Colors.backgroundBetweenNavbarAndPanel,
+		bottom: 0,
+		height: PANEL_HEIGHT + 16,
 		left: 0,
+		position: 'absolute',
 		right: 0,
-		gap: 5,
+		zIndex: -1,
+	},
+	centerButton: {
+		transform: [{ translateY: -TRANSLATE_Y }],
+	},
+	container: {
 		backgroundColor: Colors.transparent,
+		gap: 5,
+		left: 0,
+		position: 'absolute',
+		right: 0,
+	},
+	navBarButton: {
+		backgroundColor: Colors.grayBackground,
+		borderRadius: Radius.r16,
+		boxShadow: Shadows.boxShadow_elev1,
+		height: 40,
+		width: 40,
+	},
+	navBarContainer: {},
+	navBarIcons: {
+		alignItems: 'center',
+		bottom: 0,
+		flexDirection: 'row',
+		justifyContent: 'space-evenly',
+		left: 0,
+		position: 'absolute',
+		right: 0,
+		top: 0,
+	},
+
+	panelButton: {
+		backgroundColor: Colors.grayBackground,
+		borderRadius: Radius.r16,
+		boxShadow: Shadows.boxShadow_elev1,
+		height: 50,
+		width: 80,
+	},
+
+	panelButtonText: {
+		color: Colors.grayText,
+		fontSize: Fonts.f12,
 	},
 	panelContainer: {
 		backgroundColor: Colors.white,
 		borderTopLeftRadius: Radius.r20,
 		borderTopRightRadius: Radius.r20,
+		boxShadow: Shadows.boxShadow_elev1,
 		flexDirection: 'row',
 		justifyContent: 'space-evenly',
 		paddingTop: 16,
-		boxShadow: Shadows.boxShadow_elev1,
 	},
+
 	panelContent: {
 		alignItems: 'center',
 		gap: 7,
-	},
-	navBarContainer: {},
-	navBarIcons: {
-		position: 'absolute',
-		left: 0,
-		right: 0,
-		bottom: 0,
-		top: 0,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-evenly',
-	},
-	navBarButton: {
-		width: 40,
-		height: 40,
-		borderRadius: Radius.r16,
-		backgroundColor: Colors.grayBackground,
-		boxShadow: Shadows.boxShadow_elev1,
-	},
-
-	centerButton: {
-		transform: [{ translateY: -TRANSLATE_Y }],
-	},
-
-	panelButton: {
-		width: 80,
-		height: 50,
-		backgroundColor: Colors.grayBackground,
-		borderRadius: Radius.r16,
-		boxShadow: Shadows.boxShadow_elev1,
-	},
-	panelButtonText: {
-		color: Colors.grayText,
-		fontSize: Fonts.f12,
-	},
-
-	backgroundBetween: {
-		position: 'absolute',
-		zIndex: -1,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		height: PANEL_HEIGHT + 16,
-		backgroundColor: Colors.backgroundBetweenNavbarAndPanel,
 	},
 });

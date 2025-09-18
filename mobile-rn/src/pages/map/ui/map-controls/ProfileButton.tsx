@@ -28,11 +28,11 @@ export const ProfileButton = ({
 };
 const styles = StyleSheet.create({
 	iconContainer: {
-		width: 45,
-		height: 45,
-		borderRadius: Radius.r20,
-		backgroundColor: Colors.white,
-		justifyContent: 'center',
 		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r20,
+		height: 45,
+		justifyContent: 'center',
+		width: 45,
 	},
 });

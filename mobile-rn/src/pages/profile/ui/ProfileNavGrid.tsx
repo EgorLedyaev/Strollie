@@ -123,30 +123,30 @@ const styles = StyleSheet.create({
 	gridContainer: {
 		gap: Gaps.g15,
 	},
+	gridIcon: {
+		bottom: 16,
+		position: 'absolute',
+		right: 16,
+	},
+	gridItemContainer: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		boxShadow: Shadows.boxShadow_elev1,
+		flex: 1,
+		height: 130,
+	},
+	gridItemContent: {
+		...StyleSheet.absoluteFillObject,
+		alignItems: 'flex-start',
+		justifyContent: 'flex-start',
+		padding: 24,
+	},
 	gridRow: {
 		flexDirection: 'row',
 		gap: Gaps.g15,
 	},
-	gridItemContainer: {
-		flex: 1,
-		height: 130,
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		boxShadow: Shadows.boxShadow_elev1,
-	},
-	gridItemContent: {
-		...StyleSheet.absoluteFillObject,
-		justifyContent: 'flex-start',
-		alignItems: 'flex-start',
-		padding: 24,
-	},
 	gridText: {
-		fontFamily: Fonts.semibold,
 		color: Colors.headerAndInputText,
-	},
-	gridIcon: {
-		position: 'absolute',
-		right: 16,
-		bottom: 16,
+		fontFamily: Fonts.semibold,
 	},
 });

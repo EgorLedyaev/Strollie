@@ -30,9 +30,9 @@ export const CustomLink = ({
 
 const styles = StyleSheet.create({
 	link: {
-		fontSize: Fonts.f16,
 		color: Colors.greenLink,
 		fontFamily: Fonts.medium,
+		fontSize: Fonts.f16,
 		textDecorationLine: 'underline',
 	},
 });

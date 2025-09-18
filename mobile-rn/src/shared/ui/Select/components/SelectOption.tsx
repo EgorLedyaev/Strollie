@@ -44,18 +44,18 @@ export const SelectOption: React.FC<SelectOptionProps> = ({
 
 const styles = StyleSheet.create({
 	optionItem: {
-		paddingVertical: 16,
-		paddingHorizontal: 20,
+		borderBottomColor: Colors.inputOptionBorder,
+		borderBottomWidth: 1,
 		height: 54,
 		justifyContent: 'center',
-		borderBottomWidth: 1,
-		borderBottomColor: Colors.inputOptionBorder,
+		paddingHorizontal: 20,
+		paddingVertical: 16,
 	},
-	selectedOption: { backgroundColor: Colors.optionHighlight },
 	optionText: {
+		color: Colors.headerAndInputText,
 		fontFamily: Fonts.regular,
 		fontSize: 16,
-		color: Colors.headerAndInputText,
 	},
+	selectedOption: { backgroundColor: Colors.optionHighlight },
 	selectedOptionText: { fontFamily: Fonts.medium },
 });

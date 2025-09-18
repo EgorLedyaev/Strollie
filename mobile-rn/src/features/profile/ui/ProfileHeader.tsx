@@ -68,17 +68,17 @@ export function ProfileHeader({ user, onBackPress, onMenuPress }: HeaderProps) {
 
 const styles = StyleSheet.create({
 	container: {
-		height: 160,
-		justifyContent: 'space-between',
-		padding: 16,
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r20,
-		marginBottom: 20,
 		boxShadow: Shadows.boxShadow_elev1,
+		height: 160,
+		justifyContent: 'space-between',
+		marginBottom: 20,
+		padding: 16,
 	},
 	header: {
-		flexDirection: 'row',
 		alignItems: 'center',
+		flexDirection: 'row',
 		justifyContent: 'space-between',
 	},
 	text: {

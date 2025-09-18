@@ -27,19 +27,19 @@ export const ToggleModeButton = ({
 const styles = StyleSheet.create({
 	button: {
 		alignItems: 'center',
-		justifyContent: 'center',
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r16,
 		boxShadow: Shadows.boxShadow,
-		width: 46,
 		height: 46,
+		justifyContent: 'center',
+		width: 46,
 	},
 	disabled: {
 		backgroundColor: Colors.gray,
 	},
 	text: {
+		color: Colors.grayIcon,
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f20,
-		color: Colors.grayIcon,
 	},
 });

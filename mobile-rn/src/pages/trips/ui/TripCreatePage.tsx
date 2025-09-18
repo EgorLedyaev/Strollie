@@ -32,18 +32,18 @@ export const TripCreatePage: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+	action: { flex: 1, height: 44 },
+	actions: { flexDirection: 'row', gap: 12 },
 	container: {
-		flex: 1,
 		backgroundColor: Colors.lightBackground,
+		flex: 1,
 		padding: 16,
 	},
 	content: { flex: 1 },
 	title: {
-		fontSize: Fonts.f20,
-		fontFamily: Fonts.bold,
-		marginBottom: 16,
 		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
+		marginBottom: 16,
 	},
-	actions: { flexDirection: 'row', gap: 12 },
-	action: { height: 44, flex: 1 },
 });

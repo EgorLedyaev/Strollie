@@ -12,7 +12,7 @@ export const Divider = ({ style }: DividerProps) => {
 
 const styles = StyleSheet.create({
 	divider: {
-		height: 1,
 		backgroundColor: Colors.divider,
+		height: 1,
 	},
 });

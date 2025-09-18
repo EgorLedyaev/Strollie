@@ -61,8 +61,8 @@ export const MapWidget = forwardRef<WebView, MapWidgetProps>(
 
 const styles = StyleSheet.create({
 	container: { flex: 1 },
-	webview: { flex: 1 },
-	webviewLoading: { position: 'absolute', width: 0, height: 0, opacity: 0 },
-	errorView: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 	errorText: { color: Colors.error },
+	errorView: { alignItems: 'center', flex: 1, justifyContent: 'center' },
+	webview: { flex: 1 },
+	webviewLoading: { height: 0, opacity: 0, position: 'absolute', width: 0 },
 });

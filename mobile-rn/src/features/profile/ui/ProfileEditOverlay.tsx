@@ -72,26 +72,6 @@ export const ProfileEditOverlay: React.FC<ProfileMenuOverlayProps> = ({
 };
 
 const styles = StyleSheet.create({
-	overlay: {
-		flex: 1,
-		backgroundColor: Colors.shadowButton,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	menuContainer: {
-		width: 252,
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		boxShadow: Shadows.boxShadow,
-		paddingVertical: 16,
-		paddingHorizontal: 10,
-		gap: 12,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	textOverlay: {
-		color: Colors.grayTextOverlay,
-	},
 	buttonContainer: {
 		flexDirection: 'row',
 		gap: 10,
@@ -101,5 +81,25 @@ const styles = StyleSheet.create({
 	buttonContent: {
 		height: 39,
 		width: 111,
+	},
+	menuContainer: {
+		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		boxShadow: Shadows.boxShadow,
+		gap: 12,
+		justifyContent: 'center',
+		paddingHorizontal: 10,
+		paddingVertical: 16,
+		width: 252,
+	},
+	overlay: {
+		alignItems: 'center',
+		backgroundColor: Colors.shadowButton,
+		flex: 1,
+		justifyContent: 'center',
+	},
+	textOverlay: {
+		color: Colors.grayTextOverlay,
 	},
 });

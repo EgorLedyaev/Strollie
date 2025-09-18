@@ -149,59 +149,59 @@ export function VerifyCodePage() {
 }
 
 const styles = StyleSheet.create({
-	safeArea: {
-		flex: 1,
-		backgroundColor: Colors.lightBackground,
+	activeResendText: {
+		color: Colors.greenLink,
 	},
-	container: {
-		flex: 1,
-		paddingHorizontal: 16,
-		paddingTop: 80,
-		alignItems: 'center',
-	},
-	header: {
-		alignItems: 'center',
-		marginTop: 85,
-		width: '100%',
+	appButton: {
+		height: 54,
 	},
 	backButton: {
 		position: 'absolute',
 		top: 16, // Ближе к верхнему краю
 		left: 16, // Ближе к левому краю
 	},
-	title: {
-		marginBottom: 32,
+	buttonContainer: {
+		marginTop: 32,
+		width: '100%',
+	},
+	codeInput: {
+		marginTop: 60,
+	},
+	container: {
+		alignItems: 'center',
+		flex: 1,
+		paddingHorizontal: 16,
+		paddingTop: 80,
+	},
+	errorText: {
+		color: Colors.error,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f14,
+		marginTop: 16,
+		textAlign: 'center',
+	},
+	header: {
+		alignItems: 'center',
+		marginTop: 85,
+		width: '100%',
+	},
+	resendContainer: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 4,
+		justifyContent: 'center',
+		marginTop: 24,
+	},
+	resendText: {},
+	safeArea: {
+		backgroundColor: Colors.lightBackground,
+		flex: 1,
 	},
 	subtitle: {
 		color: Colors.secondaryText,
 		textAlign: 'center',
 	},
-	codeInput: {
-		marginTop: 60,
-	},
-	resendContainer: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		gap: 4,
-		marginTop: 24,
-	},
-	resendText: {},
-	activeResendText: {
-		color: Colors.greenLink,
-	},
-	buttonContainer: {
-		width: '100%',
-		marginTop: 32,
-	},
-	errorText: {
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f14,
-		color: Colors.error,
-		marginTop: 16,
-		textAlign: 'center',
-	},
-	appButton: {
-		height: 54,
+	title: {
+		marginBottom: 32,
 	},
 });

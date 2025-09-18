@@ -31,10 +31,10 @@ export const SaveProfileButton: React.FC<SaveProfileButtonProps> = ({
 };
 
 const styles = StyleSheet.create({
-	container: {
-		marginTop: 20,
-	},
 	button: {
 		width: '100%',
+	},
+	container: {
+		marginTop: 20,
 	},
 });

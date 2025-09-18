@@ -43,27 +43,27 @@ export const CalendarFilter: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-	container: {
-		flexDirection: 'row',
-		marginBottom: 16,
-		borderBottomWidth: 1,
-		borderBottomColor: Colors.gray,
-	},
-	filterTab: {
-		paddingVertical: 10,
-		paddingHorizontal: 16,
-		marginRight: 8,
-	},
 	activeFilterTab: {
-		borderBottomWidth: 2,
 		borderBottomColor: Colors.black,
-	},
-	filterText: {
-		fontSize: 14,
-		color: Colors.darkGray,
+		borderBottomWidth: 2,
 	},
 	activeFilterText: {
 		color: Colors.black,
 		fontWeight: '600',
+	},
+	container: {
+		borderBottomColor: Colors.gray,
+		borderBottomWidth: 1,
+		flexDirection: 'row',
+		marginBottom: 16,
+	},
+	filterTab: {
+		marginRight: 8,
+		paddingHorizontal: 16,
+		paddingVertical: 10,
+	},
+	filterText: {
+		color: Colors.darkGray,
+		fontSize: 14,
 	},
 });

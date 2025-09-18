@@ -46,16 +46,16 @@ export const ErrorNotification = ({ error }: ErrorNotificationProps) => {
 };
 const styles = StyleSheet.create({
 	error: {
+		backgroundColor: Colors.red,
+		padding: 15,
 		position: 'absolute',
 		top: 0,
-		padding: 15,
 		width: Dimensions.get('screen').width,
-		backgroundColor: Colors.red,
 	},
 	errorText: {
 		color: Colors.white,
+		fontFamily: 'FiraSans',
 		fontSize: Fonts.f16,
 		textAlign: 'center',
-		fontFamily: 'FiraSans',
 	},
 });

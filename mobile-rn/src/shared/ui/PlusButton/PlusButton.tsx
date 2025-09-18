@@ -24,11 +24,11 @@ export const PlusButton = ({ onPress, style, ...props }: PlusButtonProps) => {
 
 const styles = StyleSheet.create({
 	iconContainer: {
-		width: Sizes.button.sm,
-		height: Sizes.button.sm,
+		alignItems: 'center',
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r8,
+		height: Sizes.button.sm,
 		justifyContent: 'center',
-		alignItems: 'center',
+		width: Sizes.button.sm,
 	},
 });

@@ -63,10 +63,6 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 };
 
 const styles = StyleSheet.create({
-	overlayContainer: {
-		...StyleSheet.absoluteFillObject,
-		pointerEvents: 'box-none',
-	},
 	header: {
 		paddingHorizontal: 16,
 		paddingTop: Platform.OS === 'ios' ? 50 : 45, // Адаптивный отступ сверху
@@ -74,29 +70,33 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		gap: 10,
 	},
-	profileButton: {
-		width: 45,
-		height: 45,
+	mapButton: {
+		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
 		boxShadow: Shadows.boxShadow,
+		height: 46,
+		justifyContent: 'center',
+		width: 46,
 	},
 	mapControlsWrapper: {
+		bottom: 0,
+		justifyContent: 'center',
 		position: 'absolute',
 		right: 16,
 		top: 0,
-		bottom: 0,
-		justifyContent: 'center',
+	},
+	overlayContainer: {
+		...StyleSheet.absoluteFillObject,
+		pointerEvents: 'box-none',
+	},
+	profileButton: {
+		boxShadow: Shadows.boxShadow,
+		height: 45,
+		width: 45,
 	},
 	zoomAndModeContainer: {
 		gap: Gaps.g8,
 		pointerEvents: 'auto',
-	},
-	mapButton: {
-		width: 46,
-		height: 46,
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r16,
-		boxShadow: Shadows.boxShadow,
 	},
 });

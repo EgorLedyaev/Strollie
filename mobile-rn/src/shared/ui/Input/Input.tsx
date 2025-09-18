@@ -70,27 +70,27 @@ const styles = StyleSheet.create({
 		position: 'relative',
 		width: '100%',
 	},
+	eyeIcon: {
+		paddingHorizontal: 20,
+		paddingVertical: 18,
+		position: 'absolute',
+		right: 0,
+	},
 	input: {
-		height: 54,
-		borderRadius: 16,
-		paddingHorizontal: 16,
 		backgroundColor: Colors.white,
-		borderWidth: 1,
 		borderColor: Colors.inputBorder,
+		borderRadius: 16,
+		borderWidth: 1,
+		height: 54,
+		paddingHorizontal: 16,
 		textAlignVertical: 'center',
+	},
+	inputFocused: {
+		borderBottomWidth: 2,
+		borderColor: Colors.successGreen,
+		borderWidth: 0,
 	},
 	inputInvalid: {
 		borderColor: Colors.error,
-	},
-	inputFocused: {
-		borderWidth: 0,
-		borderBottomWidth: 2,
-		borderColor: Colors.successGreen,
-	},
-	eyeIcon: {
-		position: 'absolute',
-		right: 0,
-		paddingHorizontal: 20,
-		paddingVertical: 18,
 	},
 });

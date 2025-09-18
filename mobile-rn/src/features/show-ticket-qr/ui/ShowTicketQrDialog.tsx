@@ -56,22 +56,22 @@ export const ShowTicketQrDialog: React.FC<Props> = ({
 };
 
 const styles = StyleSheet.create({
+	appButton: {
+		height: 43,
+	},
 	container: { gap: 12 },
-	subtitle: { color: Colors.secondaryText },
+	qr: { height: 240, width: 240 },
+	qrPlaceholder: {
+		backgroundColor: Colors.gray,
+		borderRadius: 8,
+		height: 240,
+		width: 240,
+	},
 	qrWrap: {
 		alignItems: 'center',
 		justifyContent: 'center',
 		paddingVertical: 8,
 	},
-	qr: { width: 240, height: 240 },
-	qrPlaceholder: {
-		width: 240,
-		height: 240,
-		backgroundColor: Colors.gray,
-		borderRadius: 8,
-	},
 
-	appButton: {
-		height: 43,
-	},
+	subtitle: { color: Colors.secondaryText },
 });

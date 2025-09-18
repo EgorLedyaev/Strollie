@@ -29,23 +29,23 @@ export const MapStatusIndicator: React.FC<MapStatusIndicatorProps> = ({
 };
 
 const styles = StyleSheet.create({
+	errorText: {
+		color: Colors.red,
+		fontSize: 12,
+		marginTop: 5,
+		paddingHorizontal: 20,
+		textAlign: 'center',
+	},
 	loader: {
 		...StyleSheet.absoluteFillObject,
+		alignItems: 'center',
 		backgroundColor: Colors.backgroundMapStatus,
 		justifyContent: 'center',
-		alignItems: 'center',
 		zIndex: 10,
 	},
 	loaderText: {
-		marginTop: 10,
-		fontSize: 16,
 		color: Colors.black,
-	},
-	errorText: {
-		color: Colors.red,
-		marginTop: 5,
-		textAlign: 'center',
-		fontSize: 12,
-		paddingHorizontal: 20,
+		fontSize: 16,
+		marginTop: 10,
 	},
 });

@@ -29,24 +29,24 @@ export const ZoomButtons = ({
 );
 
 const styles = StyleSheet.create({
+	button: {
+		alignItems: 'center',
+		backgroundColor: Colors.white,
+		boxShadow: Shadows.boxShadow,
+		height: 46,
+		justifyContent: 'center',
+		width: 46,
+	},
 	container: {
 		flexDirection: 'column',
 		gap: 3,
 	},
-	button: {
-		alignItems: 'center',
-		justifyContent: 'center',
-		backgroundColor: Colors.white,
-		width: 46,
-		height: 46,
-		boxShadow: Shadows.boxShadow,
+	minusIcon: {
+		borderBottomEndRadius: Radius.r16,
+		borderBottomStartRadius: Radius.r16,
 	},
 	plusIcon: {
-		borderTopStartRadius: Radius.r16,
 		borderTopEndRadius: Radius.r16,
-	},
-	minusIcon: {
-		borderBottomStartRadius: Radius.r16,
-		borderBottomEndRadius: Radius.r16,
+		borderTopStartRadius: Radius.r16,
 	},
 });
