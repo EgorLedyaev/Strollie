@@ -434,3 +434,132 @@ npm run format:check && npm run lint && npm run typecheck && npm run fsd:check
 Структура ещё эволюционирует (много «одноразовых» слайсов). Жёсткая блокировка мешала бы частым маленьким коммитам. Как только стабилизируем основные домены (`ticket`, `trip`, `profile`, `map`), можно включить строгий режим.
 
 ---
+
+## 15. CI: производительность и стратегия native drift
+
+## 15.0 Стратегия WebView URL (безопасное окружение)
+
+Цель: всегда собирать production‑клиент с корректным публичным хостом WebView карты, не рискуя случайно закоммитить локальный IP / временный URL.
+
+### Слои стратегии
+
+1. Production источник правды: файл `.env.production` (в репозитории) содержит:
+
+```dotenv
+EXPO_PUBLIC_WEBVIEW_URL=http://91.108.246.148
+```
+
+1. Локальный override (опционально): `.env.local` (игнорируется Git) – разработчик может задать свой URL (например туннель ngrok или локальный LAN IP) **только для dev**.
+
+1. Fallback в коде: если переменная не задана, helper берёт production fallback (тот же IP) напрямую из константы – значит даже при сломанном env сборка не «пустая».
+
+1. Принудительная фиксация на CI: job `android-build` в `ci.yml` экспортирует `EXPO_PUBLIC_WEBVIEW_URL` через `env:` – исключает влияние случайного override в future.
+
+### Реализация
+
+Файл: `src/shared/lib/env/webview.ts`
+
+Экспортируемые функции:
+
+- `resolveWebviewUrl()` – чистое получение финального URL (без React зависимостей).
+- `getWebviewUrl()` – обёртка для использования в компонентах (UI слой).
+
+Особенности:
+
+- Нормализует URL (гарантирует префикс `http://` / `https://`).
+- Предупреждает (console.warn) в release, если обнаружен приватный / LAN IP, чтобы не уехать в прод с ошибкой.
+- Private/LAN детект через regexp по диапазонам `10.*`, `192.168.*`, `172.16-31.*`, `127.*`, `::1`, локальные `.local`.
+
+### Использование
+
+Вместо прямого `process.env.EXPO_PUBLIC_WEBVIEW_URL`:
+
+```ts
+import { getWebviewUrl } from 'shared/lib';
+
+const uri = getWebviewUrl();
+```
+
+Пример уже внедрён в: `pages/map/ui/map-widget/MapWidget.tsx`, `pages/map/api/mapService.ts`.
+
+### Порядок разрешения
+
+1. `process.env.EXPO_PUBLIC_WEBVIEW_URL` (из `.env.local` > `.env.production` > переменные среды CI).
+2. Fallback константа (жёстко заданный prod IP) – как последняя защита.
+
+### Как задать локальный URL
+
+Создайте `.env.local`:
+
+```dotenv
+EXPO_PUBLIC_WEBVIEW_URL=http://192.168.0.54:5173
+```
+
+Перезапустите dev сервер (`npm start`). Этот файл уже в `.gitignore`, поэтому не попадёт в PR.
+
+### Безопасность
+
+- Production всегда закреплён: `.env.production` + CI `env:`.
+- Даже если локально разработчик забудет удалить свой override → на CI он не сработает.
+- Есть runtime предупреждение если приватный IP попал в release build.
+
+### Добавление новых публичных URL
+
+Для аналогичных кейсов повторяйте паттерн: файл helper `shared/lib/env/<name>.ts` + commit `.env.production` + CI override. Избегайте чтения env напрямую внутри глубинных компонентов.
+
+---
+
+CI workflow (`.github/workflows/ci.yml`) оптимизирован под быстрые итерации мобильного приложения:
+
+### 15.1 Commit‑Stable Android Skeleton
+
+Директория `android/` закоммичена в репозиторий, чтобы:
+
+- Исключить дорогостоящий `expo prebuild` на каждом прогоне.
+- Сделать нативный слой детерминированным и кодо‑ревьюабельным.
+
+### 15.2 Advisory Native Drift Check
+
+Шаг `native-drift` запускается только если изменены файлы из группы `native_impact` (app.json, app.config.*, плагины, expo-env, некоторые assets). Скрипт `scripts/native-drift-check.sh`:
+
+1. Создаёт временную копию проекта (исключая build артефакты, `.gradle`, intermediates).
+2. Выполняет `npx expo prebuild --platform android --no-install`.
+3. Делает фильтрованный `diff -ru` с текущей `android/` (игнор служебных директорий).
+4. Печатает `NO_DRIFT` или `DRIFT_DETECTED` (не ломает сборку, пока режим advisory).
+
+Если зафиксирован `DRIFT_DETECTED` — нужно локально повторить `expo prebuild`, проанализировать различия и при необходимости закоммитить обновлённый нативный слой (отдельным осознанным PR).
+
+### 15.3 Текущие оптимизации
+
+- Gradle параллелизм: `org.gradle.parallel=true`, лимит воркеров (`org.gradle.workers.max=4`) для предсказуемости в CI.
+- ESLint / Prettier caching: директории `.cache/eslint` и `.cache/prettier` кэшируются через `actions/cache`.
+- Условная сборка Android: пропускается при отсутствии изменений в `android` и `native_impact`.
+- Линтер архитектуры (steiger) и drift check работают в advisory режиме (не блокируют быстрые фиче‑циклы).
+
+### 15.4 Возможные будущие улучшения
+
+- Удалённый Gradle build cache (shared cache server) / расширенная конфигурация.
+- Конфигурационный cache Gradle с устойчивым volume (приемлемо, когда структура стабилизируется).
+- Сжатие артефактов для последующих джоб (например распределение AAB / mapping.txt).
+- Прогрессивное ужесточение `--max-warnings` ESLint до 0 и снятие `continue-on-error`.
+- Отдельный workflow для подписанной релизной сборки (AAB) + подпись.
+
+### 15.5 Когда обновлять `android/`
+
+Обновляйте нативный слой только если:
+
+- Drift check показал значимые изменения (новые плагины, обновлённые Gradle файлы, изменения AndroidManifest, ресурсы).
+- Вручную выполнен `expo prebuild` после обновления SDK/плагина.
+- Требуется добавить/изменить нативный permission, service, intent‑filter.
+
+Не стоит коммитить временные изменения/авто‑мусор (intermediates, build, `.gradle` каталоги) — они отфильтрованы `.gitignore` и drift‑скриптом.
+
+### 15.6 Локальная проверка drift
+
+```bash
+./scripts/native-drift-check.sh
+```
+
+Если вывод `DRIFT_DETECTED` — изучите `diff` и примите решение о синхронизации.
+
+---

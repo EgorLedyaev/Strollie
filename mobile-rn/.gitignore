@@ -64,5 +64,25 @@ app-example
 .docs
 .github/instructions
 
-/android
+# --- Android native project skeleton tracked ---
+# Удалили ранее глобальный /android. Теперь игнорируем только артефакты и секреты.
+android/.gradle/
+android/.kotlin/
+android/**/build/
+android/**/intermediates/
+android/**/generated/
+android/**/outputs/
+android/**/captures/
+android/app/.cxx/
+android/local.properties
+android/**/*.iml
+android/**/hs_err_pid*.log
+android/**/*.jks
+android/**/*.keystore
+android/**/*.p12
+android/**/*.p8
+android/**/*.key
+android/app/debug.keystore
+
+# iOS: по-прежнему полностью игнорируем, можно будет позже перейти на аналогичную стратегию
 /ios
