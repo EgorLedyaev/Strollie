@@ -94,6 +94,8 @@ jobs:
         needs: [build-and-validate, changes]
         if: ${{ needs.changes.outputs.android == 'true' }}
         runs-on: ubuntu-latest
+        env:
+            EXPO_PUBLIC_WEBVIEW_URL: 'http://91.108.246.148'
         steps:
             - name: Checkout
               uses: actions/checkout@v4

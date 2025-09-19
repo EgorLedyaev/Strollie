@@ -437,6 +437,78 @@ npm run format:check && npm run lint && npm run typecheck && npm run fsd:check
 
 ## 15. CI: производительность и стратегия native drift
 
+## 15.0 Стратегия WebView URL (безопасное окружение)
+
+Цель: всегда собирать production‑клиент с корректным публичным хостом WebView карты, не рискуя случайно закоммитить локальный IP / временный URL.
+
+### Слои стратегии
+
+1. Production источник правды: файл `.env.production` (в репозитории) содержит:
+
+```dotenv
+EXPO_PUBLIC_WEBVIEW_URL=http://91.108.246.148
+```
+
+1. Локальный override (опционально): `.env.local` (игнорируется Git) – разработчик может задать свой URL (например туннель ngrok или локальный LAN IP) **только для dev**.
+
+1. Fallback в коде: если переменная не задана, helper берёт production fallback (тот же IP) напрямую из константы – значит даже при сломанном env сборка не «пустая».
+
+1. Принудительная фиксация на CI: job `android-build` в `ci.yml` экспортирует `EXPO_PUBLIC_WEBVIEW_URL` через `env:` – исключает влияние случайного override в future.
+
+### Реализация
+
+Файл: `src/shared/lib/env/webview.ts`
+
+Экспортируемые функции:
+
+- `resolveWebviewUrl()` – чистое получение финального URL (без React зависимостей).
+- `getWebviewUrl()` – обёртка для использования в компонентах (UI слой).
+
+Особенности:
+
+- Нормализует URL (гарантирует префикс `http://` / `https://`).
+- Предупреждает (console.warn) в release, если обнаружен приватный / LAN IP, чтобы не уехать в прод с ошибкой.
+- Private/LAN детект через regexp по диапазонам `10.*`, `192.168.*`, `172.16-31.*`, `127.*`, `::1`, локальные `.local`.
+
+### Использование
+
+Вместо прямого `process.env.EXPO_PUBLIC_WEBVIEW_URL`:
+
+```ts
+import { getWebviewUrl } from 'shared/lib';
+
+const uri = getWebviewUrl();
+```
+
+Пример уже внедрён в: `pages/map/ui/map-widget/MapWidget.tsx`, `pages/map/api/mapService.ts`.
+
+### Порядок разрешения
+
+1. `process.env.EXPO_PUBLIC_WEBVIEW_URL` (из `.env.local` > `.env.production` > переменные среды CI).
+2. Fallback константа (жёстко заданный prod IP) – как последняя защита.
+
+### Как задать локальный URL
+
+Создайте `.env.local`:
+
+```dotenv
+EXPO_PUBLIC_WEBVIEW_URL=http://192.168.0.54:5173
+```
+
+Перезапустите dev сервер (`npm start`). Этот файл уже в `.gitignore`, поэтому не попадёт в PR.
+
+### Безопасность
+
+- Production всегда закреплён: `.env.production` + CI `env:`.
+- Даже если локально разработчик забудет удалить свой override → на CI он не сработает.
+- Есть runtime предупреждение если приватный IP попал в release build.
+
+### Добавление новых публичных URL
+
+Для аналогичных кейсов повторяйте паттерн: файл helper `shared/lib/env/<name>.ts` + commit `.env.production` + CI override. Избегайте чтения env напрямую внутри глубинных компонентов.
+
+---
+
 CI workflow (`.github/workflows/ci.yml`) оптимизирован под быстрые итерации мобильного приложения:
 
 ### 15.1 Commit‑Stable Android Skeleton

@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import WebView from 'react-native-webview';
 
 import { mapErrorAtom, mapReadyAtom } from '@/entities/map';
+import { getWebviewUrl } from '@/shared/lib';
 import { Colors } from '@/shared/tokens';
 import { AppText, MapStatusIndicator } from '@/shared/ui';
 
@@ -16,7 +17,7 @@ export const MapWidget = forwardRef<WebView, MapWidgetProps>(
 		const [mapReady] = useAtom(mapReadyAtom);
 		const [mapError, setMapError] = useAtom(mapErrorAtom);
 
-		const webviewUrl = process.env.EXPO_PUBLIC_WEBVIEW_URL;
+		const webviewUrl = getWebviewUrl();
 		if (!webviewUrl) {
 			return (
 				<View style={styles.errorView}>
@@ -26,9 +27,7 @@ export const MapWidget = forwardRef<WebView, MapWidgetProps>(
 				</View>
 			);
 		}
-		const uri = webviewUrl.startsWith('http')
-			? webviewUrl
-			: `http://${webviewUrl}`;
+		const uri = webviewUrl; // helper уже нормализует
 
 		return (
 			<View style={styles.container}>
