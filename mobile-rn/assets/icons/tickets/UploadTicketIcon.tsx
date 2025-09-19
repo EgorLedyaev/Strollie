@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Svg, { Path, SvgProps } from 'react-native-svg';
 
-const UploadTicket = (props: SvgProps) => (
+const UploadTicketIcon = (props: SvgProps) => (
 	<Svg width={20} height={20} fill='none' {...props}>
 		<Path
 			fill='#B9B9B9'
@@ -9,4 +9,4 @@ const UploadTicket = (props: SvgProps) => (
 		/>
 	</Svg>
 );
-export default UploadTicket;
+export default UploadTicketIcon;

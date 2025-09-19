@@ -1,5 +1,5 @@
-import ScanTicket from '@/assets/icons/tickets/ScanTicket';
-import UploadTicket from '@/assets/icons/tickets/UploadTicket';
+import CameraIcon from '@/assets/icons/tickets/CameraIcon';
+import UploadTicketIcon from '@/assets/icons/tickets/UploadTicketIcon';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
@@ -106,16 +106,16 @@ export const TicketAddPage: React.FC = () => {
 							<AppText style={styles.actionButtonText}>
 								{image ? 'Изменить файл' : 'Выбрать файл'}
 							</AppText>
-							<UploadTicket />
+							<UploadTicketIcon />
 						</Pressable>
 						<Pressable
 							style={styles.actionButton}
 							onPress={pickImage}
 						>
 							<AppText style={styles.actionButtonText}>
-								Сканировать
+								Камера
 							</AppText>
-							<ScanTicket />
+							<CameraIcon />
 						</Pressable>
 					</View>
 					{image ? (
@@ -193,18 +193,20 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: Colors.uploadButtonBackground,
 		borderRadius: Radius.r16,
-		flex: 1,
+		// flex: 1,
 		flexDirection: 'row',
 		gap: 8,
 		height: 44,
 		justifyContent: 'center',
+		paddingHorizontal: 20,
+		width: 'auto',
 	},
 	actionButtonText: {
 		color: Colors.lightInputText,
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f14,
 	},
-	actionsRow: { alignItems: 'center', flexDirection: 'row', gap: 12 },
+	actionsRow: { alignItems: 'center', flexDirection: 'row', gap: 5 },
 	categoryBlock: { marginTop: 8 },
 	content: {
 		flex: 1,
@@ -238,14 +240,12 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f16,
 	},
-	// input: { borderColor: Colors.black, marginTop: 8 },
 	input: {
-		// --- Стили контейнера ---
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
 		borderRadius: Radius.r16,
 		borderWidth: 1,
-		color: Colors.greenPrimary,
+		color: Colors.headerAndInputText,
 		height: 54,
 		paddingHorizontal: 16,
 	},
