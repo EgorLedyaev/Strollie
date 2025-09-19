@@ -1,3 +1,5 @@
+import ScanTicket from '@/assets/icons/tickets/ScanTicket';
+import UploadTicket from '@/assets/icons/tickets/UploadTicket';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
@@ -14,7 +16,7 @@ import {
 	newTicketTitleAtom,
 	resetNewTicketFormAtom,
 } from '@/entities/ticket/model/ticket.add-form.state';
-import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText, AppTextInput, BackButton } from '@/shared/ui';
 
 export const TicketAddPage: React.FC = () => {
@@ -74,31 +76,48 @@ export const TicketAddPage: React.FC = () => {
 				<View style={styles.headerRightStub} />
 			</View>
 
-			<View style={styles.formCard}>
-				<View style={styles.fieldBlock}>
-					<AppText style={styles.label}>Название</AppText>
-					<AppTextInput
-						value={title}
-						onChangeText={setTitle}
-						placeholder='Введите название билета или рейса'
-						style={styles.input}
-					/>
-				</View>
-				<View style={styles.fieldBlock}>
-					<AppText style={styles.label}>Дата</AppText>
-					<AppTextInput
-						value={date}
-						onChangeText={setDate}
-						placeholder='Выберите дату билета или рейса'
-						style={styles.input}
-					/>
-				</View>
-				<View style={styles.imageRow}>
-					<Pressable style={styles.selectFileBtn} onPress={pickImage}>
-						<AppText style={styles.selectFileText}>
-							{image ? 'Изменить файл' : 'Выбрать файл'}
-						</AppText>
-					</Pressable>
+			<View style={styles.content}>
+				<View style={styles.formCard}>
+					<View style={styles.field}>
+						<AppText style={styles.label}>Название</AppText>
+						<AppTextInput
+							value={title}
+							placeholderTextColor={Colors.lightInputText}
+							onChangeText={setTitle}
+							placeholder='Введите название билета или рейса'
+							style={styles.input}
+						/>
+					</View>
+					<View style={styles.field}>
+						<AppText style={styles.label}>Дата</AppText>
+						<AppTextInput
+							value={date}
+							placeholderTextColor={Colors.lightInputText}
+							onChangeText={setDate}
+							placeholder='Выберите дату билета или рейса'
+							style={styles.input}
+						/>
+					</View>
+					<View style={styles.actionsRow}>
+						<Pressable
+							style={styles.actionButton}
+							onPress={pickImage}
+						>
+							<AppText style={styles.actionButtonText}>
+								{image ? 'Изменить файл' : 'Выбрать файл'}
+							</AppText>
+							<UploadTicket />
+						</Pressable>
+						<Pressable
+							style={styles.actionButton}
+							onPress={pickImage}
+						>
+							<AppText style={styles.actionButtonText}>
+								Сканировать
+							</AppText>
+							<ScanTicket />
+						</Pressable>
+					</View>
 					{image ? (
 						<View style={styles.previewBox}>
 							<Image
@@ -110,47 +129,48 @@ export const TicketAddPage: React.FC = () => {
 							</AppText>
 						</View>
 					) : null}
-				</View>
-				<View style={styles.categoryBlock}>
-					<AppText style={styles.label}>Категория билета</AppText>
-					<Pressable
-						style={styles.radioRow}
-						onPress={() => setCategory('transport')}
-					>
-						<View style={styles.radioOuter}>
-							{category === 'transport' && (
-								<View style={styles.radioInner} />
-							)}
-						</View>
-						<AppText
-							style={
-								category === 'transport'
-									? styles.radioTextActive
-									: styles.radioText
-							}
+
+					<View style={styles.categoryBlock}>
+						<AppText style={styles.label}>Категория билета</AppText>
+						<Pressable
+							style={styles.radioRow}
+							onPress={() => setCategory('transport')}
 						>
-							Транспорт
-						</AppText>
-					</Pressable>
-					<Pressable
-						style={styles.radioRow}
-						onPress={() => setCategory('entertainment')}
-					>
-						<View style={styles.radioOuter}>
-							{category === 'entertainment' && (
-								<View style={styles.radioInner} />
-							)}
-						</View>
-						<AppText
-							style={
-								category === 'entertainment'
-									? styles.radioTextActive
-									: styles.radioText
-							}
+							<View style={styles.radioOuter}>
+								{category === 'transport' && (
+									<View style={styles.radioInner} />
+								)}
+							</View>
+							<AppText
+								style={
+									category === 'transport'
+										? styles.radioTextActive
+										: styles.radioText
+								}
+							>
+								Транспорт
+							</AppText>
+						</Pressable>
+						<Pressable
+							style={styles.radioRow}
+							onPress={() => setCategory('entertainment')}
 						>
-							Развлечения
-						</AppText>
-					</Pressable>
+							<View style={styles.radioOuter}>
+								{category === 'entertainment' && (
+									<View style={styles.radioInner} />
+								)}
+							</View>
+							<AppText
+								style={
+									category === 'entertainment'
+										? styles.radioTextActive
+										: styles.radioText
+								}
+							>
+								Развлечения
+							</AppText>
+						</Pressable>
+					</View>
 				</View>
 			</View>
 
@@ -169,8 +189,29 @@ export const TicketAddPage: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+	actionButton: {
+		alignItems: 'center',
+		backgroundColor: Colors.uploadButtonBackground,
+		borderRadius: Radius.r16,
+		flex: 1,
+		flexDirection: 'row',
+		gap: 8,
+		height: 44,
+		justifyContent: 'center',
+	},
+	actionButtonText: {
+		color: Colors.lightInputText,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f14,
+	},
+	actionsRow: { alignItems: 'center', flexDirection: 'row', gap: 12 },
 	categoryBlock: { marginTop: 8 },
-	fieldBlock: { marginBottom: 8 },
+	content: {
+		flex: 1,
+	},
+	field: {
+		gap: Gaps.g8,
+	},
 	fileName: {
 		color: Colors.secondaryText,
 		fontFamily: Fonts.regular,
@@ -180,8 +221,10 @@ const styles = StyleSheet.create({
 	formCard: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r16,
-		gap: 12,
-		padding: 16,
+		gap: 24,
+		marginTop: 28,
+		paddingHorizontal: 16,
+		paddingVertical: 32,
 	},
 	header: {
 		alignItems: 'center',
@@ -195,12 +238,20 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f16,
 	},
-	imageRow: { alignItems: 'center', flexDirection: 'row', gap: 12 },
-	input: { marginTop: 8 },
+	// input: { borderColor: Colors.black, marginTop: 8 },
+	input: {
+		// --- Стили контейнера ---
+		backgroundColor: Colors.white,
+		borderColor: Colors.inputBorder,
+		borderRadius: Radius.r16,
+		borderWidth: 1,
+		color: Colors.greenPrimary,
+		height: 54,
+		paddingHorizontal: 16,
+	},
 	label: {
 		color: Colors.headerAndInputText,
 		fontFamily: Fonts.medium,
-		fontSize: Fonts.f16,
 	},
 	previewBox: { gap: 8, maxWidth: 140 },
 	previewImage: {
@@ -226,7 +277,12 @@ const styles = StyleSheet.create({
 		marginRight: 12,
 		width: 16,
 	},
-	radioRow: { alignItems: 'center', flexDirection: 'row', marginTop: 12 },
+	radioRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		marginTop: 12,
+		paddingHorizontal: 16,
+	},
 	radioText: {
 		color: Colors.secondaryText,
 		fontFamily: Fonts.regular,
@@ -239,18 +295,6 @@ const styles = StyleSheet.create({
 	},
 	root: { backgroundColor: Colors.grayBackground, flex: 1, padding: 16 },
 	saveBtnWrap: { height: 52, marginTop: 24 },
-	selectFileBtn: {
-		backgroundColor: Colors.grayBackground,
-		borderRadius: Radius.r16,
-		height: 44,
-		justifyContent: 'center',
-		paddingHorizontal: 16,
-	},
-	selectFileText: {
-		color: Colors.placeholderGray,
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f14,
-	},
 });
 
 export default TicketAddPage;

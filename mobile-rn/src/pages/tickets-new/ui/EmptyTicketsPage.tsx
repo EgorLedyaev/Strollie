@@ -18,11 +18,11 @@ export const EmptyTicketsPage: React.FC = () => {
 	return (
 		<View style={styles.content}>
 			<View>
-				<Image source={tickets_empty} style={styles.image} />
 				<Image
 					source={tickets_empty}
 					style={[styles.image, styles.imageRotated]}
 				/>
+				<Image source={tickets_empty} style={styles.image} />
 			</View>
 
 			<AppText style={styles.title} variant='header'>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
 	},
 	imageRotated: {
 		position: 'absolute',
-		transform: [{ rotate: '15deg' }],
+		transform: [{ rotate: '-15deg' }],
 	},
 	subtitle: {
 		color: Colors.secondaryText,
@@ -89,6 +89,6 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: Fonts.f20,
-		marginBottom: Gaps.g16,
+		marginBottom: Gaps.g12,
 	},
 });
