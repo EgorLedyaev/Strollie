@@ -124,7 +124,8 @@ jobs:
               run: bash scripts/native-drift-check.sh || true
 
             - name: Validate Gradle Wrapper
-              uses: gradle/wrapper-validation-action@v3
+              # v3 deprecated; moved to maintained action per deprecation guide
+              uses: gradle/actions/wrapper-validation@v4
 
             - name: Setup Java (Temurin 17)
               uses: actions/setup-java@v4
@@ -138,9 +139,13 @@ jobs:
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
               with:
+                  # ВАЖНО: каждая строка отдельный пакет. Ранее две строки схлопнулись в одну => sdkmanager искал несуществующий 'platforms;android-34 build-tools;34.0.0'
+                  # targetSdkVersion сейчас = 35 (см. merged manifest), поэтому ставим platform 35 + соответствующие build-tools.
+                  # Если потребуется откат: заменить 35 -> 34 и build-tools 35.0.0 -> 34.0.0
                   packages: |
-                      platforms;android-34
-                      build-tools;34.0.0
+                      platform-tools
+                      platforms;android-35
+                      build-tools;35.0.0
 
             - name: Gradle assembleRelease
               working-directory: android
