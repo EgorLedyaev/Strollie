@@ -1,14 +1,16 @@
+import * as ExpoConstants from 'expo-constants';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import { Provider as JotaiProvider } from 'jotai';
 import { Suspense, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SessionProvider } from '@/app/providers/with-session';
+import { initLogger } from '@/shared/lib/logger';
 import { Colors } from '@/shared/tokens';
 
 // Предотвращаем автоскрытие сплеш-экрана
@@ -39,6 +41,17 @@ function Root() {
 		'SuisseIntl-Bold': require('@/assets/fonts/SuisseIntl-Bold.otf'),
 		'SuisseIntl-Medium': require('@/assets/fonts/SuisseIntl-Medium.otf'),
 	});
+
+	useEffect(() => {
+		initLogger({
+			level: __DEV__ ? 'debug' : 'info',
+			defaultContext: {
+				platform: Platform.OS,
+				appVersion:
+					ExpoConstants.default?.expoConfig?.version || 'unknown',
+			},
+		});
+	}, []);
 
 	useEffect(() => {
 		if (fontsLoaded || fontError) {

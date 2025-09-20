@@ -1,5 +1,5 @@
 import AddTicketIcon from '@/assets/icons/tickets/AddTicketIcon';
-import tickets_empty from '@/assets/images/tickets-empty.png';
+import tickets_empty from '@/assets/images/tickets/tickets-empty.png';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';

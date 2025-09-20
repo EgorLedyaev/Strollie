@@ -19,6 +19,7 @@ import {
 	AppButton,
 	AppText,
 	BackButton,
+	DateInput,
 	Input,
 	Select,
 	SelectOption,
@@ -84,17 +85,6 @@ export function UserDataPage() {
 
 	const handleCitySelect = (option: SelectOption) => {
 		setRegState(prev => ({ ...prev, city: option.value }));
-	};
-
-	const formatBirthdate = (text: string) => {
-		const cleaned = text.replace(/\D/g, '');
-		if (cleaned.length <= 2) return cleaned;
-		if (cleaned.length <= 4)
-			return `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
-		return `${cleaned.slice(0, 2)}.${cleaned.slice(2, 4)}.${cleaned.slice(
-			4,
-			8,
-		)}`;
 	};
 
 	const isFormValid =
@@ -164,18 +154,27 @@ export function UserDataPage() {
 							<AppText style={styles.label}>
 								Дата рождения
 							</AppText>
-							<Input
-								placeholder='DD.MM.YYYY'
+							<DateInput
 								value={regState.birthdate}
-								onChangeText={text =>
-									handleChange(
-										'birthdate',
-										formatBirthdate(text),
-									)
+								onChangeText={value =>
+									handleChange('birthdate', value)
 								}
-								keyboardType='numeric'
-								maxLength={10}
+								allowFuture={false}
 								isInvalid={validationErrors.birthdate}
+								liveValidate={false}
+								onValidityChange={isValid => {
+									if (!isValid) {
+										setValidationErrors(prev => ({
+											...prev,
+											birthdate: true,
+										}));
+									} else if (validationErrors.birthdate) {
+										setValidationErrors(prev => ({
+											...prev,
+											birthdate: false,
+										}));
+									}
+								}}
 							/>
 						</View>
 

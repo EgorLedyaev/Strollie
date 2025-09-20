@@ -16,8 +16,15 @@ import {
 	newTicketTitleAtom,
 	resetNewTicketFormAtom,
 } from '@/entities/ticket/model/ticket.add-form.state';
+import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
-import { AppButton, AppText, AppTextInput, BackButton } from '@/shared/ui';
+import {
+	AppButton,
+	AppText,
+	AppTextInput,
+	BackButton,
+	DateInput,
+} from '@/shared/ui';
 
 export const TicketAddPage: React.FC = () => {
 	const router = useRouter();
@@ -31,42 +38,91 @@ export const TicketAddPage: React.FC = () => {
 	const [, setTickets] = useAtom(ticketsAtom);
 	const [, resetForm] = useAtom(resetNewTicketFormAtom);
 	const [saving, setSaving] = React.useState(false);
+	const [error, setError] = React.useState<string | null>(null);
+	const log = React.useMemo(() => bindLogger('ticket_add'), []);
+
+	React.useEffect(() => {
+		log.info('mount');
+	}, [log]);
 
 	const pickImage = async () => {
-		const res = await ImagePicker.launchImageLibraryAsync({
-			allowsMultipleSelection: false,
-			quality: 0.9,
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
-		});
-		if (!res.canceled) {
-			const asset = res.assets[0];
-			setImage(asset.uri);
-			setImageFileName(
-				asset.fileName ?? asset.uri.split('/').pop() ?? 'image',
-			);
+		try {
+			const res = await ImagePicker.launchImageLibraryAsync({
+				allowsMultipleSelection: false,
+				quality: 0.9,
+				mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			});
+			if (!res.canceled) {
+				const asset = res.assets[0];
+				setImage(asset.uri);
+				setImageFileName(
+					asset.fileName ?? asset.uri.split('/').pop() ?? 'image',
+				);
+				log.info('image:selected', {
+					uri: !!asset.uri,
+					name: asset.fileName,
+				});
+			}
+		} catch (e: unknown) {
+			const msg = e instanceof Error ? e.message : 'unknown';
+			log.error('image:pick_error', { message: msg });
 		}
 	};
 
 	const onSave = async () => {
 		if (!title || !date || !category) return;
-		setSaving(true);
+		setError(null);
+		let iso: string | null = null;
 		try {
+			// Ожидаем формат DD.MM.YYYY
+			const match = date.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+			if (!match) {
+				setError('Некорректная дата');
+				return;
+			}
+			const [, ddStr, mmStr, yyyyStr] = match;
+			const dd = Number(ddStr);
+			const mm = Number(mmStr);
+			const yyyy = Number(yyyyStr);
+			// Базовые границы (можно расширить если нужно)
+			if (mm < 1 || mm > 12 || dd < 1 || dd > 31 || yyyy < 1900) {
+				setError('Некорректная дата');
+				return;
+			}
+			const constructed = new Date(yyyy, mm - 1, dd);
+			// Проверяем что JS дата совпала (отсекает 31.02 и т.п.)
+			if (
+				constructed.getFullYear() !== yyyy ||
+				constructed.getMonth() !== mm - 1 ||
+				constructed.getDate() !== dd
+			) {
+				setError('Некорректная дата');
+				return;
+			}
+			iso = constructed.toISOString();
+			setSaving(true);
+			log.info('save:start', { hasImage: !!image, category });
 			const ticket = await ticketApi.createCustomTicket({
 				title,
-				date: new Date(date).toISOString(),
+				date: iso,
 				imageUri: image ?? undefined,
 				fileName: imageFileName ?? undefined,
 				businessCategory: category,
 			});
 			setTickets(prev => [...prev, ticket]);
+			log.info('save:success', { id: ticket.id });
 			resetForm();
 			router.replace('/tickets');
+		} catch (e: unknown) {
+			const msg = e instanceof Error ? e.message : 'unknown';
+			log.error('save:error', { message: msg });
+			setError('Ошибка сохранения');
 		} finally {
 			setSaving(false);
 		}
 	};
 
-	const canSave = !!title && !!date && !!category && !saving;
+	const canSave = !!title && !!date && !!category && !saving && !error;
 
 	return (
 		<SafeAreaView style={styles.root}>
@@ -78,6 +134,9 @@ export const TicketAddPage: React.FC = () => {
 
 			<View style={styles.content}>
 				<View style={styles.formCard}>
+					{error ? (
+						<AppText style={styles.errorText}>{error}</AppText>
+					) : null}
 					<View style={styles.field}>
 						<AppText style={styles.label}>Название</AppText>
 						<AppTextInput
@@ -90,12 +149,21 @@ export const TicketAddPage: React.FC = () => {
 					</View>
 					<View style={styles.field}>
 						<AppText style={styles.label}>Дата</AppText>
-						<AppTextInput
+						<DateInput
 							value={date}
-							placeholderTextColor={Colors.lightInputText}
 							onChangeText={setDate}
 							placeholder='Выберите дату билета или рейса'
-							style={styles.input}
+							allowFuture={true}
+							liveValidate={false}
+							onValidityChange={isValid => {
+								if (!isValid) {
+									setError(
+										prev => prev ?? 'Некорректная дата',
+									);
+								} else if (error === 'Некорректная дата') {
+									setError(null);
+								}
+							}}
 						/>
 					</View>
 					<View style={styles.actionsRow}>
@@ -210,6 +278,11 @@ const styles = StyleSheet.create({
 	categoryBlock: { marginTop: 8 },
 	content: {
 		flex: 1,
+	},
+	errorText: {
+		color: Colors.secondaryText,
+		fontFamily: Fonts.medium,
+		marginBottom: 8,
 	},
 	field: {
 		gap: Gaps.g8,

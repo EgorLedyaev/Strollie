@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
+	ActivityIndicator,
 	Platform,
 	Pressable,
 	ScrollView,
@@ -12,29 +13,56 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { EmptyTicketsWidget } from '@/widgets/empty-tickets';
 import { Ticket, ticketApi, TicketCard, ticketsAtom } from '@/entities/ticket';
+import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius, Sizes } from '@/shared/tokens';
 import { AppButton, AppText, BackButton } from '@/shared/ui';
 
-import { EmptyTicketsPage } from './EmptyTicketsPage';
-
 type Filter = 'all' | 'transport' | 'entertainment';
+type FetchState = 'loading' | 'loaded' | 'error';
 
 export const TicketsMainPage: React.FC = () => {
 	const router = useRouter();
 	const [tickets, setTickets] = useAtom(ticketsAtom);
-	const [loading, setLoading] = useState(false);
+	// Управляем этапами загрузки чтобы избежать мерцания
+	const [fetchState, setFetchState] = useState<FetchState>(
+		tickets.length ? 'loaded' : 'loading',
+	);
 	const [filter, setFilter] = useState<Filter>('all');
 
+	// Feature scoped logger
+	const log = useMemo(() => bindLogger('tickets'), []);
+
+	// Mount log (один раз при инициализации экрана)
 	useEffect(() => {
-		if (!tickets.length) {
-			setLoading(true);
-			ticketApi
-				.getMyTickets()
-				.then(setTickets)
-				.finally(() => setLoading(false));
-		}
-	}, [tickets.length, setTickets]);
+		log.info('mount');
+	}, [log]);
+
+	useEffect(() => {
+		if (fetchState !== 'loading') return;
+		let cancelled = false;
+		log.info('fetch:start', { cachedCount: tickets.length });
+		ticketApi
+			.getMyTickets()
+			.then(data => {
+				if (!cancelled) setTickets(data);
+				if (!cancelled) setFetchState('loaded');
+				if (!cancelled)
+					log.info('fetch:success', { count: data.length });
+			})
+			.catch(e => {
+				if (!cancelled) {
+					setFetchState('error');
+					log.error('fetch:error', {
+						message: e?.message || 'unknown',
+					});
+				}
+			});
+		return () => {
+			cancelled = true;
+		};
+	}, [fetchState, setTickets, tickets.length, log]);
 
 	const sections = useMemo(() => {
 		const filteredTickets =
@@ -71,7 +99,8 @@ export const TicketsMainPage: React.FC = () => {
 		return result;
 	}, [filter, tickets]);
 
-	const showEmpty = !loading && !tickets.length;
+	const isLoading = fetchState === 'loading';
+	const showEmpty = fetchState === 'loaded' && !tickets.length;
 
 	return (
 		<SafeAreaView style={styles.root}>
@@ -81,8 +110,28 @@ export const TicketsMainPage: React.FC = () => {
 				<View style={styles.headerRightStub} />
 			</View>
 
-			{showEmpty ? (
-				<EmptyTicketsPage />
+			{isLoading ? (
+				<View style={styles.loadingWrap} testID='tickets-loading'>
+					<ActivityIndicator
+						size='large'
+						color={Colors.greenPrimary}
+					/>
+				</View>
+			) : fetchState === 'error' ? (
+				<View style={styles.loadingWrap} testID='tickets-error'>
+					<AppText style={styles.errorText}>
+						Упс! Что-то пошло не так. Пожалуйста, попробуйте еще
+						раз.
+					</AppText>
+				</View>
+			) : showEmpty ? (
+				<EmptyTicketsWidget
+					title='Билетов пока нет'
+					subtitle='Здесь можно хранить свои билеты на различные мероприятия или рейсы'
+					variant='transport'
+					onAddPress={() => router.push('/tickets/add')}
+					testId='tickets-empty'
+				/>
 			) : (
 				<>
 					<ScrollView contentContainerStyle={styles.scrollContent}>
@@ -139,7 +188,7 @@ export const TicketsMainPage: React.FC = () => {
 								</AppText>
 							</Pressable>
 						</View>
-						<View style={styles.list}>
+						<View style={styles.list} testID='tickets-list'>
 							{sections.map(section => (
 								<View
 									key={section.title}
@@ -217,7 +266,14 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
 	},
-	cardWrap: {},
+	cardWrap: { marginBottom: 8 },
+	errorText: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f16,
+		marginBottom: 16,
+		textAlign: 'center',
+	},
 	fabContainer: {
 		alignItems: 'center',
 		bottom: 30,
@@ -295,6 +351,11 @@ const styles = StyleSheet.create({
 		gap: 16,
 		paddingHorizontal: 20,
 		// paddingTop: 24,
+	},
+	loadingWrap: {
+		alignItems: 'center',
+		flex: 1,
+		justifyContent: 'center',
 	},
 	root: {
 		backgroundColor: Colors.grayBackground,

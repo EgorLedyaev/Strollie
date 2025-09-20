@@ -6,6 +6,7 @@ export { AppButton, IconButton } from './Button';
 export type { ButtonVariant, AppButtonProps } from './Button';
 export { CodeInput } from './CodeInput';
 export type { CodeInputProps } from './CodeInput';
+export { DateInput } from './DateInput/DateInput';
 export { CustomLink } from './CustomLink';
 export { ErrorNotification } from './ErrorNotification';
 export { Input } from './Input';
