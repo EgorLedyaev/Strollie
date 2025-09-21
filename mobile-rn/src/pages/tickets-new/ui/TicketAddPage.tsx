@@ -99,6 +99,14 @@ export const TicketAddPage: React.FC = () => {
 				setError('Некорректная дата');
 				return;
 			}
+			// Не позволяем сохранять билеты в прошлом — иначе пользователь
+			// сразу не увидит билет в текущем списке (фильтр по today/future)
+			const startOfToday = new Date();
+			startOfToday.setHours(0, 0, 0, 0);
+			if (constructed < startOfToday) {
+				setError('Дата в прошлом');
+				return;
+			}
 			iso = constructed.toISOString();
 			setSaving(true);
 			log.info('save:start', { hasImage: !!image, category });

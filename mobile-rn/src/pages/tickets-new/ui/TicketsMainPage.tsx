@@ -14,7 +14,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyTicketsWidget } from '@/widgets/empty-tickets';
-import { Ticket, ticketApi, TicketCard, ticketsAtom } from '@/entities/ticket';
+import {
+	NewTicketItem,
+	Ticket,
+	ticketApi,
+	ticketsAtom,
+} from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius, Sizes } from '@/shared/tokens';
 import { AppButton, AppText, BackButton } from '@/shared/ui';
@@ -82,9 +87,16 @@ export const TicketsMainPage: React.FC = () => {
 		const future = filteredTickets.filter(
 			t => new Date(t.departureTime) > endOfToday,
 		);
+		// Прошедшие билеты (до начала сегодняшнего дня) — сейчас не показывались,
+		// из-за чего пользователь мог подумать, что билет "пропал", если выбрал дату в прошлом.
+		const past = filteredTickets.filter(
+			t => new Date(t.departureTime) < startOfToday,
+		);
 
 		const byAsc = (a: Ticket, b: Ticket) =>
 			+new Date(a.departureTime) - +new Date(b.departureTime);
+		const byDesc = (a: Ticket, b: Ticket) =>
+			+new Date(b.departureTime) - +new Date(a.departureTime);
 
 		const result: Array<{ title: string; data: Ticket[] }> = [];
 		if (today.length > 0) {
@@ -95,6 +107,9 @@ export const TicketsMainPage: React.FC = () => {
 				title: 'В последующие дни',
 				data: future.sort(byAsc),
 			});
+		}
+		if (past.length > 0) {
+			result.push({ title: 'Прошедшие', data: past.sort(byDesc) });
 		}
 		return result;
 	}, [filter, tickets]);
@@ -210,7 +225,9 @@ export const TicketsMainPage: React.FC = () => {
 											key={t.id}
 											style={styles.cardWrap}
 										>
-											<TicketCard ticket={t as Ticket} />
+											<NewTicketItem
+												ticket={t as Ticket}
+											/>
 										</View>
 									))}
 								</View>

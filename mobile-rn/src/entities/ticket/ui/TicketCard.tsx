@@ -22,8 +22,7 @@ export const TicketCard: React.FC<Props> = props => {
 	const { ticket } = props;
 	if (ticket.type === 'other') return <CinemaTicketCard {...props} />;
 	if (ticket.type === 'train') return <TrainTicketCard {...props} />;
-	// fallback: пока нет отдельных карточек для остальных — используем поездную компоновку
-	return <TrainTicketCard {...props} />;
+	return <TrainTicketCard {...props} />; // fallback
 };
 
 export default TicketCard;
