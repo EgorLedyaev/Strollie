@@ -1,3 +1,4 @@
+import { TicketAddPage } from './ui/TicketAddPage';
 import { TicketsMainPage } from './ui/TicketsMainPage';
 
-export { TicketsMainPage };
+export { TicketsMainPage, TicketAddPage };

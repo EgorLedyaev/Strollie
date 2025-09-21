@@ -7,7 +7,6 @@ import React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ticketApi, ticketsAtom } from '@/entities/ticket';
 import {
 	newTicketCategoryAtom,
 	newTicketDateAtom,
@@ -15,7 +14,9 @@ import {
 	newTicketImageFileNameAtom,
 	newTicketTitleAtom,
 	resetNewTicketFormAtom,
-} from '@/entities/ticket/model/ticket.add-form.state';
+	ticketApi,
+	ticketsAtom,
+} from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import {
