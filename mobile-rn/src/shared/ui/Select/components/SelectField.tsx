@@ -3,7 +3,7 @@ import ArrowUpIcon from '@/assets/icons/arrow/arrow-up';
 import React, { ComponentRef } from 'react';
 import { StyleSheet, TouchableOpacity } from 'react-native';
 
-import { Colors, Fonts } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 
 import { AppText, AppTextInput } from '../../Text';
 import { SelectOption } from '../types';
@@ -74,8 +74,8 @@ export const SelectField: React.FC<SelectFieldProps> = ({
 const styles = StyleSheet.create({
 	activeContainer: {
 		borderBottomColor: Colors.successGreen,
-		borderBottomLeftRadius: 0,
-		borderBottomRightRadius: 0,
+		borderBottomLeftRadius: Radius.r0,
+		borderBottomRightRadius: Radius.r0,
 		borderBottomWidth: 2,
 		borderColor: Colors.inputBorder,
 	},
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
 		color: Colors.headerAndInputText,
 		flex: 1,
 		fontFamily: Fonts.regular,
-		fontSize: 16,
+		fontSize: Fonts.f16,
 		height: '100%',
 		includeFontPadding: false,
 		padding: 0,
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 16,
+		borderRadius: Radius.r16,
 		borderWidth: 1,
 		flexDirection: 'row',
 		height: 54,
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
 		color: Colors.headerAndInputText,
 		flex: 1,
 		fontFamily: Fonts.regular,
-		fontSize: 16,
+		fontSize: Fonts.f16,
 		includeFontPadding: false,
 		textAlignVertical: 'center',
 	},

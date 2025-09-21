@@ -154,7 +154,10 @@ jobs:
                   cmdline-tools-version: 12266719
                   accept-android-sdk-licenses: true
                   log-accepted-android-sdk-licenses: true
-
+              
+            - name: Make gradlew executable
+              working-directory: android
+              run: chmod +x ./gradlew
             - name: Gradle assembleRelease
               working-directory: android
               env:
