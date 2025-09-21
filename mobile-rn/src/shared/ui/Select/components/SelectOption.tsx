@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 	optionText: {
 		color: Colors.headerAndInputText,
 		fontFamily: Fonts.regular,
-		fontSize: 16,
+		fontSize: Fonts.f16,
 	},
 	selectedOption: { backgroundColor: Colors.optionHighlight },
 	selectedOptionText: { fontFamily: Fonts.medium },

@@ -150,10 +150,10 @@ jobs:
                   # ВАЖНО: каждая строка отдельный пакет. Ранее две строки схлопнулись в одну => sdkmanager искал несуществующий 'platforms;android-34 build-tools;34.0.0'
                   # targetSdkVersion сейчас = 35 (см. merged manifest), поэтому ставим platform 35 + соответствующие build-tools.
                   # Если потребуется откат: заменить 35 -> 34 и build-tools 35.0.0 -> 34.0.0
-                  packages: |
-                      platform-tools
-                      platforms;android-35
-                      build-tools;35.0.0
+                  packages: "platform-tools platforms;android-35 build-tools;35.0.0"
+                  cmdline-tools-version: 12266719
+                  accept-android-sdk-licenses: true
+                  log-accepted-android-sdk-licenses: true
 
             - name: Gradle assembleRelease
               working-directory: android
