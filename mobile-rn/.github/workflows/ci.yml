@@ -18,6 +18,7 @@ jobs:
         outputs:
             android: ${{ steps.filter.outputs.android }}
             native_impact: ${{ steps.filter.outputs.native_impact }}
+            app_code: ${{ steps.filter.outputs.app_code }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -40,6 +41,12 @@ jobs:
                         - 'plugins/**'
                         - 'assets/**'
                         - 'expo-env.d.ts'
+                      app_code:
+                        - 'src/**/*.ts'
+                        - 'src/**/*.tsx'
+                        - 'src/**/*.js'
+                        - 'src/**/*.jsx'
+                        - 'package.json'
 
     build-and-validate:
         runs-on: ubuntu-latest
@@ -92,10 +99,11 @@ jobs:
     android-build:
         name: Android Build (release APK)
         needs: [build-and-validate, changes]
-        if: ${{ needs.changes.outputs.android == 'true' }}
+    # Запускаем сборку если изменились нативные файлы (android), публичные конфиги (native_impact) или прикладной код (app_code)
+        if: ${{ needs.changes.outputs.android == 'true' || needs.changes.outputs.native_impact == 'true' || needs.changes.outputs.app_code == 'true' }}
         runs-on: ubuntu-latest
         env:
-            EXPO_PUBLIC_WEBVIEW_URL: 'http://91.108.246.148'
+              EXPO_PUBLIC_WEBVIEW_URL: 'http://91.108.246.148'
         steps:
             - name: Checkout
               uses: actions/checkout@v4
