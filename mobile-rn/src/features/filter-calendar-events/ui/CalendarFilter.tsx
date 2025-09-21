@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { EventType } from '@/entities/event';
-import { Colors } from '@/shared/tokens';
+import { Colors, Fonts } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
 import { useCalendarFilter } from '../model';
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
 	},
 	activeFilterText: {
 		color: Colors.black,
-		fontWeight: '600',
+		fontFamily: Fonts.semibold,
 	},
 	container: {
 		borderBottomColor: Colors.gray,
@@ -65,6 +65,6 @@ const styles = StyleSheet.create({
 	},
 	filterText: {
 		color: Colors.darkGray,
-		fontSize: 14,
+		fontSize: Fonts.f14,
 	},
 });

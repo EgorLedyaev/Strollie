@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Colors } from '../../tokens';
+import { Colors, Fonts, Radius } from '../../tokens';
 import { AppText } from '../Text';
 
 interface TagProps {
@@ -29,13 +29,13 @@ export const Tag = ({
 const styles = StyleSheet.create({
 	tag: {
 		alignSelf: 'flex-start',
-		borderRadius: 12,
+		borderRadius: Radius.r10, // ближайший токен к 12 (нет r12)
 		borderWidth: 1,
 		paddingHorizontal: 8,
 		paddingVertical: 4,
 	},
 	text: {
-		fontSize: 12,
-		fontWeight: '500',
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f12,
 	},
 });

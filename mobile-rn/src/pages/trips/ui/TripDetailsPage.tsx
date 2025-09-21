@@ -325,16 +325,82 @@ export const TripDetailsPage: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+	bottomDelete: {
+		flex: 1,
+		height: 44,
+	},
+	bottomRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 16,
+		marginTop: 8,
+	},
+	bottomSave: {
+		flex: 2,
+		height: 44,
+	},
+	center: {
+		alignItems: 'center',
+		flex: 1,
+		justifyContent: 'center',
+	},
+	checkbox: {
+		borderColor: Colors.grayAvatar,
+		borderRadius: Radius.r4,
+		borderWidth: 2,
+		height: 20,
+		width: 20,
+	},
+	checkboxChecked: {
+		alignItems: 'center',
+		backgroundColor: Colors.grayAvatar,
+		borderRadius: Radius.r4,
+		height: 20,
+		justifyContent: 'center',
+		width: 20,
+	},
+	checklistBox: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		paddingHorizontal: 10,
+		paddingVertical: 20,
+		rowGap: 8,
+	},
+	checkmark: {
+		color: Colors.white,
+		fontSize: Fonts.f14,
+	},
 	container: {
 		flex: 1,
 		paddingHorizontal: 16,
 		paddingTop: 16,
+	},
+	content: {
+		flex: 1,
+	},
+	dateBox: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 8,
+	},
+	dateLabel: {
+		color: Colors.textGrayB7,
+		fontSize: Fonts.f14,
+	},
+	dateValue: {
+		color: Colors.darkGrayText43,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f16,
 	},
 	headerRow: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		paddingBottom: 14,
+	},
+	headerSpacer: {
+		height: 32,
+		width: 32,
 	},
 	headerTitle: {
 		color: Colors.headerAndInputText,
@@ -343,14 +409,90 @@ const styles = StyleSheet.create({
 		maxWidth: '70%',
 		textAlign: 'center',
 	},
-	headerSpacer: { height: 32, width: 32 },
-	content: {
-		flex: 1,
+	notesBox: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		paddingHorizontal: 10,
+		paddingVertical: 16,
 	},
-	scrollContent: { paddingBottom: 32, rowGap: Gaps.g16 },
-	center: { alignItems: 'center', flex: 1, justifyContent: 'center' },
-
-	// Даты
+	notesText: {
+		color: Colors.headerAndInputText,
+		fontSize: Fonts.f14,
+	},
+	placeDot: {
+		borderRadius: Radius.r10,
+		height: 20,
+		width: 20,
+	},
+	placeDotActive: {
+		backgroundColor: Colors.greenPrimary,
+	},
+	placeDotInactive: {
+		backgroundColor: Colors.grayMedium,
+	},
+	placeRow: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 24,
+		marginBottom: 20,
+	},
+	placeText: {
+		color: Colors.headerAndInputText,
+		fontSize: Fonts.f14,
+	},
+	placesBox: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		paddingHorizontal: 24,
+		paddingVertical: 20,
+	},
+	placesLine: {
+		backgroundColor: Colors.gray,
+		borderRadius: Radius.r5,
+		bottom: 10,
+		left: 6,
+		position: 'absolute',
+		top: 10,
+		width: 8,
+	},
+	removeIcon: {
+		color: Colors.grayText,
+		fontSize: Fonts.f12,
+		textAlign: 'center',
+		width: 12,
+	},
+	routeCard: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		padding: 20,
+		rowGap: 12,
+	},
+	routeMeta: {
+		color: Colors.headerAndInputText,
+		fontSize: Fonts.f14,
+	},
+	routeMetaRow: {
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+		gap: 10,
+	},
+	routeTitle: {
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f16,
+	},
+	rowGap10: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 10,
+	},
+	scrollContent: {
+		paddingBottom: 32,
+		rowGap: Gaps.g16,
+	},
+	section: {
+		rowGap: Gaps.g12,
+	},
 	sectionDates: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,
@@ -361,16 +503,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 24,
 		paddingVertical: 20,
 	},
-	dateBox: { alignItems: 'center', flexDirection: 'row', gap: 8 },
-	dateLabel: { color: Colors.textGrayB7, fontSize: Fonts.f14 },
-	dateValue: {
-		color: Colors.darkGrayText43,
-		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f16,
-	},
-
-	// Общая секция
-	section: { rowGap: Gaps.g12 },
 	sectionHeaderRow: {
 		alignItems: 'center',
 		flexDirection: 'row',
@@ -382,15 +514,6 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f16,
 	},
-	rowGap10: { alignItems: 'center', flexDirection: 'row', gap: 10 },
-	smallSquareWhite: {
-		alignItems: 'center',
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r8,
-		height: 32,
-		justifyContent: 'center',
-		width: 32,
-	},
 	smallSquareGreen: {
 		alignItems: 'center',
 		backgroundColor: Colors.successGreen,
@@ -399,45 +522,13 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		width: 32,
 	},
-
-	// Билеты
-	ticketsWrap: { gap: 12 },
-	ticketItem: { marginBottom: 0 },
-
-	// Места
-	placesBox: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		paddingHorizontal: 24,
-		paddingVertical: 20,
-	},
-	placesLine: {
-		backgroundColor: Colors.gray,
-		borderRadius: 5,
-		bottom: 10,
-		left: 6,
-		position: 'absolute',
-		top: 10,
-		width: 8,
-	},
-	placeRow: {
+	smallSquareWhite: {
 		alignItems: 'center',
-		flexDirection: 'row',
-		gap: 24,
-		marginBottom: 20,
-	},
-	placeDot: { borderRadius: 10, height: 20, width: 20 },
-	placeDotActive: { backgroundColor: Colors.greenPrimary },
-	placeDotInactive: { backgroundColor: Colors.grayMedium },
-	placeText: { color: Colors.headerAndInputText, fontSize: Fonts.f14 },
-
-	// Чек-лист
-	checklistBox: {
 		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		paddingHorizontal: 10,
-		paddingVertical: 20,
-		rowGap: 8,
+		borderRadius: Radius.r8,
+		height: 32,
+		justifyContent: 'center',
+		width: 32,
 	},
 	taskRow: {
 		alignItems: 'center',
@@ -445,65 +536,15 @@ const styles = StyleSheet.create({
 		gap: 8,
 		justifyContent: 'space-between',
 	},
-	checkbox: {
-		borderColor: Colors.grayAvatar,
-		borderRadius: 4,
-		borderWidth: 2,
-		height: 20,
-		width: 20,
-	},
-	checkboxChecked: {
-		alignItems: 'center',
-		backgroundColor: Colors.grayAvatar,
-		borderRadius: 4,
-		height: 20,
-		justifyContent: 'center',
-		width: 20,
-	},
-	checkmark: { color: Colors.white, fontSize: Fonts.f14 },
 	taskText: {
 		color: Colors.headerAndInputText,
 		flex: 1,
 		fontSize: Fonts.f14,
 	},
-	removeIcon: {
-		color: Colors.grayText,
-		fontSize: Fonts.f12,
-		textAlign: 'center',
-		width: 12,
+	ticketItem: {
+		marginBottom: 0,
 	},
-
-	// Маршруты
-	routeCard: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		padding: 20,
-		rowGap: 12,
+	ticketsWrap: {
+		gap: 12,
 	},
-	routeTitle: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f16,
-	},
-	routeMetaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-	routeMeta: { color: Colors.headerAndInputText, fontSize: Fonts.f14 },
-
-	// Заметки
-	notesBox: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		paddingHorizontal: 10,
-		paddingVertical: 16,
-	},
-	notesText: { color: Colors.headerAndInputText, fontSize: Fonts.f14 },
-
-	// Низ
-	bottomRow: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		gap: 16,
-		marginTop: 8,
-	},
-	bottomDelete: { flex: 1, height: 44 },
-	bottomSave: { flex: 2, height: 44 },
 });

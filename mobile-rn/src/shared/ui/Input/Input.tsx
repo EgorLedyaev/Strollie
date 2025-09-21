@@ -10,7 +10,7 @@ import {
 	View,
 } from 'react-native';
 
-import { Colors, Shadows } from '@/shared/tokens';
+import { Colors, Radius } from '@/shared/tokens';
 
 import { InputProps } from '.';
 import { AppTextInput } from '../Text';
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
 	input: {
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 16,
+		borderRadius: Radius.r16,
 		borderWidth: 1,
 		height: 54,
 		paddingHorizontal: 16,

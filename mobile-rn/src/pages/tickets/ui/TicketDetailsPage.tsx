@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
 	},
 	refundBtn: {
 		backgroundColor: Colors.grayBackground,
-		borderRadius: 10,
+		borderRadius: Radius.r10,
 		paddingHorizontal: 16,
 		paddingVertical: 12,
 	},

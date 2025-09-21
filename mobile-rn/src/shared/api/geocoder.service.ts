@@ -60,7 +60,7 @@ export const geocodeAddress = async (
 	}
 
 	try {
-		const params: any = {
+		const params: Record<string, string | number> = {
 			q: query,
 			key: API_KEY,
 			fields: 'items.point,items.address_name,items.full_name', // Запрашиваем необходимые поля
@@ -68,7 +68,8 @@ export const geocodeAddress = async (
 		};
 
 		if (location) {
-			params.location = `${location[0]},${location[1]}`; // lon,lat
+			(params as Record<string, string>).location =
+				`${location[0]},${location[1]}`; // lon,lat
 		}
 
 		const response = await axios.get<PlacesAPIResponse>(PLACES_API_URL, {

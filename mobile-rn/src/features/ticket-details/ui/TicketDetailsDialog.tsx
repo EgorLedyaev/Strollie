@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 import type { Ticket } from '@/entities/ticket';
-import { Colors, Fonts } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 import { Dialog } from '@/shared/ui/Dialog';
 
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 12,
+		borderRadius: Radius.r10,
 		borderWidth: 1,
 		height: 200,
 		marginTop: 8,
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
 	refundBtn: {
 		alignSelf: 'center',
 		backgroundColor: Colors.grayBackground,
-		borderRadius: 10,
+		borderRadius: Radius.r10,
 		paddingHorizontal: 24,
 		paddingVertical: 12,
 	},

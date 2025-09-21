@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
 	input: {
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 12,
+		borderRadius: Radius.r10,
 		borderWidth: 1,
 		color: Colors.headerAndInputText,
 		fontSize: Fonts.f16,
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
 	inputFull: {
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 12,
+		borderRadius: Radius.r10,
 		borderWidth: 1,
 		color: Colors.headerAndInputText,
 		fontSize: Fonts.f16,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 8,
+		borderRadius: Radius.r8,
 		borderWidth: 1,
 		height: 32,
 		justifyContent: 'center',

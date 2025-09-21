@@ -2,17 +2,12 @@ import type { Ticket } from '../model';
 
 const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-const qrUrl = (id: string) =>
-	`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
-		`ticket:${id}`,
-	)}`;
+// qr генератор может быть возвращен позже при интеграции backend. Пока удалён как неиспользуемый.
 
 export const ticketApi = {
 	async getMyTickets(): Promise<Ticket[]> {
 		// имитация сети
 		await sleep(500);
-
-		const now = new Date();
 
 		return [];
 	},

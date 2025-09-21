@@ -23,7 +23,7 @@ export interface ValhallaRouteRequest {
 		type?: string /*...и другие опции...*/;
 	}>;
 	costing: 'auto' | 'pedestrian' | 'bicycle' | 'multimodal' | string; // Добавь нужные типы
-	costing_options?: any;
+	costing_options?: Record<string, unknown>;
 	units?: 'kilometers' | 'miles';
 	id?: string;
 	// ... другие возможные опции Valhalla ...

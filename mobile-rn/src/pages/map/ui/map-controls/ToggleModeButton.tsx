@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';

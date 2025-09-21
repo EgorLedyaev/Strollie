@@ -1,6 +1,6 @@
 import { MinusIcon, PlusIcon } from '@/assets/icons/map';
 import React from 'react';
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Colors, Radius, Shadows } from '@/shared/tokens';
 import { IconButton } from '@/shared/ui';

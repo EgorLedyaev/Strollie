@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Colors, Shadows } from '../../tokens';
+import { Colors, Fonts, Radius, Shadows } from '../../tokens';
 import { AppText } from '../Text';
 
 interface DialogProps {
@@ -61,20 +61,20 @@ const styles = StyleSheet.create({
 	},
 	dialog: {
 		backgroundColor: Colors.white,
-		borderRadius: 16,
+		borderRadius: Radius.r16,
 		boxShadow: Shadows.boxShadow_elev2,
 		padding: 20,
 	},
 	overlay: {
-		flex: 1,
-		backgroundColor: Colors.modalOverlay, // Полупрозрачный оверлей
-		justifyContent: 'center',
 		alignItems: 'center',
+		backgroundColor: Colors.modalOverlay, // Полупрозрачный оверлей
+		flex: 1,
+		justifyContent: 'center',
 	},
 	title: {
 		color: Colors.headerAndInputText,
-		fontSize: 18,
-		fontWeight: '600',
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f18,
 		marginBottom: 16,
 		textAlign: 'center',
 	},

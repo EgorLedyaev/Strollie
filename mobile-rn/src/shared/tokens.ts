@@ -80,6 +80,8 @@ export const Gaps = {
 };
 
 export const Radius = {
+	r4: 4,
+	r5: 5,
 	r8: 8,
 	r10: 10,
 	r15: 15,

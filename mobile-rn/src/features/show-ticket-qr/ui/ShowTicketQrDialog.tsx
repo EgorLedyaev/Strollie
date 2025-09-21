@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-import { Colors } from '@/shared/tokens';
+import { Colors, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 import { Dialog } from '@/shared/ui/Dialog';
 
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
 	qr: { height: 240, width: 240 },
 	qrPlaceholder: {
 		backgroundColor: Colors.gray,
-		borderRadius: 8,
+		borderRadius: Radius.r8,
 		height: 240,
 		width: 240,
 	},

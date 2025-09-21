@@ -89,3 +89,5 @@ android/app/debug.keystore
 
 # coverage
 coverage/**/*
+
+.cache/

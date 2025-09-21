@@ -1,6 +1,6 @@
 import { Link } from 'expo-router';
 import { JSX } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { Colors, Fonts } from '@/shared/tokens';
 

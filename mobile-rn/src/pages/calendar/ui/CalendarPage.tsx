@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
 export const CalendarPage: React.FC = () => {
@@ -26,14 +26,14 @@ const styles = StyleSheet.create({
 	},
 	content: {
 		backgroundColor: Colors.white,
-		borderRadius: 20,
+		borderRadius: Radius.r20,
 		flex: 1,
 		padding: 16,
 	},
 	title: {
 		color: Colors.black,
-		fontSize: 20,
-		fontWeight: 'bold',
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
 		marginBottom: 16,
 	},
 });

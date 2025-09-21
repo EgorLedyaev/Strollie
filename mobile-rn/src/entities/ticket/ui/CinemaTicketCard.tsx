@@ -140,15 +140,14 @@ export const CinemaTicketCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
 	card: {
-		flex: 1,
-		height: 200,
 		backgroundColor: Colors.white,
-		borderTopRightRadius: Radius.r15,
 		borderBottomRightRadius: Radius.r15,
-		padding: 16,
+		borderTopRightRadius: Radius.r15,
 		boxShadow: Shadows.boxShadow_elev1,
-		// Прижать футер вниз
+		flex: 1,
 		flexDirection: 'column',
+		height: 200,
+		padding: 16,
 	},
 	footer: {
 		alignItems: 'center',
@@ -181,7 +180,7 @@ const styles = StyleSheet.create({
 	qrPreview: {
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 8,
+		borderRadius: Radius.r8,
 		borderWidth: 1,
 		height: 96,
 		marginBottom: 8,
@@ -189,10 +188,9 @@ const styles = StyleSheet.create({
 	},
 	ticketDate: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
 	ticketNo: {
-		fontSize: Fonts.f14,
-		// fontWeight заменен на fontFamily из токенов
-		fontFamily: Fonts.bold,
 		color: Colors.headerAndInputText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f14,
 	},
 	title: {
 		color: Colors.headerAndInputText,

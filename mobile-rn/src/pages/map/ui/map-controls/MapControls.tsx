@@ -64,11 +64,11 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 
 const styles = StyleSheet.create({
 	header: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: 10,
 		paddingHorizontal: 16,
 		paddingTop: Platform.OS === 'ios' ? 50 : 45, // Адаптивный отступ сверху
-		flexDirection: 'row',
-		alignItems: 'center',
-		gap: 10,
 	},
 	mapButton: {
 		alignItems: 'center',
