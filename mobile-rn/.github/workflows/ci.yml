@@ -154,6 +154,7 @@ jobs:
                       platform-tools
                       platforms;android-35
                       build-tools;35.0.0
+                  accept-android-sdk-licenses: true 
 
             - name: Gradle assembleRelease
               working-directory: android
