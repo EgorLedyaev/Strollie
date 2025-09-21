@@ -48,10 +48,6 @@ export const BackButton = ({
 };
 
 const styles = StyleSheet.create({
-	textContainer: {
-		alignItems: 'center',
-		flexDirection: 'row',
-	},
 	iconContainer: {
 		alignItems: 'center',
 		backgroundColor: Colors.white,
@@ -60,11 +56,14 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		width: Sizes.button.sm,
 	},
-	// Стили для текстового варианта
 	largeIcon: {
 		marginRight: Gaps.g5,
 	},
 	text: {
 		color: Colors.greenLink,
+	},
+	textContainer: {
+		alignItems: 'center',
+		flexDirection: 'row',
 	},
 });

@@ -83,8 +83,7 @@ jobs:
               run: npm run format:check
 
             - name: ESLint (fail on warnings)
-              run: npm run lint -- --max-warnings=100 # temporarily allow some warnings, to be fixed gradually
-              continue-on-error: true
+              run: npm run lint -- --max-warnings=0
 
             - name: Type check
               run: npm run typecheck
@@ -99,11 +98,11 @@ jobs:
     android-build:
         name: Android Build (release APK)
         needs: [build-and-validate, changes]
-    # Запускаем сборку если изменились нативные файлы (android), публичные конфиги (native_impact) или прикладной код (app_code)
+        # Запускаем сборку если изменились нативные файлы (android), публичные конфиги (native_impact) или прикладной код (app_code)
         if: ${{ needs.changes.outputs.android == 'true' || needs.changes.outputs.native_impact == 'true' || needs.changes.outputs.app_code == 'true' }}
         runs-on: ubuntu-latest
         env:
-              EXPO_PUBLIC_WEBVIEW_URL: 'http://91.108.246.148'
+            EXPO_PUBLIC_WEBVIEW_URL: 'http://91.108.246.148'
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -143,6 +142,8 @@ jobs:
 
             - name: Setup Gradle
               uses: gradle/actions/setup-gradle@v4
+              with:
+                  cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
@@ -150,11 +151,11 @@ jobs:
                   # ВАЖНО: каждая строка отдельный пакет. Ранее две строки схлопнулись в одну => sdkmanager искал несуществующий 'platforms;android-34 build-tools;34.0.0'
                   # targetSdkVersion сейчас = 35 (см. merged manifest), поэтому ставим platform 35 + соответствующие build-tools.
                   # Если потребуется откат: заменить 35 -> 34 и build-tools 35.0.0 -> 34.0.0
-                  packages: "platform-tools platforms;android-35 build-tools;35.0.0"
+                  packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
                   cmdline-tools-version: 12266719
                   accept-android-sdk-licenses: true
                   log-accepted-android-sdk-licenses: true
-              
+
             - name: Make gradlew executable
               working-directory: android
               run: chmod +x ./gradlew

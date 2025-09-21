@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
 	noResultsText: {
 		color: Colors.placeHolderInput,
 		fontFamily: Fonts.regular,
-		fontSize: 16,
+		fontSize: Fonts.f16,
 	},
 	optionsList: {
 		width: '100%',

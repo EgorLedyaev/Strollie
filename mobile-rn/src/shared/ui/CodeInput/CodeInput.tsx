@@ -10,7 +10,7 @@ import {
 	ViewStyle,
 } from 'react-native';
 
-import { Colors, Fonts } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 
 import { AppTextInput } from '../Text';
 
@@ -228,29 +228,11 @@ export const CodeInput: React.FC<CodeInputProps> = ({
 };
 
 const styles = StyleSheet.create({
-	/**
-	 * Основной контейнер компонента
-	 */
-	container: {
-		width: '100%',
-	},
-	/**
-	 * Контейнер для полей ввода кода
-	 */
-	codeContainer: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'center',
-		width: '100%',
-	},
-	/**
-	 * Стиль отдельного поля для ввода цифры
-	 */
 	codeBox: {
 		alignItems: 'center',
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 16,
+		borderRadius: Radius.r16,
 		borderWidth: 1,
 		height: 54,
 		justifyContent: 'center',
@@ -258,27 +240,21 @@ const styles = StyleSheet.create({
 		position: 'relative',
 		width: 54,
 	},
-	/**
-	 * Стиль поля с заполненной цифрой
-	 */
-	codeBoxFilled: {
-		borderColor: Colors.successGreen,
-	},
-	/**
-	 * Стиль активного поля ввода
-	 */
-	codeBoxFocused: {
-		borderColor: Colors.successGreen,
-	},
-	/**
-	 * Стиль поля при ошибке
-	 */
 	codeBoxError: {
 		borderColor: Colors.error,
 	},
-	/**
-	 * Стиль текста цифры в поле
-	 */
+	codeBoxFilled: {
+		borderColor: Colors.successGreen,
+	},
+	codeBoxFocused: {
+		borderColor: Colors.successGreen,
+	},
+	codeContainer: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'center',
+		width: '100%',
+	},
 	codeText: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f24,
@@ -287,9 +263,9 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		width: '100%',
 	},
-	/**
-	 * Стиль мигающего курсора
-	 */
+	container: {
+		width: '100%',
+	},
 	cursor: {
 		alignSelf: 'center',
 		backgroundColor: Colors.successGreen,

@@ -11,7 +11,7 @@ import {
 	View,
 } from 'react-native';
 
-import { Colors, Fonts } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 
 import { AppText, AppTextInput } from '../Text';
 import { DropdownList } from './components';
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
 	container: {
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 16,
+		borderRadius: Radius.r16,
 		borderWidth: 1,
 		overflow: 'hidden',
 		zIndex: 2,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
 	dropdownCard: {
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
-		borderRadius: 16,
+		borderRadius: Radius.r16,
 		borderWidth: 1,
 		maxHeight: MAX_DROPDOWN_HEIGHT + 54,
 		overflow: 'hidden',

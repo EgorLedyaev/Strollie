@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { Colors } from '@/shared/tokens';
+import { Colors, Fonts } from '@/shared/tokens';
 
 import { AppText } from '../Text';
 
@@ -32,7 +32,7 @@ export const MapStatusIndicator: React.FC<MapStatusIndicatorProps> = ({
 const styles = StyleSheet.create({
 	errorText: {
 		color: Colors.red,
-		fontSize: 12,
+		fontSize: Fonts.f12,
 		marginTop: 5,
 		paddingHorizontal: 20,
 		textAlign: 'center',
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
 	},
 	loaderText: {
 		color: Colors.black,
-		fontSize: 16,
+		fontSize: Fonts.f16,
 		marginTop: 10,
 	},
 });

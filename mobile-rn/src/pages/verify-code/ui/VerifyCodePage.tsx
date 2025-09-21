@@ -156,9 +156,9 @@ const styles = StyleSheet.create({
 		height: 54,
 	},
 	backButton: {
+		left: 16, // Ближе к левому краю
 		position: 'absolute',
 		top: 16, // Ближе к верхнему краю
-		left: 16, // Ближе к левому краю
 	},
 	buttonContainer: {
 		marginTop: 32,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Colors } from '../../tokens';
+import { Colors, Fonts, Radius } from '../../tokens';
 import { AppText } from '../Text';
 
 export interface CalendarDay {
@@ -75,7 +75,7 @@ export const CalendarGrid = ({
 const styles = StyleSheet.create({
 	activeDay: {
 		backgroundColor: Colors.black,
-		borderRadius: 100,
+		borderRadius: Radius.r100,
 	},
 	activeDayText: {
 		color: Colors.white,
@@ -84,15 +84,15 @@ const styles = StyleSheet.create({
 		width: '100%',
 	},
 	dayContainer: {
-		width: '14.28%', // 7 дней в неделю
+		alignItems: 'center',
 		aspectRatio: 1,
 		justifyContent: 'center',
-		alignItems: 'center',
 		position: 'relative',
+		width: '14.28%', // 7 дней в неделю
 	},
 	dayText: {
 		color: Colors.black,
-		fontSize: 16,
+		fontSize: Fonts.f16,
 	},
 	daysGrid: {
 		flexDirection: 'row',
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
 	},
 	eventDot: {
 		backgroundColor: Colors.black,
-		borderRadius: 2,
+		borderRadius: Radius.r2,
 		bottom: '15%',
 		height: 4,
 		position: 'absolute',
@@ -124,6 +124,6 @@ const styles = StyleSheet.create({
 	},
 	weekHeaderText: {
 		color: Colors.lightGray,
-		fontSize: 12,
+		fontSize: Fonts.f12,
 	},
 });
