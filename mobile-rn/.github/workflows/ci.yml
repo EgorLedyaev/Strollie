@@ -144,6 +144,15 @@ jobs:
               uses: gradle/actions/setup-gradle@v4
               with:
                   cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+            - name: Cache Gradle (wrapper + caches)
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                  key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'android/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'package-lock.json') }}
+                  restore-keys: |
+                      gradle-${{ runner.os }}-
 
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
@@ -156,6 +165,20 @@ jobs:
                   accept-android-sdk-licenses: true
                   log-accepted-android-sdk-licenses: true
 
+            - name: Restore release keystore
+              run: |
+                  mkdir -p android/app
+                  echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 --decode > android/app/upload-keystore.jks
+
+            - name: Configure signing props
+              run: |
+                  {
+                    echo "MYAPP_UPLOAD_STORE_FILE=upload-keystore.jks"
+                    echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}"
+                    echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
+                    echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}"
+                  } >> android/gradle.properties
+
             - name: Make gradlew executable
               working-directory: android
               run: chmod +x ./gradlew
@@ -163,8 +186,8 @@ jobs:
               working-directory: android
               env:
                   JAVA_OPTS: -Xmx2g
-                  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=512m" -Dorg.gradle.configuration-cache=true -Dorg.gradle.caching=true
-              run: ./gradlew assembleRelease --stacktrace --configuration-cache
+                  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=512m" -Dorg.gradle.caching=true
+              run: ./gradlew assembleRelease --stacktrace
 
             - name: Upload release APK artifact
               uses: actions/upload-artifact@v4
