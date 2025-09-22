@@ -40,8 +40,8 @@ export const Colors = {
 	scrollbarTrack: '#DDDDDD', // Цвет фона скроллбара
 	scrollbarThumb: '#BDBDBD', // Цвет ползунка скроллбара
 
-	lightInputText: '#B9B9B9',
-	uploadButtonBackground: '#F9F9F9',
+	lightInputText: '#B9B9B9', // Цвет текста кнопок загрузки файла
+	uploadButtonBackground: '#F9F9F9', // Цвет кнопок загрузки файла
 
 	// Цвета выделения
 	optionHighlight: 'rgba(31, 31, 31, 0.1)', // Цвет выделения опции в выпадающем списке

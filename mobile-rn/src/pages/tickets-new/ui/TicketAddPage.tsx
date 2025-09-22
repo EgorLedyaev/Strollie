@@ -1,12 +1,23 @@
+import FileIcon from '@/assets/icons/FileIcon';
+import IconMore from '@/assets/icons/IconMore';
 import CameraIcon from '@/assets/icons/tickets/CameraIcon';
 import UploadTicketIcon from '@/assets/icons/tickets/UploadTicketIcon';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import {
+	FilePickerSheet,
+	FilePickerSheetRef,
+} from '@/features/file-picker/ui/FilePickerSheet';
+import { ImagePreviewMenu } from '@/features/ImagePreviewMenu';
+import { takePhoto } from '@/features/profile/lib/take-photo';
 import {
 	newTicketCategoryAtom,
 	newTicketDateAtom,
@@ -42,11 +53,21 @@ export const TicketAddPage: React.FC = () => {
 	const [error, setError] = React.useState<string | null>(null);
 	const log = React.useMemo(() => bindLogger('ticket_add'), []);
 
+	const [isMenuVisible, setMenuVisible] = useState(false);
+	const [menuAnchor, setMenuAnchor] = useState<{
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	} | null>(null);
+	const moreButtonRef = useRef<View>(null);
+	const bottomSheetRef = useRef<FilePickerSheetRef>(null);
+
 	React.useEffect(() => {
 		log.info('mount');
 	}, [log]);
 
-	const pickImage = async () => {
+	const pickImage = async (onSuccess?: () => void) => {
 		try {
 			const res = await ImagePicker.launchImageLibraryAsync({
 				allowsMultipleSelection: false,
@@ -63,10 +84,33 @@ export const TicketAddPage: React.FC = () => {
 					uri: !!asset.uri,
 					name: asset.fileName,
 				});
+				onSuccess?.();
 			}
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : 'unknown';
 			log.error('image:pick_error', { message: msg });
+		}
+	};
+
+	const pickDocument = async (onSuccess?: () => void) => {
+		try {
+			const res = await DocumentPicker.getDocumentAsync({
+				type: '*/*',
+			});
+
+			if (!res.canceled) {
+				const asset = res.assets[0];
+				setImage(asset.uri);
+				setImageFileName(asset.name);
+				log.info('document:selected', {
+					uri: !!asset.uri,
+					name: asset.name,
+				});
+				onSuccess?.();
+			}
+		} catch (e: unknown) {
+			const msg = e instanceof Error ? e.message : 'unknown';
+			log.error('document:pick_error', { message: msg });
 		}
 	};
 
@@ -133,135 +177,237 @@ export const TicketAddPage: React.FC = () => {
 
 	const canSave = !!title && !!date && !!category && !saving && !error;
 
+	const handleScanPress = async () => {
+		const photoUri = await takePhoto();
+
+		if (photoUri) {
+			setImage(photoUri);
+			setImageFileName(photoUri.split('/').pop() ?? 'camera-photo.jpg');
+		} else {
+			console.log('Съемка фото отменена или нет разрешений.');
+		}
+	};
+
+	const openMenu = () => {
+		moreButtonRef.current?.measureInWindow(
+			(x: number, y: number, width: number, height: number) => {
+				setMenuAnchor({ x: x, y: y, width, height });
+				setMenuVisible(true);
+			},
+		);
+	};
+
+	const closeMenu = () => setMenuVisible(false);
+
+	const handleEditImage = () => {
+		closeMenu();
+		bottomSheetRef.current?.present();
+	};
+
+	const handleDeleteImage = () => {
+		closeMenu();
+		setImage(null);
+		setImageFileName(null);
+	};
+
+	const isImageFile = (fileName: string | null): boolean => {
+		if (!fileName) {
+			return false;
+		}
+		const lowercasedName = fileName.toLowerCase();
+		return (
+			lowercasedName.endsWith('.jpg') ||
+			lowercasedName.endsWith('.jpeg') ||
+			lowercasedName.endsWith('.png') ||
+			lowercasedName.endsWith('.gif') ||
+			lowercasedName.endsWith('.webp')
+		);
+	};
+
 	return (
-		<SafeAreaView style={styles.root}>
-			<View style={styles.header}>
-				<BackButton variant='icon' onPress={() => router.back()} />
-				<AppText style={styles.headerTitle}>Мои билеты</AppText>
-				<View style={styles.headerRightStub} />
-			</View>
+		<GestureHandlerRootView style={styles.container}>
+			<BottomSheetModalProvider>
+				<SafeAreaView style={styles.root}>
+					<View style={styles.header}>
+						<BackButton
+							variant='icon'
+							onPress={() => router.back()}
+						/>
+						<AppText style={styles.headerTitle}>Мои билеты</AppText>
+						<View style={styles.headerRightStub} />
+					</View>
 
-			<View style={styles.content}>
-				<View style={styles.formCard}>
-					{error ? (
-						<AppText style={styles.errorText}>{error}</AppText>
-					) : null}
-					<View style={styles.field}>
-						<AppText style={styles.label}>Название</AppText>
-						<AppTextInput
-							value={title}
-							placeholderTextColor={Colors.lightInputText}
-							onChangeText={setTitle}
-							placeholder='Введите название билета или рейса'
-							style={styles.input}
-						/>
-					</View>
-					<View style={styles.field}>
-						<AppText style={styles.label}>Дата</AppText>
-						<DateInput
-							value={date}
-							onChangeText={setDate}
-							placeholder='Выберите дату билета или рейса'
-							allowFuture={true}
-							liveValidate={false}
-							onValidityChange={isValid => {
-								if (!isValid) {
-									setError(
-										prev => prev ?? 'Некорректная дата',
-									);
-								} else if (error === 'Некорректная дата') {
-									setError(null);
-								}
-							}}
-						/>
-					</View>
-					<View style={styles.actionsRow}>
-						<Pressable
-							style={styles.actionButton}
-							onPress={pickImage}
-						>
-							<AppText style={styles.actionButtonText}>
-								{image ? 'Изменить файл' : 'Выбрать файл'}
-							</AppText>
-							<UploadTicketIcon />
-						</Pressable>
-						<Pressable
-							style={styles.actionButton}
-							onPress={pickImage}
-						>
-							<AppText style={styles.actionButtonText}>
-								Камера
-							</AppText>
-							<CameraIcon />
-						</Pressable>
-					</View>
-					{image ? (
-						<View style={styles.previewBox}>
-							<Image
-								source={{ uri: image }}
-								style={styles.previewImage}
-							/>
-							<AppText style={styles.fileName} numberOfLines={1}>
-								{imageFileName}
-							</AppText>
+					<View style={styles.content}>
+						<View style={styles.formCard}>
+							{error ? (
+								<AppText style={styles.errorText}>
+									{error}
+								</AppText>
+							) : null}
+							<View style={styles.field}>
+								<AppText style={styles.label}>Название</AppText>
+								<AppTextInput
+									value={title}
+									placeholderTextColor={Colors.lightInputText}
+									onChangeText={setTitle}
+									placeholder='Введите название билета или рейса'
+									style={styles.input}
+								/>
+							</View>
+							<View style={styles.field}>
+								<AppText style={styles.label}>Дата</AppText>
+								<DateInput
+									value={date}
+									onChangeText={setDate}
+									placeholder='Выберите дату билета или рейса'
+									allowFuture={true}
+									liveValidate={false}
+									onValidityChange={isValid => {
+										if (!isValid) {
+											setError(
+												prev =>
+													prev ?? 'Некорректная дата',
+											);
+										} else if (
+											error === 'Некорректная дата'
+										) {
+											setError(null);
+										}
+									}}
+								/>
+							</View>
+							{!image && (
+								<View style={styles.actionsRow}>
+									<Pressable
+										style={styles.actionButton}
+										onPress={() =>
+											bottomSheetRef.current?.present()
+										}
+									>
+										<AppText
+											style={styles.actionButtonText}
+										>
+											{'Выбрать файл'}
+										</AppText>
+										<UploadTicketIcon />
+									</Pressable>
+									<Pressable
+										style={styles.actionButton}
+										onPress={handleScanPress}
+									>
+										<AppText
+											style={styles.actionButtonText}
+										>
+											Камера
+										</AppText>
+										<CameraIcon />
+									</Pressable>
+								</View>
+							)}
+
+							{image ? (
+								<View style={styles.previewCard}>
+									{isImageFile(imageFileName) ? (
+										<Image
+											source={{ uri: image }}
+											style={styles.previewImage}
+										/>
+									) : (
+										<View
+											style={styles.previewIconContainer}
+										>
+											<FileIcon size={32} />
+										</View>
+									)}
+									<View style={styles.fileNameContainer}>
+										<AppText
+											style={styles.fileName}
+											numberOfLines={1}
+										>
+											{imageFileName}
+										</AppText>
+									</View>
+									<Pressable
+										ref={moreButtonRef}
+										style={styles.moreButton}
+										onPress={openMenu}
+									>
+										<IconMore />
+									</Pressable>
+								</View>
+							) : null}
+
+							<View style={styles.categoryBlock}>
+								<AppText style={styles.label}>
+									Категория билета
+								</AppText>
+								<Pressable
+									style={styles.radioRow}
+									onPress={() => setCategory('transport')}
+								>
+									<View style={styles.radioOuter}>
+										{category === 'transport' && (
+											<View style={styles.radioInner} />
+										)}
+									</View>
+									<AppText
+										style={
+											category === 'transport'
+												? styles.radioTextActive
+												: styles.radioText
+										}
+									>
+										Транспорт
+									</AppText>
+								</Pressable>
+								<Pressable
+									style={styles.radioRow}
+									onPress={() => setCategory('entertainment')}
+								>
+									<View style={styles.radioOuter}>
+										{category === 'entertainment' && (
+											<View style={styles.radioInner} />
+										)}
+									</View>
+									<AppText
+										style={
+											category === 'entertainment'
+												? styles.radioTextActive
+												: styles.radioText
+										}
+									>
+										Развлечения
+									</AppText>
+								</Pressable>
+							</View>
 						</View>
-					) : null}
-
-					<View style={styles.categoryBlock}>
-						<AppText style={styles.label}>Категория билета</AppText>
-						<Pressable
-							style={styles.radioRow}
-							onPress={() => setCategory('transport')}
-						>
-							<View style={styles.radioOuter}>
-								{category === 'transport' && (
-									<View style={styles.radioInner} />
-								)}
-							</View>
-							<AppText
-								style={
-									category === 'transport'
-										? styles.radioTextActive
-										: styles.radioText
-								}
-							>
-								Транспорт
-							</AppText>
-						</Pressable>
-						<Pressable
-							style={styles.radioRow}
-							onPress={() => setCategory('entertainment')}
-						>
-							<View style={styles.radioOuter}>
-								{category === 'entertainment' && (
-									<View style={styles.radioInner} />
-								)}
-							</View>
-							<AppText
-								style={
-									category === 'entertainment'
-										? styles.radioTextActive
-										: styles.radioText
-								}
-							>
-								Развлечения
-							</AppText>
-						</Pressable>
 					</View>
-				</View>
-			</View>
 
-			<View style={styles.saveBtnWrap}>
-				<AppButton
-					text='Сохранить билет'
-					onPress={onSave}
-					disabled={!canSave}
-					isLoading={saving}
-					buttonBorderRadius={Radius.r16}
-					textFontSize={Fonts.f16}
-				/>
-			</View>
-		</SafeAreaView>
+					<View style={styles.saveBtnWrap}>
+						<AppButton
+							text='Сохранить билет'
+							onPress={onSave}
+							disabled={!canSave}
+							isLoading={saving}
+							buttonBorderRadius={Radius.r16}
+							textFontSize={Fonts.f16}
+						/>
+					</View>
+					<ImagePreviewMenu
+						visible={isMenuVisible}
+						anchor={menuAnchor ?? undefined}
+						onClose={closeMenu}
+						onEdit={handleEditImage}
+						onDelete={handleDeleteImage}
+					/>
+					<FilePickerSheet
+						ref={bottomSheetRef}
+						onPickImage={pickImage}
+						onPickDocument={pickDocument}
+					/>
+				</SafeAreaView>
+			</BottomSheetModalProvider>
+		</GestureHandlerRootView>
 	);
 };
 
@@ -285,6 +431,7 @@ const styles = StyleSheet.create({
 	},
 	actionsRow: { alignItems: 'center', flexDirection: 'row', gap: 5 },
 	categoryBlock: { marginTop: 8 },
+	container: { flex: 1 },
 	content: {
 		flex: 1,
 	},
@@ -300,7 +447,12 @@ const styles = StyleSheet.create({
 		color: Colors.secondaryText,
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f14,
-		maxWidth: 120,
+		maxWidth: 140,
+		paddingVertical: 16,
+	},
+	fileNameContainer: {
+		flex: 1,
+		marginLeft: 12,
 	},
 	formCard: {
 		backgroundColor: Colors.white,
@@ -322,6 +474,7 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f16,
 	},
+	// previewBox: { gap: 8, maxWidth: 140 },
 	input: {
 		backgroundColor: Colors.white,
 		borderColor: Colors.inputBorder,
@@ -335,7 +488,29 @@ const styles = StyleSheet.create({
 		color: Colors.headerAndInputText,
 		fontFamily: Fonts.medium,
 	},
-	previewBox: { gap: 8, maxWidth: 140 },
+	moreButton: {
+		// marginLeft: 8,
+		padding: 8,
+	},
+	previewCard: {
+		alignItems: 'flex-start',
+		backgroundColor: Colors.grayBackground,
+		borderRadius: Radius.r16,
+		flexDirection: 'row',
+		paddingHorizontal: 20,
+		paddingVertical: 16,
+		width: 270,
+	},
+	previewIconContainer: {
+		alignItems: 'center',
+		backgroundColor: Colors.lightBackground,
+		borderColor: Colors.inputBorder,
+		borderRadius: Radius.r10,
+		borderWidth: 1,
+		height: 96,
+		justifyContent: 'center',
+		width: 96,
+	},
 	previewImage: {
 		borderColor: Colors.inputBorder,
 		borderRadius: Radius.r10,
