@@ -70,10 +70,12 @@ export const Colors = {
 export const Gaps = {
 	g5: 5,
 	g8: 8,
+	g10: 10,
 	g12: 12,
 	g15: 15,
 	g16: 16,
 	g20: 20,
+	g24: 24,
 	g48: 48,
 	g50: 50,
 	g80: 80,
