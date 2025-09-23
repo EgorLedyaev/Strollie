@@ -29,6 +29,8 @@ export interface AppButtonProps extends PressableProps {
 	textColor?: string;
 	textFontSize?: number;
 	textFontFamily?: string;
+	paddingHorizontal?: number;
+	paddingVertical?: number;
 	dimFactor?: number;
 	sizeActivityIndicator?: number | 'large' | 'small' | undefined;
 	/** Кастомный контент. При наличии полностью заменяет text/иконки */
@@ -61,6 +63,8 @@ export const AppButton = ({
 	textFontFamily = Fonts.semibold,
 	dimFactor = 0.85,
 	sizeActivityIndicator = 'large',
+	paddingHorizontal,
+	paddingVertical,
 	children,
 	style,
 	...props
@@ -126,6 +130,8 @@ export const AppButton = ({
 			: isSecondary || isOutline
 				? (textColor ?? Colors.greenPrimary)
 				: Colors.white,
+		paddingHorizontal: paddingHorizontal,
+		paddingVertical: paddingVertical,
 	};
 
 	const renderInnerContent = () => {
@@ -220,7 +226,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 		overflow: 'hidden',
-		padding: 10,
 	},
 	outline: {
 		alignItems: 'center',
@@ -228,7 +233,6 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		flex: 1,
 		justifyContent: 'center',
-		padding: 10,
 	},
 	shadow: {
 		boxShadow: Shadows.boxShadow_elev2,

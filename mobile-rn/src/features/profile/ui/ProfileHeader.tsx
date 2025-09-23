@@ -1,11 +1,12 @@
-import ActionIcon from '@/assets/icons/action';
 import ArrowLeftSmallIcon from '@/assets/icons/arrow/ArrowLeftSmallIcon';
-import React, { useRef } from 'react';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { User } from '@/entities/user';
+import { useAnchorMeasurement } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
+import { ActionButton } from '@/shared/ui/ActionButton';
 
 import { ProfileInfo } from './ProfileInfo';
 
@@ -23,12 +24,12 @@ interface HeaderProps {
 
 const HIT_SLOP = { top: 15, bottom: 15, left: 15, right: 15 };
 export function ProfileHeader({ user, onBackPress, onMenuPress }: HeaderProps) {
-	const menuBtnRef = useRef<View>(null);
+	const { ref: menuAnchorRef, measure } = useAnchorMeasurement();
 
 	const handleMenuPress = () => {
-		// Измеряем положение кнопки в координатах окна
-		menuBtnRef.current?.measureInWindow?.((x, y, width, height) => {
-			onMenuPress({ x, y, width, height });
+		// Унифицированное измерение через хук
+		measure().then(rect => {
+			if (rect) onMenuPress(rect);
 		});
 	};
 
@@ -43,15 +44,9 @@ export function ProfileHeader({ user, onBackPress, onMenuPress }: HeaderProps) {
 					<ArrowLeftSmallIcon />
 				</IconButton>
 				<AppText style={styles.text}>@{user?.nickname}</AppText>
-				{/* Оборачиваем кнопку меню во View с ref, чтобы измерить её позицию */}
-				<View ref={menuBtnRef} collapsable={false}>
-					<IconButton
-						onPress={handleMenuPress}
-						hitSlop={HIT_SLOP}
-						feedback='opacity'
-					>
-						<ActionIcon />
-					</IconButton>
+				{/* Оборачиваем кнопку в View с ref для стабильного измерения */}
+				<View ref={menuAnchorRef} collapsable={false}>
+					<ActionButton onPress={handleMenuPress} />
 				</View>
 			</View>
 			<ProfileInfo user={user} />

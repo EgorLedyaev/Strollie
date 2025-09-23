@@ -92,8 +92,8 @@ jobs:
               run: npm run fsd:check
               continue-on-error: true
 
-            # - name: Tests
-            #   run: npm test -- --ci
+            - name: Tests
+              run: npm test -- --ci
 
     android-build:
         name: Android Build (release APK)
@@ -157,10 +157,11 @@ jobs:
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
               with:
-                  # ВАЖНО: каждая строка отдельный пакет. Ранее две строки схлопнулись в одну => sdkmanager искал несуществующий 'platforms;android-34 build-tools;34.0.0'
-                  # targetSdkVersion сейчас = 35 (см. merged manifest), поэтому ставим platform 35 + соответствующие build-tools.
-                  # Если потребуется откат: заменить 35 -> 34 и build-tools 35.0.0 -> 34.0.0
-                  packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+                  # Каждая строка отдельный пакет. Исправлено: теперь sdkmanager корректно устанавливает пакеты.
+                  packages: |
+                      platform-tools
+                      platforms;android-35
+                      build-tools;35.0.0
                   cmdline-tools-version: 12266719
                   accept-android-sdk-licenses: true
                   log-accepted-android-sdk-licenses: true
@@ -170,28 +171,37 @@ jobs:
                   mkdir -p android/app
                   echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 --decode > android/app/upload-keystore.jks
 
-            - name: Configure signing props
-              run: |
-                  {
-                    echo "MYAPP_UPLOAD_STORE_FILE=upload-keystore.jks"
-                    echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}"
-                    echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
-                    echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}"
-                  } >> android/gradle.properties
-
             - name: Make gradlew executable
               working-directory: android
               run: chmod +x ./gradlew
 
+            - name: Signing report (diagnostic)
+              working-directory: android
+              env:
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+              run: ./gradlew :app:signingReport --quiet || true
+
             - name: Debug signing props
               working-directory: android
+              env:
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
               run: ./gradlew :app:properties | grep -i -E 'MYAPP_UPLOAD|signing'
-          
+
             - name: Gradle assembleRelease
               working-directory: android
               env:
                   JAVA_OPTS: -Xmx2g
                   GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=512m" -Dorg.gradle.caching=true
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
               run: ./gradlew assembleRelease --stacktrace
 
             - name: Upload release APK artifact

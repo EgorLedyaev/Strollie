@@ -1,12 +1,11 @@
 import FileIcon from '@/assets/icons/FileIcon';
-import IconMore from '@/assets/icons/IconMore';
 import CameraIcon from '@/assets/icons/tickets/CameraIcon';
 import UploadTicketIcon from '@/assets/icons/tickets/UploadTicketIcon';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import React, { useRef, useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -21,12 +20,14 @@ import {
 	newTicketImageFileNameAtom,
 	newTicketTitleAtom,
 	resetNewTicketFormAtom,
+	setTicketsAtom,
 	ticketApi,
-	ticketsAtom,
 } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
+import { useAnchorMeasurement } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText, AppTextInput, DateInput } from '@/shared/ui';
+import { ActionButton } from '@/shared/ui/ActionButton';
 
 import { FilePickerSheet, FilePickerSheetRef } from './FilePickerSheet';
 import { ImagePreviewMenu } from './ImagePreviewMenu';
@@ -40,20 +41,20 @@ export const TicketAddPage: React.FC = () => {
 		newTicketImageFileNameAtom,
 	);
 	const [category, setCategory] = useAtom(newTicketCategoryAtom);
-	const [, setTickets] = useAtom(ticketsAtom);
+	// read tickets separately if needed but use write-only atom for updates to avoid type issues
+	const setTickets = useSetAtom(setTicketsAtom);
 	const [, resetForm] = useAtom(resetNewTicketFormAtom);
 	const [saving, setSaving] = React.useState(false);
 	const [error, setError] = React.useState<string | null>(null);
 	const log = React.useMemo(() => bindLogger('ticket_add'), []);
 
 	const [isMenuVisible, setMenuVisible] = useState(false);
-	const [menuAnchor, setMenuAnchor] = useState<{
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} | null>(null);
-	const moreButtonRef = useRef<View>(null);
+	// Используем единый хук измерения
+	const {
+		ref: moreButtonAnchorRef,
+		measure: measureMoreBtn,
+		anchor: moreBtnAnchor,
+	} = useAnchorMeasurement();
 	const bottomSheetRef = useRef<FilePickerSheetRef>(null);
 
 	React.useEffect(() => {
@@ -182,12 +183,9 @@ export const TicketAddPage: React.FC = () => {
 	};
 
 	const openMenu = () => {
-		moreButtonRef.current?.measureInWindow(
-			(x: number, y: number, width: number, height: number) => {
-				setMenuAnchor({ x: x, y: y, width, height });
-				setMenuVisible(true);
-			},
-		);
+		measureMoreBtn().then(rect => {
+			if (rect) setMenuVisible(true);
+		});
 	};
 
 	const closeMenu = () => setMenuVisible(false);
@@ -313,13 +311,16 @@ export const TicketAddPage: React.FC = () => {
 											{imageFileName}
 										</AppText>
 									</View>
-									<Pressable
-										ref={moreButtonRef}
-										style={styles.moreButton}
-										onPress={openMenu}
+
+									<View
+										ref={moreButtonAnchorRef}
+										collapsable={false}
 									>
-										<IconMore />
-									</Pressable>
+										<ActionButton
+											onPress={openMenu}
+											variant='vertical'
+										/>
+									</View>
 								</View>
 							) : null}
 
@@ -381,7 +382,7 @@ export const TicketAddPage: React.FC = () => {
 					</View>
 					<ImagePreviewMenu
 						visible={isMenuVisible}
-						anchor={menuAnchor ?? undefined}
+						anchor={moreBtnAnchor ?? undefined}
 						onClose={closeMenu}
 						onEdit={handleEditImage}
 						onDelete={handleDeleteImage}
@@ -462,10 +463,7 @@ const styles = StyleSheet.create({
 		color: Colors.headerAndInputText,
 		fontFamily: Fonts.medium,
 	},
-	moreButton: {
-		// marginLeft: 8,
-		padding: 8,
-	},
+
 	previewCard: {
 		alignItems: 'flex-start',
 		backgroundColor: Colors.grayBackground,

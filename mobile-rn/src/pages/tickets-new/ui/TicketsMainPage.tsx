@@ -2,7 +2,6 @@ import FilterIcon from '@/assets/icons/FilterIcon';
 import AddTicketIcon from '@/assets/icons/tickets/AddTicketIcon';
 import tickets_empty from '@/assets/images/tickets/tickets-empty.png';
 import { useRouter } from 'expo-router';
-import { useAtom } from 'jotai';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
 	ActivityIndicator,
@@ -17,26 +16,24 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
-import {
-	NewTicketItem,
-	Ticket,
-	ticketApi,
-	ticketsAtom,
-} from '@/entities/ticket';
+import { NewTicketItem, Ticket, useTicketsSWR } from '@/entities/ticket';
+import { TicketsErrorState } from '@/entities/ticket/ui/TicketsErrorState';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 
 type Filter = 'all' | 'transport' | 'entertainment';
-type FetchState = 'loading' | 'loaded' | 'error';
+// legacy FetchState удалён, управление состояниями внутри useTicketsSWR
 
 export const TicketsMainPage: React.FC = () => {
 	const router = useRouter();
-	const [tickets, setTickets] = useAtom(ticketsAtom);
-	// Управляем этапами загрузки чтобы избежать мерцания
-	const [fetchState, setFetchState] = useState<FetchState>(
-		tickets.length ? 'loaded' : 'loading',
-	);
+	const {
+		tickets,
+		isHydrated: hydrated,
+		isLoading,
+		error,
+		forceRefresh,
+	} = useTicketsSWR();
 	const [filter, setFilter] = useState<Filter>('all');
 
 	// Feature scoped logger
@@ -47,53 +44,30 @@ export const TicketsMainPage: React.FC = () => {
 		log.info('mount');
 	}, [log]);
 
-	useEffect(() => {
-		if (fetchState !== 'loading') return;
-		let cancelled = false;
-		log.info('fetch:start', { cachedCount: tickets.length });
-		ticketApi
-			.getMyTickets()
-			.then(data => {
-				if (!cancelled) setTickets(data);
-				if (!cancelled) setFetchState('loaded');
-				if (!cancelled)
-					log.info('fetch:success', { count: data.length });
-			})
-			.catch(e => {
-				if (!cancelled) {
-					setFetchState('error');
-					log.error('fetch:error', {
-						message: e?.message || 'unknown',
-					});
-				}
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [fetchState, setTickets, tickets.length, log]);
+	// (удалены эффекты ручной загрузки – теперь это внутри useTicketsSWR)
 
 	const sections = useMemo(() => {
-		const filteredTickets =
+		const filteredTickets: Ticket[] =
 			filter === 'all'
 				? tickets
-				: tickets.filter(t => t.businessCategory === filter);
+				: tickets.filter((t: Ticket) => t.businessCategory === filter);
 
 		const startOfToday = new Date();
 		startOfToday.setHours(0, 0, 0, 0);
 		const endOfToday = new Date();
 		endOfToday.setHours(23, 59, 59, 999);
 
-		const today = filteredTickets.filter(t => {
+		const today = filteredTickets.filter((t: Ticket) => {
 			const d = new Date(t.departureTime);
 			return d >= startOfToday && d <= endOfToday;
 		});
 		const future = filteredTickets.filter(
-			t => new Date(t.departureTime) > endOfToday,
+			(t: Ticket) => new Date(t.departureTime) > endOfToday,
 		);
 		// Прошедшие билеты (до начала сегодняшнего дня) — сейчас не показывались,
 		// из-за чего пользователь мог подумать, что билет "пропал", если выбрал дату в прошлом.
 		const past = filteredTickets.filter(
-			t => new Date(t.departureTime) < startOfToday,
+			(t: Ticket) => new Date(t.departureTime) < startOfToday,
 		);
 
 		const byAsc = (a: Ticket, b: Ticket) =>
@@ -117,8 +91,7 @@ export const TicketsMainPage: React.FC = () => {
 		return result;
 	}, [filter, tickets]);
 
-	const isLoading = fetchState === 'loading';
-	const showEmpty = fetchState === 'loaded' && !tickets.length;
+	const showEmpty = hydrated && !isLoading && tickets.length === 0;
 
 	const imageNode = (
 		<View>
@@ -158,12 +131,9 @@ export const TicketsMainPage: React.FC = () => {
 						color={Colors.greenPrimary}
 					/>
 				</View>
-			) : fetchState === 'error' ? (
-				<View style={styles.loadingWrap} testID='tickets-error'>
-					<AppText style={styles.errorText}>
-						Упс! Что-то пошло не так. Пожалуйста, попробуйте еще
-						раз.
-					</AppText>
+			) : error ? (
+				<View style={styles.loadingWrap}>
+					<TicketsErrorState onRetry={() => forceRefresh()} />
 				</View>
 			) : showEmpty ? (
 				<View style={styles.emptyContainer}>
@@ -318,13 +288,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'flex-start',
 		paddingTop: 80,
 	},
-	errorText: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.medium,
-		fontSize: Fonts.f16,
-		marginBottom: 16,
-		textAlign: 'center',
-	},
+	// errorText стиль удалён (ошибка не показывается в текущей реализации)
 	fabContainer: {
 		alignItems: 'center',
 		bottom: 58,

@@ -114,7 +114,6 @@ export const ProfilePage: React.FC = () => {
 				onHelp={handleHelp}
 				onLogout={handleLogout}
 				anchor={menuAnchor ?? undefined}
-				offset={{ dx: menuAnchor?.width, dy: menuAnchor?.y }}
 			/>
 		</SafeAreaView>
 	);

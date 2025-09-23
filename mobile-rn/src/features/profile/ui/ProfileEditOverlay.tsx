@@ -1,8 +1,9 @@
 import React from 'react';
-import { Modal, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Popover, { PopoverPlacement } from 'react-native-popover-view';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppButton, AppText, IconButton } from '@/shared/ui';
+import { AppButton, AppText } from '@/shared/ui';
 
 interface ProfileMenuOverlayProps {
 	visible: boolean;
@@ -20,67 +21,63 @@ export const ProfileEditOverlay: React.FC<ProfileMenuOverlayProps> = ({
 	onCancel,
 }) => {
 	return (
-		<Modal
-			visible={visible}
-			transparent
-			animationType='fade'
+		<Popover
+			isVisible={visible}
 			onRequestClose={onClose}
-			statusBarTranslucent
+			placement={PopoverPlacement.CENTER}
+			arrowSize={{ width: 0, height: 0 }}
+			backgroundStyle={styles.overlay}
+			popoverStyle={styles.menuContainer}
 		>
-			<IconButton
-				style={styles.overlay}
-				onPress={onClose}
-				feedback='opacity'
-				opacity={1}
+			<View
+				testID='profile-edit-popover'
+				onStartShouldSetResponder={() => true}
 			>
-				<View
-					style={styles.menuContainer}
-					onStartShouldSetResponder={() => true}
-				>
-					<AppText style={styles.textOverlay}>
-						Сохранить изменения?
-					</AppText>
-					<View style={styles.buttonContainer}>
-						<AppButton
-							onPress={onCancel}
-							text={'Отменить'}
-							style={styles.buttonContent}
-							variant='secondary'
-							buttonBorderRadius={Radius.r10}
-							textFontFamily={Fonts.regular}
-							textFontSize={Fonts.f16}
-							textColor={Colors.grayTextButtonOverlay}
-						/>
-						<AppButton
-							onPress={onSave}
-							text={'Сохранить'}
-							style={styles.buttonContent}
-							variant='secondary'
-							buttonBorderRadius={Radius.r10}
-							textFontFamily={Fonts.regular}
-							buttonColor={Colors.successGreen}
-							textFontSize={Fonts.f16}
-							dimFactor={0.75}
-							isLoading={isLoading}
-							sizeActivityIndicator={'small'}
-						/>
-					</View>
+				<AppText style={styles.textOverlay}>
+					Сохранить изменения?
+				</AppText>
+				<View style={styles.buttonContainer}>
+					<AppButton
+						onPress={onCancel}
+						text={'Отменить'}
+						style={styles.buttonContent}
+						variant='secondary'
+						buttonBorderRadius={Radius.r10}
+						textFontFamily={Fonts.regular}
+						textFontSize={Fonts.f16}
+						textColor={Colors.grayTextButtonOverlay}
+						paddingHorizontal={24}
+						paddingVertical={10}
+					/>
+					<AppButton
+						onPress={onSave}
+						text={'Сохранить'}
+						style={styles.buttonContent}
+						variant='secondary'
+						buttonBorderRadius={Radius.r10}
+						textFontFamily={Fonts.regular}
+						buttonColor={Colors.successGreen}
+						textFontSize={Fonts.f16}
+						dimFactor={0.75}
+						isLoading={isLoading}
+						sizeActivityIndicator={'small'}
+						paddingHorizontal={24}
+						paddingVertical={10}
+					/>
 				</View>
-			</IconButton>
-		</Modal>
+			</View>
+		</Popover>
 	);
 };
 
 const styles = StyleSheet.create({
 	buttonContainer: {
 		flexDirection: 'row',
-		gap: 10,
+		gap: 16,
 		justifyContent: 'center',
-		// justifyContent: 'space-between',
 	},
 	buttonContent: {
-		height: 39,
-		width: 111,
+		height: 44,
 	},
 	menuContainer: {
 		alignItems: 'center',
@@ -89,17 +86,15 @@ const styles = StyleSheet.create({
 		boxShadow: Shadows.boxShadow,
 		gap: 12,
 		justifyContent: 'center',
-		paddingHorizontal: 10,
-		paddingVertical: 16,
-		width: 252,
+		paddingHorizontal: 16,
+		paddingVertical: 20,
 	},
 	overlay: {
-		alignItems: 'center',
 		backgroundColor: Colors.shadowButton,
-		flex: 1,
-		justifyContent: 'center',
 	},
 	textOverlay: {
 		color: Colors.grayTextOverlay,
+		marginBottom: 16,
+		textAlign: 'center',
 	},
 });

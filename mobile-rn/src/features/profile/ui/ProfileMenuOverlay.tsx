@@ -1,6 +1,6 @@
 import React from 'react';
-import { Modal, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
+import Popover, { PopoverPlacement, Rect } from 'react-native-popover-view';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
@@ -13,9 +13,7 @@ interface ProfileMenuOverlayProps {
 	onSettings: () => void;
 	onHelp: () => void;
 	onLogout: () => void;
-	// Новые пропсы для позиционирования
 	anchor?: { x: number; y: number; width: number; height: number };
-	offset?: { dx?: number; dy?: number };
 }
 
 export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
@@ -26,92 +24,71 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 	onHelp,
 	onLogout,
 	anchor,
-	offset,
 }) => {
-	const insets = useSafeAreaInsets();
-
-	// Базовый сдвиг: немного вниз и влево от правого края кнопки
-	const dx = offset?.dx ?? 8; // влево на 8
-	const dy = offset?.dy ?? 6; // вниз на 6
-
-	const menuPosition = anchor
-		? {
-				position: 'absolute' as const,
-				top: anchor.y + anchor.height + dy, // сразу под кнопкой с небольшим сдвигом вниз
-				left: Math.max(16, anchor.x + anchor.width - dx - 246), // прижимаем правый край меню к кнопке и не даем выйти за левую границу
-			}
+	const fromRect = anchor
+		? new Rect(anchor.x - 140, anchor.y + 50, anchor.width, anchor.height)
 		: undefined;
 
 	return (
-		<Modal
-			statusBarTranslucent
-			visible={visible}
-			transparent
-			animationType='fade'
+		<Popover
+			isVisible={visible}
 			onRequestClose={onClose}
+			from={fromRect}
+			placement={PopoverPlacement.BOTTOM}
+			arrowSize={{ width: 0, height: 0 }}
+			backgroundStyle={styles.overlay}
+			popoverStyle={styles.menuContainer}
 		>
-			<IconButton
-				style={[styles.overlay, { paddingTop: insets.top }]}
-				onPress={onClose}
-				feedback='opacity'
-				opacity={1}
-			>
-				<View
-					style={[styles.menuContainer, menuPosition]}
-					onStartShouldSetResponder={() => true}
+			<View testID='profile-menu-popover' style={styles.contentWrapper}>
+				<IconButton
+					style={styles.menuItem}
+					onPress={onEditProfile}
+					feedback='opacity'
 				>
+					<AppText style={styles.menuText}>
+						Редактировать профиль
+					</AppText>
+				</IconButton>
+				<IconButton
+					style={styles.menuItem}
+					onPress={onSettings}
+					feedback='opacity'
+				>
+					<AppText style={styles.menuText}>Настройки</AppText>
+				</IconButton>
+				<IconButton
+					style={styles.menuItem}
+					onPress={onHelp}
+					feedback='opacity'
+				>
+					<AppText style={styles.menuText}>Помощь</AppText>
+				</IconButton>
+				<View>
+					<Divider style={styles.divider} />
 					<IconButton
 						style={styles.menuItem}
-						onPress={onEditProfile}
+						onPress={() => {
+							onClose();
+							setTimeout(() => {
+								onLogout();
+							}, 300);
+						}}
 						feedback='opacity'
 					>
-						<AppText style={styles.menuText}>
-							Редактировать профиль
+						<AppText style={[styles.menuText, styles.logoutText]}>
+							Выйти из аккаунта
 						</AppText>
 					</IconButton>
-					<IconButton
-						style={styles.menuItem}
-						onPress={onSettings}
-						feedback='opacity'
-					>
-						<AppText style={styles.menuText}>Настройки</AppText>
-					</IconButton>
-					<IconButton
-						style={styles.menuItem}
-						onPress={onHelp}
-						feedback='opacity'
-					>
-						<AppText style={styles.menuText}>Помощь</AppText>
-					</IconButton>
-					<View>
-						<Divider style={styles.divider} />
-						<IconButton
-							style={styles.menuItem}
-							onPress={() => {
-								// Закрываем меню перед выходом
-								onClose();
-								// Делаем небольшую паузу перед выходом
-								setTimeout(() => {
-									// Выполняем выход из аккаунта
-									onLogout();
-								}, 300);
-							}}
-							feedback='opacity'
-						>
-							<AppText
-								style={[styles.menuText, styles.logoutText]}
-							>
-								Выйти из аккаунта
-							</AppText>
-						</IconButton>
-					</View>
 				</View>
-			</IconButton>
-		</Modal>
+			</View>
+		</Popover>
 	);
 };
 
 const styles = StyleSheet.create({
+	contentWrapper: {
+		gap: 20,
+	},
 	divider: {
 		marginBottom: 10,
 	},
@@ -131,16 +108,12 @@ const styles = StyleSheet.create({
 	menuItem: {
 		alignItems: 'flex-start',
 	},
-
 	menuText: {
 		color: Colors.black,
 		fontSize: Fonts.f14,
 	},
 	overlay: {
-		alignItems: 'stretch',
 		backgroundColor: Colors.shadowButton,
-		flex: 1,
-		justifyContent: 'flex-start',
 		paddingHorizontal: 16,
 	},
 });

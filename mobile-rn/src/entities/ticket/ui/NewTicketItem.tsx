@@ -1,8 +1,9 @@
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
-import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
+import { ActionButton } from '@/shared/ui/ActionButton';
 
 import type { Ticket } from '../model';
 
@@ -24,7 +25,7 @@ function formatDate(d: Date) {
  * Не использует старые карточки и их стили.
  * Нет секции для QR – намеренно по требованию.
  */
-export const NewTicketItem: React.FC<Props> = ({ ticket }) => {
+export const NewTicketItem: React.FC<Props> = ({ ticket, onPressActions }) => {
 	const departure = new Date(ticket.departureTime);
 	const title =
 		ticket.title ||
@@ -47,24 +48,27 @@ export const NewTicketItem: React.FC<Props> = ({ ticket }) => {
 			</View>
 
 			<View style={styles.mainCol}>
-				<AppText style={styles.title} numberOfLines={1}>
-					{title}
-				</AppText>
-				<AppText style={styles.date}>{formatDate(departure)}</AppText>
-				{ticket.businessCategory ? (
-					<View style={styles.badge}>
-						<AppText style={styles.badgeText} numberOfLines={1}>
-							{ticket.businessCategory}
-						</AppText>
-					</View>
-				) : null}
-				{/* Декоративные вертикальные точки */}
-				<View style={styles.dots} pointerEvents='none'>
-					<View style={styles.dot} />
-					<View style={styles.dot} />
-					<View style={styles.dot} />
+				<View style={styles.textWrap}>
+					<AppText style={styles.title} numberOfLines={1}>
+						{title}
+					</AppText>
+					<AppText style={styles.date}>
+						{formatDate(departure)}
+					</AppText>
 				</View>
+				{ticket.businessCategory ? (
+					<AppText style={styles.badgeText} numberOfLines={1}>
+						{ticket.businessCategory}
+					</AppText>
+				) : (
+					<View />
+				)}
 			</View>
+			<ActionButton
+				onPress={onPressActions ?? (() => {})}
+				variant='vertical'
+				style={styles.dots}
+			/>
 		</View>
 	);
 };
@@ -72,58 +76,48 @@ export const NewTicketItem: React.FC<Props> = ({ ticket }) => {
 const THUMB = 64;
 
 const styles = StyleSheet.create({
-	badge: {
-		alignSelf: 'flex-start',
-		backgroundColor: Colors.successGreen,
-		borderRadius: Radius.r15,
-		maxWidth: '75%',
-		paddingHorizontal: 10,
-		paddingVertical: 4,
-	},
 	badgeText: {
-		color: Colors.white,
-		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f12,
+		color: Colors.lightInputText,
+		fontSize: Fonts.f14,
 	},
 	date: {
-		color: Colors.secondaryText,
-		fontFamily: Fonts.regular,
+		color: Colors.headerAndInputText,
 		fontSize: Fonts.f14,
-		marginBottom: 6,
 	},
-	dot: {
-		backgroundColor: Colors.grayBackground,
-		borderRadius: Radius.r8 / 2,
-		height: 4,
-		width: 4,
-	},
+
 	dots: {
-		height: '100%',
-		justifyContent: 'space-between',
-		paddingVertical: 4,
-		position: 'absolute',
-		right: -12,
-		top: 0,
+		alignSelf: 'flex-start',
+		justifyContent: 'flex-end',
 	},
-	mainCol: { flex: 1, position: 'relative' },
+	mainCol: {
+		flex: 1,
+		justifyContent: 'space-between',
+		paddingVertical: 2,
+	},
 	root: {
-		alignItems: 'center',
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r16,
 		flexDirection: 'row',
 		gap: 16,
-		paddingLeft: 16,
-		paddingRight: 24,
+		paddingLeft: 32,
+		paddingRight: 16,
 		paddingVertical: 16,
 	},
-	thumb: { borderRadius: Radius.r15, height: '100%', width: '100%' },
+	textWrap: {
+		gap: Gaps.g4,
+	},
+	thumb: {
+		borderColor: Colors.inputBorder,
+		borderRadius: Radius.r8,
+		borderWidth: 1,
+		flex: 1,
+	},
 	thumbPlaceholder: {
 		backgroundColor: Colors.grayBackground,
 		borderColor: Colors.inputBorder,
-		borderRadius: Radius.r15,
-		borderWidth: 1,
-		height: '100%',
-		width: '100%',
+		borderRadius: Radius.r8,
+		borderWidth: 10,
+		flex: 1,
 	},
 	thumbWrap: { height: THUMB, width: THUMB },
 	title: {

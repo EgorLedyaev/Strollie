@@ -4,47 +4,30 @@
  * Новый пустой экран: см. pages/tickets-new.
  */
 import { useRouter } from 'expo-router';
-import { useAtom } from 'jotai';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ShowTicketQrDialog } from '@/features/show-ticket-qr';
 import { TicketDetailsDialog } from '@/features/ticket-details';
-import {
-	ticketApi,
-	TicketCard,
-	ticketsAtom,
-	type Ticket,
-} from '@/entities/ticket';
+import { TicketCard, useTicketsSWR, type Ticket } from '@/entities/ticket';
+import { TicketsErrorState } from '@/entities/ticket/ui/TicketsErrorState';
 import { Colors, Sizes } from '@/shared/tokens';
 import { AppText, BackButton } from '@/shared/ui';
 
 export const TicketListPage: React.FC = () => {
-	const [tickets, setTickets] = useAtom(ticketsAtom);
+	const {
+		tickets,
+		isHydrated: hydrated,
+		isLoading,
+		error,
+		forceRefresh,
+	} = useTicketsSWR();
 	const [qrVisible, setQrVisible] = useState(false);
 	const [qrUri, setQrUri] = useState<string | undefined>();
 	const [detailsVisible, setDetailsVisible] = useState(false);
 	const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
-	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
-
-	useEffect(() => {
-		let mounted = true;
-		if (tickets.length === 0) {
-			setIsLoading(true);
-			ticketApi
-				.getMyTickets()
-				.then(data => {
-					if (!mounted) return;
-					setTickets(data);
-				})
-				.finally(() => mounted && setIsLoading(false));
-		}
-		return () => {
-			mounted = false;
-		};
-	}, [tickets.length, setTickets]);
 
 	const sections = useMemo(() => {
 		const startOfToday = new Date();
@@ -84,8 +67,10 @@ export const TicketListPage: React.FC = () => {
 				/>
 			</View>
 			<View style={styles.content}>
-				{isLoading && !tickets.length ? (
+				{isLoading && (!hydrated || !tickets.length) ? (
 					<AppText>Загрузка…</AppText>
+				) : error ? (
+					<TicketsErrorState onRetry={() => forceRefresh()} />
 				) : !sections.length ? (
 					<AppText>Пока нет билетов</AppText>
 				) : (

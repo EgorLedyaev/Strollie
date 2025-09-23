@@ -1,9 +1,10 @@
 import EditPhotoIcon from '@/assets/icons/EditPhotoIcon';
 import { useAtomValue, useSetAtom } from 'jotai';
 import React, { useState } from 'react';
-import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { updateUserProfileAtom, userProfileAtom } from '@/entities/user';
+import { useAnchorMeasurement } from '@/shared/lib';
 import { Colors } from '@/shared/tokens';
 import { Avatar, IconButton } from '@/shared/ui';
 
@@ -23,21 +24,12 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 	const profileState = useAtomValue(userProfileAtom);
 	const updateUser = useSetAtom(updateUserProfileAtom);
 	const [optionsVisible, setOptionsVisible] = useState(false);
-	const [anchor, setAnchor] = useState<{
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} | null>(null);
+	const { ref: anchorRef, anchor, measure } = useAnchorMeasurement();
 
-	const onAvatarLayout = (e: LayoutChangeEvent) => {
-		const { x, y, width, height } = e.nativeEvent.layout;
-		console.log('x, y, width, height', x, y, width, height);
-
-		setAnchor({ x, y: y, width, height });
+	const openOptions = async () => {
+		await measure();
+		requestAnimationFrame(() => setOptionsVisible(true));
 	};
-
-	const openOptions = () => setOptionsVisible(true);
 	const closeOptions = () => setOptionsVisible(false);
 
 	const handlePickFromDevice = async () => {
@@ -60,28 +52,36 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 		closeOptions();
 	};
 
+	/* no test hooks – visibility controlled only by user action */
+
 	return (
 		<View style={styles.container}>
-			<IconButton
-				onPress={openOptions}
-				disabled={isLoading}
-				style={[styles.avatarContainer, { borderRadius: size / 2 }]}
-				onLayout={onAvatarLayout}
+			<View
+				ref={anchorRef}
+				collapsable={false}
+				testID='avatar-photo-menu-trigger'
 			>
-				<Avatar uri={avatarUrl} size={size} />
-				{/* Полупрозрачный overlay поверх аватара */}
-				<View
-					pointerEvents='none'
-					style={[
-						StyleSheet.absoluteFillObject,
-						styles.overlay,
-						{ borderRadius: size / 2 },
-					]}
-				/>
-				<View style={styles.iconContainer} pointerEvents='none'>
-					<EditPhotoIcon />
-				</View>
-			</IconButton>
+				<IconButton
+					testID='avatar-photo-menu-button'
+					onPress={openOptions}
+					disabled={isLoading}
+					style={[styles.avatarContainer, { borderRadius: size / 2 }]}
+				>
+					<Avatar uri={avatarUrl} size={size} />
+					{/* Полупрозрачный overlay поверх аватара */}
+					<View
+						pointerEvents='none'
+						style={[
+							StyleSheet.absoluteFillObject,
+							styles.overlay,
+							{ borderRadius: size / 2 },
+						]}
+					/>
+					<View style={styles.iconContainer} pointerEvents='none'>
+						<EditPhotoIcon />
+					</View>
+				</IconButton>
+			</View>
 			<AvatarPhotoOptionsModal
 				visible={optionsVisible}
 				onClose={closeOptions}

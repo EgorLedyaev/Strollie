@@ -1,24 +1,17 @@
 import no_history from '@/assets/images/routes/no-history.png';
-import { useAtom } from 'jotai';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
-import { ticketApi, ticketsAtom } from '@/entities/ticket';
+import { useTicketsSWR } from '@/entities/ticket';
+import { TicketsErrorState } from '@/entities/ticket/ui/TicketsErrorState';
 import { bindLogger } from '@/shared/lib/logger';
-import { Colors, Fonts } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
-
-type FetchState = 'loading' | 'loaded' | 'error';
+import { Colors } from '@/shared/tokens';
 
 export const RouteHistoryPage: React.FC = () => {
-	const [tickets, setTickets] = useAtom(ticketsAtom);
-	// Управляем этапами загрузки чтобы избежать мерцания
-	const [fetchState, setFetchState] = useState<FetchState>(
-		tickets.length ? 'loaded' : 'loading',
-	);
+	const { isHydrated: hydrated, isLoading, error } = useTicketsSWR();
 
 	// Feature scoped logger
 	const log = useMemo(() => bindLogger('tickets'), []);
@@ -28,33 +21,7 @@ export const RouteHistoryPage: React.FC = () => {
 		log.info('mount');
 	}, [log]);
 
-	useEffect(() => {
-		if (fetchState !== 'loading') return;
-		let cancelled = false;
-		log.info('fetch:start', { cachedCount: tickets.length });
-		ticketApi
-			.getMyTickets()
-			.then(data => {
-				if (!cancelled) setTickets(data);
-				if (!cancelled) setFetchState('loaded');
-				if (!cancelled)
-					log.info('fetch:success', { count: data.length });
-			})
-			.catch(e => {
-				if (!cancelled) {
-					setFetchState('error');
-					log.error('fetch:error', {
-						message: e?.message || 'unknown',
-					});
-				}
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [fetchState, setTickets, tickets.length, log]);
-
-	const isLoading = fetchState === 'loading';
-	const showEmpty = fetchState === 'loaded' && !tickets.length;
+	const showEmpty = hydrated && !isLoading; // всегда показываем EmptyState
 
 	return (
 		<SafeAreaView style={styles.root}>
@@ -67,12 +34,9 @@ export const RouteHistoryPage: React.FC = () => {
 						color={Colors.greenPrimary}
 					/>
 				</View>
-			) : fetchState === 'error' ? (
+			) : error ? (
 				<View style={styles.loadingWrap} testID='favourites-error'>
-					<AppText style={styles.errorText}>
-						Упс! Что-то пошло не так. Пожалуйста, попробуйте еще
-						раз.
-					</AppText>
+					<TicketsErrorState />
 				</View>
 			) : showEmpty ? (
 				<View style={styles.container}>
@@ -104,17 +68,10 @@ const styles = StyleSheet.create({
 		resizeMode: 'contain',
 		width: 265,
 	},
-	errorText: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.medium,
-		fontSize: Fonts.f16,
-		marginBottom: 16,
-		textAlign: 'center',
-	},
 	loadingWrap: {
 		alignItems: 'center',
 		flex: 1,
-		justifyContent: 'flex-start',
+		justifyContent: 'center',
 		paddingTop: 80,
 	},
 	root: {

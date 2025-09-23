@@ -103,14 +103,15 @@ android {
             keyPassword 'android'
         }
         release {
-            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+            def hasReleaseKeystore = project.hasProperty('MYAPP_UPLOAD_STORE_FILE')
+            if (hasReleaseKeystore) {
+                println "[signing] Using provided release keystore: ${MYAPP_UPLOAD_STORE_FILE}"
                 storeFile file(MYAPP_UPLOAD_STORE_FILE)
                 storePassword MYAPP_UPLOAD_STORE_PASSWORD
                 keyAlias MYAPP_UPLOAD_KEY_ALIAS
                 keyPassword MYAPP_UPLOAD_KEY_PASSWORD
             } else {
-                // Fallback to debug keystore to avoid "unknown property 'release'" errors during local builds.
-                // Replace with your own release keystore credentials for production.
+                println "[signing][WARN] Release keystore props missing; falling back to debug.keystore (NOT FOR PRODUCTION)"
                 storeFile file('debug.keystore')
                 storePassword 'android'
                 keyAlias 'androiddebugkey'
