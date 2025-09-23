@@ -178,13 +178,15 @@ jobs:
                     echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"
                     echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}"
                   } >> android/gradle.properties
-            - name: Debug signing props
-              working-directory: android
-              run: ./gradlew :app:properties | grep -i -E 'MYAPP_UPLOAD|signing'
-              
+
             - name: Make gradlew executable
               working-directory: android
               run: chmod +x ./gradlew
+
+            - name: Debug signing props
+              working-directory: android
+              run: ./gradlew :app:properties | grep -i -E 'MYAPP_UPLOAD|signing'
+          
             - name: Gradle assembleRelease
               working-directory: android
               env:
