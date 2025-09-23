@@ -1,5 +1,16 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+// Explicit SDK / tools versions (override React Native plugin defaults) to avoid
+// requesting not-yet-published API level 35 on CI. Expo SDK 53 + RN 0.79 work with 34.
+ext {
+  compileSdkVersion = 34
+  targetSdkVersion = 34
+  minSdkVersion = 24
+  buildToolsVersion = "34.0.0"
+  // Keep NDK aligned with common RN/Expo requirements; adjust if Expo release notes change
+  ndkVersion = "26.1.10909125"
+}
+
 buildscript {
   repositories {
     google()
