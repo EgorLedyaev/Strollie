@@ -8,7 +8,12 @@ import {
 	View,
 } from 'react-native';
 
-import { geocodeAddress, PlacesAPIResult } from '@/shared/api';
+import {
+	fetchPlaceDetailsById,
+	PlacesAPIResult,
+	SuggestItem,
+	suggestPlaces,
+} from '@/shared/api';
 import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
 import { AppText, AppTextInput } from '@/shared/ui';
 
@@ -19,6 +24,10 @@ export interface SearchInputProps {
 	) => void;
 	style?: object | undefined; // Дополнительные стили для кастомизации
 }
+
+type UnifiedResult = (PlacesAPIResult | SuggestItem) & {
+	point?: { lon: number; lat: number };
+};
 
 export const SearchInput: React.FC<SearchInputProps> = ({
 	onSearchResultSelect,
@@ -39,28 +48,44 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 		}
 		setIsSearching(true);
 		setSearchError(null);
-		const data = await geocodeAddress(query);
-		if (data && data.result && data.result.items.length > 0) {
-			setSearchResults(data.result.items);
+		// NEW: use suggest API instead of direct geocode
+		const suggestions = await suggestPlaces(query, 10);
+		if (suggestions.length > 0) {
+			setSearchResults(suggestions as unknown as PlacesAPIResult[]);
 		} else {
 			setSearchResults([]);
-			if (data) setSearchError('Ничего не найдено');
-			else setSearchError('Ошибка поиска');
+			setSearchError('Ничего не найдено');
 		}
 		setIsSearching(false);
 	}, []);
 
-	const handleSelectResult = (item: PlacesAPIResult) => {
-		if (!item.point) {
-			console.warn('Выбранный результат не имеет координат:', item);
-			setSearchError('У выбранного места нет точных координат.');
-			setSearchResults([]);
-			return;
-		}
-		const coordinates: [number, number] = [item.point.lon, item.point.lat];
-		const addressText = item.full_name || item.name;
+	const handleSelectResult = async (item: UnifiedResult) => {
+		let point = item.point;
+		let addressText = item.full_name || item.name;
 
-		console.log('[RN Search] Выбрано место:', addressText, coordinates);
+		if (!point) {
+			// try fetch details by id via byid endpoint
+			const detailed = await fetchPlaceDetailsById(item.id);
+			if (detailed && detailed.point) {
+				point = detailed.point;
+				addressText = detailed.full_name || detailed.name;
+			} else {
+				console.warn(
+					'Нет координат после детализации suggest',
+					item.id,
+				);
+				setSearchError('Не удалось получить координаты места');
+				setSearchResults([]);
+				return;
+			}
+		}
+
+		const coordinates: [number, number] = [point.lon, point.lat];
+		console.log(
+			'[RN Search] Выбрано место (suggest):',
+			addressText,
+			coordinates,
+		);
 		onSearchResultSelect(coordinates, addressText);
 		setSearchQuery(addressText);
 		setSearchResults([]);
@@ -108,12 +133,12 @@ export const SearchInput: React.FC<SearchInputProps> = ({
 							<AppText style={styles.searchResultName}>
 								{item.name}
 							</AppText>
-							{item.address_name && (
+							{(item as UnifiedResult).address_name && (
 								<AppText
 									style={styles.searchResultDescription}
 									numberOfLines={1}
 								>
-									{item.address_name}
+									{(item as UnifiedResult).address_name}
 								</AppText>
 							)}
 						</TouchableOpacity>

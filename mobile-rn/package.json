@@ -20,7 +20,7 @@
     "typecheck": "tsc --noEmit",
     "fsd:check": "steiger ./src",
     "fsd:warn": "steiger ./src || true",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo/config-plugins": "~10.1.2",
