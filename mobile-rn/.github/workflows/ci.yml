@@ -153,6 +153,16 @@ jobs:
                   key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'android/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'package-lock.json') }}
                   restore-keys: |
                       gradle-${{ runner.os }}-
+            - name: Cache Android SDK
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      $HOME/Android/Sdk/platforms/android-34
+                      $HOME/Android/Sdk/build-tools/34.0.0
+                      $HOME/Android/Sdk/platform-tools
+                  key: android-sdk-${{ runner.os }}-34-${{ hashFiles('android/build.gradle') }}
+                  restore-keys: |
+                      android-sdk-${{ runner.os }}-34-
 
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
@@ -172,8 +182,6 @@ jobs:
             # Диагностика и форсированный ретраи установки нужных пакетов (обход редкого бага sdkmanager с неполным индексом)
             - name: Verify / Retry Android packages
               shell: bash
-              env:
-                  ANDROID_SDK_ROOT: ${{ env.ANDROID_HOME }}
               run: |
                   set -euo pipefail
                   echo "[diagnostic] sdkmanager path: $(command -v sdkmanager || true)"
