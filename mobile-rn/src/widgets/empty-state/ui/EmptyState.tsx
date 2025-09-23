@@ -35,12 +35,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 
 const styles = StyleSheet.create({
 	actionContainer: {
+		alignItems: 'center',
 		marginTop: Gaps.g48,
 		width: '100%',
 	},
 	content: {
 		alignItems: 'center',
+		width: '100%',
 		// flex: 1,
+		// justifyContent: 'center',
 		// justifyContent: 'flex-start',
 		// paddingHorizontal: Gaps.g24,
 		// paddingTop: 80,

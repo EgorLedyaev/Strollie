@@ -1,10 +1,12 @@
 import FilterIcon from '@/assets/icons/FilterIcon';
 import AddTicketIcon from '@/assets/icons/tickets/AddTicketIcon';
+import tickets_empty from '@/assets/images/tickets/tickets-empty.png';
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
 	ActivityIndicator,
+	Image,
 	Platform,
 	Pressable,
 	ScrollView,
@@ -13,7 +15,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { EmptyTicketsWidget } from '@/widgets/empty-tickets';
+import { EmptyState } from '@/widgets/empty-state';
+import { Header } from '@/widgets/header';
 import {
 	NewTicketItem,
 	Ticket,
@@ -21,8 +24,8 @@ import {
 	ticketsAtom,
 } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
-import { Colors, Fonts, Gaps, Radius, Sizes } from '@/shared/tokens';
-import { AppButton, AppText, BackButton } from '@/shared/ui';
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
+import { AppButton, AppText } from '@/shared/ui';
 
 type Filter = 'all' | 'transport' | 'entertainment';
 type FetchState = 'loading' | 'loaded' | 'error';
@@ -117,13 +120,36 @@ export const TicketsMainPage: React.FC = () => {
 	const isLoading = fetchState === 'loading';
 	const showEmpty = fetchState === 'loaded' && !tickets.length;
 
+	const imageNode = (
+		<View>
+			<Image
+				source={tickets_empty}
+				style={[styles.image, styles.imageRotated]}
+			/>
+			<Image source={tickets_empty} style={styles.image} />
+		</View>
+	);
+
+	const actionNode = (
+		<AppButton
+			onPress={() => router.push('/tickets/add')}
+			buttonBorderRadius={Radius.r16}
+			textFontSize={Fonts.f16}
+			textFontFamily={Fonts.medium}
+			style={styles.addButtonEmpty}
+		>
+			<View style={styles.addButtonContent}>
+				<AddTicketIcon />
+				<AppText variant='button' style={styles.addButtonText}>
+					Добавить билет
+				</AppText>
+			</View>
+		</AppButton>
+	);
+
 	return (
 		<SafeAreaView style={styles.root}>
-			<View style={styles.header}>
-				<BackButton variant='icon' onPress={() => router.back()} />
-				<AppText style={styles.headerTitle}>Мои билеты</AppText>
-				<View style={styles.headerRightStub} />
-			</View>
+			<Header title='Мои билеты' />
 
 			{isLoading ? (
 				<View style={styles.loadingWrap} testID='tickets-loading'>
@@ -140,13 +166,15 @@ export const TicketsMainPage: React.FC = () => {
 					</AppText>
 				</View>
 			) : showEmpty ? (
-				<EmptyTicketsWidget
-					title='Билетов пока нет'
-					subtitle='Здесь можно хранить свои билеты на различные мероприятия или рейсы'
-					variant='transport'
-					onAddPress={() => router.push('/tickets/add')}
-					testId='tickets-empty'
-				/>
+				<View style={styles.emptyContainer}>
+					<EmptyState
+						title='Билетов пока нет'
+						description='Здесь можно хранить свои билеты на различные мероприятия или рейсы'
+						image={imageNode}
+						action={actionNode}
+						testId='tickets-empty'
+					/>
+				</View>
 			) : (
 				<>
 					<ScrollView contentContainerStyle={styles.scrollContent}>
@@ -262,28 +290,34 @@ const styles = StyleSheet.create({
 	addButton: {
 		height: 52,
 		width: 215,
-		...Platform.select({
-			ios: {
-				shadowColor: 'rgba(169, 169, 169, 0.25)',
-				shadowOffset: { width: 2, height: 4 },
-				shadowOpacity: 1,
-				shadowRadius: 6,
-			},
-			android: {
-				elevation: 8,
-			},
-		}),
+		// ...Platform.select({
+		// 	ios: {
+		// 		shadowColor: 'rgba(169, 169, 169, 0.25)',
+		// 		shadowOffset: { width: 2, height: 4 },
+		// 		shadowOpacity: 1,
+		// 		shadowRadius: 6,
+		// 	},
+		// 	android: {
+		// 		elevation: 8,
+		// 	},
+		// }),
 	},
 	addButtonContent: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		gap: Gaps.g8,
 	},
+	addButtonEmpty: { height: 52, width: '100%' },
 	addButtonText: {
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
 	},
 	cardWrap: { marginBottom: 8 },
+	emptyContainer: {
+		flex: 1,
+		justifyContent: 'flex-start',
+		paddingTop: 80,
+	},
 	errorText: {
 		color: Colors.headerAndInputText,
 		fontFamily: Fonts.medium,
@@ -293,7 +327,7 @@ const styles = StyleSheet.create({
 	},
 	fabContainer: {
 		alignItems: 'center',
-		bottom: 30,
+		bottom: 58,
 		height: 56,
 		position: 'absolute',
 		right: 16,
@@ -351,19 +385,15 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f20,
 	},
-	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
+	image: {
+		alignSelf: 'center',
+		height: 265,
+		justifyContent: 'center',
+		marginBottom: Gaps.g20,
+		resizeMode: 'contain',
+		width: 265,
 	},
-	headerRightStub: {
-		height: Sizes.button.sm,
-		width: Sizes.button.sm,
-	},
-	headerTitle: {
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f16,
-	},
+	imageRotated: { position: 'absolute', transform: [{ rotate: '-15deg' }] },
 	list: {
 		gap: 16,
 		paddingHorizontal: 20,
@@ -385,6 +415,7 @@ const styles = StyleSheet.create({
 	section: {
 		gap: 16,
 	},
+
 	sectionHeader: {
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f18,

@@ -1,6 +1,5 @@
-import PlusIcon from '@/assets/icons/action/PlusIcon';
 import emptyImg from '@/assets/images/unmatched.png';
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
 	ActivityIndicator,
@@ -12,9 +11,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { tripsApi } from '@/pages/trips/api';
+import { Header } from '@/widgets/header';
 import { ticketApi } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppText, BackButton, IconButton } from '@/shared/ui';
+import { AppText, IconButton } from '@/shared/ui';
+import { AddButton } from '@/shared/ui/AddButton';
 
 interface TripVm {
 	id: string;
@@ -33,7 +34,6 @@ function formatDate(d: Date) {
 }
 
 export const TripListPage: React.FC = () => {
-	const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [trips, setTrips] = useState<TripVm[]>([]);
 
@@ -119,15 +119,14 @@ export const TripListPage: React.FC = () => {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.content}>
-				<View style={styles.headerRow}>
-					<BackButton onPress={() => router.back()} variant='icon' />
-					<AppText style={styles.title}>Мои поездки</AppText>
-					<Link href={'/trips/new'} asChild>
-						<IconButton feedback='opacity' opacity={0.6}>
-							<PlusIcon />
-						</IconButton>
-					</Link>
-				</View>
+				<Header
+					title='Мои поездки'
+					rightContent={
+						<Link href={'/trips/new'} asChild>
+							<AddButton />
+						</Link>
+					}
+				/>
 				{content}
 			</View>
 		</SafeAreaView>
@@ -159,19 +158,8 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f16,
 		marginBottom: 6,
 	},
-	headerRow: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: 16,
-	},
 	linkText: { color: Colors.placeholderGray, fontSize: Fonts.f14 },
-	listContent: { gap: 12, paddingBottom: 24 },
-	title: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f20,
-	},
+	listContent: { gap: 12, paddingBottom: 24, paddingTop: 24 },
 	tripCard: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,

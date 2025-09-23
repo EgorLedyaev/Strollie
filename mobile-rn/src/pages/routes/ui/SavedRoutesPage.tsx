@@ -1,20 +1,19 @@
 import no_favourites from '@/assets/images/routes/no-favourites.png';
-import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/widgets/empty-state';
+import { Header } from '@/widgets/header';
 import { ticketApi, ticketsAtom } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
-import { Colors, Fonts, Sizes } from '@/shared/tokens';
-import { AppText, BackButton } from '@/shared/ui';
+import { Colors, Fonts } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
 
 type FetchState = 'loading' | 'loaded' | 'error';
 
 export const SavedRoutesPage: React.FC = () => {
-	const router = useRouter();
 	const [tickets, setTickets] = useAtom(ticketsAtom);
 	// Управляем этапами загрузки чтобы избежать мерцания
 	const [fetchState, setFetchState] = useState<FetchState>(
@@ -59,11 +58,7 @@ export const SavedRoutesPage: React.FC = () => {
 
 	return (
 		<SafeAreaView style={styles.root}>
-			<View style={styles.header}>
-				<BackButton variant='icon' onPress={() => router.back()} />
-				<AppText style={styles.headerTitle}>Избранное</AppText>
-				<View style={styles.headerRightStub} />
-			</View>
+			<Header title='Избранное' />
 
 			{isLoading ? (
 				<View style={styles.loadingWrap} testID='favourites-loading'>
@@ -115,19 +110,6 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f16,
 		marginBottom: 16,
 		textAlign: 'center',
-	},
-	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-	},
-	headerRightStub: {
-		height: Sizes.button.sm,
-		width: Sizes.button.sm,
-	},
-	headerTitle: {
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f16,
 	},
 	loadingWrap: {
 		alignItems: 'center',

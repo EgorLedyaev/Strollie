@@ -12,11 +12,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-	FilePickerSheet,
-	FilePickerSheetRef,
-} from '@/features/file-picker/ui/FilePickerSheet';
-import { ImagePreviewMenu } from '@/features/ImagePreviewMenu';
+import { Header } from '@/widgets/header';
 import { takePhoto } from '@/features/profile/lib/take-photo';
 import {
 	newTicketCategoryAtom,
@@ -30,13 +26,10 @@ import {
 } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
-import {
-	AppButton,
-	AppText,
-	AppTextInput,
-	BackButton,
-	DateInput,
-} from '@/shared/ui';
+import { AppButton, AppText, AppTextInput, DateInput } from '@/shared/ui';
+
+import { FilePickerSheet, FilePickerSheetRef } from './FilePickerSheet';
+import { ImagePreviewMenu } from './ImagePreviewMenu';
 
 export const TicketAddPage: React.FC = () => {
 	const router = useRouter();
@@ -228,14 +221,7 @@ export const TicketAddPage: React.FC = () => {
 		<GestureHandlerRootView style={styles.container}>
 			<BottomSheetModalProvider>
 				<SafeAreaView style={styles.root}>
-					<View style={styles.header}>
-						<BackButton
-							variant='icon'
-							onPress={() => router.back()}
-						/>
-						<AppText style={styles.headerTitle}>Мои билеты</AppText>
-						<View style={styles.headerRightStub} />
-					</View>
+					<Header title='Мои билеты' />
 
 					<View style={styles.content}>
 						<View style={styles.formCard}>
@@ -461,18 +447,6 @@ const styles = StyleSheet.create({
 		marginTop: 28,
 		paddingHorizontal: 16,
 		paddingVertical: 32,
-	},
-	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: 16,
-	},
-	headerRightStub: { height: 32, width: 32 },
-	headerTitle: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f16,
 	},
 	// previewBox: { gap: 8, maxWidth: 140 },
 	input: {
