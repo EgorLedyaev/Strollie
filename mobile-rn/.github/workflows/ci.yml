@@ -167,54 +167,12 @@ jobs:
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
               with:
-                   packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
+                   packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
             - name: Accept Android licenses (explicit)
               shell: bash
               run: |
                   yes | sdkmanager --licenses >/dev/null || true
-
-            # Диагностика и форсированный ретраи установки нужных пакетов (обход редкого бага sdkmanager с неполным индексом)
-            - name: Verify / Retry Android packages
-              shell: bash
-              run: |
-                  set -euo pipefail
-                  echo "[diagnostic] sdkmanager path: $(command -v sdkmanager || true)"
-                  echo "[diagnostic] Listing currently installed packages (before):"
-                  sdkmanager --list_installed || true
-                  REQUIRED_PKGS=("platform-tools" "platforms;android-34" "build-tools;34.0.0")
-                  MISSING=()
-                  for p in "${REQUIRED_PKGS[@]}"; do
-                    if ! sdkmanager --list_installed | grep -q "^${p}"; then
-                      MISSING+=("$p")
-                    fi
-                  done
-                  if [ ${#MISSING[@]} -eq 0 ]; then
-                    echo "All required Android SDK packages already present."
-                    exit 0
-                  fi
-                  echo "Missing packages: ${MISSING[*]}"
-                  # Ретраи на случай flaky сети/индекса
-                  for attempt in 1 2 3; do
-                    echo "Attempt $attempt to install missing packages..."
-                    yes | sdkmanager --install "${MISSING[@]}" && break || true
-                    sleep 15
-                  done
-                  # Финальная проверка
-                  NOT_FOUND=()
-                  for p in "${MISSING[@]}"; do
-                    if ! sdkmanager --list_installed | grep -q "^${p}"; then
-                      NOT_FOUND+=("$p")
-                    fi
-                  done
-                  if [ ${#NOT_FOUND[@]} -gt 0 ]; then
-                    echo "::error::Failed to install Android SDK packages: ${NOT_FOUND[*]}" >&2
-                    echo "Available packages snapshot (grep 34 / build-tools):" >&2
-                    sdkmanager --list | grep -E 'platforms;android-34|build-tools;34' || true
-                    exit 1
-                  fi
-                  echo "[diagnostic] Installed packages after retry:" 
-                  sdkmanager --list_installed | grep -E 'platform-tools|platforms;android-34|build-tools;34.0.0'
 
             - name: Restore release keystore
               run: |
