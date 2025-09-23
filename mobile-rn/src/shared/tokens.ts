@@ -59,7 +59,7 @@ export const Colors = {
 
 	// Другие цвета
 	red: '#FF5858',
-	error: '#FF5857', // for test
+	error: '#FF5858', // for test
 
 	transparent: 'transparent',
 

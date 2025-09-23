@@ -167,12 +167,7 @@ jobs:
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
               with:
-                  # Use API 34 matching explicit ext.compileSdkVersion to avoid failing on not-yet-published 35
-                  packages: |
-                      platform-tools
-                      platforms;android-34
-                      build-tools;34.0.0
-                  # Не пинним cmdline-tools-version чтобы получить актуальный индекс репозитория и избежать ошибки 'Failed to find package'
+                   packages: 'platform-tools platforms;android-34 build-tools;34.0.0'
 
             - name: Accept Android licenses (explicit)
               shell: bash
