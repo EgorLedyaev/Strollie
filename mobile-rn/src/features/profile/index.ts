@@ -1,4 +1,5 @@
 // Публичный API слайса profile
+import { takePhoto } from './lib/take-photo';
 import { useLogout } from './model/use-logout';
 import { useEditProfile } from './model/useEditProfile';
 import { AvatarUploader } from './ui/AvatarUploader';
@@ -14,6 +15,7 @@ export {
 	ProfileHeader,
 	ProfileMenuOverlay,
 	AvatarUploader,
+	takePhoto,
 
 	// Hooks
 	useEditProfile,

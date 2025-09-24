@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Network Security Config: scoped cleartext exception.
+     Keep as narrow as possible and REMOVE after migrating to HTTPS.
+     Allowed host: 91.108.246.148 (WebView fallback from webview.ts)
+-->
 <network-security-config>
-    <base-config cleartextTrafficPermitted="false"/>
+    <!-- Default: disallow cleartext globally -->
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- Explicitly allow ONLY the production fallback IP -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="false">91.108.246.148</domain>
-
-        <domain includeSubdomains="true">10.0.2.2</domain> <!-- Для эмулятора Android Studio -->
-        <domain includeSubdomains="true">localhost</domain> <!-- Для проброса портов и других случаев -->
-        <domain includeSubdomains="true">192.168.1.36</domain>
-
     </domain-config>
 </network-security-config>

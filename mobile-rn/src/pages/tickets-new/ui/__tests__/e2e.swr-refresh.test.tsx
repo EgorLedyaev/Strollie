@@ -2,8 +2,9 @@ import { render, waitFor } from '@testing-library/react-native';
 import { createStore, Provider as JotaiProvider } from 'jotai';
 import React from 'react';
 
-import { TicketsMainPage } from '@/pages/tickets-new/ui/TicketsMainPage';
 import * as ticketModule from '@/entities/ticket';
+
+import { TicketsMainPage } from '../TicketsMainPage';
 
 // Мокаем router
 jest.mock('expo-router', () => ({

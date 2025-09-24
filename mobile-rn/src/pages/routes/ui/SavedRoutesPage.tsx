@@ -5,8 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
-import { useTicketsSWR } from '@/entities/ticket';
-import { TicketsErrorState } from '@/entities/ticket/ui/TicketsErrorState';
+import { TicketsErrorState, useTicketsSWR } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors } from '@/shared/tokens';
 

@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Header } from '@/widgets/header';
-import { takePhoto } from '@/features/profile/lib/take-photo';
+import { takePhoto } from '@/features/profile';
 import {
 	newTicketCategoryAtom,
 	newTicketDateAtom,

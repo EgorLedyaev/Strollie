@@ -10,8 +10,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ShowTicketQrDialog } from '@/features/show-ticket-qr';
 import { TicketDetailsDialog } from '@/features/ticket-details';
-import { TicketCard, useTicketsSWR, type Ticket } from '@/entities/ticket';
-import { TicketsErrorState } from '@/entities/ticket/ui/TicketsErrorState';
+import {
+	TicketCard,
+	TicketsErrorState,
+	useTicketsSWR,
+	type Ticket,
+} from '@/entities/ticket';
 import { Colors, Sizes } from '@/shared/tokens';
 import { AppText, BackButton } from '@/shared/ui';
 
