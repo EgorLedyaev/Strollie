@@ -109,6 +109,12 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
+            - name: Inject .env
+              # Генерируем .env файл с публичным ключом 2GIS (должен быть добавлен в Secrets как EXPO_PUBLIC_2GIS_API_KEY)
+              # Если секрета нет – шаг создаст пустой файл, а приложение упадёт при запуске (осознанно)
+              run: |
+                  echo "EXPO_PUBLIC_2GIS_API_KEY=${{ secrets.EXPO_PUBLIC_2GIS_API_KEY }}" >> .env
+
             - name: Setup Node
               uses: actions/setup-node@v4
               with:
@@ -150,18 +156,17 @@ jobs:
               uses: actions/cache@v4
               with:
                   path: |
-                      $HOME/Android/Sdk/platforms/android-34
-                      $HOME/Android/Sdk/build-tools/34.0.0
-                      $HOME/Android/Sdk/platform-tools
-                  key: android-sdk-${{ runner.os }}-34-${{ hashFiles('android/build.gradle') }}
+                      /usr/local/lib/android/sdk/platforms
+                      /usr/local/lib/android/sdk/build-tools
+                      /usr/local/lib/android/sdk/platform-tools
+                  key: android-sdk-${{ runner.os }}-${{ hashFiles('android/app/build.gradle.kts') }}
                   restore-keys: |
-                      android-sdk-${{ runner.os }}-34-
+                      android-sdk-${{ runner.os }}-
 
             - name: Setup Android SDK
               uses: android-actions/setup-android@v3
               with:
-                   packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
-
+                  packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
             - name: Restore release keystore
               run: |
