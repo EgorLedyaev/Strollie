@@ -98,9 +98,11 @@ jobs:
     android-build:
         name: Android Build (release APK)
         needs: [build-and-validate, changes]
-        # Запускаем сборку если изменились нативные файлы (android), публичные конфиги (native_impact) или прикладной код (app_code)
-        if: ${{ needs.changes.outputs.android == 'true' || needs.changes.outputs.native_impact == 'true' || needs.changes.outputs.app_code == 'true' }}
+        # Запускаем сборку ТОЛЬКО на master + если есть изменения в коде/нативке
+        if: ${{ github.ref == 'refs/heads/master' && (needs.changes.outputs.android == 'true' || needs.changes.outputs.native_impact == 'true' || needs.changes.outputs.app_code == 'true') }}
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         env:
             EXPO_PUBLIC_WEBVIEW_URL: 'http://91.108.246.148'
         steps:
@@ -144,15 +146,6 @@ jobs:
               uses: gradle/actions/setup-gradle@v4
               with:
                   cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-            - name: Cache Gradle (wrapper + caches)
-              uses: actions/cache@v4
-              with:
-                  path: |
-                      ~/.gradle/caches
-                      ~/.gradle/wrapper
-                  key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', 'android/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'package-lock.json') }}
-                  restore-keys: |
-                      gradle-${{ runner.os }}-
             - name: Cache Android SDK
               uses: actions/cache@v4
               with:
@@ -169,10 +162,6 @@ jobs:
               with:
                    packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
-            - name: Accept Android licenses (explicit)
-              shell: bash
-              run: |
-                  yes | sdkmanager --licenses >/dev/null || true
 
             - name: Restore release keystore
               run: |
@@ -183,23 +172,23 @@ jobs:
               working-directory: android
               run: chmod +x ./gradlew
 
-            - name: Signing report (diagnostic)
-              working-directory: android
-              env:
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-              run: ./gradlew :app:signingReport --quiet || true
+            # - name: Signing report (diagnostic)
+            #   working-directory: android
+            #   env:
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+            #   run: ./gradlew :app:signingReport --quiet || true
 
-            - name: Debug signing props
-              working-directory: android
-              env:
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-                  ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-              run: ./gradlew :app:properties | grep -i -E 'MYAPP_UPLOAD|signing'
+            # - name: Debug signing props
+            #   working-directory: android
+            #   env:
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+            #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+            #   run: ./gradlew :app:properties | grep -i -E 'MYAPP_UPLOAD|signing'
 
             - name: Gradle assembleRelease
               working-directory: android
@@ -218,6 +207,18 @@ jobs:
                   name: app-release-apk
                   path: android/app/build/outputs/apk/release/*.apk
                   if-no-files-found: error
+
+            - name: Create GitHub Pre-release
+              if: success()
+              uses: softprops/action-gh-release@v2
+              with:
+                  files: android/app/build/outputs/apk/release/*.apk
+                  name: 'Pre-release Build #${{ github.run_number }} (${{ github.ref_name }})'
+                  tag_name: build-${{ github.ref_name }}-${{ github.run_number }}
+                  prerelease: true
+                  body: |
+                      Автоматическая сборка APK для тестирования.
+                      Коммит: ${{ github.sha }}
 
             # Optional: also build debug variant (uncomment if needed)
             # - name: Gradle assembleDebug
