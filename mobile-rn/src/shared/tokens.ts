@@ -60,6 +60,8 @@ export const Colors = {
 	// Другие цвета
 	red: '#FF5858',
 	error: '#FF5858', // for test
+	likeActive: '#F24257', // Цвет активной лайкнутой иконки
+	likeInactive: '#CBCBCB', // Цвет неактивной лайкнутой иконки
 
 	transparent: 'transparent',
 
@@ -88,8 +90,10 @@ export const Radius = {
 	r4: 4,
 	r5: 5,
 	r2: 2,
+	r7: 7,
 	r8: 8,
 	r10: 10,
+	r12: 12,
 	r15: 15,
 	r16: 16,
 	r20: 20,

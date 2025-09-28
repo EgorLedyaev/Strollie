@@ -12,6 +12,8 @@ export { ErrorNotification } from './ErrorNotification';
 export { Input } from './Input';
 export { MapStatusIndicator } from './MapStatusIndicator';
 export { AppText, AppTextInput } from './Text';
+export { PaginationDots } from './PaginationDots';
+export { LikeButton } from './LikeButton';
 
 // Новые компоненты для FSD
 export { Avatar } from './Avatar';

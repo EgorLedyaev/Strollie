@@ -151,7 +151,10 @@ export const TicketsMainPage: React.FC = () => {
 				</View>
 			) : (
 				<>
-					<ScrollView contentContainerStyle={styles.scrollContent}>
+					<ScrollView
+						contentContainerStyle={styles.scrollContent}
+						showsVerticalScrollIndicator={false}
+					>
 						<View style={styles.filtersRow}>
 							<Pressable style={styles.filterIconBtn}>
 								<FilterIcon />
@@ -350,8 +353,8 @@ const styles = StyleSheet.create({
 	},
 	futureHeader: {
 		color: Colors.secondaryText,
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f20,
+		// fontFamily: Fonts.bold,
+		// fontSize: Fonts.f20,
 	},
 	image: {
 		alignSelf: 'center',
@@ -385,8 +388,8 @@ const styles = StyleSheet.create({
 	},
 
 	sectionHeader: {
-		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f18,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
 	},
 	todayHeader: {
 		color: Colors.greenPrimary,
