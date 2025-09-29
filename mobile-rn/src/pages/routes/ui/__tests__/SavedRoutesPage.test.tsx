@@ -67,7 +67,7 @@ describe('SavedRoutesPage', () => {
 					testID={`toggle-favorite-route-${route.id}`}
 					onPress={() => onToggleFavorite(route.id)}
 				>
-					<Text>{route.title}</Text>
+					<AppText>{route.title}</AppText>
 				</Pressable>
 			</View>
 		));
@@ -78,7 +78,7 @@ describe('SavedRoutesPage', () => {
 					testID={`toggle-favorite-place-${place.id}`}
 					onPress={() => onToggleFavorite(place.id)}
 				>
-					<Text>{place.title}</Text>
+					<AppText>{place.title}</AppText>
 				</Pressable>
 			</View>
 		));
