@@ -5,7 +5,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
 	ActivityIndicator,
 	Image,
-	Platform,
 	Pressable,
 	ScrollView,
 	StyleSheet,
@@ -15,15 +14,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
-import { PlaceCard } from '@/features/place-card';
-import { RouteCard } from '@/features/route-card';
-import { Place, usePlacesSWR } from '@/entities/place';
-import { favoritePlaceIdsAtom } from '@/entities/place/model/place.state';
-import { Route, RoutesErrorState, useRoutesSWR } from '@/entities/route';
-import { favoriteRouteIdsAtom } from '@/entities/route/model/route.state';
+import { favoritePlaceIdsAtom, Place, usePlacesSWR } from '@/entities/place';
+import {
+	favoriteRouteIdsAtom,
+	Route,
+	RoutesErrorState,
+	useRoutesSWR,
+} from '@/entities/route';
 import { bindLogger } from '@/shared/lib/logger';
-import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
+
+import { PlaceCard } from './place-card/PlaceCard';
+import { RouteCard } from './route-card/RouteCard';
 
 type Filter = 'all' | 'routes' | 'places';
 
@@ -59,12 +62,19 @@ export const SavedRoutesPage: React.FC = () => {
 	const [filter, setFilter] = useState<Filter>('all');
 
 	const favourites = useMemo<FavoriteItem[]>(() => {
-		const favoriteRoutes = routes.filter(r =>
-			favoriteRouteIds.includes(r.id),
-		);
-		const favoritePlaces = places.filter(p =>
-			favoritePlaceIds.includes(p.id),
-		);
+		// const favoriteRoutes = routes.filter(r =>
+		// 	favoriteRouteIds.includes(r.id),
+		// );
+		// const favoritePlaces = places.filter(p =>
+		// 	favoritePlaceIds.includes(p.id),
+		// );
+		const favoriteRoutes = routes
+			.filter(r => favoriteRouteIds.includes(r.id))
+			.map(r => ({ ...r, isFavorite: true }));
+
+		const favoritePlaces = places
+			.filter(p => favoritePlaceIds.includes(p.id))
+			.map(p => ({ ...p, isFavorite: true }));
 
 		return [...favoriteRoutes, ...favoritePlaces].sort((a, b) =>
 			a.title.localeCompare(b.title),
@@ -152,7 +162,11 @@ export const SavedRoutesPage: React.FC = () => {
 								styles.filterBtn,
 								filter === 'places' && styles.filterBtnActive,
 							]}
-							onPress={() => setFilter('places')}
+							onPress={() =>
+								setFilter(
+									filter === 'places' ? 'all' : 'places',
+								)
+							}
 						>
 							<AppText
 								style={[
@@ -169,7 +183,11 @@ export const SavedRoutesPage: React.FC = () => {
 								styles.filterBtn,
 								filter === 'routes' && styles.filterBtnActive,
 							]}
-							onPress={() => setFilter('routes')}
+							onPress={() =>
+								setFilter(
+									filter === 'routes' ? 'all' : 'routes',
+								)
+							}
 						>
 							<AppText
 								style={[
@@ -182,7 +200,10 @@ export const SavedRoutesPage: React.FC = () => {
 							</AppText>
 						</Pressable>
 					</View>
-					<ScrollView>
+					<ScrollView
+						contentContainerStyle={styles.scrollContent}
+						showsVerticalScrollIndicator={false}
+					>
 						{sections.map(item => {
 							if (isRoute(item)) {
 								return (
@@ -222,7 +243,9 @@ const styles = StyleSheet.create({
 	},
 	filterBtn: {
 		backgroundColor: Colors.white,
+		borderColor: Colors.transparent,
 		borderRadius: Radius.r8,
+		borderWidth: 1,
 		height: 32,
 		justifyContent: 'center',
 		paddingHorizontal: 16,
@@ -230,17 +253,7 @@ const styles = StyleSheet.create({
 	filterBtnActive: {
 		borderColor: Colors.greenPrimary,
 		borderWidth: 1,
-		...Platform.select({
-			ios: {
-				shadowColor: Colors.successGreen,
-				shadowOffset: { width: 2, height: 4 },
-				shadowOpacity: 1,
-				shadowRadius: 6,
-			},
-			android: {
-				elevation: 5,
-			},
-		}),
+		boxShadow: Shadows.filterButtonShadow,
 	},
 	filterIconBtn: {
 		alignItems: 'center',
@@ -279,6 +292,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		padding: 16,
 	},
+	scrollContent: { gap: 16 },
 });
 
 export default SavedRoutesPage;

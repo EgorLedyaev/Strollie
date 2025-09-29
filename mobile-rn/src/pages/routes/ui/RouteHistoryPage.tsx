@@ -12,15 +12,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
-import { RouteCard } from '@/features/route-card';
-import { Route, RoutesErrorState, useRoutesSWR } from '@/entities/route';
-import { favoriteRouteIdsAtom } from '@/entities/route/model/route.state';
+import {
+	favoriteRouteIdsAtom,
+	Route,
+	RoutesErrorState,
+	useRoutesSWR,
+} from '@/entities/route';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
+import { RouteCard } from './route-card/RouteCard';
+
 export const RouteHistoryPage: React.FC = () => {
-	// const { routes, isHydrated: hydrated, isLoading, error } = useRoutesSWR();
 	const { routes, isHydrated, isLoading, error } = useRoutesSWR();
 
 	// Feature scoped logger
@@ -34,12 +38,26 @@ export const RouteHistoryPage: React.FC = () => {
 	// const showEmpty = hydrated && !isLoading; // всегда показываем EmptyState
 	const showEmpty = isHydrated && !isLoading && routes.length === 0;
 
+	const [favoriteRouteIds, setFavoriteRouteIds] =
+		useAtom(favoriteRouteIdsAtom);
+
+	const routesWithFavorites = useMemo(() => {
+		return routes.map(route => ({
+			...route,
+			isFavorite: favoriteRouteIds.includes(route.id),
+		}));
+	}, [routes, favoriteRouteIds]);
+
 	const sections = useMemo(() => {
 		const startOfToday = new Date();
 		startOfToday.setHours(0, 0, 0, 0);
 
-		const today = routes.filter(r => new Date(r.date) >= startOfToday);
-		const previous = routes.filter(r => new Date(r.date) < startOfToday);
+		const today = routesWithFavorites.filter(
+			r => new Date(r.date) >= startOfToday,
+		);
+		const previous = routesWithFavorites.filter(
+			r => new Date(r.date) < startOfToday,
+		);
 
 		const byDesc = (a: Route, b: Route) =>
 			+new Date(b.date) - +new Date(a.date);
@@ -55,18 +73,28 @@ export const RouteHistoryPage: React.FC = () => {
 			});
 		}
 		return result;
-	}, [routes]);
+	}, [routesWithFavorites]);
 
-	const [favoriteRouteIds, setFavoriteRouteIds] =
-		useAtom(favoriteRouteIdsAtom);
+	// const routesWithFavorites = useMemo(() => {
+	// 	return routes.map(route => ({
+	// 		...route,
+	// 		isFavorite: favoriteRouteIds.includes(route.id),
+	// 	}));
+	// }, [routes, favoriteRouteIds]);
 
-	const routesWithFavorites = useMemo(() => {
-		return routes.map(route => ({
-			...route,
-			isFavorite: favoriteRouteIds.includes(route.id),
-		}));
-	}, [routes, favoriteRouteIds]);
-
+	// const toggleFavorite = useCallback(
+	// 	(routeId: string) => {
+	// 		setFavoriteRouteIds(prevIds => {
+	// 			const isFavorite = prevIds.includes(routeId);
+	// 			if (isFavorite) {
+	// 				return prevIds.filter(id => id !== routeId);
+	// 			} else {
+	// 				return [...prevIds, routeId];
+	// 			}
+	// 		});
+	// 	},
+	// 	[routesWithFavorites],
+	// );
 	const toggleFavorite = useCallback(
 		(routeId: string) => {
 			setFavoriteRouteIds(prevIds => {
@@ -78,7 +106,7 @@ export const RouteHistoryPage: React.FC = () => {
 				}
 			});
 		},
-		[routesWithFavorites],
+		[setFavoriteRouteIds],
 	);
 
 	return (

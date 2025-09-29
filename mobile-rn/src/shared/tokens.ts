@@ -122,6 +122,8 @@ export const Shadows = {
 	boxShadow_elev2: '0px 1px 3px rgba(0,0,0,0.2)',
 	boxShadow_elev1:
 		'0 2px 4px rgba(0, 0, 0, 0.01), 0 1px 2px rgba(0, 0, 0, 0.03)',
+	filterButtonShadow:
+		'-2px -4px 6px 0 rgba(69, 205, 134, 0.15), 2px 4px 6px 0 rgba(69, 205, 134, 0.15)',
 };
 
 export const Sizes = {

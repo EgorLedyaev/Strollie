@@ -6,7 +6,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import {
 	ActivityIndicator,
 	Image,
-	Platform,
 	Pressable,
 	ScrollView,
 	StyleSheet,
@@ -23,7 +22,7 @@ import {
 	useTicketsSWR,
 } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
-import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
+import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 
 type Filter = 'all' | 'transport' | 'entertainment';
@@ -267,17 +266,6 @@ const styles = StyleSheet.create({
 	addButton: {
 		height: 52,
 		width: 215,
-		// ...Platform.select({
-		// 	ios: {
-		// 		shadowColor: 'rgba(169, 169, 169, 0.25)',
-		// 		shadowOffset: { width: 2, height: 4 },
-		// 		shadowOpacity: 1,
-		// 		shadowRadius: 6,
-		// 	},
-		// 	android: {
-		// 		elevation: 8,
-		// 	},
-		// }),
 	},
 	addButtonContent: {
 		alignItems: 'center',
@@ -305,7 +293,9 @@ const styles = StyleSheet.create({
 	},
 	filterBtn: {
 		backgroundColor: Colors.white,
+		borderColor: Colors.transparent,
 		borderRadius: Radius.r8,
+		borderWidth: 1,
 		height: 32,
 		justifyContent: 'center',
 		paddingHorizontal: 16,
@@ -313,17 +303,7 @@ const styles = StyleSheet.create({
 	filterBtnActive: {
 		borderColor: Colors.greenPrimary,
 		borderWidth: 1,
-		...Platform.select({
-			ios: {
-				shadowColor: Colors.successGreen,
-				shadowOffset: { width: 2, height: 4 },
-				shadowOpacity: 1,
-				shadowRadius: 6,
-			},
-			android: {
-				elevation: 5,
-			},
-		}),
+		boxShadow: Shadows.filterButtonShadow,
 	},
 	filterIconBtn: {
 		alignItems: 'center',
