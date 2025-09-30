@@ -1,5 +1,3 @@
-// src/features/trips/hooks/useTripsSWR.ts
-
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -13,7 +11,6 @@ import {
 	tripsHydratedAtom,
 } from './trip.state';
 
-// Интерфейсы опций и результата полностью аналогичны
 interface UseTripsSWROptions {
 	ttlMs?: number;
 	force?: boolean;
@@ -41,12 +38,10 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 	const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const runningRef = useRef(false); // Защита от гонок состояний
 
-	// 1. Первичная гидратация
 	useEffect(() => {
 		hydrate();
 	}, [hydrate]);
 
-	// 2. Функция слияния данных
 	const mergeApply = useCallback(
 		(incoming: Trip[]) => {
 			setTrips(prev => mergeTripLists(prev, incoming));
@@ -54,7 +49,6 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 		[setTrips],
 	);
 
-	// 3. Логика для блокирующего запроса (пустой кэш или force)
 	const doBlockingFetch = useCallback(async () => {
 		if (runningRef.current) return;
 		runningRef.current = true;
@@ -71,7 +65,6 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 		}
 	}, [force, ttlMs, mergeApply]);
 
-	// 4. Логика для SWR-запроса (кэш есть, обновляем в фоне)
 	const doSWRFetch = useCallback(async () => {
 		if (runningRef.current) return;
 		if (!hydrated || trips.length === 0 || force) {
@@ -96,13 +89,11 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 		}
 	}, [hydrated, trips.length, force, ttlMs, mergeApply, doBlockingFetch]);
 
-	// 5. Триггер первичной загрузки после гидратации
 	useEffect(() => {
 		if (!hydrated || runningRef.current) return;
 		void doSWRFetch();
 	}, [hydrated, doSWRFetch]);
 
-	// 6. Управление интервальным обновлением
 	useEffect(() => {
 		if (!refreshIntervalMs || !hydrated) return;
 
@@ -116,7 +107,6 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 		};
 	}, [refreshIntervalMs, hydrated, doSWRFetch]);
 
-	// 7. Публичный метод для ручного обновления
 	const forceRefresh = useCallback(async () => {
 		await doBlockingFetch();
 	}, [doBlockingFetch]);
