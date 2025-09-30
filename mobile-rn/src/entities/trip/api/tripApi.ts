@@ -1,9 +1,10 @@
-import type { Trip, TripChecklistItem } from '../model/trip.model';
+import type { Trip, TripChecklistItem } from '../model';
 
-const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+// const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+export const DEFAULT_TTL_MS = 5 * 60 * 1000; // 5 минут
 
 // In-memory dataset (can be swapped with real backend service)
-const trips: Trip[] = [
+const MOCK_TRIPS: Trip[] = [
 	{
 		id: 'trip_mock_future',
 		title: 'Летняя поездка',
@@ -30,23 +31,54 @@ export interface CreateTripInput {
 	title?: string;
 }
 
-export const tripApi = {
-	async createTrip(data: CreateTripInput): Promise<Trip> {
-		await sleep(400);
-		const now = new Date().toISOString();
-		const trip: Trip = {
-			id: `trip_${Math.random().toString(36).slice(2, 10)}`,
-			createdAt: now,
-			updatedAt: now,
-			...data,
-		};
-		trips.push(trip);
-		return trip;
-	},
-	async listTrips(): Promise<Trip[]> {
-		await sleep(200);
-		return [...trips];
-	},
+// export const tripApi = {
+// 	async createTrip(data: CreateTripInput): Promise<Trip> {
+// 		await sleep(400);
+// 		const now = new Date().toISOString();
+// 		const trip: Trip = {
+// 			id: `trip_${Math.random().toString(36).slice(2, 10)}`,
+// 			createdAt: now,
+// 			updatedAt: now,
+// 			...data,
+// 		};
+// 		trips.push(trip);
+// 		return trip;
+// 	},
+// 	async listTrips(): Promise<Trip[]> {
+// 		await sleep(200);
+// 		return [...trips];
+// 	},
+// };
+
+// export type { Trip };
+const getMyTripsSWR = async (opts: {
+	ttlMs: number;
+	onUpdate: (fresh: Trip[]) => void;
+}): Promise<void> => {
+	// Имитация задержки сети
+	await new Promise(resolve => setTimeout(resolve, 1500));
+	const freshData = [
+		...MOCK_TRIPS,
+		{
+			...MOCK_TRIPS[0],
+			id: `trip-new-${Date.now()}`,
+			title: 'Новая поездка!',
+		},
+	];
+	opts.onUpdate(freshData);
 };
 
-export type { Trip };
+// Имитация блокирующего запроса
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const getMyTrips = async (_opts: {
+	force?: boolean;
+	ttlMs: number;
+}): Promise<Trip[]> => {
+	await new Promise(resolve => setTimeout(resolve, 1200));
+	return MOCK_TRIPS;
+};
+
+export const tripApi = {
+	getMyTrips,
+	getMyTripsSWR,
+};

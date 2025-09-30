@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
 		color: Colors.secondaryText,
 		// marginBottom: Gaps.g48,
 		textAlign: 'center',
-		width: 320,
+		width: 335,
 	},
 	title: {
 		color: Colors.headerAndInputText,

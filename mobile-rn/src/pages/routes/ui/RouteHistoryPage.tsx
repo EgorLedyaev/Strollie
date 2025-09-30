@@ -28,7 +28,7 @@ export const RouteHistoryPage: React.FC = () => {
 	const { routes, isHydrated, isLoading, error } = useRoutesSWR();
 
 	// Feature scoped logger
-	const log = useMemo(() => bindLogger('tickets'), []);
+	const log = useMemo(() => bindLogger('history'), []);
 
 	// Mount log (один раз при инициализации экрана)
 	useEffect(() => {
