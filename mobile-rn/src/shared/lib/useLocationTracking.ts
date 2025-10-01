@@ -1,6 +1,8 @@
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
 
+import { updateLastKnownUser } from './map-bootstrap';
+
 type LocationCoords = Location.LocationObjectCoords;
 
 export function useLocationTracking(isEnabled: boolean = true) {
@@ -40,6 +42,10 @@ export function useLocationTracking(isEnabled: boolean = true) {
 					if (isMounted) {
 						setLocation(currentLocation.coords);
 						setLocationError(null); // Сбрасываем ошибку при успехе
+						void updateLastKnownUser([
+							currentLocation.coords.longitude,
+							currentLocation.coords.latitude,
+						]);
 					}
 				} catch (e) {
 					console.error('Error getting initial location', e);
@@ -62,6 +68,10 @@ export function useLocationTracking(isEnabled: boolean = true) {
 							// console.log('Location update:', newLocation.coords); // Для отладки
 							setLocation(newLocation.coords);
 							setLocationError(null); // Сбрасываем ошибку при успехе
+							void updateLastKnownUser([
+								newLocation.coords.longitude,
+								newLocation.coords.latitude,
+							]);
 						}
 					},
 				);

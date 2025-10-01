@@ -89,6 +89,9 @@ function MapPageContent() {
 		toggleMapMode,
 		cycleFollowMode,
 		handleSearchResultSelect,
+		onWebViewLoadStart,
+		onWebViewLoadEnd,
+		bootstrapScript,
 		// Новый стабильный флаг для UI
 		uiIs3DMode,
 		uiFollowMode,
@@ -109,7 +112,13 @@ function MapPageContent() {
 	return (
 		<>
 			<SystemBars style='dark' />
-			<MapWidget ref={webViewRef} onMessage={handleWebViewMessage} />
+			<MapWidget
+				ref={webViewRef}
+				onMessage={handleWebViewMessage}
+				onLoadStart={onWebViewLoadStart}
+				onLoadEnd={onWebViewLoadEnd}
+				injectedBootstrapScript={bootstrapScript}
+			/>
 			<MapControls
 				onZoomIn={handleZoomIn}
 				onZoomOut={handleZoomOut}

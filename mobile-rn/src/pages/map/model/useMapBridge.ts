@@ -4,7 +4,15 @@ import { Alert } from 'react-native';
 import WebView from 'react-native-webview';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useLocationTracking } from '@/shared/lib';
+import {
+	buildBootstrapPayload,
+	createBootstrapScript,
+	ensureApiKeyPersisted,
+	loadPersistedLocation,
+	MapBootstrapPayload,
+	updateShouldCenterOnUser,
+	useLocationTracking,
+} from '@/shared/lib';
 
 import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from './map-store';
 import { placedMarkersAtom } from './marker-store';
@@ -26,6 +34,13 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 	const [is3DMode, setIs3DMode] = useAtom(is3DModeAtom);
 	const setMapError = useSetAtom(mapErrorAtom);
 	const [placedMarkers, setPlacedMarkers] = useAtom(placedMarkersAtom);
+	const [isWebViewLoaded, setIsWebViewLoaded] = useState(false);
+	const [bootstrapScript, setBootstrapScript] = useState<
+		string | undefined
+	>();
+	const [isBootstrapReady, setIsBootstrapReady] = useState(false);
+	const bootstrapPayloadRef = useRef<MapBootstrapPayload | null>(null);
+	const hasSentBootstrapRef = useRef(false);
 
 	const { location } = useLocationTracking(mapReady);
 	const isLocationAvailable = !!location;
@@ -42,6 +57,13 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 	// Шлём user location в WebView при каждом обновлении координат после mapReady
 	useEffect(() => {
 		if (mapReady && location) {
+			const payload = bootstrapPayloadRef.current;
+			if (payload) {
+				bootstrapPayloadRef.current = {
+					...payload,
+					userLocation: [location.longitude, location.latitude],
+				};
+			}
 			sendMessageToWebView({
 				type: 'updateUserLocation',
 				payload: {
@@ -110,6 +132,52 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 			return [];
 		});
 	}, [setPlacedMarkers, sendMessageToWebView]);
+
+	useEffect(() => {
+		let cancelled = false;
+
+		(async () => {
+			try {
+				const envApiKey = process.env.EXPO_PUBLIC_2GIS_API_KEY;
+				await ensureApiKeyPersisted(envApiKey);
+				let persisted = await loadPersistedLocation();
+				if (envApiKey && persisted.apiKey !== envApiKey) {
+					persisted = { ...persisted, apiKey: envApiKey };
+				}
+
+				if (cancelled) return;
+
+				const payload = buildBootstrapPayload(persisted);
+				bootstrapPayloadRef.current = payload;
+				const script = createBootstrapScript(payload);
+				if (script) {
+					setBootstrapScript(script);
+					setIsBootstrapReady(true);
+				} else {
+					setBootstrapScript(undefined);
+					setIsBootstrapReady(false);
+				}
+			} catch (error) {
+				console.warn(
+					'[useMapBridge] Failed to prepare map bootstrap payload',
+					error,
+				);
+			}
+		})();
+
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
+	useEffect(() => {
+		if (!isWebViewLoaded || !isBootstrapReady) return;
+		const payload = bootstrapPayloadRef.current;
+		if (!payload || hasSentBootstrapRef.current) return;
+
+		sendMessageToWebView({ type: 'bootstrapMap', payload });
+		hasSentBootstrapRef.current = true;
+	}, [isWebViewLoaded, isBootstrapReady, sendMessageToWebView]);
 
 	const handleWebViewMessage = useCallback(
 		(event: { nativeEvent: { data: string } }) => {
@@ -385,6 +453,19 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		clearSwitching,
 	]);
 
+	const updateBootstrapFollowPreference = useCallback(
+		(shouldCenter: boolean) => {
+			const payload = bootstrapPayloadRef.current;
+			if (!payload) return;
+			bootstrapPayloadRef.current = {
+				...payload,
+				centerOnUser: shouldCenter,
+				centerOnNextUserFix: shouldCenter,
+			};
+		},
+		[],
+	);
+
 	const cycleFollowMode = useCallback(() => {
 		if (!mapReady) return;
 		setFollowMode(prev => {
@@ -397,6 +478,8 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 			switch (next) {
 				case 'none':
 					sendMessageToWebView({ type: 'stopFollow' });
+					void updateShouldCenterOnUser(false);
+					updateBootstrapFollowPreference(false);
 					break;
 				case 'center':
 					if (!location) {
@@ -417,6 +500,8 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 						},
 					});
 					sendMessageToWebView({ type: 'startFollowUser' });
+					void updateShouldCenterOnUser(true);
+					updateBootstrapFollowPreference(true);
 					break;
 				case 'heading':
 					if (!location) {
@@ -436,11 +521,18 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 						},
 					});
 					sendMessageToWebView({ type: 'startFollowHeading' });
+					void updateShouldCenterOnUser(true);
+					updateBootstrapFollowPreference(true);
 					break;
 			}
 			return next;
 		});
-	}, [mapReady, location, sendMessageToWebView]);
+	}, [
+		mapReady,
+		location,
+		sendMessageToWebView,
+		updateBootstrapFollowPreference,
+	]);
 
 	const handleSearchResultSelect = useCallback(
 		(coordinates: [number, number], addressText: string) => {
@@ -462,6 +554,15 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		[mapReady, sendMessageToWebView],
 	);
 
+	const handleWebViewLoadStart = useCallback(() => {
+		setIsWebViewLoaded(false);
+		hasSentBootstrapRef.current = false;
+	}, []);
+
+	const handleWebViewLoadEnd = useCallback(() => {
+		setIsWebViewLoaded(true);
+	}, []);
+
 	return {
 		webViewRef,
 		mapReady,
@@ -477,6 +578,10 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		toggleMapMode,
 		cycleFollowMode,
 		handleSearchResultSelect,
+		onWebViewLoadStart: handleWebViewLoadStart,
+		onWebViewLoadEnd: handleWebViewLoadEnd,
+		isBootstrapReady,
+		bootstrapScript,
 		// Показываем в UI целевой режим во время переключения
 		uiIs3DMode: isSwitchingMode
 			? pendingModeRef.current === '3d'
