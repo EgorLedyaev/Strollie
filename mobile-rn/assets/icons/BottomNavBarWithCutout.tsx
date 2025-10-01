@@ -1,11 +1,14 @@
-import { Canvas, Path, PathOp, processTransform2d, Shadow, Skia } from '@shopify/react-native-skia';
+import {
+	Canvas,
+	Path,
+	PathOp,
+	processTransform2d,
+	Shadow,
+	Skia,
+} from '@shopify/react-native-skia';
 import * as React from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useDerivedValue } from 'react-native-reanimated';
-
-
-
-
 
 // --- КОНСТАНТЫ ---
 const CUTOUT_WIDTH = 120.348;
@@ -87,7 +90,12 @@ export const BottomNavBarWithCutout = () => {
 						blur={SHADOW_BLUR}
 						color={SHADOW_COLOR}
 					/>
-					<Shadow dx={0} dy={0} blur={2} color='rgba(0, 0, 0, 0.03)' />
+					<Shadow
+						dx={0}
+						dy={0}
+						blur={2}
+						color='rgba(0, 0, 0, 0.03)'
+					/>
 				</Path>
 			</Canvas>
 		</View>
@@ -95,11 +103,11 @@ export const BottomNavBarWithCutout = () => {
 };
 
 const styles = StyleSheet.create({
+	canvas: {
+		flex: 1,
+	},
 	container: {
 		// Высота теперь учитывает отступ для тени
 		height: TOTAL_HEIGHT,
-	},
-	canvas: {
-		flex: 1,
 	},
 });

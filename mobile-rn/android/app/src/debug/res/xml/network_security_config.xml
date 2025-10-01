@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug network security config
+     Разрешаем весь cleartext (http) трафик в debug, чтобы вернуть прежнее поведение.
+     В release этого файла нет: там узкий whitelist.
+     НЕ копировать в main.
+-->
+<network-security-config>
+    <!-- Для debug разрешаем всё -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

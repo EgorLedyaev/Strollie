@@ -10,7 +10,15 @@ import { useLocationTracking } from '@/shared/lib';
 
 export type FollowMode = 'none' | 'center' | 'heading';
 
-export function useMapBridge() {
+interface UseMapBridgeOptions {
+	// Вызывается при клике на существующий маркер, передаёт сохранённые данные места
+	onMarkerClick?: (placeData: unknown) => void;
+	// Вызывается при клике по карте, должен вернуть данные места или null
+	onMapClick?: (coordinates: [number, number]) => Promise<unknown | null>;
+}
+
+export function useMapBridge(options?: UseMapBridgeOptions) {
+	const { onMarkerClick, onMapClick } = options || {};
 	const webViewRef = useRef<WebView>(null);
 
 	const [mapReady, setMapReady] = useAtom(mapReadyAtom);
@@ -90,6 +98,18 @@ export function useMapBridge() {
 		[handleDeleteMarker],
 	);
 
+	const clearAllMarkers = useCallback(() => {
+		setPlacedMarkers(prev => {
+			prev.forEach(marker => {
+				sendMessageToWebView({
+					type: 'removeMarker',
+					payload: { markerId: marker.id },
+				});
+			});
+			return [];
+		});
+	}, [setPlacedMarkers, sendMessageToWebView]);
+
 	const handleWebViewMessage = useCallback(
 		(event: { nativeEvent: { data: string } }) => {
 			try {
@@ -159,7 +179,19 @@ export function useMapBridge() {
 						const clickedId: string | undefined =
 							message.payload?.id;
 						if (clickedId) {
-							handleDeleteMarker(clickedId);
+							const marker = placedMarkers.find(
+								m => m.id === clickedId,
+							);
+							if (marker && onMarkerClick) {
+								// Передаём сохранённые данные места из маркера
+								onMarkerClick(
+									(marker as { placeData?: unknown })
+										.placeData,
+								);
+							} else if (!onMarkerClick) {
+								// Если нет callback - удаляем как раньше
+								handleDeleteMarker(clickedId);
+							}
 						}
 						break;
 					}
@@ -167,12 +199,64 @@ export function useMapBridge() {
 						const { coordinates } = message.payload as {
 							coordinates: [number, number];
 						};
-						const newMarker = { id: uuidv4(), coordinates };
-						setPlacedMarkers(prev => [...prev, newMarker]);
-						sendMessageToWebView({
-							type: 'addMarker',
-							payload: newMarker,
-						});
+
+						console.log(
+							'mapClick event, coordinates:',
+							coordinates,
+						);
+
+						if (onMapClick) {
+							// Асинхронно ищем место по координатам
+							onMapClick(coordinates).then(placeData => {
+								console.log(
+									'onMapClick результат:',
+									placeData
+										? 'Место найдено'
+										: 'Место не найдено',
+								);
+
+								// Удаляем все старые маркеры
+								clearAllMarkers();
+
+								if (placeData) {
+									// Место найдено - создаём новый маркер с данными
+									const newMarker = {
+										id: uuidv4(),
+										coordinates,
+										placeData, // Сохраняем данные места в маркере
+									};
+									console.log(
+										'Создаём маркер с ID:',
+										newMarker.id,
+									);
+									setPlacedMarkers([newMarker]);
+									sendMessageToWebView({
+										type: 'addMarker',
+										payload: newMarker,
+									});
+
+									// Показываем sheet с данными места
+									if (onMarkerClick) {
+										console.log(
+											'Вызываем onMarkerClick для открытия sheet',
+										);
+										onMarkerClick(placeData);
+									}
+								} else {
+									console.log(
+										'placeData === null, маркер не создаётся',
+									);
+								}
+							});
+						} else {
+							// Fallback - старое поведение если нет onMapClick
+							const newMarker = { id: uuidv4(), coordinates };
+							setPlacedMarkers(prev => [...prev, newMarker]);
+							sendMessageToWebView({
+								type: 'addMarker',
+								payload: newMarker,
+							});
+						}
 						break;
 					}
 					case 'longPressOnMarker':
@@ -379,6 +463,7 @@ export function useMapBridge() {
 		mapReady,
 		is3DMode,
 		isLocationAvailable,
+		clearMarkers: clearAllMarkers,
 		// В UI показываем 'none', если геолокация недоступна
 		uiFollowMode: isLocationAvailable ? followMode : 'none',
 		followMode,
