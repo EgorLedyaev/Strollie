@@ -2,15 +2,15 @@ import React, { useCallback } from 'react';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 
-import { useMapBridge } from '@/features/map-bridge';
 import {
 	PlaceDetailsProvider,
 	PlaceDetailsSheet,
 	searchPlacesByCoordinates,
 	usePlaceDetails,
-} from '@/features/place-details';
+} from '@/pages/map/place-details';
 import { useBottomNavBarControl } from '@/shared/lib';
 
+import { useMapBridge } from '../model/useMapBridge';
 import { MapControls } from './map-controls';
 import { MapWidget } from './map-widget';
 import { SHADOW_PADDING, WeatherWidget } from './map-widget/WeatherWidget';
@@ -31,7 +31,7 @@ function MapPageContent() {
 			if (placeData) {
 				// Приводим к типу Place, т.к. мы сохраняем именно Place в placeData
 				const place =
-					placeData as import('@/features/place-details').Place;
+					placeData as import('@/pages/map/place-details').Place;
 				console.log('Открываем sheet для места:', place.name);
 				setSelectedPlace(place);
 			} else {

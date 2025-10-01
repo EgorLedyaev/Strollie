@@ -3,15 +3,15 @@ import { useAtom } from 'jotai';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 
+import { useRoutesSWR } from '@/pages/routes/model/routes';
 import { EmptyState } from '@/widgets/empty-state';
-import { useRoutesSWR } from '@/entities/route';
 import { AppText } from '@/shared/ui';
 
 import { RouteCard } from '../route-card/RouteCard';
 import { RouteHistoryPage } from '../RouteHistoryPage';
 
-jest.mock('@/entities/route', () => ({
-	...jest.requireActual('@/entities/route'),
+jest.mock('@/pages/routes/model/routes', () => ({
+	...jest.requireActual('@/pages/routes/model/routes'),
 	useRoutesSWR: jest.fn(),
 }));
 jest.mock('jotai', () => ({

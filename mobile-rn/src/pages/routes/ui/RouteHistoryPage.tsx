@@ -10,19 +10,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { EmptyState } from '@/widgets/empty-state';
-import { Header } from '@/widgets/header';
 import {
 	favoriteRouteIdsAtom,
 	Route,
-	RoutesErrorState,
 	useRoutesSWR,
-} from '@/entities/route';
+} from '@/pages/routes/model/routes';
+import { EmptyState } from '@/widgets/empty-state';
+import { Header } from '@/widgets/header';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
 import { RouteCard } from './route-card/RouteCard';
+import { RoutesErrorState } from './RoutesErrorState';
 
 export const RouteHistoryPage: React.FC = () => {
 	const { routes, isHydrated, isLoading, error } = useRoutesSWR();

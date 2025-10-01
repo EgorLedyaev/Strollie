@@ -3,10 +3,11 @@ import React, { forwardRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 import WebView from 'react-native-webview';
 
-import { mapErrorAtom, mapReadyAtom } from '@/entities/map';
 import { getWebviewUrl } from '@/shared/lib';
 import { Colors } from '@/shared/tokens';
 import { AppText, MapStatusIndicator } from '@/shared/ui';
+
+import { mapErrorAtom, mapReadyAtom } from '../../model/map-store';
 
 interface MapWidgetProps {
 	onMessage: (event: { nativeEvent: { data: string } }) => void;

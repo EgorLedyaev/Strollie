@@ -8,8 +8,6 @@ import React, { useMemo, useState } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ShowTicketQrDialog } from '@/features/show-ticket-qr';
-import { TicketDetailsDialog } from '@/features/ticket-details';
 import {
 	TicketCard,
 	TicketsErrorState,
@@ -18,6 +16,9 @@ import {
 } from '@/entities/ticket';
 import { Colors, Sizes } from '@/shared/tokens';
 import { AppText, BackButton } from '@/shared/ui';
+
+import { ShowTicketQrDialog } from './ShowTicketQrDialog';
+import { TicketDetailsDialog } from './TicketDetailsDialog';
 
 export const TicketListPage: React.FC = () => {
 	const {

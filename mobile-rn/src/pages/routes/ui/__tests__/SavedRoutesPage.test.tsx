@@ -8,22 +8,28 @@ import { useAtom } from 'jotai';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 
+import {
+	favoritePlaceIdsAtom,
+	usePlacesSWR,
+} from '@/pages/routes/model/places';
+import {
+	favoriteRouteIdsAtom,
+	useRoutesSWR,
+} from '@/pages/routes/model/routes';
 import { EmptyState } from '@/widgets/empty-state';
-import { favoritePlaceIdsAtom, usePlacesSWR } from '@/entities/place';
-import { favoriteRouteIdsAtom, useRoutesSWR } from '@/entities/route';
 import { AppText } from '@/shared/ui';
 
 import { PlaceCard } from '../place-card/PlaceCard';
 import { RouteCard } from '../route-card/RouteCard';
 import { SavedRoutesPage } from '../SavedRoutesPage';
 
-jest.mock('@/entities/route', () => ({
-	...jest.requireActual('@/entities/route'),
+jest.mock('@/pages/routes/model/routes', () => ({
+	...jest.requireActual('@/pages/routes/model/routes'),
 	useRoutesSWR: jest.fn(),
 	favoriteRouteIdsAtom: { debugLabel: 'favoriteRouteIdsAtom' },
 }));
-jest.mock('@/entities/place', () => ({
-	...jest.requireActual('@/entities/place'),
+jest.mock('@/pages/routes/model/places', () => ({
+	...jest.requireActual('@/pages/routes/model/places'),
 	usePlacesSWR: jest.fn(),
 	favoritePlaceIdsAtom: { debugLabel: 'favoritePlaceIdsAtom' },
 }));

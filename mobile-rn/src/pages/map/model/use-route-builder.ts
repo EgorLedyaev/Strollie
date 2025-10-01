@@ -2,9 +2,10 @@ import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 import { Alert } from 'react-native';
 
-import { mapReadyAtom } from '@/entities/map';
-import { placedMarkersAtom } from '@/entities/marker';
 import { useLocationTracking } from '@/shared/lib';
+
+import { mapReadyAtom } from './map-store';
+import { placedMarkersAtom } from './marker-store';
 
 type SendMessageToWebView = (message: unknown) => void;
 

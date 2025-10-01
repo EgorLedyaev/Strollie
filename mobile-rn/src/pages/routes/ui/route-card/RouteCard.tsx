@@ -4,7 +4,7 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
 
-import { Route } from '@/entities/route';
+import { Route } from '@/pages/routes/model/routes';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText, LikeButton } from '@/shared/ui';
 import { PaginationDots } from '@/shared/ui/PaginationDots';

@@ -3,7 +3,7 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
 import Carousel from 'react-native-reanimated-carousel';
 
-import { Place } from '@/entities/place';
+import { Place } from '@/pages/routes/model/places';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText, LikeButton, PaginationDots } from '@/shared/ui';
 

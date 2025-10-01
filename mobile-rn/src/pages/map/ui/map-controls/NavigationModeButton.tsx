@@ -6,7 +6,9 @@ import { StyleProp, ViewStyle } from 'react-native';
 
 import { IconButton } from '@/shared/ui';
 
-export type FollowMode = 'none' | 'center' | 'heading';
+import type { FollowMode } from '../../model/useMapBridge';
+
+export type { FollowMode };
 
 export const NavigationModeButton = ({
 	mode,

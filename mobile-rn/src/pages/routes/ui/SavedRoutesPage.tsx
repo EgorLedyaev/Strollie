@@ -12,21 +12,25 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { EmptyState } from '@/widgets/empty-state';
-import { Header } from '@/widgets/header';
-import { favoritePlaceIdsAtom, Place, usePlacesSWR } from '@/entities/place';
+import {
+	favoritePlaceIdsAtom,
+	Place,
+	usePlacesSWR,
+} from '@/pages/routes/model/places';
 import {
 	favoriteRouteIdsAtom,
 	Route,
-	RoutesErrorState,
 	useRoutesSWR,
-} from '@/entities/route';
+} from '@/pages/routes/model/routes';
+import { EmptyState } from '@/widgets/empty-state';
+import { Header } from '@/widgets/header';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
 import { PlaceCard } from './place-card/PlaceCard';
 import { RouteCard } from './route-card/RouteCard';
+import { RoutesErrorState } from './RoutesErrorState';
 
 type Filter = 'all' | 'routes' | 'places';
 
