@@ -59,7 +59,7 @@ export const Colors = {
 
 	// Другие цвета
 	red: '#FF5858',
-	error: '#FF5858', // for test
+	error: '#FF5857', // for test
 	likeActive: '#F24257', // Цвет активной лайкнутой иконки
 	likeInactive: '#CBCBCB', // Цвет неактивной лайкнутой иконки
 
