@@ -3,7 +3,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { User } from '@/entities/user';
-import { useAnchorMeasurement } from '@/shared/lib/useAnchorMeasurement';
+import {
+	useAnchorMeasurement,
+	type AnchorRect,
+} from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
 import { ActionButton } from '@/shared/ui/ActionButton';
@@ -14,12 +17,7 @@ interface HeaderProps {
 	user: User;
 	onBackPress: () => void;
 	// Передаем координаты якоря кнопки для позиционирования меню
-	onMenuPress: (anchor: {
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	}) => void;
+	onMenuPress: (anchor: AnchorRect) => void;
 }
 
 const HIT_SLOP = { top: 15, bottom: 15, left: 15, right: 15 };

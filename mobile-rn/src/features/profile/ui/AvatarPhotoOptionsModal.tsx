@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Popover, { PopoverPlacement, Rect } from 'react-native-popover-view';
 
+import type { AnchorRect } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
 
@@ -11,7 +12,7 @@ interface AvatarPhotoOptionsModalProps {
 	onPickFromDevice: () => void;
 	onTakePhoto: () => void;
 	onRemove: () => void;
-	anchor?: { x: number; y: number; width: number; height: number };
+	anchor?: AnchorRect;
 }
 
 export const AvatarPhotoOptionsModal: React.FC<

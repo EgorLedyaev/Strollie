@@ -12,6 +12,7 @@ import {
 } from '@/features/profile';
 import { sessionAtom } from '@/entities/session';
 import { loadUserProfileAtom, userProfileAtom } from '@/entities/user';
+import type { AnchorRect } from '@/shared/lib/useAnchorMeasurement';
 import { Colors } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
@@ -23,12 +24,7 @@ export const ProfilePage: React.FC = () => {
 	const loadProfile = useSetAtom(loadUserProfileAtom);
 
 	const [isMenuVisible, setMenuVisible] = useState(false);
-	const [menuAnchor, setMenuAnchor] = useState<{
-		x: number;
-		y: number;
-		width: number;
-		height: number;
-	} | null>(null);
+	const [menuAnchor, setMenuAnchor] = useState<AnchorRect | null>(null);
 	const logout = useLogout();
 
 	useEffect(() => {
