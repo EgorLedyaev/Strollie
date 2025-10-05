@@ -1,7 +1,13 @@
 // Вкладка с отзывами и формой добавления
 
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import {
+	Image,
+	ScrollView,
+	StyleSheet,
+	TouchableOpacity,
+	View,
+} from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppText, AppTextInput } from '@/shared/ui';
@@ -92,12 +98,26 @@ export function ReviewsTab({ place }: ReviewsTabProps) {
 
 			{!userHasReviewed && !isReviewFormVisible && (
 				<TouchableOpacity
-					style={styles.writeReviewButton}
+					style={styles.writeReviewCard}
 					onPress={() => setIsReviewFormVisible(true)}
 				>
-					<AppText style={styles.writeReviewButtonText}>
-						Отправить отзыв
+					<AppText style={styles.writeReviewCardTitle}>
+						Вы здесь были? Оцените это место!
 					</AppText>
+
+					<View style={styles.starSelector}>
+						{[1, 2, 3, 4, 5].map(star => (
+							<AppText key={star} style={styles.starEmpty}>
+								★
+							</AppText>
+						))}
+					</View>
+
+					<View style={styles.writeReviewButton}>
+						<AppText style={styles.writeReviewButtonText}>
+							Отправить отзыв
+						</AppText>
+					</View>
 				</TouchableOpacity>
 			)}
 
@@ -186,6 +206,17 @@ function ReviewCard({ review }: ReviewCardProps) {
 		year: 'numeric',
 	});
 
+	// Генерация инициалов для аватара
+	const initials = review.user_name
+		.split(' ')
+		.map(word => word[0])
+		.join('')
+		.toUpperCase()
+		.slice(0, 2);
+
+	// Генерация цвета фона аватара на основе имени
+	const avatarColor = generateAvatarColor(review.user_name);
+
 	return (
 		<View style={styles.reviewCard}>
 			{review.is_current_user && (
@@ -193,25 +224,47 @@ function ReviewCard({ review }: ReviewCardProps) {
 			)}
 
 			<View style={styles.reviewHeader}>
-				<AppText style={styles.reviewerName}>
-					{review.user_name}
-				</AppText>
-				<AppText style={styles.reviewDate}>{date}</AppText>
-			</View>
+				<View style={styles.reviewerInfo}>
+					{/* Аватар */}
+					{review.user_photo ? (
+						<Image
+							source={{ uri: review.user_photo }}
+							style={styles.avatar}
+						/>
+					) : (
+						<View
+							style={[
+								styles.avatarFallback,
+								{ backgroundColor: avatarColor },
+							]}
+						>
+							<AppText style={styles.avatarInitials}>
+								{initials}
+							</AppText>
+						</View>
+					)}
 
-			<View style={styles.starsRow}>
-				{Array.from({ length: 5 }).map((_, index) => (
-					<AppText
-						key={index}
-						style={
-							index < review.rating
-								? styles.starActive
-								: styles.starInactive
-						}
-					>
-						★
-					</AppText>
-				))}
+					<View>
+						<AppText style={styles.reviewerName}>
+							{review.user_name}
+						</AppText>
+						<View style={styles.starsRow}>
+							{Array.from({ length: 5 }).map((_, index) => (
+								<AppText
+									key={index}
+									style={
+										index < review.rating
+											? styles.starActive
+											: styles.starInactive
+									}
+								>
+									★
+								</AppText>
+							))}
+							<AppText style={styles.reviewDate}> {date}</AppText>
+						</View>
+					</View>
+				</View>
 			</View>
 
 			<AppText style={styles.reviewText}>{review.text}</AppText>
@@ -219,7 +272,40 @@ function ReviewCard({ review }: ReviewCardProps) {
 	);
 }
 
+// Генерация цвета аватара на основе имени пользователя
+function generateAvatarColor(name: string): string {
+	const colors = [
+		'#1FD975',
+		'#1CC4C4',
+		'#45CD86',
+		'#1EB18C',
+		'#1BE07C',
+		'#3DEA90',
+	];
+	const hash = name
+		.split('')
+		.reduce((acc, char) => acc + char.charCodeAt(0), 0);
+	return colors[hash % colors.length];
+}
+
 const styles = StyleSheet.create({
+	avatar: {
+		borderRadius: Radius.r50,
+		height: 40,
+		width: 40,
+	},
+	avatarFallback: {
+		alignItems: 'center',
+		borderRadius: Radius.r50,
+		height: 40,
+		justifyContent: 'center',
+		width: 40,
+	},
+	avatarInitials: {
+		color: Colors.white,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f14,
+	},
 	avgRating: {
 		color: Colors.black,
 		fontFamily: Fonts.bold,
@@ -321,6 +407,11 @@ const styles = StyleSheet.create({
 		lineHeight: 20,
 		marginTop: Gaps.g8,
 	},
+	reviewerInfo: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: Gaps.g12,
+	},
 	reviewerName: {
 		color: Colors.black,
 		fontFamily: Fonts.semibold,
@@ -335,6 +426,10 @@ const styles = StyleSheet.create({
 	},
 	starButton: {
 		padding: 4,
+	},
+	starEmpty: {
+		color: Colors.disabledGray,
+		fontSize: Fonts.f32,
 	},
 	starInactive: {
 		color: Colors.gray,
@@ -386,15 +481,32 @@ const styles = StyleSheet.create({
 		textAlignVertical: 'top',
 	},
 	writeReviewButton: {
+		alignSelf: 'center',
 		backgroundColor: Colors.greenPrimary,
-		borderRadius: Radius.r8,
-		marginTop: Gaps.g16,
-		paddingVertical: 12,
+		borderRadius: Radius.r16,
+		paddingHorizontal: 24,
+		paddingVertical: 14,
 	},
 	writeReviewButtonText: {
 		color: Colors.white,
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f16,
+		textAlign: 'center',
+	},
+	writeReviewCard: {
+		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
+		height: 190,
+		justifyContent: 'center',
+		marginTop: Gaps.g16,
+		paddingHorizontal: Gaps.g24,
+	},
+	writeReviewCardTitle: {
+		color: Colors.black,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f18,
+		marginBottom: Gaps.g16,
 		textAlign: 'center',
 	},
 	yourReviewLabel: {

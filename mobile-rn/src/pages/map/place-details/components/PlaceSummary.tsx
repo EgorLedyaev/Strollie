@@ -154,9 +154,31 @@ export function PlaceSummary({
 					resizeMode='cover'
 				/>
 				<LinearGradient
-					colors={['rgba(0,0,0,0)', Colors.darkImageOverlay]}
+					colors={[
+						'rgba(34, 34, 34, 0)',
+						'rgba(34, 34, 34, 0.73)',
+						'rgba(34, 34, 34, 1)',
+					]}
+					locations={[0.17, 0.26, 0.43]}
 					style={styles.imageGradient}
 				/>
+
+				{/* Progress bars для carousel (collapsed state) */}
+				{!isExpanded && photoCount > 1 && (
+					<View style={styles.progressBarsContainer}>
+						{Array.from({ length: Math.min(6, photoCount) }).map(
+							(_, index) => (
+								<View
+									key={index}
+									style={[
+										styles.progressBar,
+										index === 0 && styles.progressBarActive,
+									]}
+								/>
+							),
+						)}
+					</View>
+				)}
 
 				<View style={styles.imageOverlay}>
 					<View style={styles.photosBadge}>
@@ -173,7 +195,14 @@ export function PlaceSummary({
 					!isExpanded && styles.collapsedInfoSection,
 				]}
 			>
-				<AppText style={styles.name}>{place.name}</AppText>
+				<AppText
+					style={[
+						styles.name,
+						isExpanded ? styles.nameExpanded : styles.nameCollapsed,
+					]}
+				>
+					{place.name}
+				</AppText>
 
 				{!!place.type && (
 					<AppText style={styles.type}>{place.type}</AppText>
@@ -181,12 +210,12 @@ export function PlaceSummary({
 
 				<View style={styles.metaRow}>
 					{averageRating !== null && (
-						<View style={styles.chip}>
-							<AppText style={styles.chipText}>
+						<View style={styles.ratingBadge}>
+							<AppText style={styles.ratingBadgeText}>
 								★ {averageRating.toFixed(1)}
 							</AppText>
 							{reviewCount > 0 && (
-								<AppText style={styles.chipSubText}>
+								<AppText style={styles.ratingBadgeSubText}>
 									{` · ${reviewCount}`}
 								</AppText>
 							)}
@@ -336,11 +365,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: Gaps.g10,
 		paddingVertical: 6,
 	},
-	chipSubText: {
-		color: Colors.secondaryText,
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f12,
-	},
 	chipText: {
 		color: Colors.black,
 		fontFamily: Fonts.semibold,
@@ -407,7 +431,13 @@ const styles = StyleSheet.create({
 	name: {
 		color: Colors.black,
 		fontFamily: Fonts.bold,
-		fontSize: Fonts.f24,
+		fontSize: Fonts.f24, // default
+	},
+	nameCollapsed: {
+		fontSize: Fonts.f18,
+	},
+	nameExpanded: {
+		fontSize: Fonts.f20,
 	},
 	photosBadge: {
 		alignSelf: 'flex-end',
@@ -417,6 +447,42 @@ const styles = StyleSheet.create({
 		paddingVertical: 6,
 	},
 	photosBadgeText: {
+		color: Colors.white,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f14,
+	},
+	progressBar: {
+		backgroundColor: Colors.progressBarInactive,
+		borderRadius: Radius.r100,
+		flex: 1,
+		height: 3,
+	},
+	progressBarActive: {
+		backgroundColor: Colors.white,
+	},
+	progressBarsContainer: {
+		bottom: 42,
+		flexDirection: 'row',
+		gap: Gaps.g8,
+		left: Gaps.g16,
+		position: 'absolute',
+		right: Gaps.g16,
+	},
+	ratingBadge: {
+		alignItems: 'center',
+		backgroundColor: Colors.successGreen,
+		borderRadius: Radius.r12,
+		flexDirection: 'row',
+		gap: Gaps.g4,
+		paddingHorizontal: Gaps.g10,
+		paddingVertical: 6,
+	},
+	ratingBadgeSubText: {
+		color: Colors.white,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f12,
+	},
+	ratingBadgeText: {
 		color: Colors.white,
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f14,

@@ -8,7 +8,6 @@ import {
 	searchPlacesByCoordinates,
 	usePlaceDetails,
 } from '@/pages/map/place-details';
-import { useBottomNavBarControl } from '@/shared/lib';
 
 import { useMapBridge } from '../model/useMapBridge';
 import { MapControls } from './map-controls';
@@ -17,12 +16,10 @@ import { SHADOW_PADDING, WeatherWidget } from './map-widget/WeatherWidget';
 
 function MapPageContent() {
 	const { setSelectedPlace, resetState } = usePlaceDetails();
-	const { setNavBarVisible } = useBottomNavBarControl();
 
 	const clearPlaceDetails = useCallback(() => {
 		resetState();
-		setNavBarVisible(true);
-	}, [resetState, setNavBarVisible]);
+	}, [resetState]);
 
 	// Обработчик клика на существующий маркер - переоткрываем sheet с данными
 	const handleMarkerClick = useCallback(
@@ -133,10 +130,7 @@ function MapPageContent() {
 			<View style={[styles.weatherContainer, rightForWeatherWidget]}>
 				<WeatherWidget temperature={temperature} />
 			</View>
-			<PlaceDetailsSheet
-				onBottomNavBarVisibilityChange={setNavBarVisible}
-				onDismiss={handleSheetDismiss}
-			/>
+			<PlaceDetailsSheet onDismiss={handleSheetDismiss} />
 		</>
 	);
 }

@@ -1,6 +1,6 @@
 // Компонент детальной информации о месте в Bottom Sheet
 
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -15,7 +15,6 @@ import { ReviewsTab } from './ReviewsTab';
 import { TabSelector } from './TabSelector';
 
 interface PlaceDetailsSheetProps {
-	onBottomNavBarVisibilityChange?: (visible: boolean) => void;
 	onDismiss?: () => void;
 	onBuildRoute?: (place: Place) => void;
 	onToggleFavorite?: (place: Place, nextValue: boolean) => void;
@@ -23,13 +22,12 @@ interface PlaceDetailsSheetProps {
 }
 
 export function PlaceDetailsSheet({
-	onBottomNavBarVisibilityChange,
 	onDismiss,
 	onBuildRoute,
 	onToggleFavorite,
 	onShare,
 }: PlaceDetailsSheetProps) {
-	const bottomSheetRef = useRef<BottomSheet>(null);
+	const bottomSheetRef = useRef<BottomSheetModal>(null);
 	const {
 		selectedPlace,
 		currentTab,
@@ -41,35 +39,34 @@ export function PlaceDetailsSheet({
 	// Snap points для collapsed и expanded состояний
 	const snapPoints = useMemo(() => ['40%', '90%'], []);
 
-	// Вычисляем индекс: -1 (закрыт) если нет места, 0 (collapsed) если есть
-	const sheetIndex = selectedPlace ? 0 : -1;
-
+	// Убираем sheetIndex для BottomSheetModal - он управляется через present/dismiss
 	const handleSheetChanges = useCallback(
 		(index: number) => {
 			const expanded = index === 1;
 			setIsExpanded(expanded);
 
 			const isClosed = index === -1;
-			onBottomNavBarVisibilityChange?.(isClosed);
+			// Больше не скрываем навбар - sheet просто перекрывает его
+			// onBottomNavBarVisibilityChange?.(isClosed);
 
 			if (isClosed) {
 				onDismiss?.();
 			}
 		},
-		[setIsExpanded, onBottomNavBarVisibilityChange, onDismiss],
+		[setIsExpanded, onDismiss],
 	);
 
 	useEffect(() => {
 		if (!bottomSheetRef.current) return;
 
 		if (selectedPlace) {
-			onBottomNavBarVisibilityChange?.(false);
-			bottomSheetRef.current.snapToIndex(0);
+			// Открываем модальное окно
+			bottomSheetRef.current.present();
 		} else {
-			onBottomNavBarVisibilityChange?.(true);
-			bottomSheetRef.current.close();
+			// Закрываем модальное окно
+			bottomSheetRef.current.dismiss();
 		}
-	}, [onBottomNavBarVisibilityChange, selectedPlace]);
+	}, [selectedPlace]);
 
 	const handleTabChange = useCallback(
 		(tab: TabType) => {
@@ -105,9 +102,8 @@ export function PlaceDetailsSheet({
 	};
 
 	return (
-		<BottomSheet
+		<BottomSheetModal
 			ref={bottomSheetRef}
-			index={sheetIndex}
 			snapPoints={snapPoints}
 			onChange={handleSheetChanges}
 			enablePanDownToClose
@@ -145,7 +141,7 @@ export function PlaceDetailsSheet({
 					<View style={styles.content}>{renderTabContent()}</View>
 				)}
 			</BottomSheetScrollView>
-		</BottomSheet>
+		</BottomSheetModal>
 	);
 }
 

@@ -159,15 +159,35 @@ export async function submitReview(
 
 /**
  * Поиск мест по координатам (для получения ближайших объектов)
+ *
+ * Использует Geocode API для точного поиска по координатам клика
+ * Документация: https://docs.2gis.com/ru/api/search/geocoder/reference
  */
 export async function searchPlacesByCoordinates(
 	lat: number,
 	lon: number,
-	radius: number = 1000,
+	radius: number = 50, // 50 метров - оптимальный радиус для клика
 ): Promise<Place[]> {
 	try {
-		const url = `${API_BASE_URL}/items?point=${lon},${lat}&radius=${radius}&type=branch&fields=items.point,items.adm_div,items.address&key=${API_KEY}`;
-		console.log('2GIS API request:', url);
+		const fields = [
+			'items.point',
+			'items.name',
+			'items.address',
+			'items.full_address_name',
+			'items.rubrics',
+			'items.contact_groups',
+			'items.schedule',
+			'items.reviews',
+			'items.flags',
+			'items.links',
+			'items.org',
+			'items.brand',
+			'items.attribute_groups',
+		].join(',');
+
+		const url = `${API_BASE_URL}/items/geocode?lat=${lat}&lon=${lon}&radius=${radius}&type=building,attraction&fields=${fields}&sort=distance&search_nearby=true&page=1&page_size=1&key=${API_KEY}`;
+
+		console.log('🔍 2GIS Geocode API request:', url);
 
 		const response = await fetch(url);
 
@@ -178,11 +198,11 @@ export async function searchPlacesByCoordinates(
 		const data: PlaceSearchResponse = await response.json();
 
 		// Добавляем логирование структуры ответа для диагностики
-		console.log('2GIS API response:', JSON.stringify(data, null, 2));
+		console.log('✅ 2GIS API response:', JSON.stringify(data, null, 2));
 
 		// Проверяем мета-код
 		if (data.meta && data.meta.code !== 200) {
-			console.error('2GIS API error:', data.meta.error);
+			console.error('❌ 2GIS API error:', data.meta.error);
 			return [];
 		}
 
@@ -193,11 +213,13 @@ export async function searchPlacesByCoordinates(
 			!data.result.items ||
 			data.result.items.length === 0
 		) {
-			console.log('2GIS API вернул пустой результат');
+			console.log(
+				'⚠️ 2GIS API вернул пустой результат (нет объектов в радиусе 50м)',
+			);
 			return [];
 		}
 
-		console.log(`2GIS API вернул ${data.result.items.length} мест`);
+		console.log(`📍 2GIS API нашел ${data.result.items.length} мест`);
 
 		return data.result.items.map(item => ({
 			id: item.id,
@@ -208,9 +230,35 @@ export async function searchPlacesByCoordinates(
 				full_name: item.full_name,
 			},
 			point: item.point,
+			contact_groups: item.contact_groups,
+			schedule: item.schedule,
+			reviews: item.reviews
+				? [
+						{
+							id: '1',
+							user_name: 'Mock User',
+							rating: item.reviews.general_rating || 0,
+							text: 'Mock review',
+							date: new Date().toISOString(),
+						},
+					]
+				: [],
+			review_stats: item.reviews
+				? {
+						average_rating: item.reviews.general_rating || 0,
+						total_count: item.reviews.general_review_count || 0,
+						rating_distribution: {
+							5: 0,
+							4: 0,
+							3: 0,
+							2: 0,
+							1: 0,
+						},
+					}
+				: undefined,
 		}));
 	} catch (error) {
-		console.error('Error searching places:', error);
+		console.error('❌ Error searching places:', error);
 		return [];
 	}
 }

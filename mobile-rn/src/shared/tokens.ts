@@ -24,6 +24,7 @@ export const Colors = {
 	grayTextButtonOverlay: '#A3A3A3', // Цвет текста кнопки в оверлее
 	grayTextOverlay: '#383838', // Цвет текста в оверлее
 	textAAA: '#AAAAAA', //
+	progressBarInactive: 'rgba(185, 185, 185, 0.6)', // Цвет неактивного прогресс-бара
 
 	// Цвета для форм и инпутов
 	inputBorder: '#E7E7E7',
