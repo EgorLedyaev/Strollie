@@ -45,7 +45,6 @@ LocaleConfig.locales['ru'] = {
 		'Суббота',
 	],
 	dayNamesShort: ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'],
-	today: 'Сегодня',
 };
 LocaleConfig.defaultLocale = 'ru';
 
@@ -182,6 +181,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
 								markingType={'custom'}
 								hideExtraDays={false}
 								monthFormat={'MMMM'}
+								// todayTitle={'Сегодня'}
 							/>
 						</View>
 
