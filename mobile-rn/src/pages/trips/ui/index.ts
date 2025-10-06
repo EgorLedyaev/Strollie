@@ -1,4 +1,3 @@
-export { TripListPage } from './TripListPage';
+export { TripList } from './TripList';
 export { TripDetailsPage } from './TripDetailsPage';
-export { TripCreatePage } from './TripCreatePage';
 export { TripMainPage } from './TripMainPage';

@@ -1,6 +1,6 @@
 import trips_empty from '@/assets/images/trips/trips-empty.png';
-import { Link, useRouter } from 'expo-router';
-import React, { useEffect, useMemo } from 'react';
+import { Link, useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
 	ActivityIndicator,
 	Image,
@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { TripList } from '@/pages/trips';
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
+import { useTicketsSWR } from '@/entities/ticket';
 import { TripsErrorState, useTripsSWR } from '@/entities/trip';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
@@ -22,8 +24,8 @@ export const TripMainPage: React.FC = () => {
 	const router = useRouter();
 	const {
 		trips,
-		isHydrated: hydrated,
-		isLoading,
+		isHydrated: isTripsHydrated,
+		isLoading: isLoadingTrips,
 		error,
 		forceRefresh,
 	} = useTripsSWR();
@@ -35,8 +37,23 @@ export const TripMainPage: React.FC = () => {
 		log.info('mount');
 	}, [log]);
 
-	const showEmpty = hydrated && !isLoading && trips.length !== 0;
-	// const showEmpty = hydrated && !isLoading && trips.length === 0;
+	useFocusEffect(
+		useCallback(() => {
+			forceRefresh();
+		}, [forceRefresh]),
+	);
+
+	const {
+		tickets,
+		isHydrated: isTicketsHydrated,
+		isLoading: isLoadingTickets,
+	} = useTicketsSWR();
+
+	const isHydrated = isTripsHydrated && isTicketsHydrated;
+	const isLoading = isLoadingTrips || isLoadingTickets;
+
+	// const showEmpty = hydrated && !isLoading && trips.length !== 0;
+	const showEmpty = isHydrated && !isLoading && trips.length === 0;
 
 	const actionNode = (
 		<AppButton
@@ -66,6 +83,8 @@ export const TripMainPage: React.FC = () => {
 			/>
 			{isLoading ? (
 				<View style={styles.loadingWrap} testID='trips-loading'>
+					<AppText>{isHydrated}</AppText>
+					<AppText>{isLoading}</AppText>
 					<ActivityIndicator
 						size='large'
 						color={Colors.greenPrimary}
@@ -95,7 +114,9 @@ export const TripMainPage: React.FC = () => {
 					<ScrollView
 						contentContainerStyle={styles.scrollContent}
 						showsVerticalScrollIndicator={false}
-					></ScrollView>
+					>
+						<TripList trips={trips} tickets={tickets} />
+					</ScrollView>
 				</>
 			)}
 		</SafeAreaView>
@@ -113,10 +134,6 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f16,
 	},
-	// content: {
-	// 	flex: 1,
-	// },
-	// cardWrap: { marginBottom: 8 },
 	emptyContainer: {
 		flex: 1,
 		justifyContent: 'flex-start',
@@ -127,72 +144,6 @@ const styles = StyleSheet.create({
 		resizeMode: 'contain',
 		width: 265,
 	},
-	// fabContainer: {
-	// 	alignItems: 'center',
-	// 	bottom: 58,
-	// 	height: 56,
-	// 	position: 'absolute',
-	// 	right: 16,
-	// },
-	// filterBtn: {
-	// 	backgroundColor: Colors.white,
-	// 	borderColor: Colors.transparent,
-	// 	borderRadius: Radius.r8,
-	// 	borderWidth: 1,
-	// 	height: 32,
-	// 	justifyContent: 'center',
-	// 	paddingHorizontal: 16,
-	// },
-	// filterBtnActive: {
-	// 	borderColor: Colors.greenPrimary,
-	// 	borderWidth: 1,
-	// 	boxShadow: Shadows.filterButtonShadow,
-	// },
-	// filterIconBtn: {
-	// 	alignItems: 'center',
-	// 	backgroundColor: Colors.white,
-	// 	borderRadius: Radius.r8,
-	// 	height: 32,
-	// 	justifyContent: 'center',
-	// 	width: 32,
-	// },
-	// filterText: {
-	// 	color: Colors.lightInputText,
-	// 	fontFamily: Fonts.regular,
-	// 	fontSize: Fonts.f14,
-	// },
-	// filterTextActive: {
-	// 	color: Colors.successGreen,
-	// 	fontFamily: Fonts.regular,
-	// 	fontSize: Fonts.f14,
-	// },
-	// filtersRow: {
-	// 	alignItems: 'center',
-	// 	flexDirection: 'row',
-	// 	gap: 16,
-	// 	marginBottom: 16,
-	// 	marginLeft: 12,
-	// 	marginTop: 32,
-	// },
-	// futureHeader: {
-	// 	color: Colors.secondaryText,
-	// 	// fontFamily: Fonts.bold,
-	// 	// fontSize: Fonts.f20,
-	// },
-	// image: {
-	// 	alignSelf: 'center',
-	// 	height: 265,
-	// 	justifyContent: 'center',
-	// 	marginBottom: Gaps.g20,
-	// 	resizeMode: 'contain',
-	// 	width: 265,
-	// },
-	// imageRotated: { position: 'absolute', transform: [{ rotate: '-15deg' }] },
-	// list: {
-	// 	gap: 16,
-	// 	paddingHorizontal: 20,
-	// 	// paddingTop: 24,
-	// },
 	loadingWrap: {
 		alignItems: 'center',
 		flex: 1,
@@ -205,16 +156,6 @@ const styles = StyleSheet.create({
 	},
 	scrollContent: {
 		paddingBottom: 120,
+		paddingTop: 16,
 	},
-	// section: {
-	// 	gap: 16,
-	// },
-	//
-	// sectionHeader: {
-	// 	fontFamily: Fonts.bold,
-	// 	fontSize: Fonts.f20,
-	// },
-	// todayHeader: {
-	// 	color: Colors.greenPrimary,
-	// },
 });

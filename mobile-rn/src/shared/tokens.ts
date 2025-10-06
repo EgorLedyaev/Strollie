@@ -57,6 +57,7 @@ export const Colors = {
 	greenHover: '#027962',
 	greenIconLight: '#3DEA90', // Светлый зеленый для иконок
 	greenIconDark: '#1EB18C', // Темный зеленый для иконок
+	selectedTicketBackground: 'rgba(69, 205, 134, 0.40)',
 
 	// Другие цвета
 	red: '#FF5858',

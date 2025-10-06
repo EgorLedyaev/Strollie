@@ -1,274 +1,240 @@
-import { useAtom } from 'jotai';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { tripApi } from '@/entities/trip';
+import { useTripCreate } from '@/pages/trip-create/model/useTripCreate';
+import { ChecklistInput } from '@/pages/trip-create/ui/ChecklistInput';
+import { ChecklistItem } from '@/pages/trip-create/ui/ChecklistItem';
+import { SectionItem } from '@/pages/trip-create/ui/SectionItem';
+import { Header } from '@/widgets/header';
+import { NewTicketItem } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppButton, AppText, AppTextInput } from '@/shared/ui';
-
-import {
-	checklistAtom,
-	endDateAtom,
-	isSubmittingAtom,
-	notesAtom,
-	placesAtom,
-	routesAtom,
-	startDateAtom,
-} from '../model/state';
-
-function SectionCard({ children }: { children: React.ReactNode }) {
-	return <View style={styles.sectionCard}>{children}</View>;
-}
-
-const PlusButton: React.FC<{ onPress: () => void }> = ({ onPress }) => (
-	<Pressable onPress={onPress} style={styles.plusBtn} hitSlop={8}>
-		<AppText style={styles.plus}>+</AppText>
-	</Pressable>
-);
+import { AppButton, AppText, AppTextInput, DatePickerModal } from '@/shared/ui';
 
 export const TripCreatePage: React.FC = () => {
-	const [startDate, setStartDate] = useAtom(startDateAtom);
-	const [endDate, setEndDate] = useAtom(endDateAtom);
-	const [notes, setNotes] = useAtom(notesAtom);
-	const [places, setPlaces] = useAtom(placesAtom);
-	const [routes, setRoutes] = useAtom(routesAtom);
-	const [checklist, setChecklist] = useAtom(checklistAtom);
-	const [isSubmitting, setSubmitting] = useAtom(isSubmittingAtom);
-
-	const addPlace = () => setPlaces(p => [...p, '']);
-	const updatePlace = (i: number, v: string) =>
-		setPlaces(p => p.map((x, idx) => (idx === i ? v : x)));
-	const addRoute = () => setRoutes(r => [...r, '']);
-	const updateRoute = (i: number, v: string) =>
-		setRoutes(r => r.map((x, idx) => (idx === i ? v : x)));
-	const addChecklist = () =>
-		setChecklist(c => [
-			...c,
-			{ id: Math.random().toString(36).slice(2), text: '', done: false },
-		]);
-	const updateChecklist = (i: number, v: string) =>
-		setChecklist(c =>
-			c.map((x, idx) => (idx === i ? { ...x, text: v } : x)),
-		);
-
-	const canSave = startDate && endDate && !isSubmitting;
-
-	const onSave = useCallback(async () => {
-		if (!canSave) return;
-		try {
-			setSubmitting(true);
-			await tripApi.createTrip({
-				startDate,
-				endDate,
-				ticketIds: [],
-				places: places.filter(Boolean),
-				routes: routes.filter(Boolean),
-				checklist: checklist.filter(i => i.text.trim()),
-				notes: notes.trim() || undefined,
-				title: undefined,
-			});
-			// naive reset
-			setStartDate('');
-			setEndDate('');
-			setPlaces([]);
-			setRoutes([]);
-			setChecklist([]);
-			setNotes('');
-		} finally {
-			setSubmitting(false);
-		}
-	}, [
-		canSave,
+	const {
 		startDate,
 		endDate,
-		places,
-		routes,
+		selectedTickets,
 		checklist,
-		notes,
-		setSubmitting,
-		setStartDate,
-		setEndDate,
-		setPlaces,
-		setRoutes,
-		setChecklist,
-		setNotes,
-	]);
+		isAddingChecklistItem,
+		isPickerVisible,
+		editingDateType,
+		canSave,
+		openPicker,
+		setPickerVisible,
+		handleDateSelect,
+		onSave,
+		onDelete,
+		setIsAddingChecklistItem,
+		handleAddChecklistItem,
+		handleDeleteChecklistItem,
+		formatDateForDisplay,
+	} = useTripCreate();
 
 	return (
-		<ScrollView contentContainerStyle={styles.container}>
-			<SectionCard>
-				<View style={styles.rowSpace}>
-					<View style={styles.inlineGroup}>
-						<AppText style={styles.label}>Начало</AppText>
-						<AppTextInput
-							placeholder='ДД.ММ.ГГГГ'
-							value={startDate}
-							onChangeText={setStartDate}
-							style={styles.input}
-						/>
-					</View>
-					<View style={styles.inlineGroup}>
-						<AppText style={styles.label}>Конец</AppText>
-						<AppTextInput
-							placeholder='ДД.ММ.ГГГГ'
-							value={endDate}
-							onChangeText={setEndDate}
-							style={styles.input}
-						/>
-					</View>
+		<SafeAreaView style={styles.container}>
+			<Header title='Новая поездка' />
+			<ScrollView showsVerticalScrollIndicator={false}>
+				<View style={styles.dateContainer}>
+					<Pressable
+						style={styles.dateBlock}
+						onPress={() => openPicker('start')}
+					>
+						<AppText style={styles.dateLabel}>Начало</AppText>
+						<AppText
+							variant={'h2'}
+							style={
+								!startDate
+									? styles.noDateValue
+									: styles.dateValue
+							}
+						>
+							{formatDateForDisplay(startDate)}
+						</AppText>
+					</Pressable>
+					<Pressable
+						style={styles.dateBlock}
+						onPress={() => openPicker('end')}
+					>
+						<AppText style={styles.dateLabel}>Конец</AppText>
+						<AppText
+							variant={'h2'}
+							style={
+								!endDate ? styles.noDateValue : styles.dateValue
+							}
+						>
+							{formatDateForDisplay(endDate)}
+						</AppText>
+					</Pressable>
 				</View>
-			</SectionCard>
 
-			<View style={styles.sectionHeaderRow}>
-				<AppText style={styles.sectionTitle}>Места</AppText>
-				<PlusButton onPress={addPlace} />
-			</View>
-			{places.map((p, i) => (
-				<SectionCard key={`place_${i}`}>
-					<AppTextInput
-						placeholder={`Место #${i + 1}`}
-						value={p}
-						onChangeText={v => updatePlace(i, v)}
-						style={styles.inputFull}
+				<View style={styles.sectionsContainer}>
+					<SectionItem
+						label={'Билеты'}
+						ref={'/trips/select-ticket'}
 					/>
-				</SectionCard>
-			))}
+					<View style={styles.ticketsContainer}>
+						{selectedTickets.map(ticket => (
+							<NewTicketItem key={ticket.id} ticket={ticket} />
+						))}
+					</View>
 
-			<View style={styles.sectionHeaderRow}>
-				<AppText style={styles.sectionTitle}>Чек-лист</AppText>
-				<PlusButton onPress={addChecklist} />
-			</View>
-			{checklist.map((c, i) => (
-				<SectionCard key={c.id}>
-					<AppTextInput
-						placeholder={`Пункт #${i + 1}`}
-						value={c.text}
-						onChangeText={v => updateChecklist(i, v)}
-						style={styles.inputFull}
+					<SectionItem label={'Места'} ref={'/trips/add-place'} />
+					<SectionItem
+						label={'Чек-лист'}
+						onPress={() => {
+							setIsAddingChecklistItem(true);
+						}}
 					/>
-				</SectionCard>
-			))}
+					{checklist.length > 0 && (
+						<View style={styles.checklistContainer}>
+							{checklist.map(item => (
+								<ChecklistItem
+									key={item.id}
+									item={item}
+									onDelete={handleDeleteChecklistItem}
+								/>
+							))}
+						</View>
+					)}
 
-			<View style={styles.sectionHeaderRow}>
-				<AppText style={styles.sectionTitle}>Маршруты</AppText>
-				<PlusButton onPress={addRoute} />
-			</View>
-			{routes.map((r, i) => (
-				<SectionCard key={`route_${i}`}>
+					{isAddingChecklistItem && (
+						<View style={styles.inputWrapper}>
+							<ChecklistInput onAdd={handleAddChecklistItem} />
+						</View>
+					)}
+				</View>
+
+				<View style={styles.notesContainer}>
+					<AppText variant={'header'} style={styles.sectionItemTitle}>
+						Заметки
+					</AppText>
 					<AppTextInput
-						placeholder={`Маршрут #${i + 1}`}
-						value={r}
-						onChangeText={v => updateRoute(i, v)}
-						style={styles.inputFull}
+						style={styles.notesInput}
+						multiline
+						placeholder='Введите текст того, что вы хотели записать или дополнить'
+						placeholderTextColor={Colors.grayMedium}
 					/>
-				</SectionCard>
-			))}
-
-			<View style={styles.sectionHeaderRow}>
-				<AppText style={styles.sectionTitle}>Заметки</AppText>
-			</View>
-			<SectionCard>
-				<AppTextInput
-					placeholder='Введите текст...'
-					value={notes}
-					onChangeText={setNotes}
-					multiline
-					style={[styles.inputFull, styles.notesInput]}
-				/>
-			</SectionCard>
-
-			<View style={styles.actionsRow}>
+				</View>
+			</ScrollView>
+			<View style={styles.buttonsContainer}>
 				<AppButton
 					text='Удалить'
-					variant='outline'
-					onPress={() => {
-						setStartDate('');
-						setEndDate('');
-						setPlaces([]);
-						setRoutes([]);
-						setChecklist([]);
-						setNotes('');
-					}}
-					style={styles.deleteBtn}
+					variant='secondary'
+					buttonBorderRadius={Radius.r16}
+					buttonColor={Colors.white}
 					textColor={Colors.red}
+					textFontSize={16}
+					textFontFamily={Fonts.regular}
+					onPress={onDelete}
+					style={styles.button}
+					paddingHorizontal={24}
 				/>
 				<AppButton
 					text='Сохранить поездку'
 					onPress={onSave}
 					disabled={!canSave}
-					isLoading={isSubmitting}
-					style={styles.saveBtn}
+					buttonBorderRadius={Radius.r16}
+					style={[styles.button, styles.buttonAdd]}
+					textFontSize={16}
+					paddingHorizontal={24}
 				/>
 			</View>
-		</ScrollView>
+
+			<DatePickerModal
+				visible={isPickerVisible}
+				onClose={() => setPickerVisible(false)}
+				onSelectDate={handleDateSelect}
+				initialDate={editingDateType === 'start' ? startDate : endDate}
+			/>
+		</SafeAreaView>
 	);
 };
 
 const styles = StyleSheet.create({
-	actionsRow: { flexDirection: 'row', gap: 16, marginBottom: 40 },
-	container: {
-		gap: 24,
-		padding: 16,
-	},
-	deleteBtn: { flex: 1, height: 44 },
-	inlineGroup: { gap: 8 },
-	input: {
-		backgroundColor: Colors.white,
-		borderColor: Colors.inputBorder,
-		borderRadius: Radius.r10,
-		borderWidth: 1,
-		color: Colors.headerAndInputText,
-		fontSize: Fonts.f16,
+	button: {
+		fontFamily: Fonts.regular,
 		height: 44,
-		paddingHorizontal: 12,
-		width: 140,
+		width: 'auto',
 	},
-	inputFull: {
-		backgroundColor: Colors.white,
-		borderColor: Colors.inputBorder,
-		borderRadius: Radius.r10,
-		borderWidth: 1,
-		color: Colors.headerAndInputText,
-		fontSize: Fonts.f16,
-		paddingHorizontal: 12,
-		paddingVertical: 10,
+	buttonAdd: {
+		width: 235,
 	},
-	label: { color: Colors.headerAndInputText, fontSize: Fonts.f14 },
-	notesInput: {
-		minHeight: 100,
-		textAlignVertical: 'top',
-	},
-	plus: { color: Colors.placeholderGray, fontSize: Fonts.f20 },
-	plusBtn: {
-		alignItems: 'center',
-		backgroundColor: Colors.white,
-		borderColor: Colors.inputBorder,
-		borderRadius: Radius.r8,
-		borderWidth: 1,
-		height: 32,
-		justifyContent: 'center',
-		width: 32,
-	},
-	rowSpace: {
+	buttonsContainer: {
 		flexDirection: 'row',
 		gap: 16,
-		justifyContent: 'space-between',
+		justifyContent: 'center',
+		paddingVertical: 16,
 	},
-	saveBtn: { flex: 2, height: 44 },
-	sectionCard: {
+	checklistContainer: {
 		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		gap: 12,
+		borderRadius: Radius.r16,
+		gap: 8,
 		padding: 16,
 	},
-	sectionHeaderRow: {
+	container: {
+		backgroundColor: Colors.lightBackground,
+		flex: 1,
+		padding: 16,
+	},
+	dateBlock: {
 		alignItems: 'center',
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		gap: 8,
+		justifyContent: 'center',
 	},
-	sectionTitle: {
+	dateContainer: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginTop: 24,
+		paddingHorizontal: 24,
+		paddingVertical: 20,
+	},
+	dateLabel: {
+		color: Colors.secondaryText,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f14,
+	},
+	dateValue: {
 		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
+		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f16,
+	},
+	inputWrapper: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
+		marginTop: 8,
+	},
+	noDateValue: {
+		color: Colors.lightInputText,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f14,
+	},
+	notesContainer: {
+		marginTop: 20,
+	},
+	notesInput: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
+		color: Colors.black,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f16,
+		height: 120,
+		marginTop: 12,
+		padding: 16,
+		textAlignVertical: 'top',
+	},
+	sectionItemTitle: {
+		fontSize: Fonts.f16,
+	},
+	sectionsContainer: {
+		paddingTop: 30,
+	},
+	ticketsContainer: {
+		gap: 16,
 	},
 });

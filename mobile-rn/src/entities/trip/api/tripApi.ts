@@ -70,15 +70,7 @@ const getMyTripsSWR = async (opts: {
 }): Promise<void> => {
 	// Имитация задержки сети
 	await new Promise(resolve => setTimeout(resolve, 1500));
-	const freshData = [
-		...MOCK_TRIPS,
-		{
-			...MOCK_TRIPS[0],
-			id: `trip-new-${Date.now()}`,
-			title: 'Новая поездка!',
-		},
-	];
-	opts.onUpdate(freshData);
+	opts.onUpdate([...MOCK_TRIPS]);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -86,9 +78,17 @@ const getMyTrips = async (_opts: {
 	force?: boolean;
 	ttlMs: number;
 }): Promise<Trip[]> => {
-	await new Promise(resolve => setTimeout(resolve, 1200));
-	return MOCK_TRIPS;
+	await sleep(1200);
+	// Также просто возвращаем текущее состояние
+	return [...MOCK_TRIPS];
 };
+// const getMyTrips = async (_opts: {
+// 	force?: boolean;
+// 	ttlMs: number;
+// }): Promise<Trip[]> => {
+// 	await new Promise(resolve => setTimeout(resolve, 1200));
+// 	return MOCK_TRIPS;
+// };
 
 export const tripApi = {
 	getMyTrips,

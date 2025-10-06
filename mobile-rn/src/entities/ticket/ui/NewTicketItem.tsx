@@ -1,5 +1,6 @@
+import CheckmarkIcon from '@/assets/icons/CheckmarkIcon';
 import React from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
@@ -11,6 +12,9 @@ interface Props {
 	ticket: Ticket;
 	/** Показать меню действий (опционально) */
 	onPressActions?: () => void;
+	// Обработчик нажатия на сам билет
+	onPress?: (ticketId: string) => void;
+	isSelected?: boolean;
 }
 
 function pad2(n: number) {
@@ -25,16 +29,30 @@ function formatDate(d: Date) {
  * Не использует старые карточки и их стили.
  * Нет секции для QR – намеренно по требованию.
  */
-export const NewTicketItem: React.FC<Props> = ({ ticket, onPressActions }) => {
+export const NewTicketItem: React.FC<Props> = ({
+	ticket,
+	onPressActions,
+	onPress,
+	isSelected = false,
+}) => {
 	const departure = new Date(ticket.departureTime);
 	const title =
 		ticket.title ||
 		[ticket.from, ticket.to].filter(Boolean).join(' - ') ||
 		'Билет';
 
+	const handlePress = () => {
+		if (onPress) {
+			onPress(ticket.id);
+		}
+	};
+
 	return (
-		<View style={styles.root}>
-			{/* Мини изображение/плейсхолдер */}
+		<Pressable
+			style={styles.root}
+			onPress={handlePress}
+			disabled={!onPress}
+		>
 			<View style={styles.thumbWrap}>
 				{ticket.imageUri ? (
 					<Image
@@ -69,7 +87,14 @@ export const NewTicketItem: React.FC<Props> = ({ ticket, onPressActions }) => {
 				variant='vertical'
 				style={styles.dots}
 			/>
-		</View>
+			{isSelected && (
+				<View style={styles.overlay}>
+					<View style={styles.checkmarkCircle}>
+						<CheckmarkIcon />
+					</View>
+				</View>
+			)}
+		</Pressable>
 	);
 };
 
@@ -80,11 +105,19 @@ const styles = StyleSheet.create({
 		color: Colors.lightInputText,
 		fontSize: Fonts.f14,
 	},
+	checkmarkCircle: {
+		alignItems: 'center',
+		backgroundColor: Colors.successGreen,
+		borderRadius: Radius.r100,
+		height: 48,
+		justifyContent: 'center',
+		width: 48,
+	},
+
 	date: {
 		color: Colors.headerAndInputText,
 		fontSize: Fonts.f14,
 	},
-
 	dots: {
 		alignSelf: 'flex-start',
 		justifyContent: 'flex-end',
@@ -94,11 +127,18 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		paddingVertical: 2,
 	},
+	overlay: {
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: Colors.selectedTicketBackground,
+		justifyContent: 'center',
+		paddingHorizontal: 41,
+	},
 	root: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r16,
 		flexDirection: 'row',
 		gap: 16,
+		overflow: 'hidden',
 		paddingLeft: 32,
 		paddingRight: 16,
 		paddingVertical: 16,

@@ -50,7 +50,7 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 	);
 
 	const doBlockingFetch = useCallback(async () => {
-		if (runningRef.current) return;
+		// if (runningRef.current) return;
 		runningRef.current = true;
 		setIsLoading(true);
 		setError(null);
@@ -65,18 +65,38 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 		}
 	}, [force, ttlMs, mergeApply]);
 
+	// const doSWRFetch = useCallback(async () => {
+	// 	if (runningRef.current) return;
+	// 	if (!hydrated || trips.length === 0 || force) {
+	// 		await doBlockingFetch();
+	// 		return;
+	// 	}
+	//
+	// 	runningRef.current = true;
+	// 	setIsRefreshing(true);
+	// 	setError(null);
+	// 	try {
+	// 		// SWR-метод не возвращает данные напрямую, а вызывает коллбэк
+	// 		await tripApi.getMyTripsSWR({
+	// 			ttlMs,
+	// 			onUpdate: fresh => mergeApply(fresh),
+	// 		});
+	// 	} catch (e) {
+	// 		setError(e instanceof Error ? e : new Error('Unknown SWR error'));
+	// 	} finally {
+	// 		setIsRefreshing(false);
+	// 		runningRef.current = false;
+	// 	}
+	// }, [hydrated, trips.length, force, ttlMs, mergeApply, doBlockingFetch]);
 	const doSWRFetch = useCallback(async () => {
-		if (runningRef.current) return;
-		if (!hydrated || trips.length === 0 || force) {
-			await doBlockingFetch();
-			return;
-		}
+		// Эта функция вызывается только когда данные уже есть,
+		// поэтому проверка на trips.length === 0 не нужна.
+		// Ее делает useEffect.
 
 		runningRef.current = true;
 		setIsRefreshing(true);
 		setError(null);
 		try {
-			// SWR-метод не возвращает данные напрямую, а вызывает коллбэк
 			await tripApi.getMyTripsSWR({
 				ttlMs,
 				onUpdate: fresh => mergeApply(fresh),
@@ -87,12 +107,20 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 			setIsRefreshing(false);
 			runningRef.current = false;
 		}
-	}, [hydrated, trips.length, force, ttlMs, mergeApply, doBlockingFetch]);
+	}, [force, ttlMs, mergeApply]);
+	// useEffect(() => {
+	// 	if (!hydrated || runningRef.current) return;
+	// 	void doSWRFetch();
+	// }, [hydrated, doSWRFetch]);
 
 	useEffect(() => {
 		if (!hydrated || runningRef.current) return;
-		void doSWRFetch();
-	}, [hydrated, doSWRFetch]);
+		if (trips.length === 0) {
+			void doBlockingFetch();
+		} else {
+			void doSWRFetch();
+		}
+	}, [hydrated, trips.length, doBlockingFetch, doSWRFetch]);
 
 	useEffect(() => {
 		if (!refreshIntervalMs || !hydrated) return;
