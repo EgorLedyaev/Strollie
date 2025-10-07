@@ -1,6 +1,13 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+echo "[Deps] Проверка package.json ↔ node_modules"
+if ! npm ls --depth=0 >/dev/null 2>&1; then
+	echo "❌ Обнаружены несогласованные зависимости. Убедитесь, что пакет добавлен в package.json/package-lock.json и выполните 'npm install' без флага --no-save."
+	npm ls --depth=0
+	exit 1
+fi
+
 # Быстрый архитектурный и типовой контроль перед отправкой
 npm run typecheck || exit 1
 
