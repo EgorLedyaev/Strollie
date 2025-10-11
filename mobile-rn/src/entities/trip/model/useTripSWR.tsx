@@ -48,22 +48,39 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 		},
 		[setTrips],
 	);
+	const replaceApply = useCallback(
+		(incoming: Trip[]) => {
+			// Мы не зависим от `prev`, а просто устанавливаем новые данные
+			setTrips(() => incoming);
+		},
+		[setTrips],
+	);
 
-	const doBlockingFetch = useCallback(async () => {
-		// if (runningRef.current) return;
-		runningRef.current = true;
-		setIsLoading(true);
-		setError(null);
-		try {
-			const data = await tripApi.getMyTrips({ force, ttlMs });
-			mergeApply(data);
-		} catch (e) {
-			setError(e instanceof Error ? e : new Error('Unknown fetch error'));
-		} finally {
-			setIsLoading(false);
-			runningRef.current = false;
-		}
-	}, [force, ttlMs, mergeApply]);
+	const doBlockingFetch = useCallback(
+		async (options: { forceFetch?: boolean } = {}) => {
+			if (runningRef.current) return;
+			runningRef.current = true;
+			setIsLoading(true);
+			setError(null);
+
+			const effectiveForce = options.forceFetch || force;
+
+			try {
+				const data = await tripApi.getMyTrips({
+					force: effectiveForce,
+				});
+				replaceApply(data);
+			} catch (e) {
+				setError(
+					e instanceof Error ? e : new Error('Unknown fetch error'),
+				);
+			} finally {
+				setIsLoading(false);
+				runningRef.current = false;
+			}
+		},
+		[force, replaceApply],
+	);
 
 	// const doSWRFetch = useCallback(async () => {
 	// 	if (runningRef.current) return;
@@ -136,7 +153,7 @@ export function useTripsSWR(opts: UseTripsSWROptions = {}): UseTripsSWRResult {
 	}, [refreshIntervalMs, hydrated, doSWRFetch]);
 
 	const forceRefresh = useCallback(async () => {
-		await doBlockingFetch();
+		await doBlockingFetch({ forceFetch: true });
 	}, [doBlockingFetch]);
 
 	return {

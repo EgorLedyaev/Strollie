@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
 		borderRadius: Radius.r16,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		paddingVertical: 18,
+		paddingBottom: 16,
+		paddingTop: 24,
 	},
 	sectionItemTitle: {
 		fontSize: Fonts.f16,

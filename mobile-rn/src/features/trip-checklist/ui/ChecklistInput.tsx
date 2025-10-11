@@ -1,4 +1,4 @@
-import CheckmarkIconSmall from '@/assets/icons/CheckmarkIconSmall';
+import CheckmarkIconMedium from '@/assets/icons/CheckmarkIconMedium';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -29,7 +29,7 @@ export const ChecklistInput: React.FC<{ onAdd: (text: string) => void }> = ({
 			/>
 			<Pressable onPress={handleAdd} style={styles.confirmButton}>
 				{/*<View style={styles.confirmIcon} />*/}
-				<CheckmarkIconSmall />
+				<CheckmarkIconMedium />
 			</Pressable>
 		</View>
 	);
@@ -38,7 +38,7 @@ export const ChecklistInput: React.FC<{ onAdd: (text: string) => void }> = ({
 const styles = StyleSheet.create({
 	checklistInput: {
 		flex: 1,
-		fontSize: Fonts.f16,
+		fontSize: Fonts.f14,
 		height: 40,
 		marginHorizontal: 16,
 	},

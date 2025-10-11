@@ -71,6 +71,14 @@ export const useTripCreate = () => {
 		}
 	};
 
+	const handleToggleChecklistItem = (idToToggle: string) => {
+		setChecklist(prev =>
+			prev.map(item =>
+				item.id === idToToggle ? { ...item, done: !item.done } : item,
+			),
+		);
+	};
+
 	const onSave = useCallback(async () => {
 		if (!canSave) return;
 		try {
@@ -140,7 +148,10 @@ export const useTripCreate = () => {
 		isAddingChecklistItem,
 		isPickerVisible,
 		editingDateType,
+		handleToggleChecklistItem,
 		canSave,
+		notes,
+		setNotes,
 
 		// Обработчики
 		openPicker,

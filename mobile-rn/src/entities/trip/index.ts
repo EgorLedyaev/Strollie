@@ -3,3 +3,4 @@ export { tripApi } from './api/tripApi';
 export * from './model';
 export * from './model/useTripSWR';
 export { TripsErrorState } from './ui/TripsErrorState';
+export type { UpdateTripInput } from './api/tripApi';

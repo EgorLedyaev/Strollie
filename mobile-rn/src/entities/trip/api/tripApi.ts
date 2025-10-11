@@ -1,7 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import type { Trip, TripChecklistItem } from '../model';
 
 const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 export const DEFAULT_TTL_MS = 5 * 60 * 1000; // 5 минут
+const STORAGE_KEY = 'trips';
 
 // In-memory dataset (can be swapped with real backend service)
 const MOCK_TRIPS: Trip[] = [
@@ -19,6 +22,44 @@ const MOCK_TRIPS: Trip[] = [
 		updatedAt: new Date().toISOString(),
 	},
 ];
+
+let memoryTrips: Trip[] | null = null;
+
+async function persistTrips(trips: Trip[]) {
+	try {
+		const jsonValue = JSON.stringify(trips);
+		await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+	} catch (e) {
+		console.error('Ошибка сохранения поездок в AsyncStorage', e);
+	}
+}
+
+async function loadTrips(): Promise<Trip[]> {
+	try {
+		const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
+		if (jsonValue !== null) {
+			return JSON.parse(jsonValue);
+		}
+		await persistTrips(MOCK_TRIPS);
+		return MOCK_TRIPS;
+	} catch (e) {
+		console.error('Ошибка загрузки поездок из AsyncStorage', e);
+		return MOCK_TRIPS;
+	}
+}
+
+async function ensureTripsLoaded() {
+	if (memoryTrips === null) {
+		memoryTrips = await loadTrips();
+	}
+}
+
+export interface UpdateTripInput {
+	checklist: TripChecklistItem[];
+	notes: string;
+	ticketIds: string[];
+	places: string[];
+}
 
 export interface CreateTripInput {
 	startDate: string;
@@ -40,8 +81,40 @@ async function createTrip(data: CreateTripInput): Promise<Trip> {
 		updatedAt: now,
 		...data,
 	};
-	MOCK_TRIPS.push(trip);
+	memoryTrips!.push(trip);
+	await persistTrips(memoryTrips!);
 	return trip;
+}
+
+async function updateTrip(id: string, data: UpdateTripInput): Promise<Trip> {
+	await sleep(300);
+	const tripIndex = memoryTrips!.findIndex(t => t.id === id);
+
+	if (tripIndex === -1) {
+		throw new Error('Поездка не найдена');
+	}
+
+	const originalTrip = memoryTrips![tripIndex];
+	const updatedTrip: Trip = {
+		...originalTrip,
+		...data,
+		updatedAt: new Date().toISOString(),
+	};
+	memoryTrips![tripIndex] = updatedTrip;
+	await persistTrips(memoryTrips!);
+	return updatedTrip;
+}
+
+async function deleteTrip(id: string): Promise<void> {
+	await sleep(400);
+	const initialLength = memoryTrips!.length;
+	memoryTrips = memoryTrips!.filter(t => t.id !== id);
+
+	if (memoryTrips.length === initialLength) {
+		throw new Error('Поездка для удаления не найдена');
+	}
+
+	await persistTrips(memoryTrips);
 }
 
 // export const tripApi = {
@@ -73,15 +146,14 @@ const getMyTripsSWR = async (opts: {
 	opts.onUpdate([...MOCK_TRIPS]);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getMyTrips = async (_opts: {
-	force?: boolean;
-	ttlMs: number;
-}): Promise<Trip[]> => {
-	await sleep(1200);
-	// Также просто возвращаем текущее состояние
-	return [...MOCK_TRIPS];
-};
+async function getMyTrips(opts?: { force?: boolean }): Promise<Trip[]> {
+	await ensureTripsLoaded();
+	if (opts?.force) {
+		memoryTrips = await loadTrips();
+	}
+	await sleep(500);
+	return [...memoryTrips!];
+}
 // const getMyTrips = async (_opts: {
 // 	force?: boolean;
 // 	ttlMs: number;
@@ -94,4 +166,6 @@ export const tripApi = {
 	getMyTrips,
 	getMyTripsSWR,
 	createTrip,
+	updateTrip,
+	deleteTrip,
 };

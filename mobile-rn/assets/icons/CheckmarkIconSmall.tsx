@@ -1,14 +1,17 @@
 import * as React from 'react';
 import Svg, { Path, SvgProps } from 'react-native-svg';
 
-const CheckmarkIconSmall = (props: SvgProps) => (
-	<Svg width={12} height={12} fill='none' {...props}>
+type Props = SvgProps & {
+	color?: string;
+};
+const CheckmarkIconSmall = ({ color = '#fff', ...props }: Props) => (
+	<Svg width={8} height={8} fill='none' {...props}>
 		<Path
-			stroke='#fff'
+			stroke={color}
 			strokeLinecap='round'
 			strokeLinejoin='round'
-			strokeWidth={1.667}
-			d='m1 6 3.75 5L11 1'
+			strokeWidth={1.5}
+			d='m1 4 2.25 3L7 1'
 		/>
 	</Svg>
 );

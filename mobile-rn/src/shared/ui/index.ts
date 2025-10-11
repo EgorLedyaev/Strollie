@@ -15,6 +15,7 @@ export { AppText, AppTextInput } from './Text';
 export { PaginationDots } from './PaginationDots';
 export { LikeButton } from './LikeButton';
 export { DatePickerModal } from './DatePickerModal/DatePickerModal';
+export { SectionItem } from './SectionItem';
 
 // Новые компоненты для FSD
 export { Avatar } from './Avatar';

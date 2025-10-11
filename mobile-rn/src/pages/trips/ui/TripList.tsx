@@ -1,14 +1,13 @@
 import MoreArrowIcon from '@/assets/icons/MoreArrowIcon';
 import { Link } from 'expo-router';
 import React, { useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
 import { Ticket } from '@/entities/ticket';
 import { Trip } from '@/entities/trip';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
-// TODO: поменять внешний вид карточек и сделать чтоб они открывались
 interface TripVm {
 	id: string;
 	title: string; // исходное из API
@@ -35,7 +34,7 @@ const TripCard: React.FC<{ trip: TripVm; isCompleted?: boolean }> = ({
 	isCompleted = false,
 }) => (
 	<Link href={`/trips/${trip.id}`} asChild>
-		<View style={styles.tripCard}>
+		<TouchableOpacity style={styles.tripCard}>
 			<View>
 				<AppText
 					style={[
@@ -55,7 +54,7 @@ const TripCard: React.FC<{ trip: TripVm; isCompleted?: boolean }> = ({
 				</AppText>
 			</View>
 			<MoreArrowIcon />
-		</View>
+		</TouchableOpacity>
 	</Link>
 );
 

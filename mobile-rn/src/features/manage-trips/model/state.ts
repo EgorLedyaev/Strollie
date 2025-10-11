@@ -13,3 +13,4 @@ export const checklistAtom = atom<TripChecklistItem[]>([]);
 export const isSubmittingAtom = atom(false);
 
 export const selectedTicketsAtom = atom<Ticket[]>([]);
+export const editingTripTicketsAtom = atom<Ticket[] | null>(null);

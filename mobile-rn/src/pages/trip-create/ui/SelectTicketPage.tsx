@@ -1,21 +1,26 @@
 import AddTicketIcon from '@/assets/icons/tickets/AddTicketIcon';
 import tickets_empty from '@/assets/images/tickets/tickets-empty.png';
-import { useRouter } from 'expo-router';
-import { useAtom, useAtomValue } from 'jotai';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useAtom } from 'jotai';
 import React, { useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { selectedTicketsAtom } from '@/pages/trip-create/model/state';
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
 import { TicketsList } from '@/widgets/tickets-list';
+import {
+	editingTripTicketsAtom,
+	selectedTicketsAtom,
+} from '@/features/manage-trips';
 import { TicketsErrorState, useTicketsSWR } from '@/entities/ticket';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 
 export const SelectTicketPage = () => {
 	const router = useRouter();
+	const params = useLocalSearchParams(); // Получаем параметры навигации
+	const mode = params.mode === 'edit' ? 'edit' : 'create'; // Определяем режим
 	const {
 		tickets,
 		isHydrated: hydrated,
@@ -24,10 +29,21 @@ export const SelectTicketPage = () => {
 		forceRefresh,
 	} = useTicketsSWR();
 
-	const [, setSelectedTickets] = useAtom(selectedTicketsAtom);
-	const initialSelectedTickets = useAtomValue(selectedTicketsAtom);
+	// const [, setSelectedTickets] = useAtom(selectedTicketsAtom);
+	// const initialSelectedTickets = useAtomValue(selectedTicketsAtom);
+	// const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>(() => {
+	// 	return initialSelectedTickets.map(ticket => ticket.id);
+	// });
+	const [create_selectedTickets, create_setSelectedTickets] =
+		useAtom(selectedTicketsAtom);
+	const [edit_selectedTickets, edit_setSelectedTickets] = useAtom(
+		editingTripTicketsAtom,
+	);
 	const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>(() => {
-		return initialSelectedTickets.map(ticket => ticket.id);
+		if (mode === 'edit' && edit_selectedTickets) {
+			return edit_selectedTickets.map(ticket => ticket.id);
+		}
+		return create_selectedTickets.map(ticket => ticket.id);
 	});
 
 	const handleTicketSelect = (ticketId: string) => {
@@ -44,7 +60,11 @@ export const SelectTicketPage = () => {
 		const finalSelectedTickets = tickets.filter(ticket =>
 			selectedTicketIds.includes(ticket.id),
 		);
-		setSelectedTickets(finalSelectedTickets);
+		if (mode === 'edit') {
+			edit_setSelectedTickets(finalSelectedTickets);
+		} else {
+			create_setSelectedTickets(finalSelectedTickets);
+		}
 		router.back();
 	};
 
@@ -119,7 +139,7 @@ export const SelectTicketPage = () => {
 						>
 							{/*<AddTicketIcon />*/}
 							{/*Тут должна быть кнопка перебрасывающая на экран с добавлением билета,
-							но тогда у нас нет сохранения билета в поездку*/}
+						но тогда у нас нет сохранения билета в поездку*/}
 							<AppText variant='button'>Сохранить</AppText>
 						</AppButton>
 					</View>

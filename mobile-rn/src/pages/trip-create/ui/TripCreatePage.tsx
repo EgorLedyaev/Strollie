@@ -2,14 +2,18 @@ import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useTripCreate } from '@/pages/trip-create/model/useTripCreate';
-import { ChecklistInput } from '@/pages/trip-create/ui/ChecklistInput';
-import { ChecklistItem } from '@/pages/trip-create/ui/ChecklistItem';
-import { SectionItem } from '@/pages/trip-create/ui/SectionItem';
 import { Header } from '@/widgets/header';
+import { useTripCreate } from '@/features/manage-trips';
+import { ChecklistInput, ChecklistItem } from '@/features/trip-checklist';
 import { NewTicketItem } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppButton, AppText, AppTextInput, DatePickerModal } from '@/shared/ui';
+import {
+	AppButton,
+	AppText,
+	AppTextInput,
+	DatePickerModal,
+	SectionItem,
+} from '@/shared/ui';
 
 export const TripCreatePage: React.FC = () => {
 	const {
@@ -17,6 +21,8 @@ export const TripCreatePage: React.FC = () => {
 		endDate,
 		selectedTickets,
 		checklist,
+		notes,
+		setNotes,
 		isAddingChecklistItem,
 		isPickerVisible,
 		editingDateType,
@@ -84,7 +90,7 @@ export const TripCreatePage: React.FC = () => {
 					<SectionItem
 						label={'Чек-лист'}
 						onPress={() => {
-							setIsAddingChecklistItem(true);
+							setIsAddingChecklistItem(!isAddingChecklistItem);
 						}}
 					/>
 					{checklist.length > 0 && (
@@ -93,6 +99,7 @@ export const TripCreatePage: React.FC = () => {
 								<ChecklistItem
 									key={item.id}
 									item={item}
+									showDelete={true}
 									onDelete={handleDeleteChecklistItem}
 								/>
 							))}
@@ -111,6 +118,8 @@ export const TripCreatePage: React.FC = () => {
 						Заметки
 					</AppText>
 					<AppTextInput
+						value={notes}
+						onChangeText={setNotes}
 						style={styles.notesInput}
 						multiline
 						placeholder='Введите текст того, что вы хотели записать или дополнить'
@@ -220,7 +229,7 @@ const styles = StyleSheet.create({
 	notesInput: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r16,
-		color: Colors.black,
+		color: Colors.headerAndInputText,
 		fontFamily: Fonts.regular,
 		fontSize: Fonts.f16,
 		height: 120,

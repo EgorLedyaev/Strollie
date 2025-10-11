@@ -1,15 +1,26 @@
 import PlusIcon from '@/assets/icons/action/PlusIcon';
 import EditPhotoIcon from '@/assets/icons/EditPhotoIcon';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useAtom } from 'jotai';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { tripsApi } from '@/pages/trips/api';
-import { Ticket, ticketApi, TicketCard } from '@/entities/ticket';
-import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
-import { AppButton, AppText, BackButton, IconButton } from '@/shared/ui';
-import { PlusButton } from '@/shared/ui/PlusButton';
+import { Header } from '@/widgets/header';
+import { editingTripTicketsAtom } from '@/features/manage-trips';
+import { ChecklistInput, ChecklistItem } from '@/features/trip-checklist';
+import { NewTicketItem, Ticket, ticketApi } from '@/entities/ticket';
+import { tripApi, TripChecklistItem, UpdateTripInput } from '@/entities/trip';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
+import {
+	AppButton,
+	AppText,
+	AppTextInput,
+	IconButton,
+	SectionItem,
+} from '@/shared/ui';
+
+import { Place, PlacesSection } from './PlacesSection';
 
 function pad2(n: number) {
 	return n < 10 ? `0${n}` : `${n}`;
@@ -18,9 +29,6 @@ function formatDate(d: Date) {
 	return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
 }
 
-type Place = { id: string; name: string; active?: boolean };
-type Task = { id: string; text: string; done: boolean };
-
 type TripVm = {
 	id: string;
 	title: string;
@@ -28,38 +36,127 @@ type TripVm = {
 	start: Date;
 	end: Date;
 	ticketIds: string[];
+	checklist: TripChecklistItem[];
+	notes: string;
 };
 
 export const TripDetailsPage: React.FC = () => {
 	const { id } = useLocalSearchParams();
-	const router = useRouter();
+	// const router = useRouter();
 	const [loading, setLoading] = useState(true);
 	const [trip, setTrip] = useState<TripVm | null>(null);
 	const [tickets, setTickets] = useState<Ticket[]>([]);
+	const [placesMode, setPlacesMode] = useState<'view' | 'route'>('view');
+	const [selectedRoutePlaces, setSelectedRoutePlaces] = useState<string[]>(
+		[],
+	);
+	const [checklist, setChecklist] = useState<TripChecklistItem[]>([]);
+	const [checklistMode, setChecklistMode] = useState<'view' | 'edit'>('view');
+	const [isAddingChecklistItem, setIsAddingChecklistItem] = useState(false);
+	const [editableNotes, setEditableNotes] = useState('');
+	const [, setIsSaving] = useState(false);
+	const [isDeleting, setIsDeleting] = useState(false);
+
+	const [editingTickets, setEditingTickets] = useAtom(editingTripTicketsAtom);
 
 	// Временные мок-данные для секций (уровень pages)
 	const [places] = useState<Place[]>([
-		{ id: 'p1', name: 'Цирк имени Братьев Никитиных', active: true },
+		{ id: 'p1', name: 'Цирк имени Братьев Никитиных', visited: true },
 		{ id: 'p2', name: 'ТЮЗ им. Ю.П. Киселёва' },
-		{ id: 'p3', name: 'Парк Липки' },
+		{ id: 'p3', name: 'Парк Липки', visited: true },
 		{ id: 'p4', name: 'Набережная Космонавтов' },
 	]);
-	const [tasks] = useState<Task[]>([
-		{ id: 't1', text: 'Посетить журавлей в парке Победы', done: true },
-		{ id: 't2', text: 'Сходить в Тары-Бары', done: false },
-		{
-			id: 't3',
-			text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras faucibus tellus felis, vel vehicula tortor aliquet ultrices.',
+
+	const handleBuildRouteClick = () => {
+		if (placesMode === 'view') {
+			setPlacesMode('route');
+			setSelectedRoutePlaces([]);
+		} else {
+			console.log(
+				'Нажата кнопка Построить маршрут с точками:',
+				selectedRoutePlaces,
+			);
+			setPlacesMode('view');
+		}
+	};
+	const togglePlaceSelection = (placeId: string) => {
+		setSelectedRoutePlaces(prevSelected => {
+			if (prevSelected.includes(placeId)) {
+				return prevSelected.filter(id => id !== placeId);
+			} else {
+				return [...prevSelected, placeId];
+			}
+		});
+	};
+
+	const handleToggleChecklistItem = (idToToggle: string) => {
+		if (checklistMode !== 'view') return;
+		setChecklist(currentList =>
+			currentList.map(item =>
+				item.id === idToToggle ? { ...item, done: !item.done } : item,
+			),
+		);
+	};
+
+	const handleDeleteChecklistItem = (idToDelete: string) => {
+		setChecklist(currentList =>
+			currentList.filter(item => item.id !== idToDelete),
+		);
+	};
+
+	const handleConfirmAddChecklistItem = (text: string) => {
+		const newItem: TripChecklistItem = {
+			id: `checklist_${Date.now()}`,
+			text,
 			done: false,
-		},
-	]);
+		};
+		setChecklist(prev => [...prev, newItem]);
+		setIsAddingChecklistItem(false);
+	};
+	const handleSave = async () => {
+		if (!trip) return;
+
+		setIsSaving(true);
+
+		const updatedData: UpdateTripInput = {
+			checklist: checklist,
+			notes: editableNotes,
+			ticketIds: tickets.map(t => t.id), // Преобразуем массив билетов в массив ID
+			places: places.map(p => p.id), // Преобразуем массив мест в массив ID
+		};
+
+		try {
+			await tripApi.updateTrip(trip.id, updatedData);
+			console.log('Поездка успешно сохранена!');
+			setChecklistMode('view');
+			router.back();
+		} catch (error) {
+			console.error('Ошибка при сохранении поездки:', error);
+		} finally {
+			setIsSaving(false);
+		}
+	};
+
+	const handleDelete = async () => {
+		if (!trip || isDeleting) return;
+		setIsDeleting(true);
+		try {
+			await tripApi.deleteTrip(trip.id);
+			console.log('Поездка успешно удалена!');
+			router.back();
+		} catch (error) {
+			console.error('Ошибка при удалении поездки:', error);
+		} finally {
+			setIsDeleting(false);
+		}
+	};
 
 	useEffect(() => {
 		(async () => {
 			if (!id || Array.isArray(id)) return;
 			setLoading(true);
 			const [trps, allTickets] = await Promise.all([
-				tripsApi.getMyTrips(),
+				tripApi.getMyTrips({ force: true }),
 				ticketApi.getMyTickets(),
 			]);
 			const tMap: Record<string, { to: string }> = {};
@@ -72,15 +169,17 @@ export const TripDetailsPage: React.FC = () => {
 					: undefined;
 				const displayTitle = firstTicket
 					? `Поездка в ${firstTicket.to}`
-					: found.name;
+					: found.title || 'Поездка';
 
 				const vm: TripVm = {
 					id: found.id,
-					title: found.name,
+					title: found.title || 'Поездка',
 					displayTitle,
-					start: found.startDate,
-					end: found.endDate,
+					start: new Date(found.startDate),
+					end: new Date(found.endDate),
 					ticketIds: found.ticketIds,
+					checklist: found.checklist,
+					notes: found.notes || '',
 				};
 				setTrip(vm);
 				setTickets(
@@ -91,14 +190,26 @@ export const TripDetailsPage: React.FC = () => {
 		})();
 	}, [id]);
 
+	useEffect(() => {
+		if (trip) {
+			setChecklist(trip.checklist);
+			setEditableNotes(trip.notes || '');
+		}
+	}, [trip]);
+
+	useFocusEffect(
+		useCallback(() => {
+			if (editingTickets !== null) {
+				setTickets(editingTickets);
+				setEditingTickets(null);
+			}
+		}, [editingTickets, setEditingTickets]),
+	);
+
 	if (loading) {
 		return (
 			<SafeAreaView style={styles.container}>
-				<View style={styles.headerRow}>
-					<BackButton onPress={() => router.back()} variant='icon' />
-					<AppText style={styles.headerTitle}>Поездка</AppText>
-					<View style={styles.headerSpacer} />
-				</View>
+				<Header title={'Поездка'} />
 				<View style={styles.center}>
 					<ActivityIndicator />
 				</View>
@@ -109,11 +220,7 @@ export const TripDetailsPage: React.FC = () => {
 	if (!trip) {
 		return (
 			<SafeAreaView style={styles.container}>
-				<View style={styles.headerRow}>
-					<BackButton onPress={() => router.back()} variant='icon' />
-					<AppText style={styles.headerTitle}>Поездка</AppText>
-					<View style={styles.headerSpacer} />
-				</View>
+				<Header title={'Поездка'} />
 				<View style={styles.center}>
 					<AppText>Поездка не найдена</AppText>
 				</View>
@@ -123,203 +230,175 @@ export const TripDetailsPage: React.FC = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{/* Шапка */}
-			<View style={styles.headerRow}>
-				<BackButton onPress={() => router.back()} variant='icon' />
-				<AppText style={styles.headerTitle} numberOfLines={1}>
-					{trip.displayTitle}
-				</AppText>
-				<View style={styles.headerSpacer} />
-			</View>
-
-			<FlatList
-				data={[{ key: 'content' }]}
-				keyExtractor={i => i.key}
-				renderItem={() => (
-					<View style={styles.content}>
-						{/* Даты */}
-						<View style={styles.sectionDates}>
-							<View style={styles.dateBox}>
-								<AppText style={styles.dateLabel}>
-									Начало
-								</AppText>
-								<AppText style={styles.dateValue}>
-									{formatDate(trip.start)}
-								</AppText>
-							</View>
-							<View style={styles.dateBox}>
-								<AppText style={styles.dateLabel}>
-									Конец
-								</AppText>
-								<AppText style={styles.dateValue}>
-									{formatDate(trip.end)}
-								</AppText>
-							</View>
+			<Header title={trip.displayTitle} />
+			<ScrollView
+				// contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+			>
+				<View>
+					{/* Даты */}
+					<View style={styles.dateContainer}>
+						<View style={styles.dateBlock}>
+							<AppText style={styles.dateLabel}>Начало</AppText>
+							<AppText style={styles.dateValue}>
+								{formatDate(trip.start)}
+							</AppText>
 						</View>
-
-						{/* Билеты */}
-						<View style={styles.section}>
-							<View style={styles.sectionHeaderRow}>
-								<AppText style={styles.sectionTitle}>
-									Билеты
-								</AppText>
-								<PlusButton onPress={() => {}} />
-							</View>
-							{tickets.length > 0 ? (
-								<View style={styles.ticketsWrap}>
+						<View style={styles.dateBlock}>
+							<AppText style={styles.dateLabel}>Конец</AppText>
+							<AppText style={styles.dateValue}>
+								{formatDate(trip.end)}
+							</AppText>
+						</View>
+					</View>
+					{/* Билеты */}
+					<View style={styles.sectionsContainer}>
+						<SectionItem
+							label={'Билеты'}
+							onPress={() => {
+								setEditingTickets(tickets);
+								router.push('/trips/select-ticket?mode=edit');
+							}}
+						/>
+						<View style={styles.ticketsContainer}>
+							{tickets.length > 0 && (
+								<View style={styles.ticketsContainer}>
 									{tickets.map(t => (
-										<View
-											style={styles.ticketItem}
-											key={t.id}
-										>
-											<TicketCard ticket={t} />
-										</View>
+										<NewTicketItem key={t.id} ticket={t} />
 									))}
 								</View>
-							) : null}
+							)}
 						</View>
 
-						{/* Места */}
-						<View style={styles.section}>
-							<View style={styles.sectionHeaderRow}>
-								<AppText style={styles.sectionTitle}>
-									Места
-								</AppText>
-								<PlusButton onPress={() => {}} />
-							</View>
-							<View style={styles.placesBox}>
-								<View style={styles.placesLine} />
-								{places.map(p => (
-									<View style={styles.placeRow} key={p.id}>
-										<View
-											style={[
-												styles.placeDot,
-												p.active
-													? styles.placeDotActive
-													: styles.placeDotInactive,
-											]}
-										/>
-										<AppText style={styles.placeText}>
-											{p.name}
-										</AppText>
-									</View>
-								))}
-							</View>
-						</View>
+						<PlacesSection
+							places={places}
+							mode={placesMode}
+							selectedIds={selectedRoutePlaces}
+							onBuildRouteClick={handleBuildRouteClick}
+							onPlaceSelect={togglePlaceSelection}
+						/>
 
 						{/* Чек-лист */}
-						<View style={styles.section}>
+						<View>
 							<View style={styles.sectionHeaderRow}>
 								<AppText style={styles.sectionTitle}>
 									Чек-лист
 								</AppText>
 								<View style={styles.rowGap10}>
-									<IconButton>
-										<View style={styles.smallSquareGreen}>
-											<EditPhotoIcon />
-										</View>
-									</IconButton>
-									<IconButton>
-										<View style={styles.smallSquareWhite}>
-											<PlusIcon />
-										</View>
-									</IconButton>
-								</View>
-							</View>
-							<View style={styles.checklistBox}>
-								{tasks.map(task => (
-									<View style={styles.taskRow} key={task.id}>
+									<IconButton
+										onPress={() =>
+											setChecklistMode(prev =>
+												prev === 'view'
+													? 'edit'
+													: 'view',
+											)
+										}
+									>
 										<View
 											style={
-												task.done
-													? styles.checkboxChecked
-													: styles.checkbox
+												checklistMode === 'edit'
+													? styles.smallSquareGreen
+													: styles.smallSquareWhite
 											}
 										>
-											{task.done ? (
-												<AppText
-													style={styles.checkmark}
-												>
-													✓
-												</AppText>
-											) : null}
+											<EditPhotoIcon
+												color={
+													checklistMode === 'edit'
+														? Colors.white
+														: Colors.textAAA
+												}
+											/>
 										</View>
-										<AppText style={styles.taskText}>
-											{task.text}
-										</AppText>
-										<AppText style={styles.removeIcon}>
-											×
-										</AppText>
-									</View>
-								))}
-							</View>
-						</View>
-
-						{/* Маршруты */}
-						<View style={styles.section}>
-							<View style={styles.sectionHeaderRow}>
-								<AppText style={styles.sectionTitle}>
-									Маршруты
-								</AppText>
-								<View style={styles.rowGap10}>
-									<IconButton>
+									</IconButton>
+									<IconButton
+										onPress={() =>
+											setIsAddingChecklistItem(
+												!isAddingChecklistItem,
+											)
+										}
+									>
 										<View style={styles.smallSquareWhite}>
 											<PlusIcon />
 										</View>
 									</IconButton>
 								</View>
 							</View>
-							<View style={styles.routeCard}>
-								<AppText style={styles.routeTitle}>
-									Название маршрута
-								</AppText>
-								<View style={styles.routeMetaRow}>
-									<AppText style={styles.routeMeta}>
-										Из 1 точки
-									</AppText>
-									<AppText style={styles.routeMeta}>
-										В последнюю точку
-									</AppText>
+							{checklist.length > 0 && (
+								<View style={styles.checklistBox}>
+									{checklist.map(item => (
+										<ChecklistItem
+											key={item.id}
+											item={item}
+											onToggle={
+												checklistMode === 'view'
+													? handleToggleChecklistItem
+													: undefined
+											}
+											onDelete={
+												checklistMode === 'edit'
+													? handleDeleteChecklistItem
+													: undefined
+											}
+											showDelete={
+												checklistMode === 'edit'
+											}
+										/>
+									))}
 								</View>
-							</View>
-						</View>
-
-						{/* Заметки */}
-						<View style={styles.section}>
-							<AppText style={styles.sectionTitle}>
-								Заметки
-							</AppText>
-							<View style={styles.notesBox}>
-								<AppText style={styles.notesText}>
-									Lorem ipsum dolor sit amet, consectetur
-									adipiscing elit. Cras faucibus tellus felis,
-									vel vehicula tortor aliquet ultrices.
-									Aliquam consectetur urna felis, sed commodo
-									quam tempus sit amet. Quisque ac lectus
-									vitae sem molestie tincidunt vel sed magna
-								</AppText>
-							</View>
-						</View>
-
-						{/* Нижние кнопки */}
-						<View style={styles.bottomRow}>
-							<AppButton
-								text='Удалить'
-								variant='secondary'
-								buttonColor={Colors.white}
-								textColor={Colors.red}
-								style={styles.bottomDelete}
-							/>
-							<AppButton
-								text='Сохранить поездку'
-								style={styles.bottomSave}
-							/>
+							)}
+							{isAddingChecklistItem && (
+								<View style={styles.inputWrapper}>
+									<ChecklistInput
+										onAdd={handleConfirmAddChecklistItem}
+									/>
+								</View>
+							)}
 						</View>
 					</View>
-				)}
-				contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}
-			/>
+
+					{/* Заметки */}
+					<View style={styles.notesContainer}>
+						<AppText style={styles.sectionTitle}>Заметки</AppText>
+						{checklistMode === 'edit' ? (
+							<AppTextInput
+								value={editableNotes}
+								onChangeText={setEditableNotes}
+								style={styles.notesInput}
+								multiline
+								placeholder='Введите текст того, что вы хотели записать или дополнить'
+								placeholderTextColor={Colors.grayMedium}
+							/>
+						) : (
+							<View style={styles.notesBox}>
+								<AppText style={styles.notesText}>
+									{editableNotes || 'У вас пока нет заметок.'}
+								</AppText>
+							</View>
+						)}
+					</View>
+
+					{/* Нижние кнопки */}
+					<View style={styles.bottomRow}>
+						<AppButton
+							text='Удалить'
+							variant='secondary'
+							buttonColor={Colors.white}
+							textColor={Colors.red}
+							style={styles.bottomDelete}
+							textFontFamily={Fonts.regular}
+							buttonBorderRadius={Radius.r16}
+							onPress={handleDelete}
+						/>
+						<AppButton
+							text='Сохранить поездку'
+							style={styles.bottomSave}
+							textFontFamily={Fonts.regular}
+							buttonBorderRadius={Radius.r16}
+							onPress={handleSave}
+						/>
+					</View>
+				</View>
+			</ScrollView>
 		</SafeAreaView>
 	);
 };
@@ -333,7 +412,7 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		flexDirection: 'row',
 		gap: 16,
-		marginTop: 8,
+		marginTop: 20,
 	},
 	bottomSave: {
 		flex: 2,
@@ -344,44 +423,32 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: 'center',
 	},
-	checkbox: {
-		borderColor: Colors.grayAvatar,
-		borderRadius: Radius.r4,
-		borderWidth: 2,
-		height: 20,
-		width: 20,
-	},
-	checkboxChecked: {
-		alignItems: 'center',
-		backgroundColor: Colors.grayAvatar,
-		borderRadius: Radius.r4,
-		height: 20,
-		justifyContent: 'center',
-		width: 20,
-	},
 	checklistBox: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,
-		paddingHorizontal: 10,
-		paddingVertical: 20,
-		rowGap: 8,
-	},
-	checkmark: {
-		color: Colors.white,
-		fontSize: Fonts.f14,
+		marginVertical: 10,
+		padding: 16,
 	},
 	container: {
 		flex: 1,
 		paddingHorizontal: 16,
 		paddingTop: 16,
 	},
-	content: {
-		flex: 1,
-	},
-	dateBox: {
+	dateBlock: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		gap: 8,
+		justifyContent: 'center',
+	},
+	dateContainer: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginTop: 24,
+		paddingHorizontal: 24,
+		paddingVertical: 20,
 	},
 	dateLabel: {
 		color: Colors.textGrayB7,
@@ -392,116 +459,40 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f16,
 	},
-	headerRow: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingBottom: 14,
-	},
-	headerSpacer: {
-		height: 32,
-		width: 32,
-	},
-	headerTitle: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f16,
-		maxWidth: '70%',
-		textAlign: 'center',
+	inputWrapper: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
+		marginTop: 8,
 	},
 	notesBox: {
 		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		paddingHorizontal: 10,
-		paddingVertical: 16,
+		borderRadius: Radius.r16,
+		minHeight: 120,
+		padding: 16,
+	},
+	notesContainer: {
+		gap: 12,
+		marginTop: 20,
+	},
+	notesInput: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r16,
+		color: Colors.headerAndInputText,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f16,
+		height: 120,
+		padding: 16,
+		textAlignVertical: 'top',
 	},
 	notesText: {
 		color: Colors.headerAndInputText,
-		fontSize: Fonts.f14,
-	},
-	placeDot: {
-		borderRadius: Radius.r10,
-		height: 20,
-		width: 20,
-	},
-	placeDotActive: {
-		backgroundColor: Colors.greenPrimary,
-	},
-	placeDotInactive: {
-		backgroundColor: Colors.grayMedium,
-	},
-	placeRow: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		gap: 24,
-		marginBottom: 20,
-	},
-	placeText: {
-		color: Colors.headerAndInputText,
-		fontSize: Fonts.f14,
-	},
-	placesBox: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		paddingHorizontal: 24,
-		paddingVertical: 20,
-	},
-	placesLine: {
-		backgroundColor: Colors.gray,
-		borderRadius: Radius.r5,
-		bottom: 10,
-		left: 6,
-		position: 'absolute',
-		top: 10,
-		width: 8,
-	},
-	removeIcon: {
-		color: Colors.grayText,
-		fontSize: Fonts.f12,
-		textAlign: 'center',
-		width: 12,
-	},
-	routeCard: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		padding: 20,
-		rowGap: 12,
-	},
-	routeMeta: {
-		color: Colors.headerAndInputText,
-		fontSize: Fonts.f14,
-	},
-	routeMetaRow: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: 10,
-	},
-	routeTitle: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.bold,
+		fontFamily: Fonts.regular,
 		fontSize: Fonts.f16,
 	},
 	rowGap10: {
 		alignItems: 'center',
 		flexDirection: 'row',
 		gap: 10,
-	},
-	scrollContent: {
-		paddingBottom: 32,
-		rowGap: Gaps.g16,
-	},
-	section: {
-		rowGap: Gaps.g12,
-	},
-	sectionDates: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r15,
-		flexDirection: 'row',
-		gap: 32,
-		justifyContent: 'space-between',
-		marginTop: 20,
-		paddingHorizontal: 24,
-		paddingVertical: 20,
 	},
 	sectionHeaderRow: {
 		alignItems: 'center',
@@ -513,6 +504,9 @@ const styles = StyleSheet.create({
 		color: Colors.headerAndInputText,
 		fontFamily: Fonts.bold,
 		fontSize: Fonts.f16,
+	},
+	sectionsContainer: {
+		// paddingTop: 30,
 	},
 	smallSquareGreen: {
 		alignItems: 'center',
@@ -530,21 +524,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		width: 32,
 	},
-	taskRow: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		gap: 8,
-		justifyContent: 'space-between',
-	},
-	taskText: {
-		color: Colors.headerAndInputText,
-		flex: 1,
-		fontSize: Fonts.f14,
-	},
-	ticketItem: {
-		marginBottom: 0,
-	},
-	ticketsWrap: {
-		gap: 12,
+	ticketsContainer: {
+		gap: 16,
 	},
 });
