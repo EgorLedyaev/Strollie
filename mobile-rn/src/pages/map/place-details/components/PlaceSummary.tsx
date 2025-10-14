@@ -1,7 +1,6 @@
 import LikeIcon from '@/assets/icons/LikeIcon';
 import ShareIcon from '@/assets/icons/ShareIcon';
 import fallbackImage from '@/assets/images/unmatched.png';
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
 	Image,
@@ -16,6 +15,7 @@ import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText, IconButton } from '@/shared/ui';
 
 import type { Place, TabType } from '../types';
+import { PhotoCarousel } from './PhotoCarousel';
 
 const SUMMARY_MAX_DESCRIPTION_LENGTH = 160;
 
@@ -145,49 +145,37 @@ export function PlaceSummary({
 		});
 	}, [onShare, place, websiteLabel]);
 
+	const photoUrls = useMemo(() => {
+		return (
+			place.photos?.map(p => p.url).filter(Boolean) ?? [
+				heroSource.uri ?? '',
+			]
+		).filter(url => url);
+	}, [place.photos, heroSource]);
+
 	return (
 		<View style={styles.container}>
-			<View style={styles.imageWrapper}>
-				<Image
-					source={heroSource}
-					style={styles.heroImage}
-					resizeMode='cover'
-				/>
-				<LinearGradient
-					colors={[
-						'rgba(34, 34, 34, 0)',
-						'rgba(34, 34, 34, 0.73)',
-						'rgba(34, 34, 34, 1)',
-					]}
-					locations={[0.17, 0.26, 0.43]}
-					style={styles.imageGradient}
-				/>
+			{!isExpanded && photoUrls.length > 0 ? (
+				<PhotoCarousel photos={photoUrls} />
+			) : (
+				<View style={styles.imageWrapper}>
+					<Image
+						source={heroSource}
+						style={styles.heroImage}
+						resizeMode='cover'
+					/>
 
-				{/* Progress bars для carousel (collapsed state) */}
-				{!isExpanded && photoCount > 1 && (
-					<View style={styles.progressBarsContainer}>
-						{Array.from({ length: Math.min(6, photoCount) }).map(
-							(_, index) => (
-								<View
-									key={index}
-									style={[
-										styles.progressBar,
-										index === 0 && styles.progressBarActive,
-									]}
-								/>
-							),
-						)}
-					</View>
-				)}
-
-				<View style={styles.imageOverlay}>
-					<View style={styles.photosBadge}>
-						<AppText style={styles.photosBadgeText}>
-							{photoCount > 0 ? `${photoCount} фото` : 'Нет фото'}
-						</AppText>
+					<View style={styles.imageOverlay}>
+						<View style={styles.photosBadge}>
+							<AppText style={styles.photosBadgeText}>
+								{photoCount > 0
+									? `${photoCount} фото`
+									: 'Нет фото'}
+							</AppText>
+						</View>
 					</View>
 				</View>
-			</View>
+			)}
 
 			<View
 				style={[
@@ -405,9 +393,7 @@ const styles = StyleSheet.create({
 		height: 210,
 		width: '100%',
 	},
-	imageGradient: {
-		...StyleSheet.absoluteFillObject,
-	},
+
 	imageOverlay: {
 		bottom: Gaps.g12,
 		left: Gaps.g12,
@@ -450,23 +436,6 @@ const styles = StyleSheet.create({
 		color: Colors.white,
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f14,
-	},
-	progressBar: {
-		backgroundColor: Colors.progressBarInactive,
-		borderRadius: Radius.r100,
-		flex: 1,
-		height: 3,
-	},
-	progressBarActive: {
-		backgroundColor: Colors.white,
-	},
-	progressBarsContainer: {
-		bottom: 42,
-		flexDirection: 'row',
-		gap: Gaps.g8,
-		left: Gaps.g16,
-		position: 'absolute',
-		right: Gaps.g16,
 	},
 	ratingBadge: {
 		alignItems: 'center',

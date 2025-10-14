@@ -48,6 +48,9 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 	const visibilityTranslateY = useSharedValue(
 		isVisible ? 0 : TOTAL_HEIGHT + TRANSLATE_Y,
 	);
+	const [pointerEventsState, setPointerEventsState] = useState<
+		'auto' | 'none'
+	>(isVisible ? 'auto' : 'none');
 
 	useEffect(() => {
 		visibilityTranslateY.value = withTiming(
@@ -57,6 +60,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 			},
 		);
 	}, [isVisible, visibilityTranslateY]);
+
+	useEffect(() => {
+		setPointerEventsState(isVisible ? 'auto' : 'none');
+	}, [isVisible]);
 
 	const panGesture = Gesture.Pan()
 		.onBegin(() => {
@@ -98,8 +105,6 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 	const animatedVisibilityStyle = useAnimatedStyle(() => {
 		return {
 			transform: [{ translateY: visibilityTranslateY.value }],
-			// Отключаем взаимодействие, когда компонент скрыт
-			pointerEvents: isVisible ? 'auto' : 'none',
 		};
 	});
 
@@ -120,7 +125,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 	};
 
 	return (
-		<Animated.View style={animatedVisibilityStyle}>
+		<Animated.View
+			style={animatedVisibilityStyle}
+			pointerEvents={pointerEventsState}
+		>
 			<GestureDetector gesture={composedGesture}>
 				<Animated.View
 					style={[

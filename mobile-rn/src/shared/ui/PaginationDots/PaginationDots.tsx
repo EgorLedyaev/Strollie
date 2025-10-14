@@ -5,14 +5,15 @@ import Animated, {
 	useAnimatedStyle,
 	useDerivedValue,
 	withTiming,
+	type SharedValue,
 } from 'react-native-reanimated';
 
 import { Colors, Radius } from '@/shared/tokens';
 
 interface DotProps {
 	index: number;
-	activeIndex: Animated.SharedValue<number>;
-	containerTranslateX: Animated.SharedValue<number>;
+	activeIndex: SharedValue<number>;
+	containerTranslateX: SharedValue<number>;
 }
 
 const Dot: React.FC<DotProps> = ({
@@ -52,7 +53,7 @@ const Dot: React.FC<DotProps> = ({
 
 interface PaginationProps {
 	totalCount: number;
-	activeIndex: Animated.SharedValue<number>;
+	activeIndex: SharedValue<number>;
 }
 
 export const PaginationDots: React.FC<PaginationProps> = ({

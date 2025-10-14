@@ -54,15 +54,12 @@ export const IconButton = forwardRef<PressableRef, IconButtonProps>(
 		});
 
 		// Анимированный стиль для прозрачности контента
+		const opacityFactor = 1 - opacity; // Вычисляем один раз вне worklet
 		const animatedStyle = useAnimatedStyle(() => {
-			if (feedback === 'opacity') {
-				return {
-					opacity: 1 - pressProgress.value * (1 - opacity),
-				};
-			} else {
-				// Для overlay режима возвращаем пустой объект
-				return {};
-			}
+			// Для opacity режима используем опакность
+			return {
+				opacity: 1 - pressProgress.value * opacityFactor,
+			};
 		});
 
 		return (
@@ -72,7 +69,11 @@ export const IconButton = forwardRef<PressableRef, IconButtonProps>(
 				onPressIn={handlePressIn}
 				onPressOut={handlePressOut}
 				disabled={disabled}
-				style={[styles.button, style, animatedStyle]}
+				style={[
+					styles.button,
+					style,
+					feedback === 'opacity' ? animatedStyle : undefined,
+				]}
 				{...props}
 			>
 				{(pressableState: PressableStateCallbackType) => (
