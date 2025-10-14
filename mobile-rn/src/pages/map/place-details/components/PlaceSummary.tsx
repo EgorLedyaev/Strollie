@@ -1,9 +1,7 @@
 import LikeIcon from '@/assets/icons/LikeIcon';
 import ShareIcon from '@/assets/icons/ShareIcon';
-import fallbackImage from '@/assets/images/unmatched.png';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
-	Image,
 	Linking,
 	Share,
 	StyleSheet,
@@ -15,7 +13,6 @@ import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText, IconButton } from '@/shared/ui';
 
 import type { Place, TabType } from '../types';
-import { PhotoCarousel } from './PhotoCarousel';
 
 const SUMMARY_MAX_DESCRIPTION_LENGTH = 160;
 
@@ -37,14 +34,6 @@ export function PlaceSummary({
 	isExpanded,
 }: PlaceSummaryProps) {
 	const [isFavorite, setIsFavorite] = useState(false);
-
-	const heroSource = useMemo(() => {
-		const firstPhoto = place.photos?.[0]?.url;
-		if (firstPhoto) {
-			return { uri: firstPhoto } satisfies { uri: string };
-		}
-		return fallbackImage;
-	}, [place.photos]);
 
 	const allContacts = useMemo(
 		() =>
@@ -145,38 +134,8 @@ export function PlaceSummary({
 		});
 	}, [onShare, place, websiteLabel]);
 
-	const photoUrls = useMemo(() => {
-		return (
-			place.photos?.map(p => p.url).filter(Boolean) ?? [
-				heroSource.uri ?? '',
-			]
-		).filter(url => url);
-	}, [place.photos, heroSource]);
-
 	return (
 		<View style={styles.container}>
-			{!isExpanded && photoUrls.length > 0 ? (
-				<PhotoCarousel photos={photoUrls} />
-			) : (
-				<View style={styles.imageWrapper}>
-					<Image
-						source={heroSource}
-						style={styles.heroImage}
-						resizeMode='cover'
-					/>
-
-					<View style={styles.imageOverlay}>
-						<View style={styles.photosBadge}>
-							<AppText style={styles.photosBadgeText}>
-								{photoCount > 0
-									? `${photoCount} фото`
-									: 'Нет фото'}
-							</AppText>
-						</View>
-					</View>
-				</View>
-			)}
-
 			<View
 				style={[
 					styles.infoSection,
@@ -388,23 +347,6 @@ const styles = StyleSheet.create({
 		lineHeight: 20,
 		marginTop: Gaps.g12,
 	},
-	heroImage: {
-		borderRadius: Radius.r20,
-		height: 210,
-		width: '100%',
-	},
-
-	imageOverlay: {
-		bottom: Gaps.g12,
-		left: Gaps.g12,
-		position: 'absolute',
-		right: Gaps.g12,
-	},
-	imageWrapper: {
-		borderRadius: Radius.r20,
-		overflow: 'hidden',
-		position: 'relative',
-	},
 	infoSection: {
 		gap: Gaps.g8,
 	},
@@ -424,18 +366,6 @@ const styles = StyleSheet.create({
 	},
 	nameExpanded: {
 		fontSize: Fonts.f20,
-	},
-	photosBadge: {
-		alignSelf: 'flex-end',
-		backgroundColor: Colors.modalOverlay,
-		borderRadius: Radius.r12,
-		paddingHorizontal: Gaps.g10,
-		paddingVertical: 6,
-	},
-	photosBadgeText: {
-		color: Colors.white,
-		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f14,
 	},
 	ratingBadge: {
 		alignItems: 'center',

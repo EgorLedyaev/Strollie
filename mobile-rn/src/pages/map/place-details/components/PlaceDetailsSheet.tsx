@@ -10,6 +10,7 @@ import { usePlaceDetails } from '../state/placeDetailsStore';
 import type { Place, TabType } from '../types';
 import { OverviewTab } from './OverviewTab';
 import { PhotosTab } from './PhotosTab';
+import { PlacePhotoHeader } from './PlacePhotoHeader';
 import { PlaceSummary } from './PlaceSummary';
 import { ReviewsTab } from './ReviewsTab';
 import { TabSelector } from './TabSelector';
@@ -101,45 +102,64 @@ export function PlaceDetailsSheet({
 		}
 	};
 
+	// Кастомный handle с фотографией
+	const renderHandle = useCallback(() => {
+		if (!selectedPlace) return null;
+
+		return (
+			<View style={styles.handleWrapper}>
+				<PlacePhotoHeader
+					place={selectedPlace}
+					isExpanded={isExpanded}
+				/>
+				<View style={styles.indicatorWrapper}>
+					<View style={styles.indicator} />
+				</View>
+			</View>
+		);
+	}, [selectedPlace, isExpanded]);
+
 	return (
 		<BottomSheetModal
 			ref={bottomSheetRef}
 			snapPoints={snapPoints}
 			onChange={handleSheetChanges}
 			enablePanDownToClose
-			handleIndicatorStyle={styles.indicator}
+			handleComponent={renderHandle}
 			backgroundStyle={styles.background}
 		>
 			<BottomSheetScrollView
 				contentContainerStyle={styles.contentContainer}
 				keyboardShouldPersistTaps='handled'
 			>
-				{selectedPlace && (
-					<View style={styles.summaryWrapper}>
-						<PlaceSummary
-							place={selectedPlace}
-							isExpanded={isExpanded}
-							onOpenTab={handleSummaryTabChange}
-							onBuildRoute={onBuildRoute}
-							onToggleFavorite={onToggleFavorite}
-							onShare={onShare}
-						/>
-					</View>
-				)}
+				<View style={styles.whiteBackground}>
+					{selectedPlace && (
+						<View style={styles.summaryWrapper}>
+							<PlaceSummary
+								place={selectedPlace}
+								isExpanded={isExpanded}
+								onOpenTab={handleSummaryTabChange}
+								onBuildRoute={onBuildRoute}
+								onToggleFavorite={onToggleFavorite}
+								onShare={onShare}
+							/>
+						</View>
+					)}
 
-				{isExpanded && (
-					<View style={styles.header}>
-						<TabSelector
-							currentTab={currentTab}
-							onTabChange={handleTabChange}
-							isExpanded={isExpanded}
-						/>
-					</View>
-				)}
+					{isExpanded && (
+						<View style={styles.header}>
+							<TabSelector
+								currentTab={currentTab}
+								onTabChange={handleTabChange}
+								isExpanded={isExpanded}
+							/>
+						</View>
+					)}
 
-				{isExpanded && (
-					<View style={styles.content}>{renderTabContent()}</View>
-				)}
+					{isExpanded && (
+						<View style={styles.content}>{renderTabContent()}</View>
+					)}
+				</View>
 			</BottomSheetScrollView>
 		</BottomSheetModal>
 	);
@@ -147,9 +167,9 @@ export function PlaceDetailsSheet({
 
 const styles = StyleSheet.create({
 	background: {
-		backgroundColor: Colors.white,
-		borderTopLeftRadius: Radius.r47,
-		borderTopRightRadius: Radius.r47,
+		backgroundColor: Colors.transparent, // Убираем фон, чтобы фото было видно
+		borderTopLeftRadius: Radius.r24,
+		borderTopRightRadius: Radius.r24,
 	},
 	content: {
 		flex: 1,
@@ -159,17 +179,35 @@ const styles = StyleSheet.create({
 		gap: Gaps.g16,
 		paddingBottom: Gaps.g32,
 	},
+	handleWrapper: {
+		backgroundColor: Colors.transparent, // Полностью прозрачный фон для handle
+	},
 	header: {
 		paddingHorizontal: Gaps.g16,
 		paddingTop: Gaps.g16,
 	},
 	indicator: {
+		alignSelf: 'center',
 		backgroundColor: Colors.gray,
+		borderRadius: Radius.r2,
 		height: 4,
 		width: 40,
 	},
+	indicatorWrapper: {
+		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderTopLeftRadius: Radius.r24,
+		borderTopRightRadius: Radius.r24,
+		paddingBottom: Gaps.g16, // Добавляем отступ снизу
+		paddingTop: Gaps.g12,
+	},
 	summaryWrapper: {
+		backgroundColor: Colors.white, // Белый фон для контента
 		paddingHorizontal: Gaps.g16,
 		paddingTop: Gaps.g16,
+	},
+	whiteBackground: {
+		backgroundColor: Colors.white,
+		flex: 1,
 	},
 });
