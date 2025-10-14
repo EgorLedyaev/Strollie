@@ -563,6 +563,10 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		setIsWebViewLoaded(true);
 	}, []);
 
+	const userLocation = location
+		? { lat: location.latitude, lon: location.longitude }
+		: null;
+
 	return {
 		webViewRef,
 		mapReady,
@@ -586,5 +590,6 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		uiIs3DMode: isSwitchingMode
 			? pendingModeRef.current === '3d'
 			: is3DMode,
+		userLocation,
 	} as const;
 }

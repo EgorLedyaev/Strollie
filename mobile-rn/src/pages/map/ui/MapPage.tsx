@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Alert, Platform, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 
@@ -7,7 +7,9 @@ import {
 	PlaceDetailsSheet,
 	searchPlacesByCoordinates,
 	usePlaceDetails,
+	type Place,
 } from '@/pages/map/place-details';
+import { calculateDistanceMeters, formatDistance } from '@/shared/lib';
 
 import { useMapBridge } from '../model/useMapBridge';
 import { MapControls } from './map-controls';
@@ -16,10 +18,34 @@ import { SHADOW_PADDING, WeatherWidget } from './map-widget/WeatherWidget';
 
 function MapPageContent() {
 	const { setSelectedPlace, resetState } = usePlaceDetails();
+	const userLocationRef = useRef<{ lat: number; lon: number } | null>(null);
 
 	const clearPlaceDetails = useCallback(() => {
 		resetState();
 	}, [resetState]);
+
+	const enhancePlaceWithDistance = useCallback((place: Place): Place => {
+		const currentUserLocation = userLocationRef.current;
+		if (!currentUserLocation || !place.point) {
+			return place;
+		}
+
+		const distanceMeters = calculateDistanceMeters(currentUserLocation, {
+			lat: place.point.lat,
+			lon: place.point.lon,
+		});
+
+		const formatted = formatDistance(distanceMeters);
+
+		if (!formatted) {
+			return place;
+		}
+
+		return {
+			...place,
+			distance: formatted,
+		};
+	}, []);
 
 	// Обработчик клика на существующий маркер - переоткрываем sheet с данными
 	const handleMarkerClick = useCallback(
@@ -27,16 +53,15 @@ function MapPageContent() {
 			console.log('Клик на маркер, placeData:', placeData);
 			if (placeData) {
 				// Приводим к типу Place, т.к. мы сохраняем именно Place в placeData
-				const place =
-					placeData as import('@/pages/map/place-details').Place;
+				const place = placeData as Place;
 				console.log('Открываем sheet для места:', place.name);
-				setSelectedPlace(place);
+				setSelectedPlace(enhancePlaceWithDistance(place));
 			} else {
 				console.warn('placeData отсутствует при клике на маркер');
 				clearPlaceDetails();
 			}
 		},
-		[setSelectedPlace, clearPlaceDetails],
+		[setSelectedPlace, clearPlaceDetails, enhancePlaceWithDistance],
 	);
 
 	// Обработчик клика по карте - ищем место и создаём маркер если найдено
@@ -53,9 +78,10 @@ function MapPageContent() {
 
 				console.log('Найдено мест:', places?.length || 0);
 				if (places && places.length > 0) {
-					console.log('Место найдено:', places[0].name);
+					const primaryPlace = enhancePlaceWithDistance(places[0]);
+					console.log('Место найдено:', primaryPlace.name);
 					// Найдено место - возвращаем данные для создания маркера
-					return places[0];
+					return primaryPlace;
 				} else {
 					console.log('Места не найдены в радиусе 10м');
 					clearPlaceDetails();
@@ -72,7 +98,7 @@ function MapPageContent() {
 				return null;
 			}
 		},
-		[clearPlaceDetails],
+		[clearPlaceDetails, enhancePlaceWithDistance],
 	);
 
 	const {
@@ -93,10 +119,13 @@ function MapPageContent() {
 		uiIs3DMode,
 		uiFollowMode,
 		clearMarkers,
+		userLocation,
 	} = useMapBridge({
 		onMarkerClick: handleMarkerClick,
 		onMapClick: handleMapClick,
 	});
+
+	userLocationRef.current = userLocation;
 
 	const handleSheetDismiss = useCallback(() => {
 		clearMarkers();

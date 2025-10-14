@@ -80,6 +80,10 @@ export function PlaceSummary({
 		});
 	}, [websiteContact]);
 
+	if (!isExpanded) {
+		return null;
+	}
+
 	return (
 		<View style={styles.container}>
 			<View

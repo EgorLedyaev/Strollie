@@ -85,13 +85,12 @@ const styles = StyleSheet.create({
 	container: {
 		alignItems: 'center',
 		backgroundColor: Colors.white,
-		borderTopLeftRadius: Radius.r16,
-		borderTopRightRadius: Radius.r16,
+		borderRadius: Radius.r16,
 		flexDirection: 'row',
 		gap: Gaps.g16,
-		paddingBottom: 35,
-		paddingHorizontal: Gaps.g32,
-		paddingTop: 26,
+		paddingHorizontal: Gaps.g16,
+		paddingVertical: Gaps.g12,
+		width: '100%',
 	},
 	routeButton: {
 		flex: 1,

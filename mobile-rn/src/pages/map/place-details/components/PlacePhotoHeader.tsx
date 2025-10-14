@@ -1,6 +1,6 @@
 import StarIcon from '@/assets/icons/StarIcon';
 import fallbackImage from '@/assets/images/unmatched.png';
-import React, { ReactNode, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
@@ -14,14 +14,9 @@ const PHOTO_HEIGHT = 212;
 interface PlacePhotoHeaderProps {
 	place: Place;
 	isExpanded: boolean;
-	collapsedActions?: ReactNode;
 }
 
-export function PlacePhotoHeader({
-	place,
-	isExpanded,
-	collapsedActions,
-}: PlacePhotoHeaderProps) {
+export function PlacePhotoHeader({ place, isExpanded }: PlacePhotoHeaderProps) {
 	const heroSource = useMemo(() => {
 		const firstPhoto = place.photos?.[0]?.url;
 		if (firstPhoto) {
@@ -37,7 +32,6 @@ export function PlacePhotoHeader({
 	const averageRating = place.review_stats?.average_rating ?? null;
 	const addressLine = place.address?.full_name ?? place.address?.name ?? '';
 	const distanceLabel = place.distance ?? '';
-
 	const shouldRenderCarousel = !isExpanded && photoUrls.length > 0;
 	const hasRating = averageRating !== null;
 
@@ -98,17 +92,6 @@ export function PlacePhotoHeader({
 					</View>
 				)}
 			</View>
-
-			{collapsedActions && (
-				<View
-					style={[
-						styles.collapsedActionsWrapper,
-						isExpanded && styles.collapsedActionsExpanded,
-					]}
-				>
-					{collapsedActions}
-				</View>
-			)}
 		</View>
 	);
 }
@@ -127,16 +110,6 @@ const styles = StyleSheet.create({
 	captionBlock: {
 		gap: Gaps.g4,
 		maxWidth: '68%',
-	},
-	collapsedActionsExpanded: {
-		bottom: Gaps.g16,
-	},
-	collapsedActionsWrapper: {
-		bottom: -24,
-		left: Gaps.g16,
-		position: 'absolute',
-		right: Gaps.g16,
-		zIndex: 3,
 	},
 	container: {
 		marginBottom: -Radius.r24,
@@ -179,7 +152,8 @@ const styles = StyleSheet.create({
 		borderRadius: Radius.r8,
 		flexDirection: 'row',
 		gap: Gaps.g6,
-		padding: 8,
+		paddingHorizontal: 10,
+		paddingVertical: 6,
 		position: 'absolute',
 		right: Gaps.g16,
 		top: Gaps.g20,

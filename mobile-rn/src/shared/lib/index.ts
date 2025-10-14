@@ -15,3 +15,4 @@ export {
 	updateShouldCenterOnUser,
 } from './map-bootstrap';
 export type { MapBootstrapPayload, PersistedLocation } from './map-bootstrap';
+export { calculateDistanceMeters, formatDistance } from './geo';

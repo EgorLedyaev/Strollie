@@ -136,7 +136,7 @@ export function PlaceDetailsSheet({
 					style={styles.scrollView}
 				>
 					<View style={styles.whiteBackground}>
-						{selectedPlace && (
+						{selectedPlace && isExpanded && (
 							<View style={styles.summaryWrapper}>
 								<PlaceSummary
 									place={selectedPlace}
@@ -164,14 +164,15 @@ export function PlaceDetailsSheet({
 					</View>
 				</BottomSheetScrollView>
 
-				{/* Фиксированный блок с кнопками действий снизу */}
 				{selectedPlace && (
-					<PlaceActions
-						place={selectedPlace}
-						onBuildRoute={onBuildRoute}
-						onToggleFavorite={onToggleFavorite}
-						onShare={onShare}
-					/>
+					<View style={styles.actionsWrapper}>
+						<PlaceActions
+							place={selectedPlace}
+							onBuildRoute={onBuildRoute}
+							onToggleFavorite={onToggleFavorite}
+							onShare={onShare}
+						/>
+					</View>
 				)}
 			</View>
 		</BottomSheetModal>
@@ -179,6 +180,14 @@ export function PlaceDetailsSheet({
 }
 
 const styles = StyleSheet.create({
+	actionsWrapper: {
+		backgroundColor: Colors.white,
+		borderTopLeftRadius: Radius.r24,
+		borderTopRightRadius: Radius.r24,
+		paddingBottom: Gaps.g24,
+		paddingHorizontal: Gaps.g16,
+		paddingTop: Gaps.g16,
+	},
 	background: {
 		backgroundColor: Colors.transparent, // Убираем фон, чтобы фото было видно
 		borderTopLeftRadius: Radius.r24,
@@ -190,7 +199,7 @@ const styles = StyleSheet.create({
 	},
 	contentContainer: {
 		gap: Gaps.g16,
-		paddingBottom: 120, // Отступ для фиксированного блока действий (44 + 26 + 35 + margins)
+		paddingBottom: 120,
 	},
 	handleWrapper: {
 		backgroundColor: Colors.transparent, // Полностью прозрачный фон для handle
@@ -216,6 +225,7 @@ const styles = StyleSheet.create({
 	},
 	modalContent: {
 		flex: 1,
+		justifyContent: 'space-between',
 	},
 	scrollView: {
 		flex: 1,
