@@ -1,5 +1,6 @@
 // Карусель с фото и автоматическим прогресс-баром
 
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
 	Image,
@@ -18,7 +19,7 @@ import Animated, {
 
 import { Colors, Radius } from '@/shared/tokens';
 
-const CAROUSEL_HEIGHT = 168; // Из Figma (верхняя часть виджета)
+const CAROUSEL_HEIGHT = 212; // Высота фотоблока из макета
 const PROGRESS_DURATION = 5000; // 5 секунд на фото
 const PROGRESS_BAR_HEIGHT = 3;
 const PROGRESS_BAR_GAP = 8;
@@ -100,6 +101,13 @@ export function PhotoCarousel({ photos, onClose }: PhotoCarouselProps) {
 				source={{ uri: photos[currentIndex] }}
 				style={styles.image}
 				resizeMode='cover'
+			/>
+
+			<LinearGradient
+				pointerEvents='none'
+				colors={['rgba(0,0,0,0.45)', 'transparent', 'rgba(0,0,0,0.9)']}
+				locations={[0, 0.35, 1]}
+				style={styles.gradientOverlay}
 			/>
 
 			{/* Прогресс-бары */}
@@ -189,6 +197,10 @@ const styles = StyleSheet.create({
 		position: 'relative',
 		width: '100%',
 	},
+	gradientOverlay: {
+		...StyleSheet.absoluteFillObject,
+		zIndex: 1,
+	},
 	image: {
 		height: '100%',
 		width: '100%',
@@ -211,7 +223,7 @@ const styles = StyleSheet.create({
 		left: 16,
 		position: 'absolute',
 		right: 16,
-		top: 16,
+		top: CAROUSEL_HEIGHT - 42,
 		zIndex: 5,
 	},
 	touchZone: {

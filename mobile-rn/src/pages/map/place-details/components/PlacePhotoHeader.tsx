@@ -1,5 +1,6 @@
+import StarIcon from '@/assets/icons/StarIcon';
 import fallbackImage from '@/assets/images/unmatched.png';
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
@@ -8,12 +9,19 @@ import { AppText } from '@/shared/ui';
 import type { Place } from '../types';
 import { PhotoCarousel } from './PhotoCarousel';
 
+const PHOTO_HEIGHT = 212;
+
 interface PlacePhotoHeaderProps {
 	place: Place;
 	isExpanded: boolean;
+	collapsedActions?: ReactNode;
 }
 
-export function PlacePhotoHeader({ place, isExpanded }: PlacePhotoHeaderProps) {
+export function PlacePhotoHeader({
+	place,
+	isExpanded,
+	collapsedActions,
+}: PlacePhotoHeaderProps) {
 	const heroSource = useMemo(() => {
 		const firstPhoto = place.photos?.[0]?.url;
 		if (firstPhoto) {
@@ -23,36 +31,82 @@ export function PlacePhotoHeader({ place, isExpanded }: PlacePhotoHeaderProps) {
 	}, [place.photos]);
 
 	const photoUrls = useMemo(() => {
-		return (
-			place.photos?.map(p => p.url).filter(Boolean) ?? [
-				heroSource.uri ?? '',
-			]
-		).filter(url => url);
-	}, [place.photos, heroSource]);
+		return place.photos?.map(photo => photo.url).filter(Boolean) ?? [];
+	}, [place.photos]);
 
-	const photoCount = place.photos?.length ?? 0;
+	const averageRating = place.review_stats?.average_rating ?? null;
+	const addressLine = place.address?.full_name ?? place.address?.name ?? '';
+	const distanceLabel = place.distance ?? '';
+
+	const shouldRenderCarousel = !isExpanded && photoUrls.length > 0;
+	const hasRating = averageRating !== null;
 
 	return (
 		<View style={styles.container}>
-			{!isExpanded && photoUrls.length > 0 ? (
-				<PhotoCarousel photos={photoUrls} />
-			) : (
-				<View style={styles.imageWrapper}>
+			<View style={styles.mediaWrapper}>
+				{shouldRenderCarousel ? (
+					<PhotoCarousel photos={photoUrls} />
+				) : (
 					<Image
 						source={heroSource}
 						style={styles.heroImage}
 						resizeMode='cover'
 					/>
+				)}
 
-					<View style={styles.imageOverlay}>
-						<View style={styles.photosBadge}>
-							<AppText style={styles.photosBadgeText}>
-								{photoCount > 0
-									? `${photoCount} фото`
-									: 'Нет фото'}
-							</AppText>
-						</View>
+				{!isExpanded && hasRating && (
+					<View style={styles.ratingBadge}>
+						<StarIcon />
+						<AppText style={styles.ratingValue}>
+							{averageRating?.toFixed(1)}
+						</AppText>
 					</View>
+				)}
+
+				{!isExpanded && (
+					<View style={styles.bottomOverlay}>
+						<View style={styles.captionBlock}>
+							<AppText style={styles.placeName} numberOfLines={1}>
+								{place.name}
+							</AppText>
+							{!!place.type && (
+								<AppText
+									style={styles.placeType}
+									numberOfLines={1}
+								>
+									{place.type}
+								</AppText>
+							)}
+							{!!addressLine && (
+								<AppText
+									style={styles.placeAddress}
+									numberOfLines={1}
+								>
+									{addressLine}
+								</AppText>
+							)}
+						</View>
+
+						{!!distanceLabel && (
+							<AppText
+								style={styles.distanceText}
+								numberOfLines={1}
+							>
+								{distanceLabel}
+							</AppText>
+						)}
+					</View>
+				)}
+			</View>
+
+			{collapsedActions && (
+				<View
+					style={[
+						styles.collapsedActionsWrapper,
+						isExpanded && styles.collapsedActionsExpanded,
+					]}
+				>
+					{collapsedActions}
 				</View>
 			)}
 		</View>
@@ -60,33 +114,78 @@ export function PlacePhotoHeader({ place, isExpanded }: PlacePhotoHeaderProps) {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		marginBottom: -Radius.r24, // Фото заезжает под модальное окно
-	},
-	heroImage: {
-		borderTopLeftRadius: Radius.r20,
-		borderTopRightRadius: Radius.r20,
-		height: 250,
-		width: '100%',
-	},
-	imageOverlay: {
-		bottom: Gaps.g32,
+	bottomOverlay: {
+		alignItems: 'flex-end',
+		bottom: 32,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 		left: Gaps.g16,
 		position: 'absolute',
 		right: Gaps.g16,
+		zIndex: 2,
 	},
-	imageWrapper: {
+	captionBlock: {
+		gap: Gaps.g4,
+		maxWidth: '68%',
+	},
+	collapsedActionsExpanded: {
+		bottom: Gaps.g16,
+	},
+	collapsedActionsWrapper: {
+		bottom: -24,
+		left: Gaps.g16,
+		position: 'absolute',
+		right: Gaps.g16,
+		zIndex: 3,
+	},
+	container: {
+		marginBottom: -Radius.r24,
+	},
+	distanceText: {
+		color: Colors.white,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f12,
+		textAlign: 'right',
+	},
+	heroImage: {
+		height: PHOTO_HEIGHT,
+		width: '100%',
+	},
+	mediaWrapper: {
+		borderTopLeftRadius: Radius.r24,
+		borderTopRightRadius: Radius.r24,
+		height: PHOTO_HEIGHT,
 		overflow: 'hidden',
 		position: 'relative',
 	},
-	photosBadge: {
-		alignSelf: 'flex-end',
-		backgroundColor: Colors.modalOverlay,
-		borderRadius: Radius.r12,
-		paddingHorizontal: Gaps.g10,
-		paddingVertical: 6,
+	placeAddress: {
+		color: Colors.white,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f14,
 	},
-	photosBadgeText: {
+	placeName: {
+		color: Colors.white,
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f24,
+	},
+	placeType: {
+		color: Colors.white,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f16,
+	},
+	ratingBadge: {
+		alignItems: 'center',
+		backgroundColor: Colors.greenAccent,
+		borderRadius: Radius.r8,
+		flexDirection: 'row',
+		gap: Gaps.g6,
+		padding: 8,
+		position: 'absolute',
+		right: Gaps.g16,
+		top: Gaps.g20,
+		zIndex: 2,
+	},
+	ratingValue: {
 		color: Colors.white,
 		fontFamily: Fonts.semibold,
 		fontSize: Fonts.f14,

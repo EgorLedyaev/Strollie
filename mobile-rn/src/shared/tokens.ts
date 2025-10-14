@@ -57,6 +57,7 @@ export const Colors = {
 	greenHover: '#027962',
 	greenIconLight: '#3DEA90', // Светлый зеленый для иконок
 	greenIconDark: '#1EB18C', // Темный зеленый для иконок
+	greenAccent: '#1BE07C', // Яркий зеленый для бейджей рейтинга
 	selectedTicketBackground: 'rgba(69, 205, 134, 0.40)',
 
 	// Другие цвета
@@ -75,6 +76,7 @@ export const Gaps = {
 	g3: 3,
 	g4: 4,
 	g5: 5,
+	g6: 6,
 	g8: 8,
 	g10: 10,
 	g12: 12,
