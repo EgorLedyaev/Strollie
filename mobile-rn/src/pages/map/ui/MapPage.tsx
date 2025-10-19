@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from 'react';
-import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { Alert, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
 	PlaceDetailsProvider,
@@ -10,6 +11,7 @@ import {
 	type Place,
 } from '@/pages/map/place-details';
 import { calculateDistanceMeters, formatDistance } from '@/shared/lib';
+import { Colors } from '@/shared/tokens';
 
 import { useMapBridge } from '../model/useMapBridge';
 import { MapControls } from './map-controls';
@@ -17,6 +19,7 @@ import { MapWidget } from './map-widget';
 import { SHADOW_PADDING, WeatherWidget } from './map-widget/WeatherWidget';
 
 function MapPageContent() {
+	const insets = useSafeAreaInsets();
 	const { setSelectedPlace, resetState } = usePlaceDetails();
 	const userLocationRef = useRef<{ lat: number; lon: number } | null>(null);
 
@@ -134,10 +137,22 @@ function MapPageContent() {
 
 	const rightForWeatherWidget = { right: 16 - SHADOW_PADDING };
 	const temperature = 16;
+	const statusBarHeight =
+		insets.top ||
+		(Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0);
 
 	return (
 		<>
 			<SystemBars style='dark' />
+			{statusBarHeight > 0 && (
+				<View
+					pointerEvents='none'
+					style={[
+						styles.statusBarOverlay,
+						{ height: statusBarHeight },
+					]}
+				/>
+			)}
 			<MapWidget
 				ref={webViewRef}
 				onMessage={handleWebViewMessage}
@@ -174,6 +189,14 @@ export function MapPage() {
 }
 
 const styles = StyleSheet.create({
+	statusBarOverlay: {
+		backgroundColor: Colors.statusBarOverlay,
+		left: 0,
+		position: 'absolute',
+		right: 0,
+		top: 0,
+		zIndex: 1,
+	},
 	weatherContainer: {
 		position: 'absolute',
 		top: Platform.OS === 'ios' ? 120 : 100,
