@@ -13,20 +13,23 @@ import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppText, AppTextInput } from '@/shared/ui';
 
 import { submitReview } from '../data/placeApi';
-import { usePlaceDetails } from '../state/placeDetailsStore';
 import type { Place, Review } from '../types';
 
 interface ReviewsTabProps {
 	place: Place;
+	userHasReviewed: boolean;
+	setUserHasReviewed: (value: boolean) => void;
+	isReviewFormVisible: boolean;
+	setIsReviewFormVisible: (value: boolean) => void;
 }
 
-export function ReviewsTab({ place }: ReviewsTabProps) {
-	const {
-		userHasReviewed,
-		setUserHasReviewed,
-		isReviewFormVisible,
-		setIsReviewFormVisible,
-	} = usePlaceDetails();
+export function ReviewsTab({
+	place,
+	userHasReviewed,
+	setUserHasReviewed,
+	isReviewFormVisible,
+	setIsReviewFormVisible,
+}: ReviewsTabProps) {
 	const [rating, setRating] = useState(5);
 	const [reviewText, setReviewText] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);

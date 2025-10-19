@@ -1,8 +1,14 @@
 // Компонент детальной информации о месте в Bottom Sheet
 
-import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import {
+	BottomSheetFooter,
+	BottomSheetModal,
+	BottomSheetScrollView,
+	type BottomSheetFooterProps,
+} from '@gorhom/bottom-sheet';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, Gaps, Radius } from '@/shared/tokens';
 
@@ -30,16 +36,29 @@ export function PlaceDetailsSheet({
 	onShare,
 }: PlaceDetailsSheetProps) {
 	const bottomSheetRef = useRef<BottomSheetModal>(null);
+	const insets = useSafeAreaInsets();
 	const {
 		selectedPlace,
 		currentTab,
 		setCurrentTab,
 		isExpanded,
 		setIsExpanded,
+		userHasReviewed,
+		setUserHasReviewed,
+		isReviewFormVisible,
+		setIsReviewFormVisible,
 	} = usePlaceDetails();
 
 	// Snap points для collapsed и expanded состояний
 	const snapPoints = useMemo(() => ['40%', '90%'], []);
+	const actionsBottomPadding = useMemo(() => {
+		return insets.bottom > 0 ? insets.bottom + Gaps.g12 : Gaps.g16;
+	}, [insets.bottom]);
+
+	const scrollBottomPadding = useMemo(() => {
+		const ESTIMATED_ACTIONS_HEIGHT = 88;
+		return ESTIMATED_ACTIONS_HEIGHT + actionsBottomPadding;
+	}, [actionsBottomPadding]);
 
 	// Убираем sheetIndex для BottomSheetModal - он управляется через present/dismiss
 	const handleSheetChanges = useCallback(
@@ -97,7 +116,15 @@ export function PlaceDetailsSheet({
 			case 'photos':
 				return <PhotosTab place={selectedPlace} />;
 			case 'reviews':
-				return <ReviewsTab place={selectedPlace} />;
+				return (
+					<ReviewsTab
+						place={selectedPlace}
+						userHasReviewed={userHasReviewed}
+						setUserHasReviewed={setUserHasReviewed}
+						isReviewFormVisible={isReviewFormVisible}
+						setIsReviewFormVisible={setIsReviewFormVisible}
+					/>
+				);
 			default:
 				return null;
 		}
@@ -120,6 +147,40 @@ export function PlaceDetailsSheet({
 		);
 	}, [selectedPlace, isExpanded]);
 
+	const renderFooter = useCallback(
+		(props: BottomSheetFooterProps) => {
+			if (!selectedPlace) {
+				return null;
+			}
+
+			return (
+				<BottomSheetFooter {...props} bottomInset={0}>
+					<View
+						style={[
+							styles.actionsWrapper,
+							{ paddingBottom: actionsBottomPadding },
+						]}
+						testID='place-actions-wrapper'
+					>
+						<PlaceActions
+							place={selectedPlace}
+							onBuildRoute={onBuildRoute}
+							onToggleFavorite={onToggleFavorite}
+							onShare={onShare}
+						/>
+					</View>
+				</BottomSheetFooter>
+			);
+		},
+		[
+			selectedPlace,
+			onBuildRoute,
+			onToggleFavorite,
+			onShare,
+			actionsBottomPadding,
+		],
+	);
+
 	return (
 		<BottomSheetModal
 			ref={bottomSheetRef}
@@ -127,11 +188,19 @@ export function PlaceDetailsSheet({
 			onChange={handleSheetChanges}
 			enablePanDownToClose
 			handleComponent={renderHandle}
-			backgroundStyle={styles.background}
+			backgroundStyle={
+				isExpanded
+					? styles.backgroundExpanded
+					: styles.backgroundCollapsed
+			}
+			footerComponent={renderFooter}
 		>
 			<View style={styles.modalContent}>
 				<BottomSheetScrollView
-					contentContainerStyle={styles.contentContainer}
+					contentContainerStyle={[
+						styles.contentContainer,
+						{ paddingBottom: scrollBottomPadding },
+					]}
 					keyboardShouldPersistTaps='handled'
 					style={styles.scrollView}
 				>
@@ -163,17 +232,6 @@ export function PlaceDetailsSheet({
 						)}
 					</View>
 				</BottomSheetScrollView>
-
-				{selectedPlace && (
-					<View style={styles.actionsWrapper}>
-						<PlaceActions
-							place={selectedPlace}
-							onBuildRoute={onBuildRoute}
-							onToggleFavorite={onToggleFavorite}
-							onShare={onShare}
-						/>
-					</View>
-				)}
 			</View>
 		</BottomSheetModal>
 	);
@@ -184,12 +242,16 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.white,
 		borderTopLeftRadius: Radius.r24,
 		borderTopRightRadius: Radius.r24,
-		paddingBottom: Gaps.g24,
 		paddingHorizontal: Gaps.g16,
 		paddingTop: Gaps.g16,
 	},
-	background: {
-		backgroundColor: Colors.transparent, // Убираем фон, чтобы фото было видно
+	backgroundCollapsed: {
+		backgroundColor: Colors.white,
+		borderTopLeftRadius: Radius.r24,
+		borderTopRightRadius: Radius.r24,
+	},
+	backgroundExpanded: {
+		backgroundColor: Colors.white,
 		borderTopLeftRadius: Radius.r24,
 		borderTopRightRadius: Radius.r24,
 	},
@@ -199,7 +261,6 @@ const styles = StyleSheet.create({
 	},
 	contentContainer: {
 		gap: Gaps.g16,
-		paddingBottom: 120,
 	},
 	handleWrapper: {
 		backgroundColor: Colors.transparent, // Полностью прозрачный фон для handle
@@ -225,7 +286,6 @@ const styles = StyleSheet.create({
 	},
 	modalContent: {
 		flex: 1,
-		justifyContent: 'space-between',
 	},
 	scrollView: {
 		flex: 1,
