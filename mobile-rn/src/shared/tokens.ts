@@ -70,6 +70,7 @@ export const Colors = {
 
 	modalOverlay: 'rgba(0, 0, 0, 0.5)',
 	darkImageOverlay: '#1F1F1F73', // Полупрозрачный оверлей для аватаров/фото
+	statusBarOverlay: 'rgba(0, 0, 0, 0.2)',
 };
 
 export const Gaps = {
