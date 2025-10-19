@@ -39,6 +39,7 @@ export const PlaceCard: React.FC<Props> = ({ place, onToggleFavorite }) => {
 			<LikeButton
 				onPress={() => onToggleFavorite(place.id)}
 				liked={!!place.isFavorite}
+				style={styles.likeButton}
 			/>
 			<View style={styles.dotsContainer}>
 				<PaginationDots
@@ -92,6 +93,12 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: Radius.r15,
 		height: 165,
 		width: '100%',
+	},
+
+	likeButton: {
+		left: 19,
+		position: 'absolute',
+		top: 21,
 	},
 	root: {
 		backgroundColor: Colors.white,

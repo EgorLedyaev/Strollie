@@ -1,10 +1,9 @@
-import LikeIcon from '@/assets/icons/LikeIcon';
-import ShareIcon from '@/assets/icons/ShareIcon';
+import SendPlaceIcon from '@/assets/icons/SendPlaceIcon';
 import React, { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
-import { AppButton, IconButton } from '@/shared/ui';
+import { AppButton, IconButton, LikeButton } from '@/shared/ui';
 
 import type { Place } from '../types';
 
@@ -56,25 +55,17 @@ export function PlaceActions({
 				paddingVertical={10}
 			/>
 			<View style={styles.secondaryActions}>
-				<IconButton
+				<LikeButton
 					onPress={handleToggleFavorite}
+					liked={isFavorite}
+					variant='large'
 					style={styles.secondaryActionButton}
-				>
-					{() => (
-						<LikeIcon
-							color={
-								isFavorite
-									? Colors.likeActive
-									: Colors.likeInactive
-							}
-						/>
-					)}
-				</IconButton>
+				/>
 				<IconButton
 					onPress={handleShare}
 					style={styles.secondaryActionButton}
 				>
-					{() => <ShareIcon color={Colors.greenIconDark} />}
+					<SendPlaceIcon />
 				</IconButton>
 			</View>
 		</View>
