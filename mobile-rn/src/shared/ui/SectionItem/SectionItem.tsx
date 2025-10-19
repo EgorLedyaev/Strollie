@@ -4,8 +4,9 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Fonts, Radius } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
-import { AddButton } from '@/shared/ui/AddButton';
+
+import { AddButton } from '../AddButton';
+import { AppText } from '../Text';
 
 export const SectionItem = ({
 	label,

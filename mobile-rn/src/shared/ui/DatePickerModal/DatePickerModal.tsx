@@ -4,7 +4,9 @@ import { Modal, Pressable, SafeAreaView, StyleSheet, View } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppButton, AppText } from '@/shared/ui';
+
+import { AppButton } from '../Button';
+import { AppText } from '../Text';
 
 LocaleConfig.locales['ru'] = {
 	monthNames: [
