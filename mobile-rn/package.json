@@ -19,7 +19,7 @@
     "lint": "expo lint -- --cache --cache-location .cache/eslint/.eslintcache",
     "lint:fix": "expo lint -- --fix --cache --cache-location .cache/eslint/.eslintcache",
     "format": "prettier --cache --cache-location .cache/prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
-    "format:check": "prettier --cache --cache-location .cache/prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "format:check": "prettier --cache --cache-location .cache/prettier --check --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
     "typecheck": "tsc --noEmit",
     "fsd:check": "steiger ./src",
     "fsd:warn": "steiger ./src || true",

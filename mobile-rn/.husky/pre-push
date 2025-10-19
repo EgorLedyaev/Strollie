@@ -8,7 +8,16 @@ if ! npm ls --depth=0 >/dev/null 2>&1; then
 	exit 1
 fi
 
-# Быстрый архитектурный и типовой контроль перед отправкой
+echo "[Format] Проверка форматирования"
+npm run format:check || exit 1
+
+echo "[Lint] Проверка линтером"
+npm run lint || exit 1
+
+echo "[Tests] Прогон быстрых тестов"
+npm run test -- --bail || exit 1
+
+echo "[Types] Проверка типизации"
 npm run typecheck || exit 1
 
 echo "[FSD] Архитектурная проверка (не блокирует push, исправьте позже)"
