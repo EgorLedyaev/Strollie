@@ -2,9 +2,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Place } from '@/pages/routes/model/places';
-import { RoutesImageCard } from '@/widgets/routes/card';
 import { Colors, Fonts } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
+
+import { RoutesImageCard } from '../RoutesImageCard';
 
 interface Props {
 	place: Place;

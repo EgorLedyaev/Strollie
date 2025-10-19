@@ -3,9 +3,10 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Route } from '@/pages/routes/model/routes';
-import { RoutesImageCard } from '@/widgets/routes/card';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
+
+import { RoutesImageCard } from '../RoutesImageCard';
 
 const formatDate = (isoString: string): string => {
 	const date = new Date(isoString);
