@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
 import { Colors, Gaps, Radius, Shadows } from '@/shared/tokens';
@@ -22,9 +22,25 @@ interface MapControlsProps {
 	mapReady: boolean;
 	isLocationAvailable: boolean;
 	followMode: FollowMode;
+	onProfilePress?: () => void;
 }
 
-export const MapControls: React.FC<MapControlsProps> = props => {
+export const MapControls: React.FC<MapControlsProps> = ({
+	onZoomIn,
+	onZoomOut,
+	onToggleMode,
+	onToggleFollowMode,
+	onSearchResultSelect,
+	is3DMode,
+	mapReady,
+	isLocationAvailable,
+	followMode,
+	onProfilePress,
+}) => {
+	const handleProfilePress = useCallback(() => {
+		onProfilePress?.();
+	}, [onProfilePress]);
+
 	return (
 		<View style={styles.overlayContainer} pointerEvents='box-none'>
 			<View style={styles.header} pointerEvents='box-none'>
@@ -32,28 +48,24 @@ export const MapControls: React.FC<MapControlsProps> = props => {
 					href={'/profile'}
 					pointerEvents={'auto'}
 					style={styles.profileButton}
+					onPress={handleProfilePress}
 				/>
-				<SearchInput
-					onSearchResultSelect={props.onSearchResultSelect}
-				/>
+				<SearchInput onSearchResultSelect={onSearchResultSelect} />
 			</View>
 			{/* Компонент погоды перенесен в основной экран */}
 			<View style={styles.mapControlsWrapper} pointerEvents='box-none'>
 				<View style={styles.zoomAndModeContainer}>
-					<ZoomButtons
-						onZoomIn={props.onZoomIn}
-						onZoomOut={props.onZoomOut}
-					/>
+					<ZoomButtons onZoomIn={onZoomIn} onZoomOut={onZoomOut} />
 					<ToggleModeButton
-						is3D={props.is3DMode}
-						onPress={props.onToggleMode}
-						disabled={!props.mapReady}
+						is3D={is3DMode}
+						onPress={onToggleMode}
+						disabled={!mapReady}
 					/>
 					<View />
 					<NavigationModeButton
-						mode={props.followMode}
-						onPress={props.onToggleFollowMode}
-						disabled={!props.mapReady || !props.isLocationAvailable}
+						mode={followMode}
+						onPress={onToggleFollowMode}
+						disabled={!mapReady || !isLocationAvailable}
 						style={styles.mapButton}
 					/>
 				</View>

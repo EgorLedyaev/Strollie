@@ -155,6 +155,7 @@ function MapPageContent() {
 				isLocationAvailable={isLocationAvailable}
 				onSearchResultSelect={handleSearchResultSelect}
 				followMode={uiFollowMode}
+				onProfilePress={handleSheetDismiss}
 			/>
 			<View style={[styles.weatherContainer, rightForWeatherWidget]}>
 				<WeatherWidget temperature={temperature} />
