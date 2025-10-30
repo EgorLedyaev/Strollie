@@ -182,7 +182,7 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
 				isVisible={isSearchVisible}
 				onClose={() => setSearchVisible(false)}
 				onSelectPoint={handleSelectPoint}
-				currentMode={mode} ///
+				currentMode={mode}
 				onSwitchMode={handleSwitchModeFromSearch}
 			/>
 		</Animated.View>

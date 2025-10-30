@@ -1,10 +1,11 @@
 import DeleteIcon from '@/assets/icons/DeleteIcon';
-import { GreenPointerIcon } from '@/assets/icons/map'; // Assuming you have this icon
-
+import { GreenPointerIcon } from '@/assets/icons/map';
+import Slider from '@react-native-community/slider';
+import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, AppTextInput } from '@/shared/ui';
 
 const categoryRows = [
@@ -26,6 +27,8 @@ export const AiMode = () => {
 	const [hours, setHours] = useState<string>('');
 	const [minutes, setMinutes] = useState<string>('');
 	const [comment, setComment] = useState<string>('');
+
+	const [distance, setDistance] = useState<number>(2);
 
 	const handleCategorySelect = (categoryKey: string) => {
 		setSelectedCategories(prev =>
@@ -127,33 +130,85 @@ export const AiMode = () => {
 				</TouchableOpacity>
 			</View>
 
-			{/* Время */}
-			<View style={styles.timeInputWrapper}>
-				<View style={styles.timeInputContainer}>
-					<AppTextInput
-						style={styles.timeInput}
-						keyboardType='number-pad'
-						maxLength={2}
-						value={hours}
-						onChangeText={setHours}
-						placeholder='00'
-						placeholderTextColor={Colors.headerAndInputText}
-					/>
-					<AppText style={styles.timeUnitText}>ч.</AppText>
+			{criteria === 'time' ? (
+				<View style={styles.timeInputWrapper}>
+					<View style={styles.timeInputContainer}>
+						<AppTextInput
+							style={styles.timeInput}
+							keyboardType='number-pad'
+							maxLength={2}
+							value={hours}
+							onChangeText={setHours}
+							placeholder='00'
+							placeholderTextColor={Colors.headerAndInputText}
+						/>
+						<AppText style={styles.timeUnitText}>ч.</AppText>
+					</View>
+					<View style={styles.timeInputContainer}>
+						<AppTextInput
+							style={styles.timeInput}
+							keyboardType='number-pad'
+							maxLength={2}
+							value={minutes}
+							onChangeText={setMinutes}
+							placeholder='00'
+							placeholderTextColor={Colors.headerAndInputText}
+						/>
+						<AppText style={styles.timeUnitText}>мин.</AppText>
+					</View>
 				</View>
-				<View style={styles.timeInputContainer}>
-					<AppTextInput
-						style={styles.timeInput}
-						keyboardType='number-pad'
-						maxLength={2}
-						value={minutes}
-						onChangeText={setMinutes}
-						placeholder='00'
-						placeholderTextColor={Colors.headerAndInputText}
-					/>
-					<AppText style={styles.timeUnitText}>мин.</AppText>
+			) : (
+				<View style={styles.distanceSliderContainer}>
+					<View style={styles.sliderWrapper}>
+						{/* Подсказка со значением */}
+						<View
+							style={[
+								styles.callout,
+								{
+									left: `${((distance - 1) / (12 - 1)) * 100}%`, // Динамическое позиционирование
+								},
+							]}
+						>
+							<View style={styles.calloutBody}>
+								<AppText style={styles.calloutText}>
+									{Math.round(distance)} км
+								</AppText>
+							</View>
+							<View style={styles.calloutTriangle} />
+						</View>
+						<LinearGradient
+							colors={['#1BEE88', '#E5F041', '#FF5900']}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 0 }}
+							style={styles.gradientTrack}
+						/>
+						{/* Слайдер */}
+						<View
+							style={[
+								styles.thumb,
+								{
+									left: `${((distance - 1) / (12 - 1)) * 100}%`,
+								},
+							]}
+						/>
+						<Slider
+							style={styles.slider}
+							minimumValue={1}
+							maximumValue={12}
+							step={1}
+							value={distance}
+							onValueChange={setDistance}
+							minimumTrackTintColor='transparent'
+							maximumTrackTintColor='transparent'
+							thumbTintColor={Colors.transparent}
+						/>
+					</View>
+					<View style={styles.labelsContainer}>
+						<AppText style={styles.labelText}>1 км</AppText>
+						<AppText style={styles.labelText}>12 км</AppText>
+					</View>
 				</View>
-			</View>
+			)}
 
 			{/* Комментарий */}
 			<View style={styles.section}>
@@ -162,7 +217,7 @@ export const AiMode = () => {
 				</AppText>
 				<AppTextInput
 					style={styles.commentInput}
-					placeholder='Опишите, что включить или исключить'
+					placeholder='Опишите, что включить или исключить при создании маршрута'
 					placeholderTextColor={Colors.placeHolderInput}
 					multiline
 					value={comment}
@@ -174,15 +229,42 @@ export const AiMode = () => {
 };
 
 const styles = StyleSheet.create({
+	callout: {
+		alignItems: 'center',
+		position: 'absolute',
+		top: -35,
+		transform: [{ translateX: -24 }],
+	},
+	calloutBody: {
+		backgroundColor: Colors.grayBackground,
+		borderRadius: Radius.r8,
+		paddingHorizontal: 12,
+		paddingVertical: 6,
+	},
+	calloutText: {
+		color: Colors.secondaryText,
+		fontSize: Fonts.f12,
+	},
+	calloutTriangle: {
+		backgroundColor: Colors.transparent,
+		borderLeftColor: Colors.transparent,
+		borderLeftWidth: 6,
+		borderRightColor: Colors.transparent,
+		borderRightWidth: 6,
+		borderStyle: 'solid',
+		borderTopColor: Colors.grayBackground,
+		borderTopWidth: 8,
+		marginTop: -1,
+	},
 	categoryChip: {
 		alignItems: 'center',
 		backgroundColor: Colors.uploadButtonBackground,
 		borderRadius: Radius.r16,
 		flex: 1,
 		height: 110,
-		justifyContent: 'center',
+		justifyContent: 'flex-end',
 		paddingHorizontal: 10,
-		paddingVertical: 20,
+		paddingVertical: 12,
 	},
 	categoryChipSelected: {
 		borderColor: Colors.greenPrimary,
@@ -196,7 +278,7 @@ const styles = StyleSheet.create({
 		gap: 12,
 	},
 	categoryText: {
-		color: Colors.secondaryText,
+		color: Colors.textAAA,
 		fontSize: Fonts.f14,
 		textAlign: 'center',
 	},
@@ -209,10 +291,13 @@ const styles = StyleSheet.create({
 		padding: 16,
 		textAlignVertical: 'top',
 	},
-
 	container: {
 		paddingBottom: 20,
 		paddingHorizontal: 16,
+	},
+	distanceSliderContainer: {
+		paddingHorizontal: 16,
+		paddingTop: 48,
 	},
 	fromRow: {
 		alignItems: 'center',
@@ -225,10 +310,24 @@ const styles = StyleSheet.create({
 		marginTop: 16,
 		paddingHorizontal: 16,
 	},
+	gradientTrack: {
+		borderRadius: Radius.r8,
+		height: 12,
+	},
 	input: {
 		color: Colors.lightInputText,
 		flex: 1,
 		fontSize: Fonts.f16,
+	},
+	labelText: {
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f16,
+	},
+	labelsContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		paddingHorizontal: 8,
+		paddingTop: 2,
 	},
 	pointer: {
 		alignSelf: 'flex-end',
@@ -241,6 +340,24 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f16,
 		marginBottom: 16,
 		paddingLeft: 10,
+	},
+	slider: {
+		height: 40,
+		position: 'absolute',
+		width: '100%',
+	},
+	sliderWrapper: {
+		height: 40,
+		justifyContent: 'center',
+	},
+	thumb: {
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r20,
+		boxShadow: Shadows.boxShadow,
+		height: 32,
+		position: 'absolute',
+		transform: [{ translateX: -16 }],
+		width: 32,
 	},
 	timeInput: {
 		fontFamily: Fonts.medium,
