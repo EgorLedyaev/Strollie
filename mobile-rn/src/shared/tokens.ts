@@ -65,6 +65,7 @@ export const Colors = {
 	error: '#FF5857', // for test
 	likeActive: '#F24257', // Цвет активной лайкнутой иконки
 	likeInactive: '#CBCBCB', // Цвет неактивной лайкнутой иконки
+	yellow: '#FBD84A',
 
 	transparent: 'transparent',
 
@@ -111,6 +112,7 @@ export const Radius = {
 };
 
 export const Fonts = {
+	f10: 10,
 	f12: 12,
 	f14: 14,
 	f16: 16,

@@ -35,9 +35,15 @@ const TRANSLATE_Y = 20;
 
 interface BottomNavBarProps {
 	isVisible: boolean;
+	isRouteActive: boolean;
+	onRouteToggle: () => void;
 }
 
-export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
+export const BottomNavBar: React.FC<BottomNavBarProps> = ({
+	isVisible,
+	isRouteActive,
+	onRouteToggle,
+}) => {
 	const MAX_TRANSLATE_Y = -PANEL_HEIGHT;
 	const SNAP_POINT = MAX_TRANSLATE_Y / 2;
 
@@ -108,7 +114,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 		};
 	});
 
-	const [playing, setPlaying] = useState(false);
+	// const [playing, setPlaying] = useState(false);
 
 	// Обработчики нажатий
 	const handleNavNotificationPress = () => {
@@ -116,8 +122,9 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 	};
 
 	const handleNavRoutePress = () => {
-		console.log('Route button pressed');
-		setPlaying(!playing);
+		// console.log('Route button pressed');
+		// setPlaying(!playing);
+		onRouteToggle();
 	};
 
 	const handleNavChatPress = () => {
@@ -167,7 +174,10 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({ isVisible }) => {
 							/>
 
 							<RouteToggleButton
-								isPlaying={playing}
+								// isPlaying={playing}
+								// onPress={handleNavRoutePress}
+								// style={styles.centerButton}
+								isPlaying={isRouteActive}
 								onPress={handleNavRoutePress}
 								style={styles.centerButton}
 							/>

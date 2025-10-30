@@ -25,8 +25,8 @@ export const BackButton = ({
 	return (
 		<IconButton
 			style={[
-				style,
 				isTextVariant ? styles.textContainer : styles.iconContainer,
+				style,
 			]}
 			onPress={onPress}
 			feedback={isTextVariant ? 'opacity' : 'overlay'}

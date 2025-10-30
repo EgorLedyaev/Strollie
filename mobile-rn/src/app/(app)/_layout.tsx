@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BottomNavBar } from '@/widgets/bottom-nav-bar';
+import { RoutePlanner } from '@/widgets/route-planner';
 import { BottomNavBarContext } from '@/shared/lib';
 import { Colors } from '@/shared/tokens';
 
@@ -22,7 +23,14 @@ export default function AuthLayout() {
 	// Состояние для динамического управления видимостью (например, из PlaceDetailsSheet)
 	const [navBarForceHidden, setNavBarForceHidden] = useState(false);
 
-	const isNavBarVisible = shouldShowNavBar && !navBarForceHidden;
+	const [isRoutePlannerVisible, setRoutePlannerVisible] = useState(false);
+
+	const isNavBarVisible =
+		shouldShowNavBar && !navBarForceHidden && !isRoutePlannerVisible;
+
+	const handleRouteToggle = () => {
+		setRoutePlannerVisible(prev => !prev);
+	};
 
 	// Context value для управления навбаром
 	const navBarContextValue = useMemo(
@@ -61,7 +69,16 @@ export default function AuthLayout() {
 								<Stack.Screen name='routes/history' />
 								<Stack.Screen name='routes/saved' />
 							</Stack>
-							<BottomNavBar isVisible={isNavBarVisible} />
+							<BottomNavBar
+								// isVisible={isNavBarVisible}
+								isVisible={isNavBarVisible}
+								isRouteActive={isRoutePlannerVisible}
+								onRouteToggle={handleRouteToggle}
+							/>
+							<RoutePlanner
+								isVisible={isRoutePlannerVisible}
+								onClose={() => setRoutePlannerVisible(false)}
+							/>
 						</View>
 					</BottomNavBarContext.Provider>
 				</BottomSheetModalProvider>
