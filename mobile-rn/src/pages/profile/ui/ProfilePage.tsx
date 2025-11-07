@@ -5,11 +5,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-	ProfileHeader,
-	ProfileMenuOverlay,
-	useLogout,
-} from '@/features/profile';
+import { ProfileHeader, ProfileMenuOverlay } from '@/features/profile';
 import { sessionAtom } from '@/entities/session';
 import { loadUserProfileAtom, userProfileAtom } from '@/entities/user';
 import type { AnchorRect } from '@/shared/lib/useAnchorMeasurement';
@@ -25,7 +21,6 @@ export const ProfilePage: React.FC = () => {
 
 	const [isMenuVisible, setMenuVisible] = useState(false);
 	const [menuAnchor, setMenuAnchor] = useState<AnchorRect | null>(null);
-	const logout = useLogout();
 
 	useEffect(() => {
 		// Загружаем профиль, только если его еще нет или если мы хотим обновить
@@ -68,21 +63,9 @@ export const ProfilePage: React.FC = () => {
 		);
 	}
 
-	const handleLogout = () => {
-		setMenuVisible(false);
-		setTimeout(() => {
-			logout();
-		}, 100);
-	};
-
 	const handleEditProfile = () => {
 		setMenuVisible(false);
 		router.push('/profile/edit');
-	};
-
-	const handleSettings = () => {
-		setMenuVisible(false);
-		console.log('Settings pressed');
 	};
 
 	const handleHelp = () => {
@@ -106,9 +89,7 @@ export const ProfilePage: React.FC = () => {
 				visible={isMenuVisible}
 				onClose={() => setMenuVisible(false)}
 				onEditProfile={handleEditProfile}
-				onSettings={handleSettings}
 				onHelp={handleHelp}
-				onLogout={handleLogout}
 				anchor={menuAnchor ?? undefined}
 			/>
 		</SafeAreaView>

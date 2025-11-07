@@ -5,15 +5,12 @@ import Popover, { PopoverPlacement, Rect } from 'react-native-popover-view';
 import type { AnchorRect } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
 import { AppText, IconButton } from '@/shared/ui';
-import { Divider } from '@/shared/ui/Divider';
 
 interface ProfileMenuOverlayProps {
 	visible: boolean;
 	onClose: () => void;
 	onEditProfile: () => void;
-	onSettings: () => void;
 	onHelp: () => void;
-	onLogout: () => void;
 	anchor?: AnchorRect;
 }
 
@@ -21,9 +18,7 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 	visible,
 	onClose,
 	onEditProfile,
-	onSettings,
 	onHelp,
-	onLogout,
 	anchor,
 }) => {
 	const fromRect = anchor
@@ -50,13 +45,13 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 						Редактировать профиль
 					</AppText>
 				</IconButton>
-				<IconButton
-					style={styles.menuItem}
-					onPress={onSettings}
-					feedback='opacity'
-				>
-					<AppText style={styles.menuText}>Настройки</AppText>
-				</IconButton>
+				{/*<IconButton*/}
+				{/*	style={styles.menuItem}*/}
+				{/*	onPress={onSettings}*/}
+				{/*	feedback='opacity'*/}
+				{/*>*/}
+				{/*	<AppText style={styles.menuText}>Настройки</AppText>*/}
+				{/*</IconButton>*/}
 				<IconButton
 					style={styles.menuItem}
 					onPress={onHelp}
@@ -64,23 +59,23 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 				>
 					<AppText style={styles.menuText}>Помощь</AppText>
 				</IconButton>
-				<View>
-					<Divider style={styles.divider} />
-					<IconButton
-						style={styles.menuItem}
-						onPress={() => {
-							onClose();
-							setTimeout(() => {
-								onLogout();
-							}, 300);
-						}}
-						feedback='opacity'
-					>
-						<AppText style={[styles.menuText, styles.logoutText]}>
-							Выйти из аккаунта
-						</AppText>
-					</IconButton>
-				</View>
+				{/*<View>*/}
+				{/*	<Divider style={styles.divider} />*/}
+				{/*	<IconButton*/}
+				{/*		style={styles.menuItem}*/}
+				{/*		onPress={() => {*/}
+				{/*			onClose();*/}
+				{/*			setTimeout(() => {*/}
+				{/*				onLogout();*/}
+				{/*			}, 300);*/}
+				{/*		}}*/}
+				{/*		feedback='opacity'*/}
+				{/*	>*/}
+				{/*		<AppText style={[styles.menuText, styles.logoutText]}>*/}
+				{/*			Выйти из аккаунта*/}
+				{/*		</AppText>*/}
+				{/*	</IconButton>*/}
+				{/*</View>*/}
 			</View>
 		</Popover>
 	);
@@ -90,13 +85,13 @@ const styles = StyleSheet.create({
 	contentWrapper: {
 		gap: 20,
 	},
-	divider: {
-		marginBottom: 10,
-	},
-	logoutText: {
-		color: Colors.red,
-		fontFamily: Fonts.medium,
-	},
+	// divider: {
+	// 	marginBottom: 10,
+	// },
+	// logoutText: {
+	// 	color: Colors.red,
+	// 	fontFamily: Fonts.medium,
+	// },
 	menuContainer: {
 		backgroundColor: Colors.white,
 		borderRadius: Radius.r15,

@@ -17,7 +17,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AiMode } from '@/widgets/route-planner/ui/AiMode';
 import { ManualMode } from '@/widgets/route-planner/ui/ManualMode';
-import { ModeToggle } from '@/widgets/route-planner/ui/ModeToggle';
 import { SearchScreen } from '@/widgets/route-planner/ui/SearchScreen';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppButton, BackButton } from '@/shared/ui';
@@ -140,11 +139,11 @@ export const RoutePlanner: React.FC<RoutePlannerProps> = ({
 				]}
 			>
 				<ScrollView showsVerticalScrollIndicator={false}>
-					<ModeToggle
-						activeMode={mode}
-						onModeChange={setMode}
-						style={styles.modeToggle}
-					/>
+					{/*<ModeToggle*/}
+					{/*	activeMode={mode}*/}
+					{/*	onModeChange={setMode}*/}
+					{/*	style={styles.modeToggle}*/}
+					{/*/>*/}
 
 					{mode === 'manual' ? (
 						<ManualMode
@@ -215,9 +214,6 @@ const styles = StyleSheet.create({
 		paddingBottom: 18,
 		paddingHorizontal: 16,
 		paddingTop: 16,
-	},
-	modeToggle: {
-		marginHorizontal: 16,
 	},
 	widget: {
 		backgroundColor: Colors.white,

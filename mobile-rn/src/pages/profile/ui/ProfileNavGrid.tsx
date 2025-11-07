@@ -1,4 +1,3 @@
-import BecomeGuideIcon from '@/assets/profile/BecomeGuideIcon';
 import CalendarIcon from '@/assets/profile/CalendarIcon';
 import RouteIcon from '@/assets/profile/RouteIcon';
 import SavedRouteIcon from '@/assets/profile/SavedRouteIcon';
@@ -72,7 +71,7 @@ export const ProfileNavGrid: React.FC = () => {
 		},
 		{
 			id: 'saved-routes',
-			title: 'Сохраненные маршруты',
+			title: 'Избранное',
 			icon: <SavedRouteIcon />,
 			path: '/routes/saved',
 		},
@@ -88,12 +87,12 @@ export const ProfileNavGrid: React.FC = () => {
 			icon: <CalendarIcon />,
 			path: '/calendar',
 		},
-		{
-			id: 'become-a-guide',
-			title: 'FAQ / Стать гидом',
-			icon: <BecomeGuideIcon />,
-			path: '/guide',
-		},
+		// {
+		// 	id: 'become-a-guide',
+		// 	title: 'FAQ / Стать гидом',
+		// 	icon: <BecomeGuideIcon />,
+		// 	path: '/guide',
+		// },
 	];
 
 	// ... (логика chunkArray остается без изменений)
@@ -113,6 +112,9 @@ export const ProfileNavGrid: React.FC = () => {
 					{chunk.map(item => (
 						<GridItem key={item.id} item={item} />
 					))}
+					{chunk.length === 1 && (
+						<View style={styles.gridItemPlaceholder} />
+					)}
 				</View>
 			))}
 		</View>
@@ -140,6 +142,9 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-start',
 		justifyContent: 'flex-start',
 		padding: 24,
+	},
+	gridItemPlaceholder: {
+		flex: 1,
 	},
 	gridRow: {
 		flexDirection: 'row',

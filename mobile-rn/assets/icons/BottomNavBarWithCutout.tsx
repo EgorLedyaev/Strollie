@@ -12,7 +12,7 @@ import { useDerivedValue } from 'react-native-reanimated';
 
 // --- КОНСТАНТЫ ---
 const CUTOUT_WIDTH = 120.348;
-export const BAR_HEIGHT = 72;
+export const BAR_HEIGHT = 117;
 const CORNER_RADIUS = 20;
 
 // Параметры тени

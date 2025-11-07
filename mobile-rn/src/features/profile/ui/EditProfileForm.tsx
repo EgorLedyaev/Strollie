@@ -111,7 +111,9 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 			<View style={styles.header}>
 				<BackButton variant='icon' onPress={onBackPress} />
 
-				<AppText variant='header'>Редактирование</AppText>
+				<AppText style={styles.headerText} variant='header'>
+					Редактирование
+				</AppText>
 				<View style={styles.placeHolder} />
 			</View>
 
@@ -156,6 +158,8 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 						<Input
 							value={userData.email}
 							onChangeText={value => handleChange('email', value)}
+							editable={false}
+							style={styles.emailInput}
 						/>
 					</View>
 					<View style={styles.field}>
@@ -211,7 +215,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingHorizontal: 16,
 	},
-
+	emailInput: {
+		backgroundColor: Colors.noPhotoIconBackground,
+	},
 	field: {
 		gap: Gaps.g8,
 	},
@@ -235,6 +241,9 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between',
 		marginBottom: 16,
 		marginTop: 10,
+	},
+	headerText: {
+		fontSize: Fonts.f16,
 	},
 	label: {
 		color: Colors.darkGray,

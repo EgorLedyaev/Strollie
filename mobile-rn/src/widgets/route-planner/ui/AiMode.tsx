@@ -23,7 +23,7 @@ const categoryRows = [
 export const AiMode = () => {
 	const [startPoint, setStartPoint] = useState<string>('');
 	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-	const [criteria, setCriteria] = useState<'time' | 'distance'>('time');
+	const [criteria] = useState<'time' | 'distance'>('time');
 	const [hours, setHours] = useState<string>('');
 	const [minutes, setMinutes] = useState<string>('');
 	const [comment, setComment] = useState<string>('');
@@ -95,41 +95,43 @@ export const AiMode = () => {
 			</View>
 
 			{/* Переключатель */}
-			<View style={styles.toggleContainer}>
-				<TouchableOpacity
-					style={[
-						styles.toggleButton,
-						criteria === 'time' && styles.toggleButtonActive,
-					]}
-					onPress={() => setCriteria('time')}
-				>
-					<AppText
-						style={[
-							styles.toggleText,
-							criteria === 'time' && styles.toggleTextActive,
-						]}
-					>
-						По времени
-					</AppText>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={[
-						styles.toggleButton,
-						criteria === 'distance' && styles.toggleButtonActive,
-					]}
-					onPress={() => setCriteria('distance')}
-				>
-					<AppText
-						style={[
-							styles.toggleText,
-							criteria === 'distance' && styles.toggleTextActive,
-						]}
-					>
-						По расстоянию
-					</AppText>
-				</TouchableOpacity>
-			</View>
-
+			{/*<View style={styles.toggleContainer}>*/}
+			{/*	<TouchableOpacity*/}
+			{/*		style={[*/}
+			{/*			styles.toggleButton,*/}
+			{/*			criteria === 'time' && styles.toggleButtonActive,*/}
+			{/*		]}*/}
+			{/*		onPress={() => setCriteria('time')}*/}
+			{/*	>*/}
+			{/*		<AppText*/}
+			{/*			style={[*/}
+			{/*				styles.toggleText,*/}
+			{/*				criteria === 'time' && styles.toggleTextActive,*/}
+			{/*			]}*/}
+			{/*		>*/}
+			{/*			По времени*/}
+			{/*		</AppText>*/}
+			{/*	</TouchableOpacity>*/}
+			{/*	<TouchableOpacity*/}
+			{/*		style={[*/}
+			{/*			styles.toggleButton,*/}
+			{/*			criteria === 'distance' && styles.toggleButtonActive,*/}
+			{/*		]}*/}
+			{/*		onPress={() => setCriteria('distance')}*/}
+			{/*	>*/}
+			{/*		<AppText*/}
+			{/*			style={[*/}
+			{/*				styles.toggleText,*/}
+			{/*				criteria === 'distance' && styles.toggleTextActive,*/}
+			{/*			]}*/}
+			{/*		>*/}
+			{/*			По расстоянию*/}
+			{/*		</AppText>*/}
+			{/*	</TouchableOpacity>*/}
+			{/*</View>*/}
+			<AppText style={[styles.sectionTitle, styles.timeTitle]}>
+				Время прохождения маршрута
+			</AppText>
 			{criteria === 'time' ? (
 				<View style={styles.timeInputWrapper}>
 					<View style={styles.timeInputContainer}>
@@ -380,8 +382,12 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		gap: 11,
 		height: 65,
-		marginTop: 12,
+		// marginTop: 12,
 		padding: 5,
+	},
+	timeTitle: {
+		marginBottom: 12,
+		marginTop: 16,
 	},
 	timeUnitText: {
 		color: Colors.headerAndInputText,
@@ -389,29 +395,29 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f24,
 		paddingLeft: 12,
 	},
-	toggleButton: {
-		alignItems: 'center',
-		borderRadius: Radius.r100,
-		flex: 1,
-		justifyContent: 'center',
-	},
-	toggleButtonActive: {
-		backgroundColor: Colors.white,
-	},
-	toggleContainer: {
-		backgroundColor: Colors.grayBackground,
-		borderRadius: Radius.r100,
-		flexDirection: 'row',
-		height: 46,
-		marginTop: 24,
-		padding: 4,
-	},
-	toggleText: {
-		color: Colors.secondaryText,
-		fontFamily: Fonts.semibold,
-		fontSize: Fonts.f16,
-	},
-	toggleTextActive: {
-		color: Colors.headerAndInputText,
-	},
+	// toggleButton: {
+	// 	alignItems: 'center',
+	// 	borderRadius: Radius.r100,
+	// 	flex: 1,
+	// 	justifyContent: 'center',
+	// },
+	// toggleButtonActive: {
+	// 	backgroundColor: Colors.white,
+	// },
+	// toggleContainer: {
+	// 	backgroundColor: Colors.grayBackground,
+	// 	borderRadius: Radius.r100,
+	// 	flexDirection: 'row',
+	// 	height: 46,
+	// 	marginTop: 24,
+	// 	padding: 4,
+	// },
+	// toggleText: {
+	// 	color: Colors.secondaryText,
+	// 	fontFamily: Fonts.semibold,
+	// 	fontSize: Fonts.f16,
+	// },
+	// toggleTextActive: {
+	// 	color: Colors.headerAndInputText,
+	// },
 });
