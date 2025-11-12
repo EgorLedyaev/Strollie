@@ -1,0 +1,36 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AUTH_JWKS_URI:http://auth-service:8081/oauth/jwks}
+
+  cloud:
+    gateway:
+      default-filters:
+        - AddRequestHeader=X-Correlation-Id, ${CORRELATION_ID_HEADER:${random.uuid}}
+      routes:
+        - id: auth-service
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/auth/**
+        - id: jwks
+          uri: http://auth-service:8081
+          predicates:
+            - Path=/oauth/jwks
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+  allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+  allowed-headers: "*"
