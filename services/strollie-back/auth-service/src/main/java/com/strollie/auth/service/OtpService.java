@@ -1,6 +1,8 @@
 package com.strollie.auth.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class OtpService {
+    private static final Logger log = LoggerFactory.getLogger(OtpService.class);
     private final StringRedisTemplate redis;
     private final SecureRandom random = new SecureRandom();
 
@@ -26,6 +29,7 @@ public class OtpService {
         String hash = BCrypt.hashpw(code, BCrypt.gensalt());
         String key = otpKey(email);
         redis.opsForValue().set(key, hash, ttlMinutes, TimeUnit.MINUTES);
+        log.info("OTP generated for {}: {}", email, code);
         return code;
     }
 

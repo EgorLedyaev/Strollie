@@ -1,2 +1,30 @@
 /.vscode
 /task.md
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+
+# Gradle
+**/.gradle/
+gradle/
+
+# Build outputs
+**/build/
+**/bin/
+**/out/
+target/
+
+# Logs
+*.log
+logs/
+
+# Env files
+.env
+.env.local
+
+# Misc
+*.class

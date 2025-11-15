@@ -59,6 +59,7 @@ public class TokenService {
         if (subject == null) {
             throw new IllegalArgumentException("Invalid refresh token");
         }
+        redis.expire(refreshKey(refreshId), refreshTtlHours, TimeUnit.HOURS);
         return issueAccessToken(subject);
     }
 

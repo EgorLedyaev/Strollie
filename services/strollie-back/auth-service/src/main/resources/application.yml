@@ -35,6 +35,15 @@ management:
       exposure:
         include: health,info,metrics
 
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui/index.html
+    use-root-path: true
+
 jwt:
   access-token-ttl-minutes: ${JWT_ACCESS_TTL_MINUTES:20}
   refresh-token-ttl-hours: ${JWT_REFRESH_TTL_HOURS:24}
