@@ -3,16 +3,10 @@ import React, { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
-
 import { ConfirmModal } from '@/pages/settings/ui/ConfirmModal';
 import { Header } from '@/widgets/header';
 import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
 import { ActionTouchable, AppText } from '@/shared/ui';
-
-
-
-
 
 export const SettingsPage: React.FC = () => {
 	const [activeModal, setActiveModal] = useState<'logout' | 'delete' | null>(
