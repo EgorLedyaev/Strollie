@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ticketsAtom, type Ticket } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppText, BackButton, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText, BackButton } from '@/shared/ui';
 
 interface TicketDetailsPageProps {
 	ticketId: string;
@@ -116,7 +116,7 @@ export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 						) : null}
 					</View>
 
-					<IconButton
+					<ActionTouchable
 						style={styles.refundBtn}
 						feedback='opacity'
 						opacity={0.6}
@@ -124,7 +124,7 @@ export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 						<AppText style={styles.refundText}>
 							Вернуть билет
 						</AppText>
-					</IconButton>
+					</ActionTouchable>
 				</View>
 			</ScrollView>
 		</SafeAreaView>

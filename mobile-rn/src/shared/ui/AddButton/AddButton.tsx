@@ -3,17 +3,17 @@ import { StyleSheet, TouchableOpacityProps } from 'react-native';
 
 import { Colors, Radius, Sizes } from '@/shared/tokens';
 
-import { IconButton } from '../Button';
+import { ActionTouchable } from '../Button';
 
 export const AddButton = ({ style, ...props }: TouchableOpacityProps) => {
 	return (
-		<IconButton
+		<ActionTouchable
 			style={[styles.container, style]}
 			feedback='overlay'
 			{...props}
 		>
 			<PlusIcon />
-		</IconButton>
+		</ActionTouchable>
 	);
 };
 

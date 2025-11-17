@@ -1,3 +1,4 @@
+import StarIcon from '@/assets/icons/StarIcon';
 import React, { useCallback, useMemo } from 'react';
 import { Linking, StyleSheet, TouchableOpacity, View } from 'react-native';
 
@@ -19,11 +20,19 @@ export function PlaceSummary({
 	onOpenTab,
 	isExpanded,
 }: PlaceSummaryProps) {
-	const allContacts = useMemo(
-		() =>
-			place.contact_groups?.flatMap(group => group.contacts ?? []) ?? [],
-		[place.contact_groups],
-	);
+	const allContacts = useMemo(() => {
+		const raw =
+			place.contact_groups?.flatMap(group => group.contacts ?? []) ?? [];
+		const seen = new Set<string>();
+		return raw.filter(contact => {
+			const key = `${contact.type.toLowerCase()}|${contact.value.toLowerCase()}`;
+			if (seen.has(key)) {
+				return false;
+			}
+			seen.add(key);
+			return true;
+		});
+	}, [place.contact_groups]);
 
 	const phoneContact = useMemo(
 		() =>
@@ -50,7 +59,6 @@ export function PlaceSummary({
 
 	const photoCount = place.photos?.length ?? 0;
 	const averageRating = place.review_stats?.average_rating ?? null;
-	const reviewCount = place.review_stats?.total_count ?? 0;
 
 	const shortDescription = useMemo(() => {
 		if (!place.description) return null;
@@ -108,14 +116,10 @@ export function PlaceSummary({
 				<View style={styles.metaRow}>
 					{averageRating !== null && (
 						<View style={styles.ratingBadge}>
+							<StarIcon />
 							<AppText style={styles.ratingBadgeText}>
-								★ {averageRating.toFixed(1)}
+								{averageRating?.toFixed(1)}
 							</AppText>
-							{reviewCount > 0 && (
-								<AppText style={styles.ratingBadgeSubText}>
-									{` · ${reviewCount}`}
-								</AppText>
-							)}
 						</View>
 					)}
 
@@ -255,11 +259,6 @@ const styles = StyleSheet.create({
 		gap: Gaps.g4,
 		paddingHorizontal: Gaps.g10,
 		paddingVertical: 6,
-	},
-	ratingBadgeSubText: {
-		color: Colors.white,
-		fontFamily: Fonts.regular,
-		fontSize: Fonts.f12,
 	},
 	ratingBadgeText: {
 		color: Colors.white,

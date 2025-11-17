@@ -4,7 +4,7 @@ import Popover, { PopoverPlacement, Rect } from 'react-native-popover-view';
 
 import type { AnchorRect } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
 
 interface ProfileMenuOverlayProps {
 	visible: boolean;
@@ -36,7 +36,7 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 			popoverStyle={styles.menuContainer}
 		>
 			<View testID='profile-menu-popover' style={styles.contentWrapper}>
-				<IconButton
+				<ActionTouchable
 					style={styles.menuItem}
 					onPress={onEditProfile}
 					feedback='opacity'
@@ -44,24 +44,24 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 					<AppText style={styles.menuText}>
 						Редактировать профиль
 					</AppText>
-				</IconButton>
-				{/*<IconButton*/}
+				</ActionTouchable>
+				{/*<ActionTouchable*/}
 				{/*	style={styles.menuItem}*/}
 				{/*	onPress={onSettings}*/}
 				{/*	feedback='opacity'*/}
 				{/*>*/}
 				{/*	<AppText style={styles.menuText}>Настройки</AppText>*/}
-				{/*</IconButton>*/}
-				<IconButton
+				{/*</ActionTouchable>*/}
+				<ActionTouchable
 					style={styles.menuItem}
 					onPress={onHelp}
 					feedback='opacity'
 				>
 					<AppText style={styles.menuText}>Помощь</AppText>
-				</IconButton>
+				</ActionTouchable>
 				{/*<View>*/}
 				{/*	<Divider style={styles.divider} />*/}
-				{/*	<IconButton*/}
+				{/*	<ActionTouchable*/}
 				{/*		style={styles.menuItem}*/}
 				{/*		onPress={() => {*/}
 				{/*			onClose();*/}
@@ -74,7 +74,7 @@ export const ProfileMenuOverlay: React.FC<ProfileMenuOverlayProps> = ({
 				{/*		<AppText style={[styles.menuText, styles.logoutText]}>*/}
 				{/*			Выйти из аккаунта*/}
 				{/*		</AppText>*/}
-				{/*	</IconButton>*/}
+				{/*	</ActionTouchable>*/}
 				{/*</View>*/}
 			</View>
 		</Popover>

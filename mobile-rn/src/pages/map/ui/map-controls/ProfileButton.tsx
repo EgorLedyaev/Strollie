@@ -3,7 +3,7 @@ import { Link, LinkProps } from 'expo-router';
 import { StyleSheet, ViewProps } from 'react-native';
 
 import { Colors, Radius } from '@/shared/tokens';
-import { IconButton } from '@/shared/ui';
+import { ActionTouchable } from '@/shared/ui';
 
 type ProfileButtonProps = LinkProps & {
 	pointerEvents?: ViewProps['pointerEvents'];
@@ -16,12 +16,12 @@ export const ProfileButton = ({
 	return (
 		<>
 			<Link {...linkProps} asChild>
-				<IconButton
+				<ActionTouchable
 					style={styles.iconContainer}
 					pointerEvents={pointerEvents}
 				>
 					<AvatarIcon />
-				</IconButton>
+				</ActionTouchable>
 			</Link>
 		</>
 	);

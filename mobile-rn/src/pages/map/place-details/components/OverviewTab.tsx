@@ -10,7 +10,13 @@ import {
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppText } from '@/shared/ui';
 
-import type { Contact, Place, Schedule } from '../types';
+import type {
+	Contact,
+	Place,
+	Schedule,
+	ScheduleDay,
+	ScheduleDayInterval,
+} from '../types';
 
 interface OverviewTabProps {
 	place: Place;
@@ -50,11 +56,19 @@ const WEEK_LABELS: Record<WeekdayKey, string> = {
 };
 
 export function OverviewTab({ place }: OverviewTabProps) {
-	const contacts = useMemo(
-		() =>
-			place.contact_groups?.flatMap(group => group.contacts ?? []) ?? [],
-		[place.contact_groups],
-	);
+	const contacts = useMemo(() => {
+		const raw =
+			place.contact_groups?.flatMap(group => group.contacts ?? []) ?? [];
+		const seen = new Set<string>();
+		return raw.filter(contact => {
+			const key = `${contact.type.toLowerCase()}|${contact.value.toLowerCase()}`;
+			if (seen.has(key)) {
+				return false;
+			}
+			seen.add(key);
+			return true;
+		});
+	}, [place.contact_groups]);
 
 	const phones = useMemo(
 		() =>
@@ -81,19 +95,34 @@ export function OverviewTab({ place }: OverviewTabProps) {
 	);
 
 	const scheduleEntries = useMemo(() => {
-		if (!place.schedule)
-			return [] as Array<{ label: string; value: string | undefined }>;
+		if (!place.schedule) {
+			return [] as Array<{ label: string; value: string }>;
+		}
 
 		return WEEK_ORDER.map(day => ({
 			label: WEEK_LABELS[day],
-			value: place.schedule?.[day as keyof Schedule] ?? undefined,
+			value: formatScheduleDay(getScheduleDay(place.schedule, day)),
 		}));
 	}, [place.schedule]);
 
-	const hasSchedule = scheduleEntries.length > 0;
+	const hasSchedule =
+		scheduleEntries.some(entry => entry.value !== '—') ||
+		Boolean(place.schedule?.comment);
 	const hasContacts =
-		Boolean(place.address) || phones.length > 0 || websites.length > 0;
+		Boolean(place.address?.name || place.address?.short_address) ||
+		phones.length > 0 ||
+		websites.length > 0;
 	const hasSocials = socialLinks.length > 0;
+
+	const addressLine = useMemo(() => {
+		if (!place.address) return null;
+		return (
+			place.address.short_address ||
+			place.address.name ||
+			place.address.full_name ||
+			null
+		);
+	}, [place.address]);
 
 	const handlePhonePress = (contact: Contact) => {
 		const normalized = normalizePhone(contact.value);
@@ -127,19 +156,30 @@ export function OverviewTab({ place }: OverviewTabProps) {
 								{label}
 							</AppText>
 							<AppText style={styles.scheduleHours}>
-								{value ?? '—'}
+								{value}
 							</AppText>
 						</View>
 					))}
+
+					{place.schedule?.comment && (
+						<AppText style={styles.scheduleComment}>
+							{place.schedule.comment}
+						</AppText>
+					)}
 				</View>
 			)}
 
 			{hasContacts && (
 				<View style={styles.section}>
 					<AppText style={styles.sectionTitle}>Контакты</AppText>
-					{place.address && (
+					{addressLine && (
 						<AppText style={styles.sectionText}>
-							{place.address.full_name || place.address.name}
+							{addressLine}
+						</AppText>
+					)}
+					{place.address?.city && (
+						<AppText style={styles.sectionText}>
+							{place.address.city}
 						</AppText>
 					)}
 
@@ -223,6 +263,17 @@ export function OverviewTab({ place }: OverviewTabProps) {
 	);
 }
 
+function getScheduleDay(
+	schedule: Schedule | undefined,
+	day: WeekdayKey,
+): ScheduleDay | undefined {
+	if (!schedule) {
+		return undefined;
+	}
+
+	return schedule[day];
+}
+
 function normalizePhone(value: string) {
 	return value.replace(/[^+\d]/g, '');
 }
@@ -235,6 +286,35 @@ function formatWebsite(value: string) {
 	return ensureHttp(value)
 		.replace(/^https?:\/\//i, '')
 		.replace(/\/$/, '');
+}
+
+function formatScheduleDay(day?: ScheduleDay): string {
+	if (!day) {
+		return '—';
+	}
+
+	if (day.is_day_off) {
+		return 'Выходной';
+	}
+
+	if (day.is_round_the_clock) {
+		return 'Круглосуточно';
+	}
+
+	const working = day.working_hours?.map(
+		(interval: ScheduleDayInterval) => `${interval.from}–${interval.to}`,
+	);
+
+	if (working?.length) {
+		const base = working.join(', ');
+		const breaks = day.breaks?.map(
+			(interval: ScheduleDayInterval) =>
+				`перерыв ${interval.from}–${interval.to}`,
+		);
+		return breaks?.length ? `${base}, ${breaks.join(', ')}` : base;
+	}
+
+	return '—';
 }
 
 const styles = StyleSheet.create({
@@ -268,6 +348,13 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f14,
 		marginTop: Gaps.g8,
 		opacity: 0.8,
+	},
+	scheduleComment: {
+		color: Colors.secondaryText,
+		fontFamily: Fonts.regular,
+		fontSize: Fonts.f12,
+		marginTop: Gaps.g12,
+		opacity: 0.7,
 	},
 	scheduleDay: {
 		color: Colors.secondaryText,

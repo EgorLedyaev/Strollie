@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
 
 import { GridItemBackground } from './GridItemBackground';
 
@@ -33,7 +33,7 @@ const GridItem: React.FC<{ item: NavItem }> = ({ item }) => {
 
 	return (
 		<Link href={item.path} asChild>
-			<IconButton
+			<ActionTouchable
 				style={styles.gridItemContainer}
 				onLayout={handleLayout}
 			>
@@ -50,7 +50,7 @@ const GridItem: React.FC<{ item: NavItem }> = ({ item }) => {
 					<AppText style={styles.gridText}>{item.title}</AppText>
 					<View style={styles.gridIcon}>{item.icon}</View>
 				</View>
-			</IconButton>
+			</ActionTouchable>
 		</Link>
 	);
 };

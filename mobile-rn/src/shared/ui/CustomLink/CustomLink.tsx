@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 
 import { Colors, Fonts } from '@/shared/tokens';
 
-import { IconButton } from '../Button';
+import { ActionTouchable } from '../Button';
 import { AppText } from '../Text';
 import { CustomLinkProps } from './CustomLinkProps';
 
@@ -21,9 +21,9 @@ export const CustomLink = ({
 }: CustomLinkProps): JSX.Element => {
 	return (
 		<Link {...props} asChild>
-			<IconButton feedback='opacity'>
+			<ActionTouchable feedback='opacity'>
 				<AppText style={styles.link}>{text}</AppText>
-			</IconButton>
+			</ActionTouchable>
 		</Link>
 	);
 };

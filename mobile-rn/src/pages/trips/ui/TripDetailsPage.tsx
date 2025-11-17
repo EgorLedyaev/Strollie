@@ -13,10 +13,10 @@ import { NewTicketItem, Ticket, ticketApi } from '@/entities/ticket';
 import { tripApi, TripChecklistItem, UpdateTripInput } from '@/entities/trip';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import {
+	ActionTouchable,
 	AppButton,
 	AppText,
 	AppTextInput,
-	IconButton,
 	SectionItem,
 } from '@/shared/ui';
 
@@ -285,7 +285,7 @@ export const TripDetailsPage: React.FC = () => {
 									Чек-лист
 								</AppText>
 								<View style={styles.rowGap10}>
-									<IconButton
+									<ActionTouchable
 										onPress={() =>
 											setChecklistMode(prev =>
 												prev === 'view'
@@ -309,8 +309,8 @@ export const TripDetailsPage: React.FC = () => {
 												}
 											/>
 										</View>
-									</IconButton>
-									<IconButton
+									</ActionTouchable>
+									<ActionTouchable
 										onPress={() =>
 											setIsAddingChecklistItem(
 												!isAddingChecklistItem,
@@ -320,7 +320,7 @@ export const TripDetailsPage: React.FC = () => {
 										<View style={styles.smallSquareWhite}>
 											<PlusIcon />
 										</View>
-									</IconButton>
+									</ActionTouchable>
 								</View>
 							</View>
 							{checklist.length > 0 && (

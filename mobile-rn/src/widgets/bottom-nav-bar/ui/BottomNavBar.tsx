@@ -14,7 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { Colors, Radius, Shadows } from '@/shared/tokens';
-import { IconButton } from '@/shared/ui';
+import { ActionTouchable } from '@/shared/ui';
 
 import { RouteToggleButton } from './RouteToggleButton';
 
@@ -166,7 +166,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 					<BottomNavBarWithCutout />
 				</View>
 				<View style={styles.navBarIcons}>
-					<IconButton
+					<ActionTouchable
 						style={styles.navBarButton}
 						children={<TransportIcon />}
 						// onPress={handleNavChatPress}
@@ -181,7 +181,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 						onPress={handleNavRoutePress}
 						style={styles.centerButton}
 					/>
-					<IconButton
+					<ActionTouchable
 						style={styles.navBarButton}
 						// onPress={handleNavNotificationPress}
 						onPress={handleNavSettingsPress}
@@ -198,7 +198,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 			{/*	]}*/}
 			{/*>*/}
 			{/*	<View style={styles.panelContent}>*/}
-			{/*		<IconButton*/}
+			{/*		<ActionTouchable*/}
 			{/*			children={<FeedIcon />}*/}
 			{/*			style={styles.panelButton}*/}
 			{/*		/>*/}
@@ -207,7 +207,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 			{/*		</AppText>*/}
 			{/*	</View>*/}
 			{/*	<View style={styles.panelContent}>*/}
-			{/*		<IconButton*/}
+			{/*		<ActionTouchable*/}
 			{/*			children={<ScheduleIcon />}*/}
 			{/*			style={styles.panelButton}*/}
 			{/*		/>*/}
@@ -216,7 +216,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 			{/*		</AppText>*/}
 			{/*	</View>*/}
 			{/*	<View style={styles.panelContent}>*/}
-			{/*		<IconButton*/}
+			{/*		<ActionTouchable*/}
 			{/*			children={<SettingsIcon />}*/}
 			{/*			style={styles.panelButton}*/}
 			{/*		/>*/}

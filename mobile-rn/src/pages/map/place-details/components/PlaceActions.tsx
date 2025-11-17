@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
-import { AppButton, IconButton, LikeButton } from '@/shared/ui';
+import { ActionTouchable, AppButton, LikeButton } from '@/shared/ui';
 
 import type { Place } from '../types';
 
@@ -61,12 +61,12 @@ export function PlaceActions({
 					variant='large'
 					style={styles.secondaryActionButton}
 				/>
-				<IconButton
+				<ActionTouchable
 					onPress={handleShare}
 					style={styles.secondaryActionButton}
 				>
 					<SendPlaceIcon />
-				</IconButton>
+				</ActionTouchable>
 			</View>
 		</View>
 	);

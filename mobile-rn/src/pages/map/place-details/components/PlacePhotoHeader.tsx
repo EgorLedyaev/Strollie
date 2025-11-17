@@ -1,3 +1,4 @@
+import HumanIcon from '@/assets/icons/HumanIcon';
 import StarIcon from '@/assets/icons/StarIcon';
 import fallbackImage from '@/assets/images/unmatched.png';
 import React, { useMemo } from 'react';
@@ -30,7 +31,12 @@ export function PlacePhotoHeader({ place, isExpanded }: PlacePhotoHeaderProps) {
 	}, [place.photos]);
 
 	const averageRating = place.review_stats?.average_rating ?? null;
-	const addressLine = place.address?.full_name ?? place.address?.name ?? '';
+	const addressLine =
+		place.address?.short_address ??
+		place.address?.name ??
+		place.address?.full_name ??
+		'';
+	const cityLine = place.address?.city;
 	const distanceLabel = place.distance ?? '';
 	const shouldRenderCarousel = !isExpanded && photoUrls.length > 0;
 	const hasRating = averageRating !== null;
@@ -79,15 +85,26 @@ export function PlacePhotoHeader({ place, isExpanded }: PlacePhotoHeaderProps) {
 									{addressLine}
 								</AppText>
 							)}
+							{!!cityLine && cityLine !== addressLine && (
+								<AppText
+									style={styles.placeAddress}
+									numberOfLines={1}
+								>
+									{cityLine}
+								</AppText>
+							)}
 						</View>
 
 						{!!distanceLabel && (
-							<AppText
-								style={styles.distanceText}
-								numberOfLines={1}
-							>
-								{distanceLabel}
-							</AppText>
+							<View style={styles.distanceBlock}>
+								<HumanIcon />
+								<AppText
+									style={styles.distanceText}
+									numberOfLines={1}
+								>
+									{distanceLabel}
+								</AppText>
+							</View>
 						)}
 					</View>
 				)}
@@ -113,6 +130,11 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		marginBottom: -Radius.r24,
+	},
+	distanceBlock: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		gap: Gaps.g4,
 	},
 	distanceText: {
 		color: Colors.white,

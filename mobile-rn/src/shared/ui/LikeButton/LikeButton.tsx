@@ -5,10 +5,10 @@ import type { SvgProps } from 'react-native-svg';
 
 import { Colors, Radius } from '@/shared/tokens';
 
-import { IconButton } from '../Button';
+import { ActionTouchable } from '../Button';
 
 type LikeButtonProps = Omit<
-	ComponentPropsWithoutRef<typeof IconButton>,
+	ComponentPropsWithoutRef<typeof ActionTouchable>,
 	'children'
 > & {
 	liked: boolean;
@@ -42,7 +42,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
 	const resolvedInactiveColor = inactiveColor ?? Colors.likeInactive;
 
 	return (
-		<IconButton
+		<ActionTouchable
 			onPress={onPress}
 			style={[
 				styles.likeButton,
@@ -75,7 +75,7 @@ export const LikeButton: React.FC<LikeButtonProps> = ({
 					/>
 				)
 			}
-		</IconButton>
+		</ActionTouchable>
 	);
 };
 

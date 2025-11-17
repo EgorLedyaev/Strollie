@@ -2,7 +2,7 @@ import { StyleSheet, TouchableOpacityProps, View } from 'react-native';
 
 import { Colors, Gaps, Radius } from '@/shared/tokens';
 
-import { IconButton } from '../Button';
+import { ActionTouchable } from '../Button';
 
 type ActionButtonVariant = 'horizontal' | 'vertical';
 interface ActionButtonProps extends Omit<TouchableOpacityProps, 'onPress'> {
@@ -21,7 +21,7 @@ export const ActionButton = ({
 	const isHorizontalVariant = variant === 'vertical';
 	return (
 		<View ref={ref} collapsable={false}>
-			<IconButton
+			<ActionTouchable
 				style={[
 					styles.container,
 					isHorizontalVariant ? styles.column : styles.row,
@@ -35,7 +35,7 @@ export const ActionButton = ({
 				<View style={styles.circle} />
 				<View style={styles.circle} />
 				<View style={styles.circle} />
-			</IconButton>
+			</ActionTouchable>
 		</View>
 	);
 };

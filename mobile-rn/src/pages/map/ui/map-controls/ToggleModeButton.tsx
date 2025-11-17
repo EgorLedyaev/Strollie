@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
 
 export const ToggleModeButton = ({
 	is3D,
@@ -13,7 +13,7 @@ export const ToggleModeButton = ({
 	onPress: () => void;
 	disabled: boolean;
 }) => (
-	<IconButton
+	<ActionTouchable
 		style={[styles.button, disabled && styles.disabled]}
 		onPress={onPress}
 		disabled={disabled}
@@ -21,7 +21,7 @@ export const ToggleModeButton = ({
 		<AppText style={styles.text} allowFontScaling={false}>
 			{is3D ? '2D' : '3D'}
 		</AppText>
-	</IconButton>
+	</ActionTouchable>
 );
 
 const styles = StyleSheet.create({

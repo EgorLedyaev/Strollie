@@ -4,7 +4,7 @@ import LocationIcon from '@/assets/icons/map/LocationIcon';
 import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
-import { IconButton } from '@/shared/ui';
+import { ActionTouchable } from '@/shared/ui';
 
 import type { FollowMode } from '../../model/useMapBridge';
 
@@ -34,8 +34,8 @@ export const NavigationModeButton = ({
 	};
 
 	return (
-		<IconButton style={style} onPress={onPress} disabled={disabled}>
+		<ActionTouchable style={style} onPress={onPress} disabled={disabled}>
 			{renderIcon()}
-		</IconButton>
+		</ActionTouchable>
 	);
 };

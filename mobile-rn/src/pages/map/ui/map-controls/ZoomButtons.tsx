@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Colors, Radius, Shadows } from '@/shared/tokens';
-import { IconButton } from '@/shared/ui';
+import { ActionTouchable } from '@/shared/ui';
 
 export const ZoomButtons = ({
 	onZoomIn,
@@ -13,18 +13,18 @@ export const ZoomButtons = ({
 	onZoomOut: () => void;
 }) => (
 	<View style={styles.container}>
-		<IconButton
+		<ActionTouchable
 			style={{ ...styles.button, ...styles.plusIcon }}
 			onPress={onZoomIn}
 		>
 			<PlusIcon />
-		</IconButton>
-		<IconButton
+		</ActionTouchable>
+		<ActionTouchable
 			style={{ ...styles.button, ...styles.minusIcon }}
 			onPress={onZoomOut}
 		>
 			<MinusIcon />
-		</IconButton>
+		</ActionTouchable>
 	</View>
 );
 

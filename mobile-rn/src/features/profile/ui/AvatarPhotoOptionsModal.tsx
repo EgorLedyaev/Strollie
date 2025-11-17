@@ -4,7 +4,7 @@ import Popover, { PopoverPlacement, Rect } from 'react-native-popover-view';
 
 import type { AnchorRect } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
 
 interface AvatarPhotoOptionsModalProps {
 	visible: boolean;
@@ -38,21 +38,21 @@ export const AvatarPhotoOptionsModal: React.FC<
 			popoverStyle={styles.menu}
 		>
 			<View testID='avatar-photo-menu' style={styles.contentWrapper}>
-				<IconButton
+				<ActionTouchable
 					style={styles.item}
 					onPress={onPickFromDevice}
 					feedback='opacity'
 				>
 					<AppText style={styles.text}>С устройства</AppText>
-				</IconButton>
-				<IconButton
+				</ActionTouchable>
+				<ActionTouchable
 					style={styles.item}
 					onPress={onTakePhoto}
 					feedback='opacity'
 				>
 					<AppText style={styles.text}>Сделать фото</AppText>
-				</IconButton>
-				<IconButton
+				</ActionTouchable>
+				<ActionTouchable
 					style={styles.item}
 					onPress={onRemove}
 					feedback='opacity'
@@ -60,7 +60,7 @@ export const AvatarPhotoOptionsModal: React.FC<
 					<AppText style={[styles.text, styles.delete]}>
 						Удалить
 					</AppText>
-				</IconButton>
+				</ActionTouchable>
 			</View>
 		</Popover>
 	);

@@ -2,7 +2,7 @@ import LocationIcon from '@/assets/icons/map/LocationIcon';
 import React from 'react';
 import { StyleProp, ViewStyle } from 'react-native';
 
-import { IconButton } from '@/shared/ui';
+import { ActionTouchable } from '@/shared/ui';
 
 export const CenterOnUserButton = ({
 	onPress,
@@ -13,7 +13,7 @@ export const CenterOnUserButton = ({
 	disabled: boolean;
 	style?: StyleProp<ViewStyle>;
 }) => (
-	<IconButton style={style} onPress={onPress} disabled={disabled}>
+	<ActionTouchable style={style} onPress={onPress} disabled={disabled}>
 		<LocationIcon width={24} height={24} />
-	</IconButton>
+	</ActionTouchable>
 );

@@ -8,7 +8,7 @@ import {
 	type AnchorRect,
 } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
 import { ActionButton } from '@/shared/ui/ActionButton';
 
 import { ProfileInfo } from './ProfileInfo';
@@ -34,13 +34,13 @@ export function ProfileHeader({ user, onBackPress, onMenuPress }: HeaderProps) {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<IconButton
+				<ActionTouchable
 					onPress={onBackPress}
 					hitSlop={HIT_SLOP}
 					feedback='opacity'
 				>
 					<ArrowLeftSmallIcon />
-				</IconButton>
+				</ActionTouchable>
 				<AppText style={styles.text}>@{user?.nickname}</AppText>
 				{/* Оборачиваем кнопку в View с ref для стабильного измерения */}
 				<View ref={menuAnchorRef} collapsable={false}>

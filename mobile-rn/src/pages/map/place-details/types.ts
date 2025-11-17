@@ -9,6 +9,10 @@ export interface Address {
 	name: string;
 	full_name?: string;
 	building_name?: string;
+	city?: string;
+	street?: string;
+	house_number?: string;
+	short_address?: string;
 }
 
 export interface ContactGroup {
@@ -22,14 +26,27 @@ export interface Contact {
 	text?: string;
 }
 
+export interface ScheduleDayInterval {
+	from: string;
+	to: string;
+}
+
+export interface ScheduleDay {
+	working_hours?: ScheduleDayInterval[];
+	breaks?: ScheduleDayInterval[];
+	is_day_off?: boolean;
+	is_round_the_clock?: boolean;
+}
+
 export interface Schedule {
-	Mon?: string;
-	Tue?: string;
-	Wed?: string;
-	Thu?: string;
-	Fri?: string;
-	Sat?: string;
-	Sun?: string;
+	comment?: string;
+	Mon?: ScheduleDay;
+	Tue?: ScheduleDay;
+	Wed?: ScheduleDay;
+	Thu?: ScheduleDay;
+	Fri?: ScheduleDay;
+	Sat?: ScheduleDay;
+	Sun?: ScheduleDay;
 }
 
 export interface Photo {

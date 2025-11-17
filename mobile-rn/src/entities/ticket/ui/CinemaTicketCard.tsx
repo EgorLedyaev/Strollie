@@ -6,7 +6,7 @@ import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
 
 import type { Ticket } from '../model';
 
@@ -43,7 +43,7 @@ export const CinemaTicketCard: React.FC<Props> = ({
 
 	return (
 		<View style={styles.wrap}>
-			<IconButton
+			<ActionTouchable
 				onPress={onShowQr}
 				feedback='opacity'
 				opacity={0.6}
@@ -62,7 +62,7 @@ export const CinemaTicketCard: React.FC<Props> = ({
 				<AppText style={styles.ticketDate}>
 					{formatDate(departure)}
 				</AppText>
-			</IconButton>
+			</ActionTouchable>
 
 			<View style={styles.card}>
 				{/* Иконка типа билета в правом нижнем углу карточки */}
@@ -124,7 +124,7 @@ export const CinemaTicketCard: React.FC<Props> = ({
 					</View>
 				) : null}
 
-				<IconButton
+				<ActionTouchable
 					style={styles.footer}
 					onPress={onMorePress}
 					feedback='opacity'
@@ -132,7 +132,7 @@ export const CinemaTicketCard: React.FC<Props> = ({
 				>
 					<AppText style={styles.more}>Подробнее</AppText>
 					<ArrowUpRightSmallIcon />
-				</IconButton>
+				</ActionTouchable>
 			</View>
 		</View>
 	);

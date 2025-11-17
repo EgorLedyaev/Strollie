@@ -6,7 +6,7 @@ import { StyleSheet, View } from 'react-native';
 import { updateUserProfileAtom, userProfileAtom } from '@/entities/user';
 import { useAnchorMeasurement } from '@/shared/lib';
 import { Colors } from '@/shared/tokens';
-import { Avatar, IconButton } from '@/shared/ui';
+import { ActionTouchable, Avatar } from '@/shared/ui';
 
 import { useUploadAvatar } from '../model/useUploadAvatar';
 import { AvatarPhotoOptionsModal } from './AvatarPhotoOptionsModal';
@@ -61,7 +61,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 				collapsable={false}
 				testID='avatar-photo-menu-trigger'
 			>
-				<IconButton
+				<ActionTouchable
 					testID='avatar-photo-menu-button'
 					onPress={openOptions}
 					disabled={isLoading}
@@ -80,7 +80,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 					<View style={styles.iconContainer} pointerEvents='none'>
 						<EditPhotoIcon />
 					</View>
-				</IconButton>
+				</ActionTouchable>
 			</View>
 			<AvatarPhotoOptionsModal
 				visible={optionsVisible}

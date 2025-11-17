@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacityProps } from 'react-native';
 
 import { Colors, Gaps, Radius, Sizes } from '@/shared/tokens';
 
-import { IconButton } from '../Button';
+import { ActionTouchable } from '../Button';
 import { AppText } from '../Text';
 
 type BackButtonVariant = 'icon' | 'text';
@@ -23,7 +23,7 @@ export const BackButton = ({
 }: BackButtonProps) => {
 	const isTextVariant = variant === 'text';
 	return (
-		<IconButton
+		<ActionTouchable
 			style={[
 				isTextVariant ? styles.textContainer : styles.iconContainer,
 				style,
@@ -43,7 +43,7 @@ export const BackButton = ({
 			) : (
 				<ArrowLeftSmallIcon />
 			)}
-		</IconButton>
+		</ActionTouchable>
 	);
 };
 

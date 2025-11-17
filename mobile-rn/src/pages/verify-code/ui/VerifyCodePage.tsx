@@ -13,11 +13,11 @@ import {
 } from '@/features/auth-by-email';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import {
+	ActionTouchable,
 	AppButton,
 	AppText,
 	BackButton,
 	CodeInput,
-	IconButton,
 } from '@/shared/ui';
 import { StatusBarBackground } from '@/shared/ui/StatusBarBackground';
 
@@ -111,7 +111,7 @@ export function VerifyCodePage() {
 				{error && <AppText style={styles.errorText}>{error}</AppText>}
 
 				<View style={styles.resendContainer}>
-					<IconButton
+					<ActionTouchable
 						disabled={!canResend}
 						onPress={handleResendCode}
 						feedback='opacity'
@@ -124,7 +124,7 @@ export function VerifyCodePage() {
 						>
 							{isResending ? 'Отправка...' : 'Отправить снова'}
 						</AppText>
-					</IconButton>
+					</ActionTouchable>
 
 					{!canResend && (
 						<AppText style={styles.resendText}>

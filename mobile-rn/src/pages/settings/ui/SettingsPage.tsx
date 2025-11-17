@@ -1,12 +1,18 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+
 
 import { ConfirmModal } from '@/pages/settings/ui/ConfirmModal';
 import { Header } from '@/widgets/header';
 import { Colors, Fonts, Gaps, Radius, Shadows } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
+
+
+
+
 
 export const SettingsPage: React.FC = () => {
 	const [activeModal, setActiveModal] = useState<'logout' | 'delete' | null>(
@@ -36,33 +42,36 @@ export const SettingsPage: React.FC = () => {
 				<View style={styles.section}>
 					<AppText style={styles.sectionTitle}>Профиль</AppText>
 					<View style={styles.card}>
-						<Pressable
+						<ActionTouchable
 							style={styles.actionItem}
 							onPress={() => setActiveModal('logout')}
+							feedback='opacity'
 						>
 							<AppText style={styles.actionText}>
 								Выйти из профиля
 							</AppText>
-						</Pressable>
+						</ActionTouchable>
 						<View style={styles.separator} />
-						<Pressable
+						<ActionTouchable
 							style={styles.actionItem}
 							onPress={() => setActiveModal('delete')}
+							feedback='opacity'
 						>
 							<AppText style={styles.deleteText}>
 								Удалить профиль
 							</AppText>
-						</Pressable>
+						</ActionTouchable>
 					</View>
 					<View style={styles.card}>
-						<Pressable
+						<ActionTouchable
 							style={styles.actionItem}
 							onPress={handleChangeEmail}
+							feedback='opacity'
 						>
 							<AppText style={styles.actionText}>
 								Изменить почту профиля
 							</AppText>
-						</Pressable>
+						</ActionTouchable>
 					</View>
 				</View>
 
@@ -72,23 +81,25 @@ export const SettingsPage: React.FC = () => {
 						Юр. информация
 					</AppText>
 					<View style={styles.card}>
-						<Pressable
+						<ActionTouchable
 							style={styles.actionItem}
 							onPress={handleOpenOffer}
+							feedback='opacity'
 						>
 							<AppText style={styles.linkText}>
 								Публичная оферта
 							</AppText>
-						</Pressable>
+						</ActionTouchable>
 						<View style={styles.separator} />
-						<Pressable
+						<ActionTouchable
 							style={styles.actionItem}
 							onPress={handleOpenPolicy}
+							feedback='opacity'
 						>
 							<AppText style={styles.linkText}>
 								Политика конфиденциальности
 							</AppText>
-						</Pressable>
+						</ActionTouchable>
 					</View>
 				</View>
 
@@ -116,7 +127,7 @@ export const SettingsPage: React.FC = () => {
 				confirmText='Выйти'
 				onClose={() => setActiveModal(null)}
 				onConfirm={handleLogout}
-				primaryButton={'gray'}
+				primaryButton='gray'
 			/>
 			<ConfirmModal
 				isVisible={activeModal === 'delete'}
@@ -133,6 +144,7 @@ export const SettingsPage: React.FC = () => {
 
 const styles = StyleSheet.create({
 	actionItem: {
+		alignItems: 'flex-start',
 		paddingHorizontal: 20,
 		paddingVertical: 18,
 	},

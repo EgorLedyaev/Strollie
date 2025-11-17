@@ -2,7 +2,7 @@
 export { BackButton } from './BackButton';
 export { Select } from './Select';
 export type { SelectOption, SelectProps } from './Select';
-export { AppButton, IconButton } from './Button';
+export { AppButton, ActionTouchable } from './Button';
 export type { ButtonVariant, AppButtonProps } from './Button';
 export { CodeInput } from './CodeInput';
 export type { CodeInputProps } from './CodeInput';
@@ -24,3 +24,5 @@ export { Tag } from './Tag';
 export { CalendarGrid } from './CalendarGrid';
 export type { CalendarDay } from './CalendarGrid';
 export { StatusBarBackground } from './StatusBarBackground';
+export { ConfirmPopover } from './ConfirmPopover';
+export type { ConfirmPopoverProps } from './ConfirmPopover';

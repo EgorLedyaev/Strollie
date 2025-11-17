@@ -4,7 +4,7 @@ import Popover, { PopoverPlacement, Rect } from 'react-native-popover-view';
 
 import type { AnchorRect } from '@/shared/lib/useAnchorMeasurement';
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppText, IconButton } from '@/shared/ui';
+import { ActionTouchable, AppText } from '@/shared/ui';
 
 interface ImagePreviewMenuProps {
 	visible: boolean;
@@ -37,14 +37,14 @@ export const ImagePreviewMenu: React.FC<ImagePreviewMenuProps> = ({
 			popoverStyle={styles.menuContainer}
 		>
 			<View style={styles.menuContent} testID='image-preview-menu'>
-				<IconButton onPress={onEdit} feedback='opacity'>
+				<ActionTouchable onPress={onEdit} feedback='opacity'>
 					<AppText style={styles.menuText}>Изменить</AppText>
-				</IconButton>
-				<IconButton onPress={onDelete} feedback='opacity'>
+				</ActionTouchable>
+				<ActionTouchable onPress={onDelete} feedback='opacity'>
 					<AppText style={[styles.menuText, styles.deleteText]}>
 						Удалить
 					</AppText>
-				</IconButton>
+				</ActionTouchable>
 			</View>
 		</Popover>
 	);
