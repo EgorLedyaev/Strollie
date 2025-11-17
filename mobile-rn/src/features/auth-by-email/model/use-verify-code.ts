@@ -3,6 +3,8 @@ import { useState } from 'react';
 
 import { setSessionAtom } from '@/entities/session';
 import { userApi, type User } from '@/entities/user';
+import { verifyOneTimeCode } from '@/shared/api';
+import { OTP_CODE_LENGTH } from '@/shared/config';
 
 import { registrationStateAtom, verifyCodeErrorAtom } from './state';
 
@@ -22,23 +24,29 @@ export const useVerifyCode = () => {
 		{ onSuccess }: VerifyCodeCallbacks,
 	) => {
 		setIsLoading(true);
+		setError(null);
 		try {
-			// В реальном API мы бы отправили { email, code } и получили бы токен и профиль
-			if (code.length !== 4 || !/^\d{4}$/.test(code) || code !== '1234') {
-				throw new Error('Неверный код подтверждения.');
+			const normalizedCode = code.trim();
+			const codePattern = new RegExp(`^\\d{${OTP_CODE_LENGTH}}$`);
+			if (!codePattern.test(normalizedCode)) {
+				throw new Error(
+					`Введите ${OTP_CODE_LENGTH}-значный код подтверждения.`,
+				);
 			}
 
 			if (!regState.email) {
 				throw new Error('Сессия истекла, email не найден.');
 			}
 
-			let userProfile: User | null;
-			const mockToken = 'mock-refresh-token-' + Date.now();
+			const tokens = await verifyOneTimeCode({
+				email: regState.email,
+				code: normalizedCode,
+			});
 
+			let userProfile: User | null = null;
 			if (regState.isRegistering) {
-				// Финализация регистрации: создаем профиль
 				const newUser: User = {
-					user_id: 'user-' + Date.now(),
+					user_id: regState.email,
 					email: regState.email,
 					created_at: new Date().toISOString(),
 					firstName: regState.firstName || '',
@@ -49,7 +57,6 @@ export const useVerifyCode = () => {
 				};
 				userProfile = await userApi.saveUserProfile(newUser);
 			} else {
-				// Вход существующего пользователя: загружаем профиль
 				userProfile = await userApi.loadUserProfile(regState.email);
 			}
 
@@ -57,10 +64,13 @@ export const useVerifyCode = () => {
 				throw new Error('Не удалось получить данные пользователя.');
 			}
 
-			// Устанавливаем сессию
-			setSession({ refreshToken: mockToken, userProfile });
+			setSession({
+				accessToken: tokens.access_token,
+				refreshToken: tokens.refresh_token,
+				tokenType: tokens.token_type,
+				userProfile,
+			});
 
-			// Очищаем состояние регистрации
 			setRegState({ isRegistering: false });
 			onSuccess();
 		} catch (err) {

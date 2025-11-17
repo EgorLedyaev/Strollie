@@ -1,20 +1,42 @@
-import { useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { useMemo, useState } from 'react';
 
-export const useResendCode = () => {
+import { requestOneTimeCode } from '@/shared/api';
+
+import { registrationStateAtom } from './state';
+
+interface UseResendCodeParams {
+	email?: string;
+}
+
+export const useResendCode = (params?: UseResendCodeParams) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const registrationState = useAtomValue(registrationStateAtom);
+	const targetEmail = useMemo(() => {
+		if (params?.email) {
+			return params.email.trim().toLowerCase();
+		}
+		return registrationState.email ?? '';
+	}, [params?.email, registrationState.email]);
 
 	const resendCode = async () => {
+		if (!targetEmail) {
+			setError('Не удалось определить email для повторной отправки.');
+			return false;
+		}
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Имитация API запроса для повторной отправки кода
-			// В реальном приложении здесь будет вызов API
-			// Здесь мы просто имитируем успешное выполнение
+			await requestOneTimeCode(targetEmail);
 			return true;
 		} catch (err) {
 			console.error('Ошибка повторной отправки кода', err);
-			setError('Не удалось отправить код повторно.');
+			const message =
+				err instanceof Error
+					? err.message
+					: 'Не удалось отправить код повторно.';
+			setError(message);
 			return false;
 		} finally {
 			setIsLoading(false);

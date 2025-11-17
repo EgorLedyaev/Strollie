@@ -25,7 +25,9 @@ export function VerifyEmailChangePage() {
 	const [timeLeft, setTimeLeft] = useState(60);
 	const [canResend, setCanResend] = useState(false);
 	const { verifyCode, isLoading } = useVerifyEmailChange();
-	const { resendCode, isLoading: isResending } = useResendCode();
+	const { resendCode, isLoading: isResending } = useResendCode({
+		email: newEmail ?? undefined,
+	});
 	const newEmail = useAtomValue(newEmailAtom);
 
 	useEffect(() => {

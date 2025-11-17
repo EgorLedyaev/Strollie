@@ -5,8 +5,11 @@ import axios, {
 	InternalAxiosRequestConfig,
 } from 'axios';
 
+import { API_BASE_URL } from '@/shared/config/api';
+
 // Базовый экземпляр
 const apiClient = axios.create({
+	baseURL: API_BASE_URL,
 	timeout: 15000,
 	headers: {
 		'Content-Type': 'application/json',

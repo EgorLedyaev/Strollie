@@ -77,7 +77,11 @@ export const useVerifyEmailChange = () => {
 			setIsLoading(false);
 			return;
 		}
-		if (!currentSession?.userProfile || !currentSession.refreshToken) {
+		if (
+			!currentSession?.userProfile ||
+			!currentSession.refreshToken ||
+			!currentSession.accessToken
+		) {
 			setError('Не удалось обновить email: сессия не найдена.');
 			setIsLoading(false);
 			return;
@@ -85,7 +89,9 @@ export const useVerifyEmailChange = () => {
 
 		try {
 			const newSessionData = {
+				accessToken: currentSession.accessToken,
 				refreshToken: currentSession.refreshToken,
+				tokenType: currentSession.tokenType,
 				userProfile: {
 					...currentSession.userProfile,
 					email: newEmail,

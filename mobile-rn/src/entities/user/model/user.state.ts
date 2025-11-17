@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { atom } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
+import { USER_PROFILE_STORAGE_KEY } from '@/shared/config';
+
 import { userApi } from '../api/api';
 import type { User } from './user.model';
 
@@ -41,7 +43,7 @@ const storage = createJSONStorage<UserProfileState>(() => AsyncStorage);
  * Используется для хранения и управления состоянием профиля пользователя в приложении.
  */
 const userProfileAtomWithStorage = atomWithStorage(
-	'user_profile',
+	USER_PROFILE_STORAGE_KEY,
 	INITIAL_STATE,
 	storage,
 );

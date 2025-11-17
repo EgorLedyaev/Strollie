@@ -1,13 +1,35 @@
 import { useRouter, useSegments } from 'expo-router';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
 
-import { sessionAtom } from '@/entities/session';
+import { refreshSessionAtom, sessionAtom } from '@/entities/session';
+import { apiClient } from '@/shared/api';
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
 	const session = useAtomValue(sessionAtom);
+	const refreshSession = useSetAtom(refreshSessionAtom);
 	const segments = useSegments(); // ['(app)', 'profile'] или ['sign-in']
 	const router = useRouter();
+
+	useEffect(() => {
+		if (session.accessToken) {
+			apiClient.defaults.headers.common.Authorization = `${
+				session.tokenType ?? 'Bearer'
+			} ${session.accessToken}`;
+		} else {
+			delete apiClient.defaults.headers.common.Authorization;
+		}
+	}, [session.accessToken, session.tokenType]);
+
+	useEffect(() => {
+		if (
+			session.refreshToken &&
+			session.refreshToken !== undefined &&
+			session.accessToken === null
+		) {
+			refreshSession();
+		}
+	}, [session.refreshToken, session.accessToken, refreshSession]);
 
 	useEffect(() => {
 		// Это определяет, находится ли текущий маршрут ВНУТРИ защищенной группы (app)

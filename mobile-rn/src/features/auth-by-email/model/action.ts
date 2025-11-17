@@ -1,6 +1,6 @@
 import { atom, type Getter, type Setter } from 'jotai';
 
-import { userApi } from '@/entities/user';
+import { requestOneTimeCode } from '@/shared/api';
 
 import {
 	registrationErrorAtom,
@@ -40,20 +40,22 @@ const submitUserDataAction = async (
 	try {
 		// Имитируем отправку данных на бэкенд и запрос кода.
 		// В реальном приложении здесь будет API-вызов.
-		console.log(
-			'Отправка данных для регистрации и запрос кода для:',
-			state.email,
-		);
-		await new Promise(resolve => setTimeout(resolve, 1000)); // Имитация задержки сети
+		const normalizedEmail = state.email?.trim().toLowerCase();
+		if (!normalizedEmail) {
+			throw new Error(
+				'Не удалось определить email. Вернитесь на предыдущий шаг.',
+			);
+		}
 
-		// Если бэкенд подтвердил, что данные приняты и код отправлен, вызываем onSuccess.
+		await requestOneTimeCode(normalizedEmail);
 		onSuccess();
 	} catch (err) {
 		console.error('Ошибка при отправке данных регистрации', err);
-		set(
-			registrationErrorAtom,
-			'Не удалось отправить данные для регистрации.',
-		);
+		const message =
+			err instanceof Error
+				? err.message
+				: 'Не удалось отправить данные для регистрации.';
+		set(registrationErrorAtom, message);
 	} finally {
 		set(registrationIsLoadingAtom, false);
 	}
@@ -83,7 +85,7 @@ const checkEmailAndProceedAction = async (
 	{ onSuccess }: CheckEmailArgs,
 ): Promise<void> => {
 	const state = get(registrationStateAtom);
-	const email = state.email;
+	const email = state.email?.trim().toLowerCase();
 
 	set(registrationIsLoadingAtom, true);
 	set(registrationErrorAtom, null);
@@ -95,18 +97,12 @@ const checkEmailAndProceedAction = async (
 			throw new Error('Введите корректный email');
 		}
 
-		// 2. Проверка на уникальность (имитация API-запроса)
-		// Имитируем задержку сети для реалистичности
-		await new Promise(resolve => setTimeout(resolve, 500));
-		const isAlreadyRegistered = await userApi.isUserRegistered(email);
-		if (isAlreadyRegistered) {
-			throw new Error(
-				'Этот email уже зарегистрирован. Попробуйте войти.',
-			);
-		}
-
-		// Все проверки пройдены
-		state.isRegistering = true; // Устанавливаем состояние регистрации
+		// Сохраняем нормализованный email и помечаем, что мы в потоке регистрации
+		set(registrationStateAtom, prev => ({
+			...prev,
+			email,
+			isRegistering: true,
+		}));
 		onSuccess();
 	} catch (err) {
 		const message =

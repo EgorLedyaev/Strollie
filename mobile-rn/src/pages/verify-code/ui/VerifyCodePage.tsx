@@ -11,6 +11,7 @@ import {
 	useVerifyCode,
 	verifyCodeErrorAtom,
 } from '@/features/auth-by-email';
+import { OTP_CODE_LENGTH } from '@/shared/config';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import {
 	ActionTouchable,
@@ -48,7 +49,7 @@ export function VerifyCodePage() {
 	}, [timeLeft]);
 
 	const handleResendCode = async () => {
-		if (!canResend || !isResending) return;
+		if (!canResend || isResending) return;
 		setError(null);
 		const success = await resendCode();
 		if (success) {
@@ -103,7 +104,7 @@ export function VerifyCodePage() {
 				<CodeInput
 					value={code}
 					onChangeText={setCode}
-					length={4}
+					length={OTP_CODE_LENGTH}
 					autoFocus
 					isError={!!error}
 					style={styles.codeInput}
@@ -138,7 +139,7 @@ export function VerifyCodePage() {
 						text='Далее'
 						onPress={handleVerifyCode}
 						isLoading={isLoading}
-						disabled={code.length < 4 || isLoading}
+						disabled={code.length < OTP_CODE_LENGTH || isLoading}
 						style={styles.appButton}
 						buttonBorderRadius={Radius.r22}
 					/>

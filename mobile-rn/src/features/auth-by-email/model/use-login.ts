@@ -1,6 +1,6 @@
 import { useAtom, useSetAtom } from 'jotai';
 
-import { userApi } from '@/entities/user';
+import { requestOneTimeCode } from '@/shared/api';
 
 import {
 	authErrorAtom,
@@ -25,11 +25,9 @@ export const useLogin = () => {
 		email: string,
 		{ onSuccess }: LoginCallbacks,
 	) => {
-		console.log(
-			`Попытка входа с email: ${email} email trim is ${!email.trim()}`,
-		);
+		const normalizedEmail = email.trim().toLowerCase();
 
-		if (!email.trim()) {
+		if (!normalizedEmail) {
 			setError('Введите email.');
 			return;
 		}
@@ -37,25 +35,12 @@ export const useLogin = () => {
 		setIsLoading(true);
 		setError(null);
 		try {
-			// Шаг 1: Просто проверяем, есть ли такой пользователь в "базе данных".
-			const isRegistered = await userApi.isUserRegistered(email);
-			console.log(
-				`Вход в систему с email: ${email}, зарегистрирован: ${isRegistered}`,
-			);
-
-			if (!isRegistered) {
-				throw new Error(
-					'Пользователь не найден. Пожалуйста, зарегистрируйтесь.',
-				);
-			}
-			// Шаг 2: Сохраняем email в состояние фичи и помечаем, что это НЕ регистрация
+			await requestOneTimeCode(normalizedEmail);
 			setRegState(prev => ({
 				...prev,
-				email,
-				isRegistering: false, // Указываем, что это не регистрация
+				email: normalizedEmail,
+				isRegistering: false,
 			}));
-
-			// Шаг 3: Передаем управление наверх (странице), чтобы она сделала навигацию на экран верификации.
 			onSuccess();
 		} catch (err) {
 			console.error('Ошибка входа', err);
