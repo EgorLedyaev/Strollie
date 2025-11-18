@@ -17,7 +17,7 @@
 - ESLint + Prettier + steiger (feature-sliced архитектурный линтер)
 - react-native-reanimated, gesture-handler, safe-area, svg
 
-Инфраструктурные утилиты: axios (HTTP), uuid, AsyncStorage (@react-native-async-storage) для persistence атомов.
+Инфраструктурные утилиты: кастомный HTTP-клиент поверх fetch, uuid, AsyncStorage (@react-native-async-storage) для persistence атомов.
 
 ---
 
@@ -138,7 +138,7 @@ interface Trip {
 Сейчас это in-memory моки / задержки через `sleep`. При замене на бэкенд:
 
 1. Сохранить сигнатуры экспортируемых методов.
-2. Добавить HTTP-клиент (axios уже установлен) в `shared/api/client.ts` при необходимости.
+2. Добавить HTTP-клиент (см. реализацию ApiClient на fetch) в `shared/api/client.ts` при необходимости.
 3. Интерфейсы типов не менять без ревью (повлияет на UI и состояние).
 
 Пример: `ticketApi.getMyTickets()` возвращает массив билетов с уже готовым `qrCodeUrl` (используется публичный сервис генерации QR). `tripApi.createTrip` возвращает созданную сущность и пушит в локальный массив.

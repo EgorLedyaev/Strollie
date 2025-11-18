@@ -4,6 +4,7 @@ import React from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Header } from '@/widgets/header';
 import {
 	EditProfileForm,
 	useEditProfile,
@@ -52,7 +53,9 @@ export const EditProfilePage: React.FC = () => {
 			user={profile}
 			onSave={handleSave}
 			isSaving={isSaving}
-			onBackPress={router.back}
+			headerSlot={
+				<Header onBackPress={router.back} title='Редактирование' />
+			}
 		/>
 	);
 };

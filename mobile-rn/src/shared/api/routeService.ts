@@ -1,7 +1,5 @@
 // routeService.ts
-import axios from 'axios';
-
-import apiClient from './client';
+import apiClient, { HttpError } from './client';
 
 export interface RouteRequestData {
 	startPoint: { lon: number; lat: number };
@@ -53,19 +51,16 @@ export async function buildOptimalRoute(
 		return data;
 	} catch (error) {
 		console.error('Error in buildOptimalRoute sending request:', error);
-		if (axios.isAxiosError(error)) {
-			const errorDetails = error.response
-				? `Status: ${error.response.status}, Data: ${JSON.stringify(error.response.data)}`
-				: 'No response received';
-			console.error('Axios error details:', errorDetails);
+		if (error instanceof HttpError) {
+			const errorDetails = `Status: ${error.status ?? 'unknown'}, Data: ${JSON.stringify(error.data)}`;
+			console.error('HTTP error details:', errorDetails);
 			throw new Error(
 				`Сервер маршрутизации вернул ошибку: ${errorDetails}`,
 			);
-		} else {
-			throw new Error(
-				'Не удалось построить маршрут: ' +
-					(error instanceof Error ? error.message : String(error)),
-			);
 		}
+		throw new Error(
+			'Не удалось построить маршрут: ' +
+				(error instanceof Error ? error.message : String(error)),
+		);
 	}
 }

@@ -1,7 +1,1 @@
-export {
-	// State
-	citiesAtom,
-	citiesIsLoadingAtom,
-	citiesErrorAtom,
-	fetchCitiesAtom,
-} from './model/city.state';
+export { useCitiesQuery } from './model/city.queries';

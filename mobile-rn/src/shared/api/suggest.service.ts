@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import { EXPO_PUBLIC_2GIS_API_KEY } from '@/shared/config/api';
 
 import type { PlacesAPIResult } from './geocoder.service';
@@ -48,17 +46,16 @@ export async function suggestPlaces(
 ): Promise<SuggestItem[]> {
 	if (!query.trim() || !API_KEY) return [];
 	try {
-		const params: Record<string, string | number> = {
+		const params: Record<string, string> = {
 			q: query,
 			key: API_KEY,
-			page_size: limit,
-			// request point + address fields directly when possible
+			page_size: String(limit),
 			fields: 'items.point,items.full_name,items.address_name',
 		};
-		const { data } = await axios.get<SuggestResponse>(SUGGEST_API_URL, {
+		const data = await request2GIS<SuggestResponse>(
+			SUGGEST_API_URL,
 			params,
-			timeout: 8000,
-		});
+		);
 		if (data.meta.code === 200 && data.result) return data.result.items;
 		return [];
 	} catch (e) {
@@ -71,6 +68,7 @@ export async function suggestPlaces(
  * Fetch detail for a selected suggestion by its numeric id part.
  * Suggest id usually formatted <objectId>_<segmentId>. Use part before underscore for byid.
  */
+
 export async function fetchPlaceDetailsById(
 	suggestId: string,
 ): Promise<PlacesAPIResult | null> {
@@ -82,10 +80,10 @@ export async function fetchPlaceDetailsById(
 			key: API_KEY,
 			fields: 'items.point,items.full_name,items.address_name',
 		};
-		const { data } = await axios.get<PlaceByIdResponse>(PLACES_BY_ID_URL, {
+		const data = await request2GIS<PlaceByIdResponse>(
+			PLACES_BY_ID_URL,
 			params,
-			timeout: 8000,
-		});
+		);
 		if (
 			data.meta.code === 200 &&
 			data.result &&
@@ -97,4 +95,31 @@ export async function fetchPlaceDetailsById(
 		console.warn('[Suggest] byid error', e);
 	}
 	return null;
+}
+
+async function request2GIS<T>(
+	url: string,
+	params: Record<string, string>,
+	timeout = 8000,
+): Promise<T> {
+	const endpoint = new URL(url);
+	Object.entries(params).forEach(([key, value]) => {
+		endpoint.searchParams.append(key, value);
+	});
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), timeout);
+	try {
+		const response = await fetch(endpoint.toString(), {
+			method: 'GET',
+			signal: controller.signal,
+		});
+		if (!response.ok) {
+			throw new Error(
+				`2GIS request failed with status ${response.status}`,
+			);
+		}
+		return (await response.json()) as T;
+	} finally {
+		clearTimeout(timeoutId);
+	}
 }

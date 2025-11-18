@@ -1,20 +1,14 @@
-import { useAtom, useSetAtom } from 'jotai';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import {
-	citiesAtom,
-	citiesIsLoadingAtom,
-	fetchCitiesAtom,
-} from '@/entities/city';
+import { useCitiesQuery } from '@/entities/city';
 import { type User } from '@/entities/user';
-import { Colors, Fonts, Gaps, Radius, Sizes } from '@/shared/tokens';
+import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import {
 	AppButton,
 	AppText,
-	BackButton,
 	Input,
 	Select,
 	type SelectOption,
@@ -37,24 +31,22 @@ interface EditProfileFormProps {
 	user: User;
 	onSave: (userData: UserProfileData) => void;
 	isSaving: boolean;
-	onBackPress: () => void;
+	headerSlot?: ReactNode;
 }
 
-export const EditProfileForm: React.FC<EditProfileFormProps> = ({
+export function EditProfileForm({
 	user,
 	onSave,
 	isSaving,
-	onBackPress,
-}) => {
-	const [cityOptions] = useAtom(citiesAtom);
-	const [isLoadingCities] = useAtom(citiesIsLoadingAtom);
-	const fetchCities = useSetAtom(fetchCitiesAtom);
+	headerSlot,
+}: EditProfileFormProps) {
+	const {
+		data: cityOptions = [],
+		isPending: isLoadingCities,
+		isRefetching,
+	} = useCitiesQuery();
 
 	const [visible, setVisible] = useState(false);
-
-	useEffect(() => {
-		fetchCities();
-	}, [fetchCities]);
 
 	// Инициализируем локальное состояние из user один раз
 	const initialData = useMemo(
@@ -107,15 +99,9 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<View></View>
-			<View style={styles.header}>
-				<BackButton variant='icon' onPress={onBackPress} />
-
-				<AppText style={styles.headerText} variant='header'>
-					Редактирование
-				</AppText>
-				<View style={styles.placeHolder} />
-			</View>
+			{headerSlot ? (
+				<View style={styles.header}>{headerSlot}</View>
+			) : null}
 
 			<KeyboardAwareScrollView
 				contentContainerStyle={styles.scrollContent}
@@ -169,7 +155,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 							value={userData.city}
 							onSelect={handleCitySelect}
 							placeholder={
-								isLoadingCities
+								isLoadingCities || isRefetching
 									? 'Загрузка...'
 									: 'Выберите город'
 							}
@@ -204,7 +190,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({
 			/>
 		</SafeAreaView>
 	);
-};
+}
 
 const styles = StyleSheet.create({
 	buttonContent: {
@@ -221,7 +207,6 @@ const styles = StyleSheet.create({
 	field: {
 		gap: Gaps.g8,
 	},
-
 	footer: {
 		borderTopColor: Colors.gray,
 		marginBottom: 40,
@@ -235,24 +220,16 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingVertical: 24,
 	},
+
 	header: {
-		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: 16,
-		marginTop: 10,
+		paddingVertical: 16,
 	},
-	headerText: {
-		fontSize: Fonts.f16,
-	},
+
 	label: {
 		color: Colors.darkGray,
 		fontFamily: Fonts.medium,
 		fontSize: Fonts.f14,
 		marginLeft: 16,
-	},
-	placeHolder: {
-		width: Sizes.button.sm,
 	},
 	scrollContent: {
 		paddingBottom: 20,

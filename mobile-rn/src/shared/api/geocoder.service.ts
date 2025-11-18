@@ -1,6 +1,4 @@
 // src/shared/api/geocoder.service.ts
-import axios from 'axios';
-
 import { EXPO_PUBLIC_2GIS_API_KEY } from '@/shared/config/api';
 
 const API_KEY = EXPO_PUBLIC_2GIS_API_KEY;
@@ -59,39 +57,43 @@ export const geocodeAddress = async (
 		return null;
 	}
 
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), 10000);
 	try {
-		const params: Record<string, string | number> = {
+		const params: Record<string, string> = {
 			q: query,
 			key: API_KEY,
-			fields: 'items.point,items.address_name,items.full_name', // Запрашиваем необходимые поля
-			page_size: results,
+			fields: 'items.point,items.address_name,items.full_name',
+			page_size: String(results),
 		};
 
 		if (location) {
-			(params as Record<string, string>).location =
-				`${location[0]},${location[1]}`; // lon,lat
+			params.location = `${location[0]},${location[1]}`;
 		}
 
-		const response = await axios.get<PlacesAPIResponse>(PLACES_API_URL, {
-			params,
-			timeout: 10000,
+		const url = new URL(PLACES_API_URL);
+		Object.entries(params).forEach(([key, value]) => {
+			url.searchParams.append(key, value);
 		});
 
-		// Проверяем, что ответ успешный и содержит результаты
-		if (response.data.meta.code === 200 && response.data.result) {
-			return response.data;
-		} else {
-			console.warn(
-				'2GIS geocoding response error:',
-				response.data.meta.error?.message,
-			);
-			return { ...response.data, result: { items: [], total: 0 } }; // Возвращаем пустой результат при ошибке API
+		const response = await fetch(url.toString(), {
+			method: 'GET',
+			signal: controller.signal,
+		});
+
+		const data = (await response.json()) as PlacesAPIResponse;
+		if (data.meta.code === 200 && data.result) {
+			return data;
 		}
+		console.warn(
+			'2GIS geocoding response error:',
+			data.meta.error?.message,
+		);
+		return { ...data, result: { items: [], total: 0 } };
 	} catch (error) {
 		console.error('Ошибка геокодирования 2GIS:', error);
-		if (axios.isAxiosError(error) && error.response) {
-			console.error('Данные ошибки:', error.response.data);
-		}
 		return null;
+	} finally {
+		clearTimeout(timeoutId);
 	}
 };

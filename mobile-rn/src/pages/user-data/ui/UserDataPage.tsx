@@ -13,7 +13,7 @@ import {
 	registrationStateAtom,
 	submitUserDataAtom,
 } from '@/features/auth-by-email';
-import { citiesAtom, fetchCitiesAtom } from '@/entities/city';
+import { useCitiesQuery } from '@/entities/city';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import {
 	AppButton,
@@ -35,15 +35,17 @@ export function UserDataPage() {
 		Record<string, boolean>
 	>({});
 
-	const [cityOptions] = useAtom(citiesAtom);
-	const fetchCities = useSetAtom(fetchCitiesAtom);
+	const {
+		data: cityOptions = [],
+		isPending: isCitiesLoading,
+		isRefetching: isCitiesRefetching,
+	} = useCitiesQuery();
 	const submitUserData = useSetAtom(submitUserDataAtom);
 
 	useEffect(() => {
-		fetchCities();
 		// Очищаем ошибку при входе на экран
 		setFormError(null);
-	}, [fetchCities, setFormError]);
+	}, [setFormError]);
 
 	const handleProceedToVerification = () => {
 		// Сбрасываем предыдущие ошибки
@@ -145,7 +147,11 @@ export function UserDataPage() {
 								options={cityOptions}
 								value={regState.city}
 								onSelect={handleCitySelect}
-								placeholder='Выберите город'
+								placeholder={
+									isCitiesLoading || isCitiesRefetching
+										? 'Загрузка...'
+										: 'Выберите город'
+								}
 								isInvalid={validationErrors.city}
 							/>
 						</View>
