@@ -1,15 +1,17 @@
 import { useRouter, useSegments } from 'expo-router';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { refreshSessionAtom, sessionAtom } from '@/entities/session';
 import { apiClient } from '@/shared/api';
+import { analytics } from '@/shared/lib';
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
 	const session = useAtomValue(sessionAtom);
 	const refreshSession = useSetAtom(refreshSessionAtom);
 	const segments = useSegments(); // ['(app)', 'profile'] или ['sign-in']
 	const router = useRouter();
+	const lastSessionKeyRef = useRef<string | null>(null);
 
 	useEffect(() => {
 		if (session.accessToken) {
@@ -30,6 +32,24 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 			refreshSession();
 		}
 	}, [session.refreshToken, session.accessToken, refreshSession]);
+
+	useEffect(() => {
+		if (session.refreshToken === undefined) {
+			return;
+		}
+		const userId = session.userProfile?.user_id ?? null;
+		const sessionKey = `${session.isAuthenticated}-${userId ?? 'anonymous'}`;
+		if (lastSessionKeyRef.current === sessionKey) {
+			return;
+		}
+		lastSessionKeyRef.current = sessionKey;
+		analytics.setUser(userId);
+		analytics.trackEvent('user.session', {
+			state: session.isAuthenticated ? 'login' : 'logout',
+			method: session.isAuthenticated ? 'silent' : 'logout',
+			userId,
+		});
+	}, [session.refreshToken, session.isAuthenticated, session.userProfile]);
 
 	useEffect(() => {
 		// Это определяет, находится ли текущий маршрут ВНУТРИ защищенной группы (app)

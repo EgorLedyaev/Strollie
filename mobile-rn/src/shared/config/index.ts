@@ -8,3 +8,9 @@ export {
 	type MockUploadMode,
 } from './feature-flags';
 export { OTP_CODE_LENGTH } from './auth';
+export {
+	ANALYTICS_ENABLED,
+	ANALYTICS_DEBUG,
+	ANALYTICS_INCLUDE_CONTEXT,
+	APPMETRICA_API_KEY,
+} from './analytics';

@@ -10,6 +10,13 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { SessionProvider } from '@/app/providers/with-session';
+import {
+	ANALYTICS_DEBUG,
+	ANALYTICS_ENABLED,
+	ANALYTICS_INCLUDE_CONTEXT,
+	APPMETRICA_API_KEY,
+} from '@/shared/config';
+import { analytics, createAppMetricaTransport } from '@/shared/lib';
 import { initLogger } from '@/shared/lib/logger';
 import { Colors } from '@/shared/tokens';
 
@@ -51,6 +58,36 @@ function Root() {
 					ExpoConstants.default?.expoConfig?.version || 'unknown',
 			},
 		});
+	}, []);
+
+	useEffect(() => {
+		analytics.registerTransport(
+			createAppMetricaTransport({
+				apiKey: APPMETRICA_API_KEY,
+				logs: ANALYTICS_DEBUG,
+				includeContext: ANALYTICS_INCLUDE_CONTEXT,
+			}),
+		);
+
+		analytics
+			.init({
+				appVersion: ExpoConstants.default?.expoConfig?.version,
+				platform: Platform.OS,
+				enabled: ANALYTICS_ENABLED,
+				debug: ANALYTICS_DEBUG,
+			})
+			.then(() =>
+				analytics.trackEvent('app.launch', {
+					source: 'cold',
+					trigger: 'root-layout',
+				}),
+			)
+			.catch(error =>
+				console.warn(
+					'[analytics] Не удалось инициализировать сервис',
+					error,
+				),
+			);
 	}, []);
 
 	useEffect(() => {
