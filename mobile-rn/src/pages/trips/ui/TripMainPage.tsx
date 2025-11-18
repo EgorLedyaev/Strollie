@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { TripList } from '@/pages/trips';
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
 import { useTicketsSWR } from '@/entities/ticket';
@@ -19,6 +18,8 @@ import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 import { AddButton } from '@/shared/ui/AddButton';
+
+import { TripList } from './TripList';
 
 export const TripMainPage: React.FC = () => {
 	const router = useRouter();

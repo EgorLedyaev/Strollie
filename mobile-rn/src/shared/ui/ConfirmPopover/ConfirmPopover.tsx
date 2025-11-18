@@ -3,7 +3,8 @@ import { StyleSheet, View, ViewStyle } from 'react-native';
 import Popover, { PopoverPlacement } from 'react-native-popover-view';
 
 import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
-import { AppButton, AppButtonProps, AppText } from '@/shared/ui';
+import { AppButton, AppButtonProps } from '@/shared/ui/Button';
+import { AppText } from '@/shared/ui/Text';
 
 type ConfirmPopoverButton = Pick<
 	AppButtonProps,
