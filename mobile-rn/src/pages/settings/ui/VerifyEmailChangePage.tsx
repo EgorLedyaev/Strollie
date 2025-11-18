@@ -24,11 +24,11 @@ export function VerifyEmailChangePage() {
 	const [error, setError] = useAtom(verifyChangeErrorAtom);
 	const [timeLeft, setTimeLeft] = useState(60);
 	const [canResend, setCanResend] = useState(false);
+	const newEmail = useAtomValue(newEmailAtom);
 	const { verifyCode, isLoading } = useVerifyEmailChange();
 	const { resendCode, isLoading: isResending } = useResendCode({
 		email: newEmail ?? undefined,
 	});
-	const newEmail = useAtomValue(newEmailAtom);
 
 	useEffect(() => {
 		let timer: ReturnType<typeof setInterval>;

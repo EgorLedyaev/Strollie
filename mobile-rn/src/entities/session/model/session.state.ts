@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { atom } from 'jotai';
+import { atom, type Getter } from 'jotai';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 
 import { resetUserProfileAtom, type User } from '@/entities/user/@x/session';
@@ -65,6 +65,9 @@ const sessionAtomWithStorage = atomWithStorage(
 	storage,
 );
 
+const readSession = (get: Getter): Session =>
+	get(sessionAtomWithStorage) as Session;
+
 /**
  * Экспортируемый атом сессии, который поддерживает Suspense.
  * Когда компонент попытается прочитать этот атом до того, как данные загрузятся
@@ -101,7 +104,7 @@ export const setSessionAtom = atom(
 );
 
 export const refreshSessionAtom = atom(null, async (get, set) => {
-	const current = get(sessionAtomWithStorage);
+	const current = readSession(get);
 	if (!current.refreshToken) {
 		return;
 	}
@@ -131,7 +134,7 @@ export const refreshSessionAtom = atom(null, async (get, set) => {
  * Атом для выхода из системы (write-only).
  */
 export const logoutAtom = atom(null, async (get, set) => {
-	const current = get(sessionAtomWithStorage);
+	const current = readSession(get);
 	const refreshToken = current.refreshToken;
 	try {
 		if (refreshToken) {
