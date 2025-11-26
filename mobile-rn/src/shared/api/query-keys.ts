@@ -1,6 +1,7 @@
 const sessionRoot = ['session'] as const;
 const citiesRoot = ['cities'] as const;
 const routesRoot = ['routes'] as const;
+const placesRoot = ['places'] as const;
 
 export const sessionKeys = {
 	all: sessionRoot,
@@ -16,10 +17,29 @@ export const routesKeys = {
 	byId: (id: string) => [...routesRoot, id] as const,
 };
 
+export const placesKeys = {
+	suggest: (query: string, limit: number) =>
+		[...placesRoot, 'suggest', query, limit] as const,
+	details: (id: string) => [...placesRoot, 'details', id] as const,
+	geocode: (
+		query: string,
+		location: [number, number] | undefined,
+		results: number,
+	) =>
+		[
+			...placesRoot,
+			'geocode',
+			query,
+			location ? `${location[0]},${location[1]}` : 'none',
+			results,
+		] as const,
+};
+
 export const queryKeys = {
 	session: sessionKeys,
 	cities: citiesKeys,
 	routes: routesKeys,
+	places: placesKeys,
 } as const;
 
 type ValueOf<T> = T[keyof T];

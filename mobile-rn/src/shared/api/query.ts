@@ -36,3 +36,24 @@ export const createQueryFn =
 			throw error;
 		}
 	};
+
+export const createMutationFn =
+	<TData, TVariables = void>(
+		requestFactory: (variables: TVariables) => HttpRequestConfig,
+	) =>
+	async (variables: TVariables): Promise<TData> => {
+		try {
+			const config = requestFactory(variables);
+			const { data } = await apiClient.request<TData>(config);
+			return data;
+		} catch (error) {
+			if (error instanceof HttpError) {
+				throw new AppError(error.message, {
+					status: error.status,
+					data: error.data,
+					cause: error,
+				});
+			}
+			throw error;
+		}
+	};

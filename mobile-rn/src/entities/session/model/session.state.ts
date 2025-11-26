@@ -14,7 +14,7 @@ import { SESSION_STORAGE_KEY } from '@/shared/config';
  * Тип для состояния сессии.
  * Содержит информацию о том, аутентифицирован ли пользователь и его refresh токен.
  */
-interface Session {
+export interface SessionSnapshot {
 	isAuthenticated: boolean;
 	accessToken: string | null;
 	refreshToken: string | null | undefined;
@@ -26,7 +26,7 @@ interface Session {
  * Начальное состояние сессии.
  * По умолчанию пользователь не аутентифицирован и refresh токен отсутствует.
  */
-const INITIAL_STATE: Session = {
+const INITIAL_STATE: SessionSnapshot = {
 	isAuthenticated: false,
 	accessToken: null,
 	refreshToken: undefined,
@@ -34,12 +34,12 @@ const INITIAL_STATE: Session = {
 	userProfile: null,
 };
 
-const CLEARED_STATE: Session = {
+const CLEARED_STATE: SessionSnapshot = {
 	...INITIAL_STATE,
 	refreshToken: null,
 };
 
-const applyAuthHeader = (session: Session) => {
+const applyAuthHeader = (session: SessionSnapshot) => {
 	if (session.accessToken) {
 		apiClient.defaults.headers.common.Authorization = `${
 			session.tokenType ?? 'Bearer'
@@ -52,7 +52,7 @@ const applyAuthHeader = (session: Session) => {
  * Хранилище для состояния сессии.
  * Используется для сохранения и извлечения данных сессии из AsyncStorage.
  */
-const storage = createJSONStorage<Session>(() => AsyncStorage);
+const storage = createJSONStorage<SessionSnapshot>(() => AsyncStorage);
 
 /**
  * Базовый атом для хранения состояния сессии. Он взаимодействует с AsyncStorage.
@@ -65,8 +65,8 @@ const sessionAtomWithStorage = atomWithStorage(
 	storage,
 );
 
-const readSession = (get: Getter): Session =>
-	get(sessionAtomWithStorage) as Session;
+const readSession = (get: Getter): SessionSnapshot =>
+	get(sessionAtomWithStorage) as SessionSnapshot;
 
 /**
  * Экспортируемый атом сессии, который поддерживает Suspense.
@@ -91,7 +91,7 @@ interface NewSessionPayload {
 export const setSessionAtom = atom(
 	null,
 	(get, set, newSessionData: NewSessionPayload) => {
-		const newSession: Session = {
+		const newSession: SessionSnapshot = {
 			isAuthenticated: true,
 			accessToken: newSessionData.accessToken,
 			refreshToken: newSessionData.refreshToken,
@@ -110,7 +110,7 @@ export const refreshSessionAtom = atom(null, async (get, set) => {
 	}
 	try {
 		const tokens = await refreshAccessToken(current.refreshToken);
-		const updatedSession: Session = {
+		const updatedSession: SessionSnapshot = {
 			...current,
 			isAuthenticated: true,
 			accessToken: tokens.access_token,

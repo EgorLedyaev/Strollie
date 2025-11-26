@@ -1,4 +1,5 @@
 // Публичный API слайса session
+import { useSessionQuery } from './model/session.queries';
 import {
 	logoutAtom,
 	refreshSessionAtom,
@@ -12,4 +13,6 @@ export {
 	logoutAtom,
 	setSessionAtom,
 	refreshSessionAtom,
+	// Queries
+	useSessionQuery,
 };
