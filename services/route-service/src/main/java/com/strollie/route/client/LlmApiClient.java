@@ -29,7 +29,11 @@ public class LlmApiClient {
 
     public List<PlaceDto> filterPlaces(List<PlaceDto> places, String userDescription, int durationHours) {
         String placesJson;
-        try { placesJson = mapper.writeValueAsString(places); } catch (Exception e) { return places; }
+        try {
+            placesJson = mapper.writeValueAsString(places);
+        } catch (Exception e) {
+            return places;
+        }
         String prompt = "Выбери 5-8 наиболее подходящих мест для маршрута.\n" +
                 "Описание маршрута: " + userDescription + "\n" +
                 "Длительность: " + durationHours + " часов\n" +
@@ -58,7 +62,8 @@ public class LlmApiClient {
 
             if (resp == null || resp.getChoices() == null || resp.getChoices().isEmpty()) return places;
             String content = resp.getChoices().get(0).getMessage().getContent();
-            List<Selected> selected = mapper.readValue(content, new TypeReference<List<Selected>>(){});
+            List<Selected> selected = mapper.readValue(content, new TypeReference<List<Selected>>() {
+            });
             Set<String> ids = selected.stream().map(s -> s.placeId).collect(Collectors.toCollection(HashSet::new));
             return places.stream().filter(p -> ids.contains(p.getId())).collect(Collectors.toList());
         } catch (Exception e) {

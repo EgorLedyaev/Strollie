@@ -9,6 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CityRegionCache {
     private final Map<String, String> cities = new ConcurrentHashMap<>();
 
-    public String get(String city) { return cities.get(city); }
-    public void put(String city, String id) { cities.put(city, id); }
+    public String get(String city) {
+        return cities.get(city);
+    }
+
+    public void put(String city, String id) {
+        cities.put(city, id);
+    }
 }

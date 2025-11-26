@@ -18,4 +18,5 @@ public class LlmFilterService {
     public List<PlaceDto> filterAndRankPlaces(List<PlaceDto> places, String userDescription, int durationHours) {
         return llmApiClient.filterPlaces(places, userDescription, durationHours);
     }
+
 }

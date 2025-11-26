@@ -12,7 +12,7 @@ public class DirectionsLinkBuilder {
     public static String build2GisLink(String city, List<PlaceDto> orderedPlaces) {
         List<PlaceDto> valid = orderedPlaces.stream()
                 .filter(p -> p.getId() != null && p.getId().matches("\\d+"))
-                .collect(Collectors.toList());
+                .toList();
         String pointsRaw = valid.stream()
                 .map(p -> formatPoint(p.getLon(), p.getLat(), p.getId()))
                 .collect(Collectors.joining("|"));
@@ -24,5 +24,7 @@ public class DirectionsLinkBuilder {
         return String.format(Locale.US, "%f,%f;%s", lon, lat, id);
     }
 
-    private static String toCitySlug(String city) { return ""; }
+    private static String toCitySlug(String city) {
+        return "";
+    }
 }

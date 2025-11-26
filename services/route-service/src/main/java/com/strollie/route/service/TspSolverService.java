@@ -3,11 +3,7 @@ package com.strollie.route.service;
 import com.strollie.route.model.dto.PlaceDto;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class TspSolverService {
@@ -40,5 +36,5 @@ public class TspSolverService {
         double c = 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
         return 6371000.0 * c;
     }
-    
+
 }

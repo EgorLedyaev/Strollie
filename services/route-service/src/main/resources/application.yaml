@@ -1,1 +1,40 @@
-spring.application.name=route
+server:
+  port: 8082
+
+spring:
+  application:
+    name: route-service
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=24h
+
+api:
+  gis:
+    base-url: https://catalog.api.2gis.com
+    key: e1270ba5-84c8-4ca1-9ac5-00fca2286431
+    timeout: 5000
+    max-places-per-category: 10
+  llm:
+    provider: openrouter
+    base-url: https://openrouter.ai/api/v1
+    key: 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
+    model: openai/gpt-oss-safeguard-20b
+    max-tokens: 1000
+    timeout: 30000
+
+routing:
+  default-radius-meters: 3000
+  min-places: 3
+  max-places: 8
+  max-route-duration-hours: 5
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui
+
+logging:
+  level:
+    com.strollie.route.client: INFO
