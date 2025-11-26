@@ -13,11 +13,13 @@ import { AvatarPhotoOptionsModal } from './AvatarPhotoOptionsModal';
 
 interface AvatarUploaderProps {
 	size?: number;
+	value?: string | null;
 	onAvatarChange?: (uri: string | null) => void;
 }
 
 export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 	size = 100,
+	value,
 	onAvatarChange,
 }) => {
 	const { uploadAvatar, takePhoto, isLoading, avatarUrl } = useUploadAvatar();
@@ -67,7 +69,7 @@ export const AvatarUploader: React.FC<AvatarUploaderProps> = ({
 					disabled={isLoading}
 					style={[styles.avatarContainer, { borderRadius: size / 2 }]}
 				>
-					<Avatar uri={avatarUrl} size={size} />
+					<Avatar uri={value ?? avatarUrl} size={size} />
 					{/* Полупрозрачный overlay поверх аватара */}
 					<View
 						pointerEvents='none'

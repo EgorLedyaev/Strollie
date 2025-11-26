@@ -1,4 +1,5 @@
 import { render, waitFor } from '@testing-library/react-native';
+import { formatISO } from 'date-fns';
 import { createStore, Provider as JotaiProvider } from 'jotai';
 import React from 'react';
 
@@ -23,8 +24,8 @@ describe('SWR e2e refresh scenario', () => {
 			id,
 			from: 'A',
 			to: 'B',
-			departureTime: new Date().toISOString(),
-			arrivalTime: new Date().toISOString(),
+			departureTime: formatISO(new Date()),
+			arrivalTime: formatISO(new Date()),
 			isUsed: false,
 			type: 'train',
 			businessCategory: 'transport',

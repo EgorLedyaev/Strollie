@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { formatISO } from 'date-fns';
 import { getDefaultStore } from 'jotai';
 
 import type { Ticket } from '../model';
@@ -37,8 +38,8 @@ function sampleTicket(id: string): Ticket {
 		id,
 		from: 'A',
 		to: 'B',
-		departureTime: new Date().toISOString(),
-		arrivalTime: new Date().toISOString(),
+		departureTime: formatISO(new Date()),
+		arrivalTime: formatISO(new Date()),
 		isUsed: false,
 		type: 'train',
 		businessCategory: 'transport',

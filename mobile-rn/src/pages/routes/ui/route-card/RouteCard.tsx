@@ -1,4 +1,6 @@
 import ArrowRightIcon from '@/assets/icons/ArrowRightIcon';
+import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -9,8 +11,7 @@ import { AppText } from '@/shared/ui';
 import { RoutesImageCard } from '../RoutesImageCard';
 
 const formatDate = (isoString: string): string => {
-	const date = new Date(isoString);
-	return date.toLocaleDateString('ru-RU');
+	return format(parseISO(isoString), 'dd.MM.yyyy', { locale: ru });
 };
 
 interface Props {

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
+import { formatISO, startOfToday, subDays } from 'date-fns';
 import { useAtom } from 'jotai';
 import React from 'react';
 import { Pressable, View } from 'react-native';
@@ -86,18 +87,17 @@ describe('RouteHistoryPage', () => {
 	});
 
 	it('should render sections with routes correctly sorted', () => {
-		const today = new Date();
-		const yesterday = new Date();
-		yesterday.setDate(today.getDate() - 1);
+		const today = startOfToday();
+		const yesterday = subDays(today, 1);
 
 		const mockRoutes = [
 			{
 				id: '1',
-				date: yesterday.toISOString(),
+				date: formatISO(yesterday),
 				title: 'Yesterday Route',
 			},
-			{ id: '2', date: today.toISOString(), title: 'Today Route 1' },
-			{ id: '3', date: today.toISOString(), title: 'Today Route 2' },
+			{ id: '2', date: formatISO(today), title: 'Today Route 1' },
+			{ id: '3', date: formatISO(today), title: 'Today Route 2' },
 		];
 
 		mockedUseRoutesSWR.mockReturnValue({
@@ -121,7 +121,7 @@ describe('RouteHistoryPage', () => {
 	it('should call setFavoriteRouteIds when a route is toggled', () => {
 		const mockSetFavorite = jest.fn();
 		const mockRoutes = [
-			{ id: '1', date: new Date().toISOString(), title: 'Test Route' },
+			{ id: '1', date: formatISO(startOfToday()), title: 'Test Route' },
 		];
 
 		mockedUseRoutesSWR.mockReturnValue({

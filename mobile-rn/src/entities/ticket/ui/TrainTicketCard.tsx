@@ -1,6 +1,8 @@
 import ArrowRightLineIcon from '@/assets/icons/arrow/ArrowRightLineIcon';
 import ArrowUpRightSmallIcon from '@/assets/icons/arrow/ArrowUpRightSmallIcon';
 import TrainIcon from '@/assets/icons/tickets/TrainIcon';
+import { differenceInMinutes, format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
@@ -21,21 +23,18 @@ function humanTicketNo(id: string) {
 }
 
 function formatTime(d: Date) {
-	return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	return format(d, 'HH:mm', { locale: ru });
 }
 
-function pad2(n: number) {
-	return n < 10 ? `0${n}` : `${n}`;
-}
 function formatDate(d: Date) {
 	// dd.MM.yyyy — точки вместо слэшей
-	return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
+	return format(d, 'dd.MM.yyyy', { locale: ru });
 }
 
 function formatDuration(from: Date, to: Date) {
-	const ms = Math.max(0, +to - +from);
-	const h = Math.floor(ms / 3_600_000);
-	const m = Math.round((ms % 3_600_000) / 60_000);
+	const totalMinutes = Math.max(0, differenceInMinutes(to, from));
+	const h = Math.floor(totalMinutes / 60);
+	const m = totalMinutes % 60;
 	if (h >= 1) return `${h} ч${m ? ` ${m} мин` : ''}`;
 	return `${m} мин`;
 }
@@ -45,8 +44,8 @@ export const TrainTicketCard: React.FC<Props> = ({
 	onShowQr,
 	onMorePress,
 }) => {
-	const departure = new Date(ticket.departureTime);
-	const arrival = new Date(ticket.arrivalTime);
+	const departure = parseISO(ticket.departureTime);
+	const arrival = parseISO(ticket.arrivalTime);
 	// Между городами оставляем тире
 	const title = `${ticket.from} - ${ticket.to}`;
 

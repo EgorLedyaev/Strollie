@@ -1,3 +1,4 @@
+import { formatISO } from 'date-fns';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useState } from 'react';
 
@@ -48,7 +49,7 @@ export const useVerifyCode = () => {
 				const newUser: User = {
 					user_id: regState.email,
 					email: regState.email,
-					created_at: new Date().toISOString(),
+					created_at: formatISO(new Date()),
 					firstName: regState.firstName || '',
 					lastName: regState.lastName || '',
 					nickname: regState.nickname || '',

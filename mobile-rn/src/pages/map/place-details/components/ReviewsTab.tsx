@@ -1,5 +1,7 @@
 // Вкладка с отзывами и формой добавления
 
+import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React, { useState } from 'react';
 import {
 	Image,
@@ -203,11 +205,7 @@ interface ReviewCardProps {
 }
 
 function ReviewCard({ review }: ReviewCardProps) {
-	const date = new Date(review.date).toLocaleDateString('ru-RU', {
-		day: 'numeric',
-		month: 'long',
-		year: 'numeric',
-	});
+	const date = format(parseISO(review.date), 'd MMMM yyyy', { locale: ru });
 
 	// Генерация инициалов для аватара
 	const initials = review.user_name

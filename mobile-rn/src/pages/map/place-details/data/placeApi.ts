@@ -1,5 +1,7 @@
 // API клиент для работы с 2GIS
 
+import { formatISO } from 'date-fns';
+
 import type {
 	Contact,
 	ContactGroup,
@@ -183,7 +185,7 @@ export async function submitReview(
 			user_name: 'Текущий пользователь',
 			rating,
 			text,
-			date: new Date().toISOString(),
+			date: formatISO(new Date()),
 			is_current_user: true,
 		};
 
@@ -359,7 +361,7 @@ function normalizePlace(item: PlaceItem): Place {
 					user_name: 'Mock User',
 					rating: item.reviews.general_rating || 0,
 					text: 'Mock review',
-					date: new Date().toISOString(),
+					date: formatISO(new Date()),
 				},
 			]
 		: [];

@@ -1,11 +1,12 @@
 import React from 'react';
+import { Controller } from 'react-hook-form';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Header } from '@/widgets/header';
 import { useTripCreate } from '@/features/manage-trips';
 import { ChecklistInput, ChecklistItem } from '@/features/trip-checklist';
-import { NewTicketItem } from '@/entities/ticket';
+import { NewTicketItem, Ticket } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import {
 	AppButton,
@@ -17,26 +18,25 @@ import {
 
 export const TripCreatePage: React.FC = () => {
 	const {
-		startDate,
-		endDate,
-		selectedTickets,
-		checklist,
-		notes,
-		setNotes,
+		control,
+		handleSubmit,
+		isValid,
+		formValues,
 		isAddingChecklistItem,
 		isPickerVisible,
 		editingDateType,
-		canSave,
 		openPicker,
 		setPickerVisible,
 		handleDateSelect,
-		onSave,
 		onDelete,
 		setIsAddingChecklistItem,
 		handleAddChecklistItem,
 		handleDeleteChecklistItem,
 		formatDateForDisplay,
+		isSubmitting,
 	} = useTripCreate();
+
+	const { startDate, endDate, selectedTickets, checklist } = formValues;
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -81,7 +81,7 @@ export const TripCreatePage: React.FC = () => {
 						ref={'/trips/select-ticket'}
 					/>
 					<View style={styles.ticketsContainer}>
-						{selectedTickets.map(ticket => (
+						{(selectedTickets || []).map((ticket: Ticket) => (
 							<NewTicketItem key={ticket.id} ticket={ticket} />
 						))}
 					</View>
@@ -93,7 +93,7 @@ export const TripCreatePage: React.FC = () => {
 							setIsAddingChecklistItem(!isAddingChecklistItem);
 						}}
 					/>
-					{checklist.length > 0 && (
+					{checklist && checklist.length > 0 && (
 						<View style={styles.checklistContainer}>
 							{checklist.map(item => (
 								<ChecklistItem
@@ -117,13 +117,19 @@ export const TripCreatePage: React.FC = () => {
 					<AppText variant={'header'} style={styles.sectionItemTitle}>
 						Заметки
 					</AppText>
-					<AppTextInput
-						value={notes}
-						onChangeText={setNotes}
-						style={styles.notesInput}
-						multiline
-						placeholder='Введите текст того, что вы хотели записать или дополнить'
-						placeholderTextColor={Colors.grayMedium}
+					<Controller
+						control={control}
+						name='notes'
+						render={({ field: { onChange, value } }) => (
+							<AppTextInput
+								value={value}
+								onChangeText={onChange}
+								style={styles.notesInput}
+								multiline
+								placeholder='Введите текст того, что вы хотели записать или дополнить'
+								placeholderTextColor={Colors.grayMedium}
+							/>
+						)}
 					/>
 				</View>
 			</ScrollView>
@@ -142,8 +148,8 @@ export const TripCreatePage: React.FC = () => {
 				/>
 				<AppButton
 					text='Сохранить поездку'
-					onPress={onSave}
-					disabled={!canSave}
+					onPress={handleSubmit}
+					disabled={!isValid || isSubmitting}
 					buttonBorderRadius={Radius.r16}
 					style={[styles.button, styles.buttonAdd]}
 					textFontSize={16}

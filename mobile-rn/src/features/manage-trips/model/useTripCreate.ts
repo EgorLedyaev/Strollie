@@ -1,9 +1,13 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 import { tripApi, TripChecklistItem } from '@/entities/trip';
+import { formatDate } from '@/shared/lib/date';
 
+import { tripCreateSchema, TripCreateSchema } from './schema';
 import {
 	checklistAtom,
 	endDateAtom,
@@ -25,36 +29,103 @@ export const useTripCreate = () => {
 	);
 	const [isAddingChecklistItem, setIsAddingChecklistItem] = useState(false);
 
-	// Глобальное состояние формы (Jotai)
-	const [startDate, setStartDate] = useAtom(startDateAtom);
-	const [endDate, setEndDate] = useAtom(endDateAtom);
-	const [selectedTickets, setSelectedTickets] = useAtom(selectedTicketsAtom);
-	const [places, setPlaces] = useAtom(placesAtom);
-	const [routes, setRoutes] = useAtom(routesAtom);
-	const [checklist, setChecklist] = useAtom(checklistAtom);
-	const [notes, setNotes] = useAtom(notesAtom);
+	// Глобальное состояние (Jotai)
+	const [startDateAtomVal, setStartDateAtom] = useAtom(startDateAtom);
+	const [endDateAtomVal, setEndDateAtom] = useAtom(endDateAtom);
+	const [selectedTicketsAtomVal, setSelectedTicketsAtom] =
+		useAtom(selectedTicketsAtom);
+	const [placesAtomVal, setPlacesAtom] = useAtom(placesAtom);
+	const [routesAtomVal, setRoutesAtom] = useAtom(routesAtom);
+	const [checklistAtomVal, setChecklistAtom] = useAtom(checklistAtom);
+	const [notesAtomVal, setNotesAtom] = useAtom(notesAtom);
 	const [isSubmitting, setSubmitting] = useAtom(isSubmittingAtom);
 
-	// Производные состояния и логика
-	const canSave = startDate && endDate && !isSubmitting;
+	// Инициализация формы
+	const form = useForm<TripCreateSchema>({
+		resolver: zodResolver(tripCreateSchema),
+		defaultValues: {
+			startDate: startDateAtomVal,
+			endDate: endDateAtomVal,
+			selectedTickets: selectedTicketsAtomVal,
+			places: placesAtomVal,
+			routes: routesAtomVal,
+			checklist: checklistAtomVal,
+			notes: notesAtomVal,
+		},
+		mode: 'onChange',
+	});
+
+	const {
+		control,
+		handleSubmit,
+		setValue,
+		watch,
+		formState: { isValid },
+	} = form;
+	const formValues = watch();
+
+	// Синхронизация атомов с формой (для полей, изменяемых извне)
+	useEffect(() => {
+		if (
+			JSON.stringify(selectedTicketsAtomVal) !==
+			JSON.stringify(formValues.selectedTickets)
+		) {
+			setValue('selectedTickets', selectedTicketsAtomVal);
+		}
+	}, [selectedTicketsAtomVal, setValue, formValues.selectedTickets]);
+
+	useEffect(() => {
+		if (
+			JSON.stringify(placesAtomVal) !== JSON.stringify(formValues.places)
+		) {
+			setValue('places', placesAtomVal);
+		}
+	}, [placesAtomVal, setValue, formValues.places]);
+
+	useEffect(() => {
+		if (
+			JSON.stringify(routesAtomVal) !== JSON.stringify(formValues.routes)
+		) {
+			setValue('routes', routesAtomVal);
+		}
+	}, [routesAtomVal, setValue, formValues.routes]);
+
+	// Синхронизация формы с атомами (для сохранения состояния при навигации)
+	useEffect(() => {
+		setStartDateAtom(formValues.startDate);
+	}, [formValues.startDate, setStartDateAtom]);
+
+	useEffect(() => {
+		setEndDateAtom(formValues.endDate);
+	}, [formValues.endDate, setEndDateAtom]);
+
+	useEffect(() => {
+		setNotesAtom(formValues.notes || '');
+	}, [formValues.notes, setNotesAtom]);
+
+	useEffect(() => {
+		setChecklistAtom(formValues.checklist || []);
+	}, [formValues.checklist, setChecklistAtom]);
 
 	const resetForm = useCallback(() => {
-		setStartDate('');
-		setEndDate('');
-		setSelectedTickets([]);
-		setPlaces([]);
-		setRoutes([]);
-		setChecklist([]);
-		setNotes('');
+		setStartDateAtom('');
+		setEndDateAtom('');
+		setSelectedTicketsAtom([]);
+		setPlacesAtom([]);
+		setRoutesAtom([]);
+		setChecklistAtom([]);
+		setNotesAtom('');
 		setIsAddingChecklistItem(false);
+		form.reset();
 	}, [
-		setStartDate,
-		setEndDate,
-		setSelectedTickets,
-		setPlaces,
-		setRoutes,
-		setChecklist,
-		setNotes,
+		setStartDateAtom,
+		setEndDateAtom,
+		setSelectedTicketsAtom,
+		setPlacesAtom,
+		setRoutesAtom,
+		setChecklistAtom,
+		setNotesAtom,
+		form,
 	]);
 
 	// Обработчики событий
@@ -64,33 +135,35 @@ export const useTripCreate = () => {
 	};
 
 	const handleDateSelect = (date: string | null) => {
+		const dateStr = date ?? '';
 		if (editingDateType === 'start') {
-			setStartDate(date ?? '');
+			setValue('startDate', dateStr, { shouldValidate: true });
 		} else {
-			setEndDate(date ?? '');
+			setValue('endDate', dateStr, { shouldValidate: true });
 		}
 	};
 
 	const handleToggleChecklistItem = (idToToggle: string) => {
-		setChecklist(prev =>
-			prev.map(item =>
-				item.id === idToToggle ? { ...item, done: !item.done } : item,
-			),
+		const currentChecklist = formValues.checklist || [];
+		const updated = currentChecklist.map(item =>
+			item.id === idToToggle ? { ...item, done: !item.done } : item,
 		);
+		setValue('checklist', updated);
 	};
 
-	const onSave = useCallback(async () => {
-		if (!canSave) return;
+	const onSubmit = async (data: TripCreateSchema) => {
 		try {
 			setSubmitting(true);
 			await tripApi.createTrip({
-				startDate,
-				endDate,
-				ticketIds: selectedTickets.map(ticket => ticket.id),
-				places: places.filter(Boolean),
-				routes: routes.filter(Boolean),
-				checklist: checklist.filter(i => i.text.trim()),
-				notes: notes.trim() || undefined,
+				startDate: data.startDate,
+				endDate: data.endDate,
+				ticketIds: (data.selectedTickets || []).map(
+					(ticket: { id: string }) => ticket.id,
+				),
+				places: (data.places || []).filter(Boolean),
+				routes: (data.routes || []).filter(Boolean),
+				checklist: (data.checklist || []).filter(i => i.text.trim()),
+				notes: (data.notes || '').trim() || undefined,
 				title: undefined,
 			});
 			resetForm();
@@ -100,19 +173,7 @@ export const useTripCreate = () => {
 		} finally {
 			setSubmitting(false);
 		}
-	}, [
-		canSave,
-		startDate,
-		endDate,
-		places,
-		selectedTickets,
-		routes,
-		checklist,
-		notes,
-		setSubmitting,
-		resetForm,
-		router,
-	]);
+	};
 
 	const onDelete = useCallback(() => {
 		resetForm();
@@ -125,43 +186,44 @@ export const useTripCreate = () => {
 			text,
 			done: false,
 		};
-		setChecklist(prev => [...prev, newItem]);
+		const currentChecklist = formValues.checklist || [];
+		setValue('checklist', [...currentChecklist, newItem]);
 		setIsAddingChecklistItem(false);
 	};
 
 	const handleDeleteChecklistItem = (idToDelete: string) => {
-		setChecklist(prev => prev.filter(item => item.id !== idToDelete));
+		const currentChecklist = formValues.checklist || [];
+		setValue(
+			'checklist',
+			currentChecklist.filter(item => item.id !== idToDelete),
+		);
 	};
 
-	const formatDateForDisplay = (dateString: string | null) => {
+	const formatDateForDisplay = (dateString: string | null | undefined) => {
 		if (!dateString) return 'ДД.ММ.ГГГГ';
-		return new Date(dateString).toLocaleDateString('ru-RU');
+		return formatDate(dateString);
 	};
 
-	// Возвращаем все, что нужно для UI
 	return {
-		// Состояние
-		startDate,
-		endDate,
-		selectedTickets,
-		checklist,
+		control,
+		handleSubmit: handleSubmit(onSubmit),
+		isValid,
+		formValues,
+
 		isAddingChecklistItem,
 		isPickerVisible,
 		editingDateType,
-		handleToggleChecklistItem,
-		canSave,
-		notes,
-		setNotes,
+		isSubmitting,
 
-		// Обработчики
 		openPicker,
 		setPickerVisible,
 		handleDateSelect,
-		onSave,
 		onDelete,
 		setIsAddingChecklistItem,
 		handleAddChecklistItem,
 		handleDeleteChecklistItem,
+		handleToggleChecklistItem,
 		formatDateForDisplay,
+		setValue,
 	};
 };

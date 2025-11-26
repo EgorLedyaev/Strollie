@@ -1,3 +1,5 @@
+import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
@@ -50,10 +52,10 @@ export const TicketDetailsDialog: React.FC<Props> = ({
 					{/* Дата / время отправления */}
 					<View style={styles.dateTimeRow}>
 						<AppText style={styles.dateText}>
-							{formatFullDate(new Date(ticket.departureTime))}
+							{formatFullDate(parseISO(ticket.departureTime))}
 						</AppText>
 						<AppText style={styles.timeText}>
-							{formatTime(new Date(ticket.departureTime))}
+							{formatTime(parseISO(ticket.departureTime))}
 						</AppText>
 					</View>
 					{/* Зал / Ряд / Место (для кино или если данные присутствуют) */}
@@ -147,17 +149,13 @@ function humanTicketNo(id: string) {
 	return `№${tail}`;
 }
 function formatTime(d: Date) {
-	return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	return format(d, 'HH:mm', { locale: ru });
 }
 function formatFullDate(d: Date) {
-	return d.toLocaleDateString('ru-RU', {
-		day: '2-digit',
-		month: 'long',
-		year: 'numeric',
-	});
+	return format(d, 'dd MMMM yyyy', { locale: ru });
 }
 function formatDateTimeRange(iso: string) {
-	const d = new Date(iso);
+	const d = parseISO(iso);
 	return `${formatFullDate(d)} ${formatTime(d)}`;
 }
 function formatPrice(value: number, currency = 'RUB') {

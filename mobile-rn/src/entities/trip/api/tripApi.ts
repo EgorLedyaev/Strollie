@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { formatISO } from 'date-fns';
 
 import type { Trip, TripChecklistItem } from '../model';
 
@@ -18,8 +19,8 @@ const MOCK_TRIPS: Trip[] = [
 		routes: [],
 		checklist: [],
 		notes: '',
-		createdAt: new Date().toISOString(),
-		updatedAt: new Date().toISOString(),
+		createdAt: formatISO(new Date()),
+		updatedAt: formatISO(new Date()),
 	},
 ];
 
@@ -74,7 +75,7 @@ export interface CreateTripInput {
 
 async function createTrip(data: CreateTripInput): Promise<Trip> {
 	await sleep(400);
-	const now = new Date().toISOString();
+	const now = formatISO(new Date());
 	const trip: Trip = {
 		id: `trip_${Math.random().toString(36).slice(2, 10)}`,
 		createdAt: now,
@@ -98,7 +99,7 @@ async function updateTrip(id: string, data: UpdateTripInput): Promise<Trip> {
 	const updatedTrip: Trip = {
 		...originalTrip,
 		...data,
-		updatedAt: new Date().toISOString(),
+		updatedAt: formatISO(new Date()),
 	};
 	memoryTrips![tripIndex] = updatedTrip;
 	await persistTrips(memoryTrips!);

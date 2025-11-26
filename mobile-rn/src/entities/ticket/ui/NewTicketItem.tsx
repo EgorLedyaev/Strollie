@@ -1,4 +1,6 @@
 import CheckmarkIcon from '@/assets/icons/CheckmarkIcon';
+import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 
@@ -17,13 +19,6 @@ interface Props {
 	isSelected?: boolean;
 }
 
-function pad2(n: number) {
-	return n < 10 ? `0${n}` : `${n}`;
-}
-function formatDate(d: Date) {
-	return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
-}
-
 /**
  * Полностью независимый отображатель билета.
  * Не использует старые карточки и их стили.
@@ -35,7 +30,7 @@ export const NewTicketItem: React.FC<Props> = ({
 	onPress,
 	isSelected = false,
 }) => {
-	const departure = new Date(ticket.departureTime);
+	const departure = parseISO(ticket.departureTime);
 	const title =
 		ticket.title ||
 		[ticket.from, ticket.to].filter(Boolean).join(' - ') ||
@@ -71,7 +66,7 @@ export const NewTicketItem: React.FC<Props> = ({
 						{title}
 					</AppText>
 					<AppText style={styles.date}>
-						{formatDate(departure)}
+						{format(departure, 'dd.MM.yyyy', { locale: ru })}
 					</AppText>
 				</View>
 				{ticket.businessCategory ? (

@@ -1,5 +1,6 @@
 import walk_image from '@/assets/images/routes/embankment.png';
 import stadium_image from '@/assets/images/routes/sports.png';
+import { formatISO } from 'date-fns';
 
 import type { Route } from './route.model';
 
@@ -7,7 +8,7 @@ export const MOCK_ROUTES: Route[] = [
 	{
 		id: '1',
 		title: 'Прогулка по набережной',
-		date: new Date().toISOString(),
+		date: formatISO(new Date()),
 		distance: '3,3 км',
 		duration: '58 мин',
 		startPoint: 'Чернышевского, 132',

@@ -1,5 +1,7 @@
 import PlusIcon from '@/assets/icons/action/PlusIcon';
 import EditPhotoIcon from '@/assets/icons/EditPhotoIcon';
+import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useAtom } from 'jotai';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -22,11 +24,8 @@ import {
 
 import { Place, PlacesSection } from './PlacesSection';
 
-function pad2(n: number) {
-	return n < 10 ? `0${n}` : `${n}`;
-}
 function formatDate(d: Date) {
-	return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
+	return format(d, 'dd.MM.yyyy', { locale: ru });
 }
 
 type TripVm = {
@@ -175,8 +174,8 @@ export const TripDetailsPage: React.FC = () => {
 					id: found.id,
 					title: found.title || 'Поездка',
 					displayTitle,
-					start: new Date(found.startDate),
-					end: new Date(found.endDate),
+					start: parseISO(found.startDate),
+					end: parseISO(found.endDate),
 					ticketIds: found.ticketIds,
 					checklist: found.checklist,
 					notes: found.notes || '',

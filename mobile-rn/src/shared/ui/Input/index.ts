@@ -6,6 +6,7 @@ import { Input } from './Input';
 export type InputProps = TextInputProps & {
 	isPassword?: boolean;
 	isInvalid?: boolean;
+	error?: string;
 };
 
 export { Input };

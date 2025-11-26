@@ -10,14 +10,15 @@ import {
 	View,
 } from 'react-native';
 
-import { Colors, Radius } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 
 import { InputProps } from '.';
-import { AppTextInput } from '../Text';
+import { AppText, AppTextInput } from '../Text';
 
 export const Input = ({
 	isPassword,
 	isInvalid,
+	error,
 	style,
 	...props
 }: TextInputProps & InputProps) => {
@@ -63,6 +64,7 @@ export const Input = ({
 					{isPasswordVisible ? <EyeOpenedIcon /> : <EyeClosedIcon />}
 				</Pressable>
 			)}
+			{error && <AppText style={styles.errorText}>{error}</AppText>}
 		</View>
 	);
 };
@@ -71,6 +73,12 @@ const styles = StyleSheet.create({
 	container: {
 		position: 'relative',
 		width: '100%',
+	},
+	errorText: {
+		color: Colors.error,
+		fontSize: Fonts.f12,
+		marginLeft: 16,
+		marginTop: 4,
 	},
 	eyeIcon: {
 		paddingHorizontal: 20,

@@ -1,3 +1,5 @@
+import { formatISO } from 'date-fns';
+
 import { mockTicketRepo } from '../api/mockTicketRepo';
 import { DEFAULT_TTL_MS, ticketApi } from '../api/ticketApi';
 import type { Ticket } from '../model';
@@ -15,8 +17,8 @@ function ticket(id: string): Ticket {
 		id,
 		from: 'A',
 		to: 'B',
-		departureTime: new Date().toISOString(),
-		arrivalTime: new Date().toISOString(),
+		departureTime: formatISO(new Date()),
+		arrivalTime: formatISO(new Date()),
 		isUsed: false,
 		type: 'train',
 		businessCategory: 'transport',

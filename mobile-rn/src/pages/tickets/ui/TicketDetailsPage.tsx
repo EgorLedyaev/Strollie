@@ -1,3 +1,4 @@
+import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
 import { useAtom } from 'jotai';
 import React from 'react';
@@ -30,7 +31,7 @@ export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 		);
 	}
 
-	const departure = new Date(ticket.departureTime);
+	const departure = parseISO(ticket.departureTime);
 	const qrUri = ticket.qrCodeUrl;
 	const isCinema = ticket.type === 'other';
 	const title = isCinema ? ticket.to : `${ticket.from} - ${ticket.to}`;
@@ -58,13 +59,10 @@ export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 
 					<View style={styles.dateTimeRow}>
 						<AppText style={styles.dateText}>
-							{departure.toLocaleDateString()}
+							{format(departure, 'dd.MM.yyyy')}
 						</AppText>
 						<AppText style={styles.timeText}>
-							{departure.toLocaleTimeString([], {
-								hour: '2-digit',
-								minute: '2-digit',
-							})}
+							{format(departure, 'HH:mm')}
 						</AppText>
 					</View>
 

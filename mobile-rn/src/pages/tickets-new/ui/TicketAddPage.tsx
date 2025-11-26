@@ -2,6 +2,7 @@ import FileIcon from '@/assets/icons/FileIcon';
 import CameraIcon from '@/assets/icons/tickets/CameraIcon';
 import UploadTicketIcon from '@/assets/icons/tickets/UploadTicketIcon';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { formatISO, isBefore, startOfToday } from 'date-fns';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
@@ -140,13 +141,12 @@ export const TicketAddPage: React.FC = () => {
 			}
 			// Не позволяем сохранять билеты в прошлом — иначе пользователь
 			// сразу не увидит билет в текущем списке (фильтр по today/future)
-			const startOfToday = new Date();
-			startOfToday.setHours(0, 0, 0, 0);
-			if (constructed < startOfToday) {
+			const start = startOfToday();
+			if (isBefore(constructed, start)) {
 				setError('Дата в прошлом');
 				return;
 			}
-			iso = constructed.toISOString();
+			iso = formatISO(constructed);
 			setSaving(true);
 			log.info('save:start', { hasImage: !!image, category });
 			const ticket = await ticketApi.createCustomTicket({

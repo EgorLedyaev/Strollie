@@ -1,4 +1,14 @@
 import FilterIcon from '@/assets/icons/FilterIcon';
+import {
+	compareAsc,
+	compareDesc,
+	endOfToday,
+	isAfter,
+	isBefore,
+	isWithinInterval,
+	parseISO,
+	startOfToday,
+} from 'date-fns';
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
@@ -27,28 +37,29 @@ export const TicketsList: React.FC<TicketsListProps> = ({
 				? tickets
 				: tickets.filter((t: Ticket) => t.businessCategory === filter);
 
-		const startOfToday = new Date();
-		startOfToday.setHours(0, 0, 0, 0);
-		const endOfToday = new Date();
-		endOfToday.setHours(23, 59, 59, 999);
+		const start = startOfToday();
+		const end = endOfToday();
 
 		const today = filteredTickets.filter((t: Ticket) => {
-			const d = new Date(t.departureTime);
-			return d >= startOfToday && d <= endOfToday;
+			const d = parseISO(t.departureTime);
+			return isWithinInterval(d, {
+				start: start,
+				end: end,
+			});
 		});
-		const future = filteredTickets.filter(
-			(t: Ticket) => new Date(t.departureTime) > endOfToday,
+		const future = filteredTickets.filter((t: Ticket) =>
+			isAfter(parseISO(t.departureTime), end),
 		);
 		// Прошедшие билеты (до начала сегодняшнего дня) — сейчас не показывались,
 		// из-за чего пользователь мог подумать, что билет "пропал", если выбрал дату в прошлом.
-		const past = filteredTickets.filter(
-			(t: Ticket) => new Date(t.departureTime) < startOfToday,
+		const past = filteredTickets.filter((t: Ticket) =>
+			isBefore(parseISO(t.departureTime), start),
 		);
 
 		const byAsc = (a: Ticket, b: Ticket) =>
-			+new Date(a.departureTime) - +new Date(b.departureTime);
+			compareAsc(parseISO(a.departureTime), parseISO(b.departureTime));
 		const byDesc = (a: Ticket, b: Ticket) =>
-			+new Date(b.departureTime) - +new Date(a.departureTime);
+			compareDesc(parseISO(a.departureTime), parseISO(b.departureTime));
 
 		const result: Array<{ title: string; data: Ticket[] }> = [];
 		if (today.length > 0) {

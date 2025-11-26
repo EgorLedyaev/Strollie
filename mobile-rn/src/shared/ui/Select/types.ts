@@ -24,4 +24,6 @@ export interface SelectProps {
 	label?: string;
 	/** Флаг состояния ошибки */
 	isInvalid?: boolean;
+	/** Текст ошибки */
+	error?: string;
 }

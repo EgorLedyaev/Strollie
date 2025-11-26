@@ -1,7 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
 
-import { sessionAtom } from '@/entities/session';
 import {
 	AppError,
 	createMutationFn,
@@ -23,10 +21,7 @@ const updateProfileRequest = createMutationFn<User, User>(payload => ({
 	data: payload,
 }));
 
-export const useUserProfileQuery = () => {
-	const sessionSnapshot = useAtomValue(sessionAtom);
-	const email = sessionSnapshot.userProfile?.email;
-
+export const useUserProfileQuery = (email?: string | null) => {
 	return useQuery({
 		queryKey: queryKeys.session.profile(),
 		enabled: Boolean(email),

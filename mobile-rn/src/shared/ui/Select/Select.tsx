@@ -27,6 +27,7 @@ export const Select: React.FC<SelectProps> = ({
 	onSelect,
 	label,
 	isInvalid = false,
+	error,
 }) => {
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState('');
@@ -251,6 +252,7 @@ export const Select: React.FC<SelectProps> = ({
 					)}
 				</Modal>
 			)}
+			{error && <AppText style={styles.errorText}>{error}</AppText>}
 		</View>
 	);
 };
@@ -275,6 +277,12 @@ const styles = StyleSheet.create({
 		maxHeight: MAX_DROPDOWN_HEIGHT + 54,
 		overflow: 'hidden',
 		position: 'absolute',
+	},
+	errorText: {
+		color: Colors.error,
+		fontSize: Fonts.f12,
+		marginLeft: 16,
+		marginTop: 4,
 	},
 	fieldRow: {
 		alignItems: 'center',

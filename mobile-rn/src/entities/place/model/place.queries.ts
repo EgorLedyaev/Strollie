@@ -4,10 +4,10 @@ import { useMemo } from 'react';
 import {
 	fetchPlaceDetailsById,
 	geocodeAddress,
+	placesKeys,
 	suggestPlaces,
 	type PlacesAPIResult,
 } from '@/shared/api';
-import { placesKeys } from '@/shared/api/query-keys';
 
 interface UseSuggestPlacesOptions {
 	limit?: number;

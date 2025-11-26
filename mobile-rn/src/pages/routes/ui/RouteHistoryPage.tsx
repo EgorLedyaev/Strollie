@@ -1,4 +1,5 @@
 import no_history from '@/assets/images/routes/no-history.png';
+import { compareDesc, parseISO, startOfToday } from 'date-fns';
 import { useAtom } from 'jotai';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import {
@@ -49,18 +50,17 @@ export const RouteHistoryPage: React.FC = () => {
 	}, [routes, favoriteRouteIds]);
 
 	const sections = useMemo(() => {
-		const startOfToday = new Date();
-		startOfToday.setHours(0, 0, 0, 0);
+		const start = startOfToday();
 
 		const today = routesWithFavorites.filter(
-			r => new Date(r.date) >= startOfToday,
+			r => parseISO(r.date) >= start,
 		);
 		const previous = routesWithFavorites.filter(
-			r => new Date(r.date) < startOfToday,
+			r => parseISO(r.date) < start,
 		);
 
 		const byDesc = (a: Route, b: Route) =>
-			+new Date(b.date) - +new Date(a.date);
+			compareDesc(parseISO(a.date), parseISO(b.date));
 
 		const result: Array<{ title: string; data: Route[] }> = [];
 		if (today.length > 0) {

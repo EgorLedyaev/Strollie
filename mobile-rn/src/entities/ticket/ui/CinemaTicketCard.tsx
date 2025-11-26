@@ -2,6 +2,8 @@ import ArrowUpRightSmallIcon from '@/assets/icons/arrow/ArrowUpRightSmallIcon';
 import ClockSmallIcon from '@/assets/icons/clock/ClockSmallIcon';
 import MarkerSmallIcon from '@/assets/icons/marker/MarkerSmallIcon';
 import CinemaIcon from '@/assets/icons/tickets/CinemaIcon';
+import { format, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 
@@ -22,15 +24,12 @@ function humanTicketNo(id: string) {
 }
 
 function formatTime(d: Date) {
-	return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	return format(d, 'HH:mm', { locale: ru });
 }
 
-function pad2(n: number) {
-	return n < 10 ? `0${n}` : `${n}`;
-}
 function formatDate(d: Date) {
 	// dd.MM.yyyy — точки вместо слэшей
-	return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
+	return format(d, 'dd.MM.yyyy', { locale: ru });
 }
 
 export const CinemaTicketCard: React.FC<Props> = ({
@@ -38,7 +37,7 @@ export const CinemaTicketCard: React.FC<Props> = ({
 	onShowQr,
 	onMorePress,
 }) => {
-	const departure = new Date(ticket.departureTime);
+	const departure = parseISO(ticket.departureTime);
 	const title = ticket.to;
 
 	return (

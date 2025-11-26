@@ -1,3 +1,4 @@
+import { isFuture, isValid, parse, startOfToday } from 'date-fns';
 import React, {
 	useCallback,
 	useEffect,
@@ -40,16 +41,8 @@ const DATE_PATTERN = /^\d{2}\.\d{2}\.\d{4}$/;
 
 function parseDate(value: string) {
 	if (!DATE_PATTERN.test(value)) return null;
-	const [dd, mm, yyyy] = value.split('.').map(Number);
-	const date = new Date(yyyy, mm - 1, dd);
-	// Проверяем корректность (например 31.02 -> невалидно)
-	if (
-		date.getFullYear() !== yyyy ||
-		date.getMonth() !== mm - 1 ||
-		date.getDate() !== dd
-	) {
-		return null;
-	}
+	const date = parse(value, 'dd.MM.yyyy', startOfToday());
+	if (!isValid(date)) return null;
 	return date;
 }
 
@@ -94,8 +87,7 @@ export const DateInput: React.FC<DateInputProps> = ({
 			const date = parseDate(v);
 			if (!date) return false;
 			if (!allowFuture) {
-				const now = new Date();
-				if (date.getTime() > now.getTime()) return false;
+				if (isFuture(date)) return false;
 			}
 			return true;
 		},

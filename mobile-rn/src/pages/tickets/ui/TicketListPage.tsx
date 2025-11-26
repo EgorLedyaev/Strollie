@@ -3,6 +3,14 @@
  * Не удалять: может понадобиться при возврате к секционному списку.
  * Новый пустой экран: см. pages/tickets-new.
  */
+import {
+	compareAsc,
+	endOfToday,
+	isAfter,
+	isWithinInterval,
+	parseISO,
+	startOfToday,
+} from 'date-fns';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { SectionList, StyleSheet, View } from 'react-native';
@@ -35,21 +43,19 @@ export const TicketListPage: React.FC = () => {
 	const router = useRouter();
 
 	const sections = useMemo(() => {
-		const startOfToday = new Date();
-		startOfToday.setHours(0, 0, 0, 0);
-		const endOfToday = new Date();
-		endOfToday.setHours(23, 59, 59, 999);
+		const todayStart = startOfToday();
+		const todayEnd = endOfToday();
 
 		const today = tickets.filter(t => {
-			const d = new Date(t.departureTime);
-			return d >= startOfToday && d <= endOfToday;
+			const d = parseISO(t.departureTime);
+			return isWithinInterval(d, { start: todayStart, end: todayEnd });
 		});
-		const future = tickets.filter(
-			t => new Date(t.departureTime) > endOfToday,
+		const future = tickets.filter(t =>
+			isAfter(parseISO(t.departureTime), todayEnd),
 		);
 
 		const byAsc = (a: Ticket, b: Ticket) =>
-			+new Date(a.departureTime) - +new Date(b.departureTime);
+			compareAsc(parseISO(a.departureTime), parseISO(b.departureTime));
 
 		const result: Array<{ title: string; data: Ticket[] }> = [];
 		if (today.length)

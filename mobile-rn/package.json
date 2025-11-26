@@ -29,6 +29,7 @@
 		"@expo/config-plugins": "~10.1.2",
 		"@expo/vector-icons": "^14.1.0",
 		"@gorhom/bottom-sheet": "^4",
+		"@hookform/resolvers": "^5.2.2",
 		"@react-native-async-storage/async-storage": "2.1.2",
 		"@react-native-community/netinfo": "^11.4.1",
 		"@react-native-community/slider": "4.5.6",
@@ -40,6 +41,7 @@
 		"@tanstack/react-query": "^5.90.10",
 		"@tanstack/react-query-persist-client": "^5.90.12",
 		"@typescript-eslint/eslint-plugin": "^8.38.0",
+		"date-fns": "^4.1.0",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-native": "^5.0.0",
 		"expo": "^53.0.22",
@@ -68,6 +70,7 @@
 		"jotai": "^2.12.5",
 		"react": "19.0.0",
 		"react-dom": "19.0.0",
+		"react-hook-form": "^7.66.1",
 		"react-native": "0.79.5",
 		"react-native-appmetrica-next": "^2.8.4",
 		"react-native-calendars": "^1.1313.0",
@@ -84,7 +87,8 @@
 		"react-native-svg": "15.11.2",
 		"react-native-web": "^0.20.0",
 		"react-native-webview": "^13.15.0",
-		"uuid": "^11.1.0"
+		"uuid": "^11.1.0",
+		"zod": "^4.1.13"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.28.0",

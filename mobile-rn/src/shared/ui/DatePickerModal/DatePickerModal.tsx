@@ -1,4 +1,6 @@
 import ArrowLeftLargeIcon from '@/assets/icons/arrow/ArrowLeftLargeIcon';
+import { format, formatISO, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Modal, Pressable, SafeAreaView, StyleSheet, View } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
@@ -60,16 +62,12 @@ interface DatePickerModalProps {
 const formatDateHeader = (
 	dateString: string,
 ): { main: string; year: string } => {
-	const date = new Date(dateString);
-	const year = date.getFullYear().toString();
+	const date = parseISO(dateString);
+	const year = format(date, 'yyyy');
 
-	const weekday = new Intl.DateTimeFormat('ru-RU', {
-		weekday: 'short',
-	}).format(date);
-	const month = new Intl.DateTimeFormat('ru-RU', { month: 'short' }).format(
-		date,
-	);
-	const day = date.getDate();
+	const weekday = format(date, 'ccc', { locale: ru });
+	const month = format(date, 'MMM', { locale: ru });
+	const day = format(date, 'd');
 
 	const formattedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
 	const formattedMonth = month.replace('.', '');
@@ -86,12 +84,13 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
 	initialDate,
 }) => {
 	const [selectedDate, setSelectedDate] = useState(
-		initialDate || new Date().toISOString().split('T')[0],
+		initialDate || formatISO(new Date(), { representation: 'date' }),
 	);
 	useEffect(() => {
 		if (visible) {
 			setSelectedDate(
-				initialDate || new Date().toISOString().split('T')[0],
+				initialDate ||
+					formatISO(new Date(), { representation: 'date' }),
 			);
 		}
 	}, [visible, initialDate]);

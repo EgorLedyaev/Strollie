@@ -1,4 +1,6 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,14 +8,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useCitiesQuery } from '@/entities/city';
 import { type User } from '@/entities/user';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
-import {
-	AppButton,
-	AppText,
-	Input,
-	Select,
-	type SelectOption,
-} from '@/shared/ui';
+import { AppButton, AppText, Input, Select } from '@/shared/ui';
 
+import { profileSchema, type ProfileSchema } from '../model/schema';
 import { AvatarUploader } from './AvatarUploader';
 import { ProfileEditOverlay } from './ProfileEditOverlay';
 
@@ -48,8 +45,7 @@ export function EditProfileForm({
 
 	const [visible, setVisible] = useState(false);
 
-	// Инициализируем локальное состояние из user один раз
-	const initialData = useMemo(
+	const defaultValues = useMemo(
 		() => ({
 			firstName: user.firstName || '',
 			lastName: user.lastName || '',
@@ -59,31 +55,22 @@ export function EditProfileForm({
 			birthDate: user.birthDate || '',
 			photo: user.photo,
 		}),
-		[user.user_id],
+		[user],
 	);
 
-	const [userData, setUserData] = useState<UserProfileData>(initialData);
+	const { control, handleSubmit, reset } = useForm<ProfileSchema>({
+		resolver: zodResolver(profileSchema),
+		defaultValues,
+		mode: 'onChange',
+	});
 
 	useEffect(() => {
-		setUserData(initialData);
-	}, [initialData]);
+		reset(defaultValues);
+	}, [defaultValues, reset]);
 
-	const handleChange = (field: keyof UserProfileData, value: string) => {
-		setUserData(prev => ({ ...prev, [field]: value }));
-	};
-
-	const handleCitySelect = (option: SelectOption) => {
-		handleChange('city', option.value);
-	};
-
-	const handleAvatarChange = (uri: string | null) => {
-		if (uri) {
-			handleChange('photo', uri);
-		}
-	};
-
-	const handleSave = () => {
-		onSave(userData);
+	const handleSave = (data: ProfileSchema) => {
+		onSave(data as UserProfileData);
+		setVisible(false);
 	};
 
 	const formatBirthdate = (text: string) => {
@@ -94,7 +81,7 @@ export function EditProfileForm({
 		} else if (cleaned.length > 2) {
 			formatted = `${cleaned.slice(0, 2)}.${cleaned.slice(2)}`;
 		}
-		handleChange('birthDate', formatted);
+		return formatted;
 	};
 
 	return (
@@ -107,68 +94,128 @@ export function EditProfileForm({
 				contentContainerStyle={styles.scrollContent}
 				showsVerticalScrollIndicator={false}
 			>
-				<AvatarUploader onAvatarChange={handleAvatarChange} />
+				<Controller
+					control={control}
+					name='photo'
+					render={({ field: { onChange, value } }) => (
+						<AvatarUploader
+							onAvatarChange={uri => onChange(uri)}
+							value={value}
+						/>
+					)}
+				/>
 
 				<View style={styles.form}>
 					<View style={styles.field}>
 						<AppText style={styles.label}>Имя</AppText>
-						<Input
-							value={userData.firstName}
-							onChangeText={value =>
-								handleChange('firstName', value)
-							}
+						<Controller
+							control={control}
+							name='firstName'
+							render={({
+								field: { onChange, value },
+								fieldState: { error },
+							}) => (
+								<Input
+									value={value}
+									onChangeText={onChange}
+									error={error?.message}
+								/>
+							)}
 						/>
 					</View>
 					<View style={styles.field}>
 						<AppText style={styles.label}>Фамилия</AppText>
-						<Input
-							value={userData.lastName}
-							onChangeText={value =>
-								handleChange('lastName', value)
-							}
+						<Controller
+							control={control}
+							name='lastName'
+							render={({
+								field: { onChange, value },
+								fieldState: { error },
+							}) => (
+								<Input
+									value={value}
+									onChangeText={onChange}
+									error={error?.message}
+								/>
+							)}
 						/>
 					</View>
 					<View style={styles.field}>
 						<AppText style={styles.label}>Никнейм</AppText>
-						<Input
-							value={userData.nickname}
-							onChangeText={value =>
-								handleChange('nickname', value)
-							}
+						<Controller
+							control={control}
+							name='nickname'
+							render={({
+								field: { onChange, value },
+								fieldState: { error },
+							}) => (
+								<Input
+									value={value}
+									onChangeText={onChange}
+									error={error?.message}
+								/>
+							)}
 						/>
 					</View>
 					<View style={styles.field}>
 						<AppText style={styles.label}>
 							Электронная почта
 						</AppText>
-						<Input
-							value={userData.email}
-							onChangeText={value => handleChange('email', value)}
-							editable={false}
-							style={styles.emailInput}
+						<Controller
+							control={control}
+							name='email'
+							render={({ field: { value } }) => (
+								<Input
+									value={value}
+									editable={false}
+									style={styles.emailInput}
+								/>
+							)}
 						/>
 					</View>
 					<View style={styles.field}>
 						<AppText style={styles.label}>Город</AppText>
-						<Select
-							options={cityOptions}
-							value={userData.city}
-							onSelect={handleCitySelect}
-							placeholder={
-								isLoadingCities || isRefetching
-									? 'Загрузка...'
-									: 'Выберите город'
-							}
+						<Controller
+							control={control}
+							name='city'
+							render={({
+								field: { onChange, value },
+								fieldState: { error },
+							}) => (
+								<Select
+									options={cityOptions}
+									value={value}
+									onSelect={option => onChange(option.value)}
+									placeholder={
+										isLoadingCities || isRefetching
+											? 'Загрузка...'
+											: 'Выберите город'
+									}
+									error={error?.message}
+								/>
+							)}
 						/>
 					</View>
 					<View style={styles.field}>
 						<AppText style={styles.label}>Дата рождения</AppText>
-						<Input
-							value={userData.birthDate}
-							onChangeText={formatBirthdate}
-							placeholder='ДД.ММ.ГГГГ'
-							keyboardType='numeric'
-							maxLength={10}
+						<Controller
+							control={control}
+							name='birthDate'
+							render={({
+								field: { onChange, value },
+								fieldState: { error },
+							}) => (
+								<Input
+									value={value}
+									onChangeText={text =>
+										onChange(formatBirthdate(text))
+									}
+									placeholder='ДД.ММ.ГГГГ'
+									keyboardType='numeric'
+									maxLength={10}
+									error={error?.message}
+								/>
+							)}
 						/>
 					</View>
 				</View>
@@ -184,7 +231,7 @@ export function EditProfileForm({
 			<ProfileEditOverlay
 				visible={visible}
 				onClose={() => setVisible(false)}
-				onSave={handleSave}
+				onSave={handleSubmit(handleSave)}
 				isLoading={isSaving}
 				onCancel={() => setVisible(false)}
 			/>

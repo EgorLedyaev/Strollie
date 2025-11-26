@@ -1,4 +1,11 @@
 import MoreArrowIcon from '@/assets/icons/MoreArrowIcon';
+import {
+	compareDesc,
+	format,
+	isBefore,
+	parseISO,
+	startOfToday,
+} from 'date-fns';
 import { Link } from 'expo-router';
 import React, { useMemo } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -22,11 +29,8 @@ interface TripListProps {
 	tickets: Ticket[];
 }
 
-function pad2(n: number) {
-	return n < 10 ? `0${n}` : `${n}`;
-}
 function formatDate(d: Date) {
-	return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}`;
+	return format(d, 'dd.MM.yyyy');
 }
 
 const TripCard: React.FC<{ trip: TripVm; isCompleted?: boolean }> = ({
@@ -70,8 +74,8 @@ export const TripList: React.FC<TripListProps> = ({ trips, tickets }) => {
 			const displayTitle = firstTicket
 				? `Поездка в ${firstTicket.to}`
 				: t.title || 'Поездка';
-			const startDate = new Date(t.startDate);
-			const endDate = new Date(t.endDate);
+			const startDate = parseISO(t.startDate);
+			const endDate = parseISO(t.endDate);
 
 			return {
 				id: t.id,
@@ -83,14 +87,13 @@ export const TripList: React.FC<TripListProps> = ({ trips, tickets }) => {
 			};
 		});
 
-		const startOfToday = new Date();
-		startOfToday.setHours(0, 0, 0, 0);
+		const start = startOfToday();
 
-		const actual = tripsVm.filter(t => t.endDate >= startOfToday);
-		const completed = tripsVm.filter(t => t.endDate < startOfToday);
+		const actual = tripsVm.filter(t => !isBefore(t.endDate, start));
+		const completed = tripsVm.filter(t => isBefore(t.endDate, start));
 
 		const byEndDateDesc = (a: TripVm, b: TripVm) =>
-			b.endDate.getTime() - a.endDate.getTime();
+			compareDesc(a.endDate, b.endDate);
 
 		const result: Array<{ title: string; data: TripVm[] }> = [];
 		if (actual.length > 0) {
