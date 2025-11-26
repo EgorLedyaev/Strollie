@@ -49,7 +49,7 @@ public class GisApiClient {
             }
             log.info(">>> RESOLVED CITY ID: {}", cityId);
 
-            // 2. Получаем ID рубрик
+            // 2. Получаем ID рубрик (с учетом сортировки по популярности)
             List<String> rubricIds = resolveRubricIds(categoryNames, cityId);
             if (rubricIds.isEmpty()) {
                 log.info("!!! No rubric IDs found for categories: {} in city: {}", categoryNames, city);
@@ -57,10 +57,11 @@ public class GisApiClient {
             }
             log.info(">>> RESOLVED RUBRIC IDs: {}", rubricIds);
 
-            // 3. Вычисляем лимит на каждую категорию, чтобы получить разнообразие
-            // Минимум 5 мест на категорию, чтобы было из чего выбрать, но не меньше 1
+            // 3. Вычисляем лимит на каждую категорию.
+            // Например, если лимит 10 и 2 категории -> запрашиваем по 5 мест каждой.
+            // Минимум 5, чтобы у LLM был выбор.
             int limitPerCategory = Math.max(5, totalPageSize / Math.max(1, rubricIds.size()));
-            log.info(">>> STRATEGY: Fetching {} items per category separately", limitPerCategory);
+            log.info(">>> STRATEGY: Fetching {} items per category separately to ensure diversity", limitPerCategory);
 
             // 4. Выполняем поиск ПАРАЛЛЕЛЬНО для каждой рубрики отдельно
             return Flux.fromIterable(rubricIds)
@@ -68,8 +69,8 @@ public class GisApiClient {
                     .collectList()
                     .block()
                     .stream()
-                    .flatMap(List::stream) // Объединяем списки результатов
-                    .distinct() // Убираем дубликаты (если одно место в разных рубриках)
+                    .flatMap(List::stream) // Объединяем результаты всех запросов в один плоский список
+                    .distinct() // Убираем дубликаты, если одно место попало в разные рубрики
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
@@ -87,8 +88,8 @@ public class GisApiClient {
                 .scheme("https")
                 .host(extractHost(baseUrl))
                 .path(ITEMS_ENDPOINT)
-                .queryParam("rubric_id", rubricId) // Запрашиваем только одну рубрику
-                // .queryParam("city_id", cityId) // city_id часто мешает при поиске по радиусу, лучше убрать
+                .queryParam("rubric_id", rubricId) // Запрашиваем строго одну рубрику
+                // .queryParam("city_id", cityId) // Убрано специально: мешает поиску по радиусу на границах городов
                 .queryParam("point", lon + "," + lat)
                 .queryParam("radius", radiusMeters)
                 .queryParam("page_size", pageSize)
@@ -106,6 +107,7 @@ public class GisApiClient {
                     // log.info(">>> ITEMS STATUS (Rubric {}): {}", rubricId, resp.statusCode());
                     return resp.bodyToMono(String.class)
                             .map(body -> {
+                                // log.info(">>> ITEMS RAW BODY (Rubric {}): {}", rubricId, body); // Раскомментировать при необходимости
                                 try {
                                     return mapper.readValue(body, GisItemsResponse.class);
                                 } catch (Exception ex) {
@@ -162,20 +164,24 @@ public class GisApiClient {
                     .build()
                     .toUriString();
 
-            // log.info(">>> REGION REQUEST: {}", sanitizeUrl(regionUrl));
+            log.info(">>> REGION REQUEST: {}", sanitizeUrl(regionUrl));
 
             return webClient.get()
                     .uri(regionUrl)
                     .accept(MediaType.APPLICATION_JSON)
-                    .exchangeToMono(resp -> resp.bodyToMono(String.class)
-                            .map(body -> {
-                                try {
-                                    return mapper.readValue(body, GisRegionSearchResponse.class);
-                                } catch (Exception ex) {
-                                    log.error("!!! Failed to parse REGION response: {}", ex.getMessage());
-                                    return null;
-                                }
-                            }))
+                    .exchangeToMono(resp -> {
+                        log.info(">>> REGION STATUS: {}", resp.statusCode());
+                        return resp.bodyToMono(String.class)
+                                .map(body -> {
+                                    log.info(">>> REGION RAW BODY: {}", body);
+                                    try {
+                                        return mapper.readValue(body, GisRegionSearchResponse.class);
+                                    } catch (Exception ex) {
+                                        log.error("!!! Failed to parse REGION response: {}", ex.getMessage());
+                                        return null;
+                                    }
+                                });
+                    })
                     .map(resp -> {
                         if (resp.getResult() != null && resp.getResult().getItems() != null && !resp.getResult().getItems().isEmpty()) {
                             String id = resp.getResult().getItems().get(0).getId();
@@ -213,25 +219,40 @@ public class GisApiClient {
                         return webClient.get()
                                 .uri(rubricUrl)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .exchangeToMono(resp -> resp.bodyToMono(String.class)
-                                        .flatMap(body -> {
-                                            try {
-                                                GisRubricSearchResponse parsed = mapper.readValue(body, GisRubricSearchResponse.class);
-                                                return Mono.justOrEmpty(parsed);
-                                            } catch (Exception ex) {
-                                                log.error("!!! Failed to parse RUBRIC response [{}]: {}", cat, ex.getMessage());
-                                                return Mono.empty();
-                                            }
-                                        }))
-                                .onErrorResume(e -> Mono.empty());
+                                .exchangeToMono(resp -> {
+                                    log.info(">>> RUBRIC STATUS [{}]: {}", cat, resp.statusCode());
+                                    return resp.bodyToMono(String.class)
+                                            .flatMap(body -> {
+                                                log.info(">>> RUBRIC RAW BODY [{}]: {}", cat, body);
+                                                try {
+                                                    GisRubricSearchResponse parsed = mapper.readValue(body, GisRubricSearchResponse.class);
+                                                    return Mono.justOrEmpty(parsed);
+                                                } catch (Exception ex) {
+                                                    log.error("!!! Failed to parse RUBRIC response [{}]: {}", cat, ex.getMessage());
+                                                    return Mono.empty();
+                                                }
+                                            });
+                                })
+                                .onErrorResume(e -> {
+                                    log.warn("!!! Error fetching rubric [{}]: {}", cat, e.getMessage());
+                                    return Mono.empty();
+                                });
                     })
                     .flatMap(resp -> {
                         if (resp.getResult() != null && resp.getResult().getItems() != null && !resp.getResult().getItems().isEmpty()) {
-                            // !!! ВАЖНОЕ ИЗМЕНЕНИЕ: Сортировка по популярности (branch_count) !!!
-                            // Мы ищем элемент с максимальным branch_count
+
+                            // ЛОГИРУЕМ ВСЕХ КАНДИДАТОВ
+                            log.info("--- Candidates for current category ---");
+                            resp.getResult().getItems().forEach(item ->
+                                    log.info("   -> Candidate: ID={}, Name='{}', BranchCount={}",
+                                            item.getId(), item.getName(), item.getBranchCount())
+                            );
+
+                            // СОРТИРОВКА ПО ПОПУЛЯРНОСТИ (branch_count)
+                            // Чтобы выбрать самую крупную категорию (например "Рестораны", а не "Рестораны на крыше")
                             return Flux.fromIterable(resp.getResult().getItems())
                                     .sort(Comparator.comparingInt(GisRubricSearchResponse.Item::getBranchCount).reversed())
-                                    .next() // Берем самый популярный
+                                    .next() // Берем первый (самый популярный)
                                     .map(item -> {
                                         log.info(">>> SELECTED RUBRIC for query: Name='{}', ID={}, Count={}",
                                                 item.getName(), item.getId(), item.getBranchCount());

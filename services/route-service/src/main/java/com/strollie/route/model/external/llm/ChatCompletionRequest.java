@@ -13,6 +13,7 @@ public class ChatCompletionRequest {
     private String model;
     private List<Message> messages;
     private Integer max_tokens;
+    private Double temperature;
 
     @Data
     @NoArgsConstructor
