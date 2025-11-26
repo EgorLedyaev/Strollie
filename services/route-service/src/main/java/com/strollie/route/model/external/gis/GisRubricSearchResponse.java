@@ -1,6 +1,7 @@
 package com.strollie.route.model.external.gis;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -21,5 +22,7 @@ public class GisRubricSearchResponse {
     public static class Item {
         private String id;
         private String name;
+        @JsonProperty("branch_count")
+        private int branchCount;
     }
 }

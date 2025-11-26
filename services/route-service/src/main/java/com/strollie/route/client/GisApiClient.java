@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -36,8 +37,8 @@ public class GisApiClient {
     private final CityRegionCache cityCache;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public List<PlaceDto> searchPlaces(String city, List<String> categoryNames, double lat, double lon, int radiusMeters, int pageSize) {
-        log.info(">>> START SEARCH: City='{}', Categories={}, Radius={}, PageSize={}", city, categoryNames, radiusMeters, pageSize);
+    public List<PlaceDto> searchPlaces(String city, List<String> categoryNames, double lat, double lon, int radiusMeters, int totalPageSize) {
+        log.info(">>> START SEARCH: City='{}', Categories={}, Radius={}, TotalLimit={}", city, categoryNames, radiusMeters, totalPageSize);
 
         try {
             // 1. Получаем ID города
@@ -56,59 +57,75 @@ public class GisApiClient {
             }
             log.info(">>> RESOLVED RUBRIC IDs: {}", rubricIds);
 
-            String rubricParam = String.join(",", rubricIds);
+            // 3. Вычисляем лимит на каждую категорию, чтобы получить разнообразие
+            // Минимум 5 мест на категорию, чтобы было из чего выбрать, но не меньше 1
+            int limitPerCategory = Math.max(5, totalPageSize / Math.max(1, rubricIds.size()));
+            log.info(">>> STRATEGY: Fetching {} items per category separately", limitPerCategory);
 
-            // 3. Формируем запрос на поиск мест
-            String baseUrl = config.getGis().getBaseUrl();
-            String itemsUrl = UriComponentsBuilder.newInstance()
-                    .scheme("https")
-                    .host(extractHost(baseUrl))
-                    .path(ITEMS_ENDPOINT)
-                    .queryParam("rubric_id", rubricParam)
-                    // .queryParam("city_id", cityId) // Можно попробовать закомментировать, если поиск по радиусу не работает
-                    .queryParam("point", lon + "," + lat)
-                    .queryParam("radius", radiusMeters)
-                    .queryParam("page_size", pageSize)
-                    .queryParam("fields", "items.point,items.rubrics")
-                    .queryParam("key", apiKey())
-                    .build()
-                    .toUriString();
-
-            log.info(">>> ITEMS REQUEST URL: {}", sanitizeUrl(itemsUrl));
-
-            GisItemsResponse response = webClient.get()
-                    .uri(itemsUrl)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchangeToMono(resp -> {
-                        log.info(">>> ITEMS RESPONSE STATUS: {}", resp.statusCode());
-                        return resp.bodyToMono(String.class)
-                                .map(body -> {
-                                    log.info(">>> ITEMS RAW BODY: {}", body); // ВЫВОДИМ ПОЛНЫЙ ОТВЕТ
-                                    try {
-                                        return mapper.readValue(body, GisItemsResponse.class);
-                                    } catch (Exception ex) {
-                                        log.error("!!! Failed to parse ITEMS response: {}", ex.getMessage());
-                                        return null;
-                                    }
-                                });
-                    })
-                    .block();
-
-            if (response == null || response.getResult() == null || response.getResult().getItems() == null) {
-                log.warn("!!! Items result is empty or null");
-                return Collections.emptyList();
-            }
-
-            log.info(">>> ITEMS FOUND COUNT: {}", response.getResult().getItems().size());
-
-            return response.getResult().getItems().stream()
-                    .map(this::mapToPlaceDto)
+            // 4. Выполняем поиск ПАРАЛЛЕЛЬНО для каждой рубрики отдельно
+            return Flux.fromIterable(rubricIds)
+                    .flatMap(rubricId -> searchItemsForSingleRubric(rubricId, lat, lon, radiusMeters, limitPerCategory))
+                    .collectList()
+                    .block()
+                    .stream()
+                    .flatMap(List::stream) // Объединяем списки результатов
+                    .distinct() // Убираем дубликаты (если одно место в разных рубриках)
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
             log.error("!!! Error during searchPlaces execution. City: {}, Error: {}", city, e.getMessage(), e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Выполняет поиск мест для ОДНОЙ конкретной рубрики.
+     */
+    private Mono<List<PlaceDto>> searchItemsForSingleRubric(String rubricId, double lat, double lon, int radiusMeters, int pageSize) {
+        String baseUrl = config.getGis().getBaseUrl();
+        String itemsUrl = UriComponentsBuilder.newInstance()
+                .scheme("https")
+                .host(extractHost(baseUrl))
+                .path(ITEMS_ENDPOINT)
+                .queryParam("rubric_id", rubricId) // Запрашиваем только одну рубрику
+                // .queryParam("city_id", cityId) // city_id часто мешает при поиске по радиусу, лучше убрать
+                .queryParam("point", lon + "," + lat)
+                .queryParam("radius", radiusMeters)
+                .queryParam("page_size", pageSize)
+                .queryParam("fields", "items.point,items.rubrics")
+                .queryParam("key", apiKey())
+                .build()
+                .toUriString();
+
+        log.info(">>> ITEMS REQUEST (Rubric {}): {}", rubricId, sanitizeUrl(itemsUrl));
+
+        return webClient.get()
+                .uri(itemsUrl)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchangeToMono(resp -> {
+                    // log.info(">>> ITEMS STATUS (Rubric {}): {}", rubricId, resp.statusCode());
+                    return resp.bodyToMono(String.class)
+                            .map(body -> {
+                                try {
+                                    return mapper.readValue(body, GisItemsResponse.class);
+                                } catch (Exception ex) {
+                                    log.error("!!! Failed to parse ITEMS response for rubric {}: {}", rubricId, ex.getMessage());
+                                    return null;
+                                }
+                            });
+                })
+                .map(response -> {
+                    if (response == null || response.getResult() == null || response.getResult().getItems() == null) {
+                        return Collections.<PlaceDto>emptyList();
+                    }
+                    return response.getResult().getItems().stream()
+                            .map(this::mapToPlaceDto)
+                            .collect(Collectors.toList());
+                })
+                .onErrorResume(e -> {
+                    log.error("Error fetching items for rubric {}: {}", rubricId, e.getMessage());
+                    return Mono.just(Collections.emptyList());
+                });
     }
 
     private PlaceDto mapToPlaceDto(GisItemsResponse.Item item) {
@@ -145,32 +162,26 @@ public class GisApiClient {
                     .build()
                     .toUriString();
 
-            log.info(">>> REGION REQUEST: {}", sanitizeUrl(regionUrl));
+            // log.info(">>> REGION REQUEST: {}", sanitizeUrl(regionUrl));
 
             return webClient.get()
                     .uri(regionUrl)
                     .accept(MediaType.APPLICATION_JSON)
-                    .exchangeToMono(resp -> {
-                        log.info(">>> REGION STATUS: {}", resp.statusCode());
-                        return resp.bodyToMono(String.class)
-                                .map(body -> {
-                                    log.info(">>> REGION RAW BODY: {}", body);
-                                    try {
-                                        return mapper.readValue(body, GisRegionSearchResponse.class);
-                                    } catch (Exception ex) {
-                                        log.error("!!! Failed to parse REGION response: {}", ex.getMessage());
-                                        return null;
-                                    }
-                                });
-                    })
+                    .exchangeToMono(resp -> resp.bodyToMono(String.class)
+                            .map(body -> {
+                                try {
+                                    return mapper.readValue(body, GisRegionSearchResponse.class);
+                                } catch (Exception ex) {
+                                    log.error("!!! Failed to parse REGION response: {}", ex.getMessage());
+                                    return null;
+                                }
+                            }))
                     .map(resp -> {
                         if (resp.getResult() != null && resp.getResult().getItems() != null && !resp.getResult().getItems().isEmpty()) {
                             String id = resp.getResult().getItems().get(0).getId();
-                            log.info("Resolved City ID: {}", id);
                             cityCache.put(city, id);
                             return id;
                         }
-                        log.warn("!!! Region search returned empty items");
                         return "";
                     })
                     .block();
@@ -202,41 +213,30 @@ public class GisApiClient {
                         return webClient.get()
                                 .uri(rubricUrl)
                                 .accept(MediaType.APPLICATION_JSON)
-                                .exchangeToMono(resp -> {
-                                    log.info(">>> RUBRIC STATUS [{}]: {}", cat, resp.statusCode());
-                                    return resp.bodyToMono(String.class)
-                                            .flatMap(body -> {
-                                                // ЛОГИРУЕМ ТЕЛО, ЧТОБЫ ВИДЕТЬ branch_count
-                                                log.info(">>> RUBRIC RAW BODY [{}]: {}", cat, body);
-                                                try {
-                                                    GisRubricSearchResponse parsed = mapper.readValue(body, GisRubricSearchResponse.class);
-                                                    return Mono.justOrEmpty(parsed);
-                                                } catch (Exception ex) {
-                                                    log.error("!!! Failed to parse RUBRIC response [{}]: {}", cat, ex.getMessage());
-                                                    return Mono.empty();
-                                                }
-                                            });
-                                })
-                                .onErrorResume(e -> {
-                                    log.error("!!! Error fetching rubric [{}]: {}", cat, e.getMessage());
-                                    return Mono.empty();
-                                });
+                                .exchangeToMono(resp -> resp.bodyToMono(String.class)
+                                        .flatMap(body -> {
+                                            try {
+                                                GisRubricSearchResponse parsed = mapper.readValue(body, GisRubricSearchResponse.class);
+                                                return Mono.justOrEmpty(parsed);
+                                            } catch (Exception ex) {
+                                                log.error("!!! Failed to parse RUBRIC response [{}]: {}", cat, ex.getMessage());
+                                                return Mono.empty();
+                                            }
+                                        }))
+                                .onErrorResume(e -> Mono.empty());
                     })
                     .flatMap(resp -> {
                         if (resp.getResult() != null && resp.getResult().getItems() != null && !resp.getResult().getItems().isEmpty()) {
-                            // ЛОГИРУЕМ ВСЕ НАЙДЕННЫЕ ВАРИАНТЫ ДЛЯ КАТЕГОРИИ
-                            log.info("--- Candidates for current category ---");
-                            resp.getResult().getItems().forEach(item ->
-                                            log.info("   -> Candidate: ID={}, Name='{}'", item.getId(), item.getName())
-                                    // Если бы было поле branch_count в DTO, мы бы вывели его здесь: item.getBranchCount()
-                            );
-
-                            // Пока берем первый попавшийся (0), но в логах увидим, были ли другие
-                            String selectedId = resp.getResult().getItems().get(0).getId();
-                            String selectedName = resp.getResult().getItems().get(0).getName();
-
-                            log.info(">>> SELECTED RUBRIC: ID={}, Name='{}'", selectedId, selectedName);
-                            return Mono.just(selectedId);
+                            // !!! ВАЖНОЕ ИЗМЕНЕНИЕ: Сортировка по популярности (branch_count) !!!
+                            // Мы ищем элемент с максимальным branch_count
+                            return Flux.fromIterable(resp.getResult().getItems())
+                                    .sort(Comparator.comparingInt(GisRubricSearchResponse.Item::getBranchCount).reversed())
+                                    .next() // Берем самый популярный
+                                    .map(item -> {
+                                        log.info(">>> SELECTED RUBRIC for query: Name='{}', ID={}, Count={}",
+                                                item.getName(), item.getId(), item.getBranchCount());
+                                        return item.getId();
+                                    });
                         }
                         log.warn("!!! No items found in rubric response");
                         return Mono.empty();
