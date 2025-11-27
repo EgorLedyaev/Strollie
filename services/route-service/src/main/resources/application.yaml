@@ -19,14 +19,14 @@ api:
     provider: openrouter
     base-url: https://openrouter.ai/api/v1
     key: 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
-    model: openai/gpt-oss-safeguard-20b
+    model: openai/gpt-oss-20b:free
     max-tokens: 1000
     timeout: 30000
 
 routing:
-  default-radius-meters: 3000
+  default-radius-meters: 5000
   min-places: 3
-  max-places: 8
+  max-places: 10
   max-route-duration-hours: 5
 
 springdoc:

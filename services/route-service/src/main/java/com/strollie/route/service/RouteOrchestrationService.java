@@ -1,5 +1,6 @@
 package com.strollie.route.service;
 
+import com.strollie.route.client.LlmApiClient;
 import com.strollie.route.model.dto.PlaceDto;
 import com.strollie.route.model.dto.RouteRequest;
 import com.strollie.route.model.dto.RouteResponse;
@@ -17,6 +18,7 @@ public class RouteOrchestrationService {
 
     private final GisPlaceService gisPlaceService;
     private final LlmFilterService llmFilterService;
+    private final LlmApiClient llmApiClient;
     private final TspSolverService tspSolverService;
 
     public RouteResponse generateRoute(RouteRequest request) {
@@ -28,7 +30,7 @@ public class RouteOrchestrationService {
                 request.getDurationHours());
 
         // Этап 1: Поиск в GIS
-        log.info("Step 1/4: Fetching candidates from GIS service...");
+        log.info("Step 1/5: Fetching candidates from GIS service...");
         List<PlaceDto> candidates = gisPlaceService.findPlacesByCategories(
                 request.getCity(),
                 request.getCategories(),
@@ -43,7 +45,7 @@ public class RouteOrchestrationService {
         }
 
         // Этап 2: Фильтрация через LLM
-        log.info("Step 2/4: Filtering candidates via LLM service. Input size: {}", candidates.size());
+        log.info("Step 2/5: Filtering candidates via LLM service. Input size: {}", candidates.size());
         List<PlaceDto> filtered = llmFilterService.filterAndRankPlaces(
                 candidates,
                 request.getDescription(),
@@ -60,12 +62,17 @@ public class RouteOrchestrationService {
         start.setLon(request.getStartPoint().getLon());
 
         // Этап 4: Оптимизация маршрута (TSP)
-        log.info("Step 3/4: Optimizing route order (TSP) for {} points (including start)...", filtered.size() + 1);
+        log.info("Step 3/5: Optimizing route order (TSP) for {} points (including start)...", filtered.size() + 1);
         List<PlaceDto> ordered = tspSolverService.optimizeRoute(start, filtered);
         log.info("Route optimization completed. Final sequence size: {}", ordered.size());
 
+        // Этап 5: Генерация описания (LLM)
+        log.info("Step 4/5: Generating route description...");
+        String routeDescription = llmApiClient.generateRouteDescription(ordered, request.getDescription());
+        log.info("Description generated.");
+
         // Генерация ссылки
-        log.info("Step 4/4: Building navigation link...");
+        log.info("Step 5/5: Building navigation link...");
         String url = DirectionsLinkBuilder.build2GisLink(request.getCity(), ordered);
         log.info("Directions link generated: {}", url);
 
@@ -73,6 +80,7 @@ public class RouteOrchestrationService {
 
         return RouteResponse.builder()
                 .places(ordered)
+                .description(routeDescription) // Записываем описание в ответ
                 .directionsUrl(url)
                 .build();
     }

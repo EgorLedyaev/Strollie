@@ -12,6 +12,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RouteResponse {
+
     private List<PlaceDto> places;
+
     private String directionsUrl;
+
+    private String description;
+
 }

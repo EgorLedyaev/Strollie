@@ -1,165 +1,168 @@
 package com.strollie.route.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.strollie.route.config.ApiKeysConfig;
 import com.strollie.route.model.dto.PlaceDto;
-import com.strollie.route.model.external.llm.ChatCompletionRequest;
-import com.strollie.route.model.external.llm.ChatCompletionResponse;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class LlmApiClient {
+
     private final WebClient webClient;
-    private final ApiKeysConfig config;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ApiKeysConfig apiKeysConfig;
+    private final ObjectMapper objectMapper;
 
-    private static final Pattern JSON_BLOCK_PATTERN = Pattern.compile("```(?:json)?\\s*(\\[.*])\\s*```", Pattern.DOTALL);
-
-    public LlmApiClient(WebClient webClient, ApiKeysConfig config) {
-        this.webClient = webClient;
-        this.config = config;
-    }
-
-    public List<PlaceDto> filterPlaces(List<PlaceDto> places, String userDescription, int durationHours) {
-        if (places.isEmpty()) return places;
-
-        String placesJson;
-        try {
-            List<PlaceCompactDto> compactList = places.stream()
-                    .map(p -> new PlaceCompactDto(p.getId(), p.getName(), p.getCategory()))
-                    .collect(Collectors.toList());
-            placesJson = mapper.writeValueAsString(compactList);
-        } catch (Exception e) {
-            log.error("Error serializing places for LLM", e);
-            return places;
+    public List<PlaceDto> filterPlaces(List<PlaceDto> candidates, String userDescription, int durationHours) {
+        if (candidates == null || candidates.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        // Оптимальное количество мест
-        int minPlaces = Math.max(2, durationHours / 2);
-        int maxPlaces = Math.min(durationHours + 2, 7);
+        try {
+            String candidatesJson = objectMapper.writeValueAsString(candidates);
 
-        // Проверка: просил ли пользователь еду?
-        boolean isFoodRequested = userDescription.toLowerCase().matches(".*(еда|ужин|обед|завтрак|ресторан|кафе|перекус|поесть|голод).*");
-        String foodInstruction = isFoodRequested
-                ? "ПОЛЬЗОВАТЕЛЬ ПРОСИТ ЕДУ! Ты ОБЯЗАН включить в маршрут МИНИМУМ 1 заведение общественного питания, даже если они не идеальны."
-                : "Если уместно, добавь 1 место для перекуса.";
+            String systemPrompt = """
+                    You are a smart travel assistant.
+                    Filter the provided list of places based on the user's description and available time.
+                    Sort them by relevance.
+                    
+                    IMPORTANT: You must output strictly valid JSON in the following format:
+                    {
+                      "places": [
+                        ... (list of selected PlaceDto objects)
+                      ]
+                    }
+                    Do not include any markdown formatting, backticks, or explanatory text. Just the JSON object.
+                    """;
 
-        String prompt = String.format("""
-                        Ты — опытный гид. Составь идеальный маршрут из предложенных кандидатов.
-                        
-                        ВХОДНЫЕ ДАННЫЕ:
-                        1. Пожелание: "%s"
-                        2. Время: %d ч.
-                        3. Кандидаты (JSON):
-                        %s
-                        
-                        ПРАВИЛА ОТБОРА:
-                        1. КОЛИЧЕСТВО: Выбери от %d до %d мест.
-                        2. БАЛАНС: Маршрут должен быть разнообразным (прогулка + культура + еда). Не выбирай 3 парка подряд или 3 музея подряд.
-                        3. %s
-                        4. ЕДА (ВАЖНО):
-                           - Категории в данных могут врать (например, хороший ресторан может быть помечен как "Быстрое питание").
-                           - СМОТРИ НА НАЗВАНИЕ!
-                           - Если запрос романтический: Исключай ТОЛЬКО явный масс-маркет (Вкусно и точка, KFC, Burger King, Шаурма).
-                           - Уютные бургерные, бистро или кофейни — ОСТАВЛЯЙ, если нет лучших альтернатив.
-                           - В маршруте должно быть не более 2-х мест с едой (одно основное, одно — кофе/десерт).
-                        
-                        ФОРМАТ ОТВЕТА (JSON массив):
-                        [{"placeId": "...", "reason": "..."}]
-                        """,
-                userDescription,
-                durationHours,
-                placesJson,
-                minPlaces,
-                maxPlaces,
-                foodInstruction
-        );
+            String userPrompt = String.format(
+                    "User description: %s\nAvailable duration: %d hours\n\nCandidates list JSON: %s",
+                    userDescription,
+                    durationHours,
+                    candidatesJson
+            );
 
-        ChatCompletionRequest req = new ChatCompletionRequest();
-        req.setModel(config.getLlm().getModel());
-        req.setMax_tokens(config.getLlm().getMaxTokens());
-        req.setTemperature(0.5); // Чуть повышаем, чтобы он не боялся выбирать
+            String responseContent = callLlm(systemPrompt, userPrompt);
 
-        List<ChatCompletionRequest.Message> msgs = new ArrayList<>();
-        msgs.add(new ChatCompletionRequest.Message("system", "Ты помощник, который создает сбалансированные маршруты. Ты умеешь отличать плохой фастфуд от хорошего кафе по названию."));
-        msgs.add(new ChatCompletionRequest.Message("user", prompt));
-        req.setMessages(msgs);
+            if (responseContent == null) return candidates;
+
+            LlmResponseWrapper wrapper = objectMapper.readValue(responseContent, LlmResponseWrapper.class);
+            return wrapper.getPlaces() != null ? wrapper.getPlaces() : candidates;
+
+        } catch (JsonProcessingException e) {
+            log.error("JSON processing error while filtering places", e);
+            return candidates;
+        } catch (Exception e) {
+            log.error("Unexpected error during LLM request", e);
+            return candidates;
+        }
+    }
+
+    public String generateRouteDescription(List<PlaceDto> route, String userDescription) {
+        if (route == null || route.isEmpty()) {
+            return "Маршрут не найден.";
+        }
 
         try {
-            log.info(">>> LLM Request. Candidates: {}, Food requested: {}", places.size(), isFoodRequested);
+            String routeJson = objectMapper.writeValueAsString(route);
 
-            WebClient wc = webClient.mutate().baseUrl(config.getLlm().getBaseUrl()).build();
-            ChatCompletionResponse resp = wc.post()
-                    .uri("/chat/completions")
-                    .header("Authorization", "Bearer " + config.getLlm().getKey())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .bodyValue(req)
-                    .retrieve()
-                    .bodyToMono(ChatCompletionResponse.class)
-                    .block();
+            String systemPrompt = """
+                    You are an enthusiastic travel guide.
+                    Write a short, engaging summary (3-5 sentences) of the walking route provided.
+                    Mention key highlights and the overall vibe.
+                    Language: Russian.
+                    
+                    IMPORTANT: You must output strictly valid JSON in the following format:
+                    {
+                      "description": "Your text here..."
+                    }
+                    """;
 
-            if (resp == null || resp.getChoices() == null || resp.getChoices().isEmpty()) {
-                return places;
+            String userPrompt = String.format(
+                    "User's original wish: %s\n\nFinal Route Sequence: %s",
+                    userDescription,
+                    routeJson
+            );
+
+            String responseContent = callLlm(systemPrompt, userPrompt);
+
+            if (responseContent == null) return "Описание маршрута временно недоступно.";
+
+            DescriptionResponseWrapper wrapper = objectMapper.readValue(responseContent, DescriptionResponseWrapper.class);
+            return wrapper.getDescription();
+
+        } catch (Exception e) {
+            log.error("Error generating route description", e);
+            return "Приятной прогулки по выбранным местам!";
+        }
+    }
+
+    private String callLlm(String systemPrompt, String userPrompt) {
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", apiKeysConfig.getLlm().getModel());
+        requestBody.put("messages", List.of(
+                Map.of("role", "system", "content", systemPrompt),
+                Map.of("role", "user", "content", userPrompt)
+        ));
+        requestBody.put("temperature", 0.4); // Чуть выше для креативности в описании
+        requestBody.put("response_format", Map.of("type", "json_object"));
+        requestBody.put("max_tokens", apiKeysConfig.getLlm().getMaxTokens());
+
+        String rawResponse = webClient.post()
+                .uri(apiKeysConfig.getLlm().getBaseUrl() + "/chat/completions")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKeysConfig.getLlm().getKey())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        if (rawResponse == null || rawResponse.isBlank()) {
+            log.error("LLM returned empty response");
+            return null;
+        }
+
+        try {
+            JsonNode rootNode = objectMapper.readTree(rawResponse);
+            if (rootNode.has("error")) {
+                log.error("LLM API Error: {}", rootNode.get("error").toPrettyString());
+                return null;
             }
-
-            String content = resp.getChoices().get(0).getMessage().getContent();
-            // log.info(">>> LLM Raw: {}", content); // Можно включить для отладки
-
-            String cleanJson = cleanLlmResponse(content);
-            List<Selected> selected = mapper.readValue(cleanJson, new TypeReference<List<Selected>>() {
-            });
-
-            log.info(">>> LLM Selected {} places:", selected.size());
-            selected.forEach(s -> log.info("   + {}", s.reason));
-
-            Set<String> ids = selected.stream().map(s -> s.placeId).collect(Collectors.toCollection(HashSet::new));
-
-            // Важно: сохраняем порядок из LLM, если он логичен, или исходный фильтрованный
-            // Сейчас просто фильтруем исходный список, чтобы сохранить гео-сортировку (если она была)
-            return places.stream()
-                    .filter(p -> ids.contains(p.getId()))
-                    .collect(Collectors.toList());
-
-        } catch (Exception e) {
-            log.error("Error in LLM filter", e);
-            return places.subList(0, Math.min(places.size(), 3));
+            JsonNode choices = rootNode.get("choices");
+            if (choices != null && !choices.isEmpty()) {
+                return choices.get(0).get("message").get("content").asText();
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Error parsing LLM response", e);
         }
+        return null;
     }
 
-    private String cleanLlmResponse(String content) {
-        if (content == null) return "[]";
-        Matcher matcher = JSON_BLOCK_PATTERN.matcher(content);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        int start = content.indexOf('[');
-        int end = content.lastIndexOf(']');
-        if (start != -1 && end != -1 && end > start) {
-            return content.substring(start, end + 1);
-        }
-        return content;
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class LlmResponseWrapper {
+        private List<PlaceDto> places;
     }
 
-    public static class Selected {
-        public String placeId;
-        public String reason;
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private static class DescriptionResponseWrapper {
+        private String description;
     }
 
-    public static record PlaceCompactDto(String id, String name, String category) {
-    }
-    
 }

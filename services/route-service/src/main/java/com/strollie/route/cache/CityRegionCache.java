@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class CityRegionCache {
+
     private final Map<String, String> cities = new ConcurrentHashMap<>();
 
     public String get(String city) {
@@ -16,4 +17,5 @@ public class CityRegionCache {
     public void put(String city, String id) {
         cities.put(city, id);
     }
+
 }
