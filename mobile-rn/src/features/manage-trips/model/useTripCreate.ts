@@ -4,7 +4,7 @@ import { useAtom } from 'jotai';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { tripApi, TripChecklistItem } from '@/entities/trip';
+import { TripChecklistItem, useCreateTripMutation } from '@/entities/trip';
 import { formatDate } from '@/shared/lib/date';
 
 import { tripCreateSchema, TripCreateSchema } from './schema';
@@ -21,6 +21,7 @@ import {
 
 export const useTripCreate = () => {
 	const router = useRouter();
+	const createTripMutation = useCreateTripMutation();
 
 	// Локальное UI состояние
 	const [isPickerVisible, setPickerVisible] = useState(false);
@@ -151,10 +152,10 @@ export const useTripCreate = () => {
 		setValue('checklist', updated);
 	};
 
-	const onSubmit = async (data: TripCreateSchema) => {
-		try {
-			setSubmitting(true);
-			await tripApi.createTrip({
+	const onSubmit = (data: TripCreateSchema) => {
+		setSubmitting(true);
+		createTripMutation.mutate(
+			{
 				startDate: data.startDate,
 				endDate: data.endDate,
 				ticketIds: (data.selectedTickets || []).map(
@@ -165,14 +166,20 @@ export const useTripCreate = () => {
 				checklist: (data.checklist || []).filter(i => i.text.trim()),
 				notes: (data.notes || '').trim() || undefined,
 				title: undefined,
-			});
-			resetForm();
-			router.back();
-		} catch (error) {
-			console.error('Failed to create trip:', error);
-		} finally {
-			setSubmitting(false);
-		}
+			},
+			{
+				onSuccess: () => {
+					resetForm();
+					router.back();
+				},
+				onError: error => {
+					console.error('Failed to create trip:', error);
+				},
+				onSettled: () => {
+					setSubmitting(false);
+				},
+			},
+		);
 	};
 
 	const onDelete = useCallback(() => {

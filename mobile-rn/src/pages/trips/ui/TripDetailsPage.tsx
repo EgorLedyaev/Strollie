@@ -12,7 +12,12 @@ import { Header } from '@/widgets/header';
 import { editingTripTicketsAtom } from '@/features/manage-trips';
 import { ChecklistInput, ChecklistItem } from '@/features/trip-checklist';
 import { NewTicketItem, Ticket, ticketApi } from '@/entities/ticket';
-import { tripApi, TripChecklistItem, UpdateTripInput } from '@/entities/trip';
+import {
+	TripChecklistItem,
+	useDeleteTripMutation,
+	useTripDetailsQuery,
+	useUpdateTripMutation,
+} from '@/entities/trip';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import {
 	ActionTouchable,
@@ -24,41 +29,38 @@ import {
 
 import { Place, PlacesSection } from './PlacesSection';
 
-function formatDate(d: Date) {
-	return format(d, 'dd.MM.yyyy', { locale: ru });
+function formatDate(d: Date | string) {
+	const date = typeof d === 'string' ? parseISO(d) : d;
+	return format(date, 'dd.MM.yyyy', { locale: ru });
 }
 
-type TripVm = {
-	id: string;
-	title: string;
-	displayTitle: string;
-	start: Date;
-	end: Date;
-	ticketIds: string[];
-	checklist: TripChecklistItem[];
-	notes: string;
-};
-
 export const TripDetailsPage: React.FC = () => {
-	const { id } = useLocalSearchParams();
-	// const router = useRouter();
-	const [loading, setLoading] = useState(true);
-	const [trip, setTrip] = useState<TripVm | null>(null);
-	const [tickets, setTickets] = useState<Ticket[]>([]);
+	const { id } = useLocalSearchParams<{ id: string }>();
+
+	// Queries & Mutations
+	const { data: trip, isLoading: isTripLoading } = useTripDetailsQuery(id!);
+	const updateTripMutation = useUpdateTripMutation();
+	const deleteTripMutation = useDeleteTripMutation();
+
+	// Local State for Editing
 	const [placesMode, setPlacesMode] = useState<'view' | 'route'>('view');
 	const [selectedRoutePlaces, setSelectedRoutePlaces] = useState<string[]>(
 		[],
 	);
-	const [checklist, setChecklist] = useState<TripChecklistItem[]>([]);
+
+	// Checklist & Notes Local State (for Edit Mode)
+	const [localChecklist, setLocalChecklist] = useState<TripChecklistItem[]>(
+		[],
+	);
 	const [checklistMode, setChecklistMode] = useState<'view' | 'edit'>('view');
 	const [isAddingChecklistItem, setIsAddingChecklistItem] = useState(false);
 	const [editableNotes, setEditableNotes] = useState('');
-	const [, setIsSaving] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
 
+	// Tickets State
+	const [tickets, setTickets] = useState<Ticket[]>([]);
 	const [editingTickets, setEditingTickets] = useAtom(editingTripTicketsAtom);
 
-	// Временные мок-данные для секций (уровень pages)
+	// Mock Places
 	const [places] = useState<Place[]>([
 		{ id: 'p1', name: 'Цирк имени Братьев Никитиных', visited: true },
 		{ id: 'p2', name: 'ТЮЗ им. Ю.П. Киселёва' },
@@ -66,41 +68,80 @@ export const TripDetailsPage: React.FC = () => {
 		{ id: 'p4', name: 'Набережная Космонавтов' },
 	]);
 
+	// Sync Trip Data to Local State
+	useEffect(() => {
+		if (trip) {
+			setLocalChecklist(trip.checklist);
+			setEditableNotes(trip.notes || '');
+			// Fetch tickets for this trip
+			ticketApi.getMyTickets().then(allTickets => {
+				setTickets(
+					allTickets.filter(t => trip.ticketIds.includes(t.id)),
+				);
+			});
+		}
+	}, [trip]);
+
+	// Ticket Selection Return Handler (Auto-save)
+	useFocusEffect(
+		useCallback(() => {
+			if (editingTickets !== null && trip) {
+				const newTicketIds = editingTickets.map(t => t.id);
+				setTickets(editingTickets);
+				updateTripMutation.mutate({
+					id: trip.id,
+					data: {
+						ticketIds: newTicketIds,
+						checklist: trip.checklist,
+						notes: trip.notes || '',
+						places: trip.places,
+					},
+				});
+				setEditingTickets(null);
+			}
+		}, [editingTickets, setEditingTickets, trip, updateTripMutation]),
+	);
+
 	const handleBuildRouteClick = () => {
 		if (placesMode === 'view') {
 			setPlacesMode('route');
 			setSelectedRoutePlaces([]);
 		} else {
-			console.log(
-				'Нажата кнопка Построить маршрут с точками:',
-				selectedRoutePlaces,
-			);
+			console.log('Route built:', selectedRoutePlaces);
 			setPlacesMode('view');
 		}
 	};
+
 	const togglePlaceSelection = (placeId: string) => {
-		setSelectedRoutePlaces(prevSelected => {
-			if (prevSelected.includes(placeId)) {
-				return prevSelected.filter(id => id !== placeId);
-			} else {
-				return [...prevSelected, placeId];
-			}
+		setSelectedRoutePlaces(prev =>
+			prev.includes(placeId)
+				? prev.filter(id => id !== placeId)
+				: [...prev, placeId],
+		);
+	};
+
+	// View Mode: Immediate Toggle
+	const handleToggleChecklistItem = (idToToggle: string) => {
+		if (checklistMode !== 'view' || !trip) return;
+
+		const updatedChecklist = trip.checklist.map(item =>
+			item.id === idToToggle ? { ...item, done: !item.done } : item,
+		);
+
+		updateTripMutation.mutate({
+			id: trip.id,
+			data: {
+				checklist: updatedChecklist,
+				notes: trip.notes || '',
+				ticketIds: trip.ticketIds,
+				places: trip.places,
+			},
 		});
 	};
 
-	const handleToggleChecklistItem = (idToToggle: string) => {
-		if (checklistMode !== 'view') return;
-		setChecklist(currentList =>
-			currentList.map(item =>
-				item.id === idToToggle ? { ...item, done: !item.done } : item,
-			),
-		);
-	};
-
+	// Edit Mode: Local State Manipulation
 	const handleDeleteChecklistItem = (idToDelete: string) => {
-		setChecklist(currentList =>
-			currentList.filter(item => item.id !== idToDelete),
-		);
+		setLocalChecklist(prev => prev.filter(item => item.id !== idToDelete));
 	};
 
 	const handleConfirmAddChecklistItem = (text: string) => {
@@ -109,103 +150,43 @@ export const TripDetailsPage: React.FC = () => {
 			text,
 			done: false,
 		};
-		setChecklist(prev => [...prev, newItem]);
+		setLocalChecklist(prev => [...prev, newItem]);
 		setIsAddingChecklistItem(false);
 	};
-	const handleSave = async () => {
+
+	// Save Changes (Edit Mode)
+	const handleSave = () => {
 		if (!trip) return;
 
-		setIsSaving(true);
-
-		const updatedData: UpdateTripInput = {
-			checklist: checklist,
-			notes: editableNotes,
-			ticketIds: tickets.map(t => t.id), // Преобразуем массив билетов в массив ID
-			places: places.map(p => p.id), // Преобразуем массив мест в массив ID
-		};
-
-		try {
-			await tripApi.updateTrip(trip.id, updatedData);
-			console.log('Поездка успешно сохранена!');
-			setChecklistMode('view');
-			router.back();
-		} catch (error) {
-			console.error('Ошибка при сохранении поездки:', error);
-		} finally {
-			setIsSaving(false);
-		}
+		updateTripMutation.mutate(
+			{
+				id: trip.id,
+				data: {
+					checklist: localChecklist,
+					notes: editableNotes,
+					ticketIds: trip.ticketIds,
+					places: trip.places,
+				},
+			},
+			{
+				onSuccess: () => {
+					setChecklistMode('view');
+					router.back();
+				},
+			},
+		);
 	};
 
-	const handleDelete = async () => {
-		if (!trip || isDeleting) return;
-		setIsDeleting(true);
-		try {
-			await tripApi.deleteTrip(trip.id);
-			console.log('Поездка успешно удалена!');
-			router.back();
-		} catch (error) {
-			console.error('Ошибка при удалении поездки:', error);
-		} finally {
-			setIsDeleting(false);
-		}
+	const handleDelete = () => {
+		if (!trip) return;
+		deleteTripMutation.mutate(trip.id, {
+			onSuccess: () => {
+				router.back();
+			},
+		});
 	};
 
-	useEffect(() => {
-		(async () => {
-			if (!id || Array.isArray(id)) return;
-			setLoading(true);
-			const [trps, allTickets] = await Promise.all([
-				tripApi.getMyTrips({ force: true }),
-				ticketApi.getMyTickets(),
-			]);
-			const tMap: Record<string, { to: string }> = {};
-			for (const tk of allTickets) tMap[tk.id] = { to: tk.to };
-
-			const found = trps.find(t => t.id === id);
-			if (found) {
-				const firstTicket = found.ticketIds[0]
-					? tMap[found.ticketIds[0]]
-					: undefined;
-				const displayTitle = firstTicket
-					? `Поездка в ${firstTicket.to}`
-					: found.title || 'Поездка';
-
-				const vm: TripVm = {
-					id: found.id,
-					title: found.title || 'Поездка',
-					displayTitle,
-					start: parseISO(found.startDate),
-					end: parseISO(found.endDate),
-					ticketIds: found.ticketIds,
-					checklist: found.checklist,
-					notes: found.notes || '',
-				};
-				setTrip(vm);
-				setTickets(
-					allTickets.filter(tk => found.ticketIds.includes(tk.id)),
-				);
-			}
-			setLoading(false);
-		})();
-	}, [id]);
-
-	useEffect(() => {
-		if (trip) {
-			setChecklist(trip.checklist);
-			setEditableNotes(trip.notes || '');
-		}
-	}, [trip]);
-
-	useFocusEffect(
-		useCallback(() => {
-			if (editingTickets !== null) {
-				setTickets(editingTickets);
-				setEditingTickets(null);
-			}
-		}, [editingTickets, setEditingTickets]),
-	);
-
-	if (loading) {
+	if (isTripLoading) {
 		return (
 			<SafeAreaView style={styles.container}>
 				<Header title={'Поездка'} />
@@ -227,30 +208,34 @@ export const TripDetailsPage: React.FC = () => {
 		);
 	}
 
+	const displayTitle = trip.title || 'Поездка';
+	const firstTicket = tickets.find(t => t.id === trip.ticketIds[0]);
+	const finalDisplayTitle = firstTicket
+		? `Поездка в ${firstTicket.to}`
+		: displayTitle;
+
 	return (
 		<SafeAreaView style={styles.container}>
-			<Header title={trip.displayTitle} />
-			<ScrollView
-				// contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}
-			>
+			<Header title={finalDisplayTitle} />
+			<ScrollView showsVerticalScrollIndicator={false}>
 				<View>
-					{/* Даты */}
+					{/* Dates */}
 					<View style={styles.dateContainer}>
 						<View style={styles.dateBlock}>
 							<AppText style={styles.dateLabel}>Начало</AppText>
 							<AppText style={styles.dateValue}>
-								{formatDate(trip.start)}
+								{formatDate(trip.startDate)}
 							</AppText>
 						</View>
 						<View style={styles.dateBlock}>
 							<AppText style={styles.dateLabel}>Конец</AppText>
 							<AppText style={styles.dateValue}>
-								{formatDate(trip.end)}
+								{formatDate(trip.endDate)}
 							</AppText>
 						</View>
 					</View>
-					{/* Билеты */}
+
+					{/* Tickets */}
 					<View style={styles.sectionsContainer}>
 						<SectionItem
 							label={'Билеты'}
@@ -260,13 +245,9 @@ export const TripDetailsPage: React.FC = () => {
 							}}
 						/>
 						<View style={styles.ticketsContainer}>
-							{tickets.length > 0 && (
-								<View style={styles.ticketsContainer}>
-									{tickets.map(t => (
-										<NewTicketItem key={t.id} ticket={t} />
-									))}
-								</View>
-							)}
+							{tickets.map(t => (
+								<NewTicketItem key={t.id} ticket={t} />
+							))}
 						</View>
 
 						<PlacesSection
@@ -277,7 +258,7 @@ export const TripDetailsPage: React.FC = () => {
 							onPlaceSelect={togglePlaceSelection}
 						/>
 
-						{/* Чек-лист */}
+						{/* Checklist */}
 						<View>
 							<View style={styles.sectionHeaderRow}>
 								<AppText style={styles.sectionTitle}>
@@ -322,9 +303,16 @@ export const TripDetailsPage: React.FC = () => {
 									</ActionTouchable>
 								</View>
 							</View>
-							{checklist.length > 0 && (
+
+							{(checklistMode === 'view'
+								? trip.checklist
+								: localChecklist
+							).length > 0 && (
 								<View style={styles.checklistBox}>
-									{checklist.map(item => (
+									{(checklistMode === 'view'
+										? trip.checklist
+										: localChecklist
+									).map(item => (
 										<ChecklistItem
 											key={item.id}
 											item={item}
@@ -355,7 +343,7 @@ export const TripDetailsPage: React.FC = () => {
 						</View>
 					</View>
 
-					{/* Заметки */}
+					{/* Notes */}
 					<View style={styles.notesContainer}>
 						<AppText style={styles.sectionTitle}>Заметки</AppText>
 						{checklistMode === 'edit' ? (
@@ -370,13 +358,13 @@ export const TripDetailsPage: React.FC = () => {
 						) : (
 							<View style={styles.notesBox}>
 								<AppText style={styles.notesText}>
-									{editableNotes || 'У вас пока нет заметок.'}
+									{trip.notes || 'У вас пока нет заметок.'}
 								</AppText>
 							</View>
 						)}
 					</View>
 
-					{/* Нижние кнопки */}
+					{/* Bottom Buttons */}
 					<View style={styles.bottomRow}>
 						<AppButton
 							text='Удалить'
@@ -387,6 +375,7 @@ export const TripDetailsPage: React.FC = () => {
 							textFontFamily={Fonts.regular}
 							buttonBorderRadius={Radius.r16}
 							onPress={handleDelete}
+							isLoading={deleteTripMutation.isPending}
 						/>
 						<AppButton
 							text='Сохранить поездку'
@@ -394,6 +383,7 @@ export const TripDetailsPage: React.FC = () => {
 							textFontFamily={Fonts.regular}
 							buttonBorderRadius={Radius.r16}
 							onPress={handleSave}
+							isLoading={updateTripMutation.isPending}
 						/>
 					</View>
 				</View>

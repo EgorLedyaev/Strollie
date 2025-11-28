@@ -12,8 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
-import { useTicketsSWR } from '@/entities/ticket';
-import { TripsErrorState, useTripsSWR } from '@/entities/trip';
+import { useTicketsQuery } from '@/entities/ticket';
+import { TripsErrorState, useTripsQuery } from '@/entities/trip';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
@@ -24,12 +24,11 @@ import { TripList } from './TripList';
 export const TripMainPage: React.FC = () => {
 	const router = useRouter();
 	const {
-		trips,
-		isHydrated: isTripsHydrated,
+		data: trips = [],
 		isLoading: isLoadingTrips,
 		error,
-		forceRefresh,
-	} = useTripsSWR();
+		refetch,
+	} = useTripsQuery();
 
 	const log = useMemo(() => bindLogger('trips'), []);
 
@@ -40,21 +39,15 @@ export const TripMainPage: React.FC = () => {
 
 	useFocusEffect(
 		useCallback(() => {
-			forceRefresh();
-		}, [forceRefresh]),
+			refetch();
+		}, [refetch]),
 	);
 
-	const {
-		tickets,
-		isHydrated: isTicketsHydrated,
-		isLoading: isLoadingTickets,
-	} = useTicketsSWR();
+	const { data: tickets = [], isLoading: isLoadingTickets } =
+		useTicketsQuery();
 
-	const isHydrated = isTripsHydrated && isTicketsHydrated;
 	const isLoading = isLoadingTrips || isLoadingTickets;
-
-	// const showEmpty = hydrated && !isLoading && trips.length !== 0;
-	const showEmpty = isHydrated && !isLoading && trips.length === 0;
+	const showEmpty = !isLoading && trips.length === 0;
 
 	const actionNode = (
 		<AppButton
@@ -84,8 +77,6 @@ export const TripMainPage: React.FC = () => {
 			/>
 			{isLoading ? (
 				<View style={styles.loadingWrap} testID='trips-loading'>
-					<AppText>{isHydrated}</AppText>
-					<AppText>{isLoading}</AppText>
 					<ActivityIndicator
 						size='large'
 						color={Colors.greenPrimary}
@@ -93,7 +84,7 @@ export const TripMainPage: React.FC = () => {
 				</View>
 			) : error ? (
 				<View style={styles.loadingWrap}>
-					<TripsErrorState onRetry={() => forceRefresh()} />
+					<TripsErrorState onRetry={() => refetch()} />
 				</View>
 			) : showEmpty ? (
 				<View style={styles.emptyContainer}>

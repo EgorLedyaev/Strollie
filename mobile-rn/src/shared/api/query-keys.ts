@@ -2,6 +2,8 @@ const sessionRoot = ['session'] as const;
 const citiesRoot = ['cities'] as const;
 const routesRoot = ['routes'] as const;
 const placesRoot = ['places'] as const;
+const ticketsRoot = ['tickets'] as const;
+const tripsRoot = ['trips'] as const;
 
 export const sessionKeys = {
 	all: sessionRoot,
@@ -15,6 +17,16 @@ export const citiesKeys = {
 export const routesKeys = {
 	all: routesRoot,
 	byId: (id: string) => [...routesRoot, id] as const,
+};
+
+export const ticketsKeys = {
+	all: ticketsRoot,
+	byId: (id: string) => [...ticketsRoot, id] as const,
+};
+
+export const tripsKeys = {
+	all: tripsRoot,
+	byId: (id: string) => [...tripsRoot, id] as const,
 };
 
 export const placesKeys = {
@@ -40,6 +52,8 @@ export const queryKeys = {
 	cities: citiesKeys,
 	routes: routesKeys,
 	places: placesKeys,
+	tickets: ticketsKeys,
+	trips: tripsKeys,
 } as const;
 
 type ValueOf<T> = T[keyof T];

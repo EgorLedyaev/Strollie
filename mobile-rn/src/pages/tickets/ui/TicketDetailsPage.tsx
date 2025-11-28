@@ -1,11 +1,10 @@
 import { format, parseISO } from 'date-fns';
 import { useRouter } from 'expo-router';
-import { useAtom } from 'jotai';
 import React from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ticketsAtom, type Ticket } from '@/entities/ticket';
+import { useTicketsQuery } from '@/entities/ticket';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { ActionTouchable, AppText, BackButton } from '@/shared/ui';
 
@@ -16,7 +15,7 @@ interface TicketDetailsPageProps {
 export const TicketDetailsPage: React.FC<TicketDetailsPageProps> = ({
 	ticketId,
 }) => {
-	const [tickets] = useAtom<Ticket[]>(ticketsAtom);
+	const { data: tickets = [] } = useTicketsQuery();
 	const ticket = tickets.find(t => t.id === ticketId);
 	const router = useRouter();
 

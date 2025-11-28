@@ -1,6 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { atom, type Getter } from 'jotai';
-import { atomWithStorage, createJSONStorage } from 'jotai/utils';
+import { atomWithStorage } from 'jotai/utils';
 
 import { resetUserProfileAtom, type User } from '@/entities/user/@x/session';
 import {
@@ -9,6 +8,18 @@ import {
 	revokeRefreshToken,
 } from '@/shared/api';
 import { SESSION_STORAGE_KEY } from '@/shared/config';
+import { secureAtomStorage } from '@/shared/lib/secure-storage';
+
+interface AsyncStorage<Value> {
+	getItem: (key: string, initialValue?: Value) => Promise<Value>;
+	setItem: (key: string, newValue: Value) => Promise<void>;
+	removeItem: (key: string) => Promise<void>;
+	subscribe?: (
+		key: string,
+		callback: (value: Value) => void,
+		initialValue?: Value,
+	) => () => void;
+}
 
 /**
  * Тип для состояния сессии.
@@ -48,18 +59,19 @@ const applyAuthHeader = (session: SessionSnapshot) => {
 		delete apiClient.defaults.headers.common.Authorization;
 	}
 };
+
 /**
  * Хранилище для состояния сессии.
- * Используется для сохранения и извлечения данных сессии из AsyncStorage.
+ * Используется для сохранения и извлечения данных сессии из SecureStore.
  */
-const storage = createJSONStorage<SessionSnapshot>(() => AsyncStorage);
+const storage = secureAtomStorage as AsyncStorage<SessionSnapshot>;
 
 /**
  * Базовый атом для хранения состояния сессии. Он взаимодействует с AsyncStorage.
  * Мы не будем экспортировать его напрямую, чтобы избежать случайного использования
  * без Suspense.
  */
-const sessionAtomWithStorage = atomWithStorage(
+const sessionAtomWithStorage = atomWithStorage<SessionSnapshot>(
 	SESSION_STORAGE_KEY,
 	INITIAL_STATE,
 	storage,
@@ -74,7 +86,9 @@ const readSession = (get: Getter): SessionSnapshot =>
  * из AsyncStorage, Jotai "выбросит" промис, который будет перехвачен
  * ближайшим <Suspense> boundary.
  */
-export const sessionAtom = atom(get => get(sessionAtomWithStorage));
+export const sessionAtom = atom<SessionSnapshot>(
+	get => get(sessionAtomWithStorage) as SessionSnapshot,
+);
 
 /**
  * Атом для ПРЯМОЙ установки новой сессии.

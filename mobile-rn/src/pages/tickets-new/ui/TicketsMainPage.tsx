@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyState } from '@/widgets/empty-state';
 import { Header } from '@/widgets/header';
 import { TicketsList } from '@/widgets/tickets-list';
-import { TicketsErrorState, useTicketsSWR } from '@/entities/ticket';
+import { TicketsErrorState, useTicketsQuery } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
@@ -18,12 +18,12 @@ import { AppButton, AppText } from '@/shared/ui';
 export const TicketsMainPage: React.FC = () => {
 	const router = useRouter();
 	const {
-		tickets,
-		isHydrated: hydrated,
+		data: tickets = [],
 		isLoading,
 		error,
-		forceRefresh,
-	} = useTicketsSWR();
+		refetch: forceRefresh,
+	} = useTicketsQuery();
+	const hydrated = true;
 
 	// Feature scoped logger
 	const log = useMemo(() => bindLogger('tickets'), []);

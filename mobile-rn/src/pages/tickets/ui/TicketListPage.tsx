@@ -19,7 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
 	TicketCard,
 	TicketsErrorState,
-	useTicketsSWR,
+	useTicketsQuery,
 	type Ticket,
 } from '@/entities/ticket';
 import { Colors, Sizes } from '@/shared/tokens';
@@ -30,12 +30,12 @@ import { TicketDetailsDialog } from './TicketDetailsDialog';
 
 export const TicketListPage: React.FC = () => {
 	const {
-		tickets,
-		isHydrated: hydrated,
+		data: tickets = [],
 		isLoading,
 		error,
-		forceRefresh,
-	} = useTicketsSWR();
+		refetch: forceRefresh,
+	} = useTicketsQuery();
+	const hydrated = true;
 	const [qrVisible, setQrVisible] = useState(false);
 	const [qrUri, setQrUri] = useState<string | undefined>();
 	const [detailsVisible, setDetailsVisible] = useState(false);

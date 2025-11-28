@@ -1,9 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, waitFor } from '@testing-library/react-native';
 import { createStore, Provider as JotaiProvider } from 'jotai';
 import React from 'react';
 
 import * as ticketModule from '@/entities/ticket';
 import type { Ticket } from '@/entities/ticket';
+import { apiClient, ticketsKeys } from '@/shared/api';
 
 import { TicketsMainPage } from '../TicketsMainPage';
 
@@ -13,12 +15,7 @@ jest.mock('expo-router', () => ({
 }));
 
 // Spy mocks
-const getMyTicketsMock = jest
-	.spyOn(ticketModule.ticketApi, 'getMyTickets')
-	.mockImplementation(() => Promise.resolve([]));
-const getMyTicketsSWRMock = jest
-	.spyOn(ticketModule.ticketApi, 'getMyTicketsSWR')
-	.mockImplementation(() => Promise.resolve([]));
+const apiClientGetMock = jest.spyOn(apiClient, 'get');
 
 // Helper to wrap with jotai provider so we can pass initial tickets
 function renderWithState(initialTickets: Ticket[] = []) {
@@ -28,44 +25,56 @@ function renderWithState(initialTickets: Ticket[] = []) {
 	if (initialTickets.length) {
 		store.set(ticketModule.setTicketsAtom, () => initialTickets);
 	}
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				retry: false,
+			},
+		},
+	});
+	// Pre-populate query cache if initialTickets are provided
+	if (initialTickets.length) {
+		queryClient.setQueryData(ticketsKeys.all, initialTickets);
+	}
 	return render(
 		<JotaiProvider store={store}>
-			<TicketsMainPage />
+			<QueryClientProvider client={queryClient}>
+				<TicketsMainPage />
+			</QueryClientProvider>
 		</JotaiProvider>,
 	);
 }
 
 describe('TicketsMainPage', () => {
 	beforeEach(() => {
-		getMyTicketsMock.mockReset();
-		getMyTicketsSWRMock.mockReset();
+		apiClientGetMock.mockReset();
 	});
 
 	it('shows loading then empty state', async () => {
-		getMyTicketsMock.mockResolvedValueOnce([]);
+		apiClientGetMock.mockResolvedValueOnce({ data: [] });
 		const { queryByTestId } = renderWithState([]);
 		expect(queryByTestId('tickets-loading')).not.toBeNull();
 		await waitFor(() =>
 			expect(queryByTestId('tickets-empty')).not.toBeNull(),
 		);
-		// SWR не должен дёргаться если нет данных и snapshot пустой (первый блокинг запрос уже был)
-		expect(getMyTicketsSWRMock).toHaveBeenCalledTimes(0);
 	});
 
 	it('shows list when api returns tickets', async () => {
-		getMyTicketsMock.mockResolvedValueOnce([
-			{
-				id: '1',
-				title: 'A',
-				from: 'A',
-				to: 'B',
-				departureTime: '2024-01-01',
-				arrivalTime: '2024-01-01',
-				isUsed: false,
-				type: 'train',
-				businessCategory: 'transport',
-			},
-		]);
+		apiClientGetMock.mockResolvedValueOnce({
+			data: [
+				{
+					id: '1',
+					title: 'A',
+					from: 'A',
+					to: 'B',
+					departureTime: '2024-01-01',
+					arrivalTime: '2024-01-01',
+					isUsed: false,
+					type: 'train',
+					businessCategory: 'transport',
+				},
+			],
+		});
 		const { queryByTestId } = renderWithState([]);
 		await waitFor(() =>
 			expect(queryByTestId('tickets-list')).not.toBeNull(),
@@ -75,19 +84,21 @@ describe('TicketsMainPage', () => {
 	it('uses SWR refresh when snapshot present', async () => {
 		// Сценарий: уже есть локальный билет (snapshot), TTL истёк -> блокирующий не нужен, должен пойти SWR путь
 		// Для простоты имитируем что blocking fetch пропускается (tickets не пустой), и SWR возвращает обновлённый список
-		getMyTicketsSWRMock.mockResolvedValueOnce([
-			{
-				id: '2',
-				title: 'B',
-				from: 'A',
-				to: 'C',
-				departureTime: '2024-02-01',
-				arrivalTime: '2024-02-01',
-				isUsed: false,
-				type: 'train',
-				businessCategory: 'transport',
-			},
-		]);
+		apiClientGetMock.mockResolvedValueOnce({
+			data: [
+				{
+					id: '2',
+					title: 'B',
+					from: 'A',
+					to: 'C',
+					departureTime: '2024-02-01',
+					arrivalTime: '2024-02-01',
+					isUsed: false,
+					type: 'train',
+					businessCategory: 'transport',
+				},
+			],
+		});
 		// snapshot изначально
 		const snapshot: Ticket[] = [
 			{
@@ -105,6 +116,6 @@ describe('TicketsMainPage', () => {
 		const { queryByTestId } = renderWithState(snapshot);
 		// Должен сразу показать список (без спиннера) тк snapshot есть
 		expect(queryByTestId('tickets-loading')).toBeNull();
-		await waitFor(() => expect(getMyTicketsSWRMock).toHaveBeenCalled());
+		await waitFor(() => expect(apiClientGetMock).toHaveBeenCalled());
 	});
 });

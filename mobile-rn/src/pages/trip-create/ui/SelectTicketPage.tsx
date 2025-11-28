@@ -13,7 +13,7 @@ import {
 	editingTripTicketsAtom,
 	selectedTicketsAtom,
 } from '@/features/manage-trips';
-import { TicketsErrorState, useTicketsSWR } from '@/entities/ticket';
+import { TicketsErrorState, useTicketsQuery } from '@/entities/ticket';
 import { Colors, Fonts, Gaps, Radius } from '@/shared/tokens';
 import { AppButton, AppText } from '@/shared/ui';
 
@@ -22,12 +22,12 @@ export const SelectTicketPage = () => {
 	const params = useLocalSearchParams(); // Получаем параметры навигации
 	const mode = params.mode === 'edit' ? 'edit' : 'create'; // Определяем режим
 	const {
-		tickets,
-		isHydrated: hydrated,
+		data: tickets = [],
 		isLoading,
 		error,
-		forceRefresh,
-	} = useTicketsSWR();
+		refetch: forceRefresh,
+	} = useTicketsQuery();
+	const hydrated = true;
 
 	// const [, setSelectedTickets] = useAtom(selectedTicketsAtom);
 	// const initialSelectedTickets = useAtomValue(selectedTicketsAtom);

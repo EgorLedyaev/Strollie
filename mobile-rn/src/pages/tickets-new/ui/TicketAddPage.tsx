@@ -6,7 +6,7 @@ import { formatISO, isBefore, startOfToday } from 'date-fns';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import React, { useRef, useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -21,8 +21,8 @@ import {
 	newTicketImageFileNameAtom,
 	newTicketTitleAtom,
 	resetNewTicketFormAtom,
-	setTicketsAtom,
-	ticketApi,
+	useAddTicketMutation,
+	type Ticket,
 } from '@/entities/ticket';
 import { bindLogger } from '@/shared/lib/logger';
 import { useAnchorMeasurement } from '@/shared/lib/useAnchorMeasurement';
@@ -42,8 +42,7 @@ export const TicketAddPage: React.FC = () => {
 		newTicketImageFileNameAtom,
 	);
 	const [category, setCategory] = useAtom(newTicketCategoryAtom);
-	// read tickets separately if needed but use write-only atom for updates to avoid type issues
-	const setTickets = useSetAtom(setTicketsAtom);
+	const addTicketMutation = useAddTicketMutation();
 	const [, resetForm] = useAtom(resetNewTicketFormAtom);
 	const [saving, setSaving] = React.useState(false);
 	const [error, setError] = React.useState<string | null>(null);
@@ -149,14 +148,19 @@ export const TicketAddPage: React.FC = () => {
 			iso = formatISO(constructed);
 			setSaving(true);
 			log.info('save:start', { hasImage: !!image, category });
-			const ticket = await ticketApi.createCustomTicket({
-				title,
-				date: iso,
+			const ticketPayload: Omit<Ticket, 'id'> = {
+				from: title,
+				to: title,
+				departureTime: iso,
+				arrivalTime: iso,
+				isUsed: false,
+				type: category === 'transport' ? 'train' : 'other',
+				businessCategory: category,
+				title: title,
 				imageUri: image ?? undefined,
 				fileName: imageFileName ?? undefined,
-				businessCategory: category,
-			});
-			setTickets(prev => [...prev, ticket]);
+			};
+			const ticket = await addTicketMutation.mutateAsync(ticketPayload);
 			log.info('save:success', { id: ticket.id });
 			resetForm();
 			router.replace('/tickets');

@@ -1,9 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, waitFor } from '@testing-library/react-native';
 import { formatISO } from 'date-fns';
 import { createStore, Provider as JotaiProvider } from 'jotai';
 import React from 'react';
 
 import * as ticketModule from '@/entities/ticket';
+import { apiClient, ticketsKeys } from '@/shared/api';
 
 import { TicketsMainPage } from '../TicketsMainPage';
 
@@ -13,11 +15,7 @@ jest.mock('expo-router', () => ({
 }));
 
 describe('SWR e2e refresh scenario', () => {
-	const getMyTicketsSpy = jest.spyOn(ticketModule.ticketApi, 'getMyTickets');
-	const getMyTicketsSWRSpy = jest.spyOn(
-		ticketModule.ticketApi,
-		'getMyTicketsSWR',
-	);
+	const apiClientGetSpy = jest.spyOn(apiClient, 'get');
 
 	function ticket(id: string) {
 		return {
@@ -39,24 +37,34 @@ describe('SWR e2e refresh scenario', () => {
 		if (snapshot.length) {
 			store.set(ticketModule.setTicketsAtom, () => snapshot);
 		}
+		const queryClient = new QueryClient({
+			defaultOptions: {
+				queries: {
+					retry: false,
+				},
+			},
+		});
+		if (snapshot.length) {
+			queryClient.setQueryData(ticketsKeys.all, snapshot);
+		}
 		return render(
 			<JotaiProvider store={store}>
-				<TicketsMainPage />
+				<QueryClientProvider client={queryClient}>
+					<TicketsMainPage />
+				</QueryClientProvider>
 			</JotaiProvider>,
 		);
 	}
 
 	beforeEach(() => {
-		getMyTicketsSpy.mockReset();
-		getMyTicketsSWRSpy.mockReset();
+		apiClientGetSpy.mockReset();
 	});
 
 	it('shows snapshot instantly then merges SWR result', async () => {
 		const snapshot = [ticket('local-1')];
 		// SWR возвратит новый билет
-		getMyTicketsSWRSpy.mockImplementation(async opts => {
-			opts?.onUpdate?.([ticket('local-1'), ticket('remote-2')]);
-			return [ticket('local-1'), ticket('remote-2')];
+		apiClientGetSpy.mockResolvedValue({
+			data: [ticket('local-1'), ticket('remote-2')],
 		});
 
 		const { queryByTestId } = renderWithSnapshot(snapshot);
@@ -64,6 +72,6 @@ describe('SWR e2e refresh scenario', () => {
 		expect(queryByTestId('tickets-loading')).toBeNull();
 
 		// Ждём когда SWR дернётся
-		await waitFor(() => expect(getMyTicketsSWRSpy).toHaveBeenCalled());
+		await waitFor(() => expect(apiClientGetSpy).toHaveBeenCalled());
 	});
 });
