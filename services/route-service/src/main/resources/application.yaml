@@ -12,15 +12,15 @@ spring:
 api:
   gis:
     base-url: https://catalog.api.2gis.com
-    key: e1270ba5-84c8-4ca1-9ac5-00fca2286431
+    key: ${GIS_API_KEY}
     timeout: 5000
     max-places-per-category: 10
   llm:
     provider: openrouter
     base-url: https://openrouter.ai/api/v1
-    key: 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
-    model: openai/gpt-oss-20b:free
-    max-tokens: 1000
+    key: ${LLM_API_KEY}
+    model: x-ai/grok-4.1-fast:free
+    max-tokens: 20000
     timeout: 30000
 
 routing:

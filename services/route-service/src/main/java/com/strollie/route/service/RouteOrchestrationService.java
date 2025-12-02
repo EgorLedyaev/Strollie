@@ -1,5 +1,6 @@
 package com.strollie.route.service;
 
+import com.strollie.route.client.GisApiClient;
 import com.strollie.route.client.LlmApiClient;
 import com.strollie.route.model.dto.PlaceDto;
 import com.strollie.route.model.dto.RouteRequest;
@@ -16,72 +17,110 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RouteOrchestrationService {
 
-    private final GisPlaceService gisPlaceService;
+    private static final int DEFAULT_RADIUS_METERS = 3000;
+    private final GisApiClient gisApiClient;
     private final LlmFilterService llmFilterService;
     private final LlmApiClient llmApiClient;
     private final TspSolverService tspSolverService;
+    private final CategoryEnricherService categoryEnricherService;
 
     public RouteResponse generateRoute(RouteRequest request) {
-        log.info("Starting route generation. City: {}, Categories: {}, Start: [{}, {}], Duration: {}h",
-                request.getCity(),
-                request.getCategories(),
-                request.getStartPoint().getLat(),
-                request.getStartPoint().getLon(),
-                request.getDurationHours());
+        log.info("=== ROUTE GENERATION START ===");
+        log.info("City: {}, Categories: {}, Duration: {}h",
+                request.getCity(), request.getCategories(), request.getDurationHours());
+        log.info("User description: '{}'", request.getDescription());
 
-        // Этап 1: Поиск в GIS
-        log.info("Step 1/5: Fetching candidates from GIS service...");
-        List<PlaceDto> candidates = gisPlaceService.findPlacesByCategories(
-                request.getCity(),
+        // Step 1: Обогащение категорий на основе описания пользователя
+        log.info("Step 1/5: Enriching categories based on user description...");
+        List<String> enrichedCategories = categoryEnricherService.enrichCategories(
                 request.getCategories(),
+                request.getDescription(),
+                request.getCity()
+        );
+        log.info("Categories after enrichment: {}", enrichedCategories);
+
+        // Step 2: Поиск мест в GIS
+        log.info("Step 2/5: Fetching places from GIS...");
+        List<PlaceDto> candidates = gisApiClient.searchPlaces(
+                request.getCity(),
+                enrichedCategories,
                 request.getStartPoint().getLat(),
                 request.getStartPoint().getLon(),
-                3000
+                DEFAULT_RADIUS_METERS,
+                30
         );
-        log.info("GIS search completed. Candidates found: {}", candidates.size());
+        log.info("GIS returned {} candidates", candidates.size());
 
         if (candidates.isEmpty()) {
-            log.warn("No candidates found in GIS. Returning empty route.");
+            log.warn("No candidates found. Returning empty route.");
+            return emptyRoute();
         }
 
-        // Этап 2: Фильтрация через LLM
-        log.info("Step 2/5: Filtering candidates via LLM service. Input size: {}", candidates.size());
+        // Step 3: LLM фильтрация
+        log.info("Step 3/5: LLM filtering {} candidates...", candidates.size());
         List<PlaceDto> filtered = llmFilterService.filterAndRankPlaces(
                 candidates,
                 request.getDescription(),
                 request.getDurationHours()
         );
-        log.info("LLM filtering completed. Selected places: {}", filtered.size());
+        log.info("After LLM filter: {} places", filtered.size());
 
-        // Этап 3: Подготовка стартовой точки
-        PlaceDto start = new PlaceDto();
-        start.setId("start");
-        start.setName("Start");
-        start.setCategory("start");
-        start.setLat(request.getStartPoint().getLat());
-        start.setLon(request.getStartPoint().getLon());
+        if (filtered.isEmpty()) {
+            log.warn("LLM returned 0 results, using candidates sorted by rating as fallback");
+            filtered = candidates.stream()
+                    .sorted((a, b) -> {
+                        Double ra = a.getRating();
+                        Double rb = b.getRating();
+                        if (ra == null && rb == null) return 0;
+                        if (ra == null) return 1;
+                        if (rb == null) return -1;
+                        return rb.compareTo(ra);
+                    })
+                    .limit(calculateTargetPlaces(request.getDurationHours()))
+                    .toList();
+            log.info("Fallback selected {} places", filtered.size());
+        }
 
-        // Этап 4: Оптимизация маршрута (TSP)
-        log.info("Step 3/5: Optimizing route order (TSP) for {} points (including start)...", filtered.size() + 1);
+        // Step 4: TSP оптимизация
+        log.info("Step 4/5: Optimizing route order (TSP)...");
+        PlaceDto start = createStartPoint(request);
         List<PlaceDto> ordered = tspSolverService.optimizeRoute(start, filtered);
-        log.info("Route optimization completed. Final sequence size: {}", ordered.size());
+        log.info("Route optimized: {} points", ordered.size());
 
-        // Этап 5: Генерация описания (LLM)
-        log.info("Step 4/5: Generating route description...");
-        String routeDescription = llmApiClient.generateRouteDescription(ordered, request.getDescription());
-        log.info("Description generated.");
+        // Step 5: Генерация описания
+        log.info("Step 5/5: Generating route description...");
+        String description = llmApiClient.generateRouteDescription(ordered, request.getDescription());
 
-        // Генерация ссылки
-        log.info("Step 5/5: Building navigation link...");
         String url = DirectionsLinkBuilder.build2GisLink(request.getCity(), ordered);
-        log.info("Directions link generated: {}", url);
 
-        log.info("Route generation finished successfully.");
+        log.info("=== ROUTE GENERATION COMPLETE ===");
 
         return RouteResponse.builder()
                 .places(ordered)
-                .description(routeDescription) // Записываем описание в ответ
+                .description(description)
                 .directionsUrl(url)
+                .build();
+    }
+
+    private int calculateTargetPlaces(int durationHours) {
+        return Math.max(3, durationHours * 2);
+    }
+
+    private PlaceDto createStartPoint(RouteRequest request) {
+        return PlaceDto.builder()
+                .id("start")
+                .name("Начальная точка")
+                .category("start")
+                .lat(request.getStartPoint().getLat())
+                .lon(request.getStartPoint().getLon())
+                .build();
+    }
+
+    private RouteResponse emptyRoute() {
+        return RouteResponse.builder()
+                .places(List.of())
+                .description("К сожалению, не удалось найти подходящие места.")
+                .directionsUrl(null)
                 .build();
     }
 
