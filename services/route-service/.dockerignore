@@ -1,0 +1,12 @@
+.git
+.gitignore
+.gitattributes
+.gradle
+build/
+out/
+bin/
+.idea/
+*.iml
+target/
+.env
+src/test/
