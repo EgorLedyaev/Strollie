@@ -1,16 +1,25 @@
-FROM eclipse-temurin:17-jdk AS build
-WORKDIR /app
-COPY gradlew gradlew
-COPY gradle gradle
-COPY build.gradle build.gradle
-COPY settings.gradle settings.gradle
-RUN chmod +x gradlew
-COPY src src
-RUN ./gradlew clean bootJar --no-daemon
+# ЭТАП 1: Сборка
+FROM gradle:8-jdk17-alpine AS build
 
-FROM eclipse-temurin:17-jre
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar /app/app.jar
+
+# Копируем конфиги Gradle для кеширования зависимостей
+COPY build.gradle settings.gradle ./
+RUN gradle clean build --no-daemon > /dev/null 2>&1 || true
+
+# Копируем исходники
+COPY src ./src
+
+# Собираем bootJar
+RUN gradle bootJar --no-daemon
+
+# ЭТАП 2: Запуск
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/build/libs/*.jar app.jar
+
 EXPOSE 8082
-ENV JAVA_OPTS=""
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar /app/app.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

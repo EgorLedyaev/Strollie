@@ -40,8 +40,7 @@ public class RouteController {
             @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     public ResponseEntity<RouteResponse> generateRoute(
-            @Valid @RequestBody
-            @RequestBody(description = "Параметры генерации маршрута",
+            @Valid @RequestBody(description = "Параметры генерации маршрута",
                     required = true,
                     content = @Content(
                             schema = @Schema(implementation = RouteRequest.class),
