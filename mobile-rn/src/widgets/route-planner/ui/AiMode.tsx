@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
 	container: {
 		paddingBottom: 20,
 		paddingHorizontal: 16,
+		paddingTop: 24,
 	},
 	distanceSliderContainer: {
 		paddingHorizontal: 16,
@@ -307,17 +308,14 @@ const styles = StyleSheet.create({
 		borderRadius: Radius.r16,
 		borderWidth: 1.5,
 		flexDirection: 'row',
-		gap: 12,
 		height: 52,
-		marginTop: 16,
-		paddingHorizontal: 16,
+		paddingHorizontal: 20,
 	},
 	gradientTrack: {
 		borderRadius: Radius.r8,
 		height: 12,
 	},
 	input: {
-		color: Colors.lightInputText,
 		flex: 1,
 		fontSize: Fonts.f16,
 	},
@@ -332,7 +330,7 @@ const styles = StyleSheet.create({
 		paddingTop: 2,
 	},
 	pointer: {
-		alignSelf: 'flex-end',
+		alignSelf: 'center',
 	},
 	section: {
 		marginTop: 24,
