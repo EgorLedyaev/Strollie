@@ -147,13 +147,32 @@ const getMyTripsSWR = async (opts: {
 	opts.onUpdate([...MOCK_TRIPS]);
 };
 
+const LOG_TAG = '[tripApi]';
+
 async function getMyTrips(opts?: { force?: boolean }): Promise<Trip[]> {
-	await ensureTripsLoaded();
-	if (opts?.force) {
-		memoryTrips = await loadTrips();
+	console.log(LOG_TAG, 'getMyTrips: called with opts =', opts);
+	try {
+		await ensureTripsLoaded();
+		console.log(
+			LOG_TAG,
+			'getMyTrips: trips loaded, count =',
+			memoryTrips?.length ?? 0,
+		);
+		if (opts?.force) {
+			console.log(LOG_TAG, 'getMyTrips: force reload requested');
+			memoryTrips = await loadTrips();
+		}
+		await sleep(500);
+		console.log(
+			LOG_TAG,
+			'getMyTrips: returning trips, count =',
+			memoryTrips?.length ?? 0,
+		);
+		return [...memoryTrips!];
+	} catch (error) {
+		console.error(LOG_TAG, 'getMyTrips: error', error);
+		throw error;
 	}
-	await sleep(500);
-	return [...memoryTrips!];
 }
 // const getMyTrips = async (_opts: {
 // 	force?: boolean;

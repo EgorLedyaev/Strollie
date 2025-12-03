@@ -9,8 +9,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { ReactQueryProvider } from '@/app/providers/_with-react-query';
-import { SessionProvider } from '@/app/providers/with-session';
+import { ReactQueryProvider } from '@/app/_providers/_with-react-query';
+import { SessionProvider } from '@/app/_providers/with-session';
 import {
 	ANALYTICS_DEBUG,
 	ANALYTICS_ENABLED,

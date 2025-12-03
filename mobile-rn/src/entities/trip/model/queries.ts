@@ -10,12 +10,44 @@ import {
 } from '../api/tripApi';
 import type { Trip } from './trip.model';
 
+const LOG_TAG = '[trips/queries]';
+
 export function useTripsQuery() {
-	return useQuery({
+	console.log(LOG_TAG, 'useTripsQuery: hook called');
+	const query = useQuery({
 		queryKey: tripsKeys.all,
-		queryFn: () => tripApi.getMyTrips(),
+		queryFn: async () => {
+			console.log(LOG_TAG, 'queryFn: starting tripApi.getMyTrips()...');
+			try {
+				const trips = await tripApi.getMyTrips();
+				console.log(
+					LOG_TAG,
+					'queryFn: success, count =',
+					trips?.length ?? 0,
+				);
+				return trips;
+			} catch (error) {
+				console.error(LOG_TAG, 'queryFn: error', error);
+				throw error;
+			}
+		},
 		staleTime: 1000 * 60 * 5, // 5 minutes
 	});
+	console.log(
+		LOG_TAG,
+		'useTripsQuery: status =',
+		query.status,
+		', isLoading =',
+		query.isLoading,
+		', isPending =',
+		query.isPending,
+		', isFetching =',
+		query.isFetching,
+	);
+	if (query.error) {
+		console.error(LOG_TAG, 'useTripsQuery: error =', query.error);
+	}
+	return query;
 }
 
 export function useTripDetailsQuery(tripId: string) {

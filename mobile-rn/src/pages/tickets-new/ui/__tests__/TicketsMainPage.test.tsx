@@ -4,7 +4,8 @@ import { createStore, Provider as JotaiProvider } from 'jotai';
 import React from 'react';
 
 import type { Ticket } from '@/entities/ticket';
-import { axiosClient, ticketsKeys } from '@/shared/api';
+import { ticketApi } from '@/entities/ticket/api/ticketApi';
+import { ticketsKeys } from '@/shared/api';
 
 import { TicketsMainPage } from '../TicketsMainPage';
 
@@ -13,8 +14,8 @@ jest.mock('expo-router', () => ({
 	useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
 }));
 
-// Spy mocks
-const axiosGetMock = jest.spyOn(axiosClient, 'get');
+// Spy on ticketApi (now used directly instead of axiosClient)
+const getMyTicketsMock = jest.spyOn(ticketApi, 'getMyTickets');
 
 // Helper to wrap with providers and optionally pre-populate React Query cache
 function renderWithState(initialTickets: Ticket[] = []) {
@@ -41,11 +42,11 @@ function renderWithState(initialTickets: Ticket[] = []) {
 
 describe('TicketsMainPage', () => {
 	beforeEach(() => {
-		axiosGetMock.mockReset();
+		getMyTicketsMock.mockReset();
 	});
 
 	it('shows loading then empty state', async () => {
-		axiosGetMock.mockResolvedValueOnce({ data: [] });
+		getMyTicketsMock.mockResolvedValueOnce([]);
 		const { queryByTestId } = renderWithState([]);
 		expect(queryByTestId('tickets-loading')).not.toBeNull();
 		await waitFor(() =>
@@ -54,21 +55,19 @@ describe('TicketsMainPage', () => {
 	});
 
 	it('shows list when api returns tickets', async () => {
-		axiosGetMock.mockResolvedValueOnce({
-			data: [
-				{
-					id: '1',
-					title: 'A',
-					from: 'A',
-					to: 'B',
-					departureTime: '2024-01-01',
-					arrivalTime: '2024-01-01',
-					isUsed: false,
-					type: 'train',
-					businessCategory: 'transport',
-				},
-			],
-		});
+		getMyTicketsMock.mockResolvedValueOnce([
+			{
+				id: '1',
+				title: 'A',
+				from: 'A',
+				to: 'B',
+				departureTime: '2024-01-01',
+				arrivalTime: '2024-01-01',
+				isUsed: false,
+				type: 'train',
+				businessCategory: 'transport',
+			},
+		]);
 		const { queryByTestId } = renderWithState([]);
 		await waitFor(() =>
 			expect(queryByTestId('tickets-list')).not.toBeNull(),
@@ -77,21 +76,19 @@ describe('TicketsMainPage', () => {
 
 	it('shows cached data instantly when available in React Query', async () => {
 		// React Query cache already has data - should show list immediately
-		axiosGetMock.mockResolvedValueOnce({
-			data: [
-				{
-					id: '2',
-					title: 'B',
-					from: 'A',
-					to: 'C',
-					departureTime: '2024-02-01',
-					arrivalTime: '2024-02-01',
-					isUsed: false,
-					type: 'train',
-					businessCategory: 'transport',
-				},
-			],
-		});
+		getMyTicketsMock.mockResolvedValueOnce([
+			{
+				id: '2',
+				title: 'B',
+				from: 'A',
+				to: 'C',
+				departureTime: '2024-02-01',
+				arrivalTime: '2024-02-01',
+				isUsed: false,
+				type: 'train',
+				businessCategory: 'transport',
+			},
+		]);
 
 		const cachedTickets: Ticket[] = [
 			{
@@ -113,6 +110,6 @@ describe('TicketsMainPage', () => {
 		expect(queryByTestId('tickets-list')).not.toBeNull();
 
 		// Background refetch should still happen
-		await waitFor(() => expect(axiosGetMock).toHaveBeenCalled());
+		await waitFor(() => expect(getMyTicketsMock).toHaveBeenCalled());
 	});
 });
