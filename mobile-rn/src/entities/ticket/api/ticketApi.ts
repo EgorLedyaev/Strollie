@@ -1,84 +1,51 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import type { Ticket } from '../model';
-import { mockTicketRepo } from './mockTicketRepo';
 
-const sleep = (ms: number) => new Promise(res => setTimeout(res, ms)); // может пригодиться дальше
+const STORAGE_KEY = 'tickets_v1';
 
-// TTL в миллисекундах: если lastSync свежее этого порога — повторный сетевой/mock вызов можно пропустить.
-export const DEFAULT_TTL_MS = 5 * 60 * 1000; // 5 минут
+const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
+/**
+ * Read all tickets from AsyncStorage.
+ */
+async function readTickets(): Promise<Ticket[]> {
+	const raw = await AsyncStorage.getItem(STORAGE_KEY);
+	if (!raw) return [];
+	try {
+		return JSON.parse(raw) as Ticket[];
+	} catch {
+		return [];
+	}
+}
+
+/**
+ * Write all tickets to AsyncStorage.
+ */
+async function writeTickets(tickets: Ticket[]): Promise<void> {
+	await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(tickets));
+}
+
+/**
+ * [MOCK] Ticket API for development.
+ * In production, these will be replaced with real API calls.
+ */
 export const ticketApi = {
 	/**
-	 * Получить билеты (mock) с учётом кэша lastSync.
-	 * @param opts.force - игнорировать TTL и форсировать обращение к репо
-	 * @param opts.ttlMs - переопределить TTL
+	 * Fetch all user tickets.
+	 * Mock: reads from AsyncStorage with simulated network delay.
 	 */
-	async getMyTickets(
-		opts: { force?: boolean; ttlMs?: number } = {},
-	): Promise<Ticket[]> {
-		const { force = false, ttlMs = DEFAULT_TTL_MS } = opts;
-		// Читаем метаданные чтобы понять свежесть
-		if (!force) {
-			try {
-				const meta = await mockTicketRepo.meta();
-				if (Date.now() - meta.lastSync < ttlMs) {
-					// Данные свежие: возвращаем локальный snapshot без симуляции сети
-					const { items } = await mockTicketRepo.list({
-						simulateNetwork: false,
-					});
-					return items;
-				}
-			} catch {
-				// молча продолжаем — fallback к обычному пути
-			}
-		}
-		// Выполняем "сетевой" (симулированный) вызов
-		const { items } = await mockTicketRepo.list();
-		return items;
+	async getMyTickets(): Promise<Ticket[]> {
+		await sleep(300); // Simulate network delay
+		const tickets = await readTickets();
+		console.log(`[MOCK API] Loaded ${tickets.length} tickets`);
+		return tickets;
 	},
+
 	/**
-	 * SWR-вариант: мгновенно возвращает (стейл) локальные данные, если они свежие по TTL,
-	 * и параллельно (если устарели) триггерит фоновое обновление через onUpdate.
-	 * Если данных нет вообще — ждём первый fetch (behaves like getMyTickets).
+	 * Create a custom ticket.
+	 * Mock: saves to AsyncStorage with simulated network delay.
 	 */
-	async getMyTicketsSWR(
-		opts: {
-			onUpdate?: (fresh: Ticket[]) => void | Promise<void>;
-			ttlMs?: number;
-		} = {},
-	): Promise<Ticket[]> {
-		const { onUpdate, ttlMs = DEFAULT_TTL_MS } = opts;
-		// Сначала читаем локально без сети
-		let meta;
-		try {
-			meta = await mockTicketRepo.meta();
-		} catch {
-			/* ignore */
-		}
-		const { items: snapshot } = await mockTicketRepo.list({
-			simulateNetwork: false,
-		});
-		const age = meta ? Date.now() - meta.lastSync : Infinity;
-		const stale = age >= ttlMs;
-		// Если нет данных вообще — делаем обычный fetch (блокирующий)
-		if (snapshot.length === 0) {
-			const { items } = await mockTicketRepo.list();
-			return items;
-		}
-		// Если данные есть и не устарели — просто возвращаем
-		if (!stale) return snapshot;
-		// Возвращаем стейл сразу, а обновление пробуем в фоне
-		mockTicketRepo.list().then(({ items }) => {
-			if (onUpdate) {
-				try {
-					onUpdate(items);
-				} catch {
-					/* ignore */
-				}
-			}
-		});
-		return snapshot;
-	},
-	/** Создание пользовательского билета (мок без backend). */
 	async createCustomTicket(data: {
 		title: string;
 		date: string; // ISO
@@ -86,7 +53,8 @@ export const ticketApi = {
 		fileName?: string | null;
 		businessCategory: 'transport' | 'entertainment';
 	}): Promise<Ticket> {
-		await sleep(120); // имитация небольшой задержки
+		await sleep(150); // Simulate network delay
+
 		const id = `custom_${Date.now()}`;
 		const ticket: Ticket = {
 			id,
@@ -101,7 +69,51 @@ export const ticketApi = {
 			imageUri: data.imageUri ?? undefined,
 			fileName: data.fileName ?? undefined,
 		};
-		await mockTicketRepo.create(ticket);
+
+		const tickets = await readTickets();
+		tickets.push(ticket);
+		await writeTickets(tickets);
+
+		console.log(`[MOCK API] Created ticket ${id}`);
 		return ticket;
+	},
+
+	/**
+	 * Delete a ticket by ID.
+	 * Mock: removes from AsyncStorage.
+	 */
+	async deleteTicket(id: string): Promise<void> {
+		await sleep(100);
+
+		const tickets = await readTickets();
+		const filtered = tickets.filter(t => t.id !== id);
+		await writeTickets(filtered);
+
+		console.log(`[MOCK API] Deleted ticket ${id}`);
+	},
+
+	/**
+	 * Update a ticket.
+	 * Mock: updates in AsyncStorage.
+	 */
+	async updateTicket(
+		id: string,
+		data: Partial<Omit<Ticket, 'id'>>,
+	): Promise<Ticket> {
+		await sleep(150);
+
+		const tickets = await readTickets();
+		const index = tickets.findIndex(t => t.id === id);
+
+		if (index === -1) {
+			throw new Error(`Ticket ${id} not found`);
+		}
+
+		const updated = { ...tickets[index], ...data };
+		tickets[index] = updated;
+		await writeTickets(tickets);
+
+		console.log(`[MOCK API] Updated ticket ${id}`);
+		return updated;
 	},
 };

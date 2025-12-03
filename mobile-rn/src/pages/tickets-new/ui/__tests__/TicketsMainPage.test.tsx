@@ -3,9 +3,8 @@ import { render, waitFor } from '@testing-library/react-native';
 import { createStore, Provider as JotaiProvider } from 'jotai';
 import React from 'react';
 
-import * as ticketModule from '@/entities/ticket';
 import type { Ticket } from '@/entities/ticket';
-import { apiClient, ticketsKeys } from '@/shared/api';
+import { axiosClient, ticketsKeys } from '@/shared/api';
 
 import { TicketsMainPage } from '../TicketsMainPage';
 
@@ -15,16 +14,11 @@ jest.mock('expo-router', () => ({
 }));
 
 // Spy mocks
-const apiClientGetMock = jest.spyOn(apiClient, 'get');
+const axiosGetMock = jest.spyOn(axiosClient, 'get');
 
-// Helper to wrap with jotai provider so we can pass initial tickets
+// Helper to wrap with providers and optionally pre-populate React Query cache
 function renderWithState(initialTickets: Ticket[] = []) {
 	const store = createStore();
-	// Помечаем как уже гидратированное (иначе компонент сам дернёт hydrate + сетевой вызов)
-	store.set(ticketModule.ticketsHydratedAtom, true);
-	if (initialTickets.length) {
-		store.set(ticketModule.setTicketsAtom, () => initialTickets);
-	}
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
@@ -47,11 +41,11 @@ function renderWithState(initialTickets: Ticket[] = []) {
 
 describe('TicketsMainPage', () => {
 	beforeEach(() => {
-		apiClientGetMock.mockReset();
+		axiosGetMock.mockReset();
 	});
 
 	it('shows loading then empty state', async () => {
-		apiClientGetMock.mockResolvedValueOnce({ data: [] });
+		axiosGetMock.mockResolvedValueOnce({ data: [] });
 		const { queryByTestId } = renderWithState([]);
 		expect(queryByTestId('tickets-loading')).not.toBeNull();
 		await waitFor(() =>
@@ -60,7 +54,7 @@ describe('TicketsMainPage', () => {
 	});
 
 	it('shows list when api returns tickets', async () => {
-		apiClientGetMock.mockResolvedValueOnce({
+		axiosGetMock.mockResolvedValueOnce({
 			data: [
 				{
 					id: '1',
@@ -81,10 +75,9 @@ describe('TicketsMainPage', () => {
 		);
 	});
 
-	it('uses SWR refresh when snapshot present', async () => {
-		// Сценарий: уже есть локальный билет (snapshot), TTL истёк -> блокирующий не нужен, должен пойти SWR путь
-		// Для простоты имитируем что blocking fetch пропускается (tickets не пустой), и SWR возвращает обновлённый список
-		apiClientGetMock.mockResolvedValueOnce({
+	it('shows cached data instantly when available in React Query', async () => {
+		// React Query cache already has data - should show list immediately
+		axiosGetMock.mockResolvedValueOnce({
 			data: [
 				{
 					id: '2',
@@ -99,10 +92,10 @@ describe('TicketsMainPage', () => {
 				},
 			],
 		});
-		// snapshot изначально
-		const snapshot: Ticket[] = [
+
+		const cachedTickets: Ticket[] = [
 			{
-				id: 'snap',
+				id: 'cached',
 				from: 'X',
 				to: 'Y',
 				departureTime: '2024-01-10',
@@ -110,12 +103,16 @@ describe('TicketsMainPage', () => {
 				isUsed: false,
 				type: 'train',
 				businessCategory: 'transport',
-				title: 'Snapshot',
+				title: 'Cached Ticket',
 			},
 		];
-		const { queryByTestId } = renderWithState(snapshot);
-		// Должен сразу показать список (без спиннера) тк snapshot есть
+		const { queryByTestId } = renderWithState(cachedTickets);
+
+		// Should show list immediately without loading spinner (cache hit)
 		expect(queryByTestId('tickets-loading')).toBeNull();
-		await waitFor(() => expect(apiClientGetMock).toHaveBeenCalled());
+		expect(queryByTestId('tickets-list')).not.toBeNull();
+
+		// Background refetch should still happen
+		await waitFor(() => expect(axiosGetMock).toHaveBeenCalled());
 	});
 });

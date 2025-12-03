@@ -1,5 +1,7 @@
 // routeService.ts
-import apiClient, { HttpError } from './client';
+import { AxiosError } from 'axios';
+
+import axiosClient from './axios-client';
 
 export interface RouteRequestData {
 	startPoint: { lon: number; lat: number };
@@ -41,7 +43,7 @@ export async function buildOptimalRoute(
 		: `http://${routeBuilderUrl}/route/calculate`;
 
 	try {
-		const { data } = await apiClient.post<RouteResponse>(
+		const { data } = await axiosClient.post<RouteResponse>(
 			normalizedUrl,
 			requestData,
 			{
@@ -51,8 +53,8 @@ export async function buildOptimalRoute(
 		return data;
 	} catch (error) {
 		console.error('Error in buildOptimalRoute sending request:', error);
-		if (error instanceof HttpError) {
-			const errorDetails = `Status: ${error.status ?? 'unknown'}, Data: ${JSON.stringify(error.data)}`;
+		if (error instanceof AxiosError) {
+			const errorDetails = `Status: ${error.response?.status ?? 'unknown'}, Data: ${JSON.stringify(error.response?.data)}`;
 			console.error('HTTP error details:', errorDetails);
 			throw new Error(
 				`Сервер маршрутизации вернул ошибку: ${errorDetails}`,

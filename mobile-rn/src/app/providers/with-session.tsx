@@ -3,7 +3,6 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 
 import { refreshSessionAtom, sessionAtom } from '@/entities/session';
-import { apiClient } from '@/shared/api';
 import { analytics } from '@/shared/lib';
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -13,15 +12,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 	const router = useRouter();
 	const lastSessionKeyRef = useRef<string | null>(null);
 
-	useEffect(() => {
-		if (session.accessToken) {
-			apiClient.defaults.headers.common.Authorization = `${
-				session.tokenType ?? 'Bearer'
-			} ${session.accessToken}`;
-		} else {
-			delete apiClient.defaults.headers.common.Authorization;
-		}
-	}, [session.accessToken, session.tokenType]);
+	// Token injection is now handled by axios interceptors in axios-client.ts
+	// No need to manually set Authorization header here
 
 	useEffect(() => {
 		if (

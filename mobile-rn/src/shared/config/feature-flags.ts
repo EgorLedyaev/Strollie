@@ -3,6 +3,11 @@
 
 export type MockUploadMode = 'local' | 'cdn';
 
+// Enable/disable mock authentication. Default: true (until backend ready)
+// Use code "1234" to authenticate in dev mode
+export const USE_MOCK_AUTH =
+	(process.env.EXPO_PUBLIC_USE_MOCK_AUTH || 'true') === 'true';
+
 // Enable/disable avatar upload mock. Default: true (until backend ready)
 export const USE_MOCK_UPLOAD_AVATAR =
 	(process.env.EXPO_PUBLIC_USE_MOCK_UPLOAD_AVATAR || 'true') === 'true';

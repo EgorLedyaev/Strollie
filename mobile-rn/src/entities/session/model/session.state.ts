@@ -2,11 +2,7 @@ import { atom, type Getter } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 
 import { resetUserProfileAtom, type User } from '@/entities/user/@x/session';
-import {
-	apiClient,
-	refreshAccessToken,
-	revokeRefreshToken,
-} from '@/shared/api';
+import { refreshAccessToken, revokeRefreshToken } from '@/shared/api';
 import { SESSION_STORAGE_KEY } from '@/shared/config';
 import { secureAtomStorage } from '@/shared/lib/secure-storage';
 
@@ -50,15 +46,8 @@ const CLEARED_STATE: SessionSnapshot = {
 	refreshToken: null,
 };
 
-const applyAuthHeader = (session: SessionSnapshot) => {
-	if (session.accessToken) {
-		apiClient.defaults.headers.common.Authorization = `${
-			session.tokenType ?? 'Bearer'
-		} ${session.accessToken}`;
-	} else {
-		delete apiClient.defaults.headers.common.Authorization;
-	}
-};
+// Note: Auth header injection is now handled automatically by axios interceptors
+// See: shared/api/axios-client.ts
 
 /**
  * Хранилище для состояния сессии.
@@ -112,7 +101,6 @@ export const setSessionAtom = atom(
 			tokenType: newSessionData.tokenType ?? 'Bearer',
 			userProfile: newSessionData.userProfile ?? null,
 		};
-		applyAuthHeader(newSession);
 		set(sessionAtomWithStorage, newSession);
 	},
 );
@@ -130,7 +118,6 @@ export const refreshSessionAtom = atom(null, async (get, set) => {
 			accessToken: tokens.access_token,
 			tokenType: tokens.token_type ?? current.tokenType ?? 'Bearer',
 		};
-		applyAuthHeader(updatedSession);
 		set(sessionAtomWithStorage, updatedSession);
 	} catch (error) {
 		console.warn(
@@ -139,7 +126,6 @@ export const refreshSessionAtom = atom(null, async (get, set) => {
 		);
 		// Если refresh не удался, очищаем сессию полностью.
 		set(resetUserProfileAtom);
-		applyAuthHeader(CLEARED_STATE);
 		set(sessionAtomWithStorage, CLEARED_STATE);
 	}
 });
@@ -158,7 +144,6 @@ export const logoutAtom = atom(null, async (get, set) => {
 		console.warn('Не удалось отозвать refresh токен при выходе', error);
 	} finally {
 		set(resetUserProfileAtom);
-		applyAuthHeader(CLEARED_STATE);
 		set(sessionAtomWithStorage, CLEARED_STATE);
 	}
 });

@@ -1,16 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { apiClient, ticketsKeys } from '@/shared/api';
+import { axiosClient, ticketsKeys } from '@/shared/api';
 
 import type { Ticket } from './ticket.model';
 
 async function fetchTickets(): Promise<Ticket[]> {
-	const { data } = await apiClient.get<Ticket[]>('/tickets');
+	const { data } = await axiosClient.get<Ticket[]>('/tickets');
 	return data;
 }
 
 async function createTicket(ticket: Omit<Ticket, 'id'>): Promise<Ticket> {
-	const { data } = await apiClient.post<Ticket>('/tickets', ticket);
+	const { data } = await axiosClient.post<Ticket>('/tickets', ticket);
 	return data;
 }
 
