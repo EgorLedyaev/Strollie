@@ -37,7 +37,7 @@ public class RouteRequest {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(name = "Point", description = "Координаты точки")
+    @Schema(name = "RoutePoint", description = "Координаты точки")
     public static class Point {
         @NotNull
         @Schema(description = "Широта", example = "59.9311")
@@ -46,4 +46,5 @@ public class RouteRequest {
         @Schema(description = "Долгота", example = "30.3609")
         private Double lon;
     }
+
 }
