@@ -1,25 +1,26 @@
-# ЭТАП 1: Сборка
-FROM gradle:8-jdk17-alpine AS build
-
+# ЭТАП 1: Сборка (Builder)
+FROM gradle:8-jdk17-alpine AS builder
 WORKDIR /app
 
-# Копируем конфиги Gradle для кеширования зависимостей
 COPY build.gradle settings.gradle ./
-RUN gradle clean build --no-daemon > /dev/null 2>&1 || true
 
-# Копируем исходники
+RUN gradle dependencies --no-daemon
+
 COPY src ./src
 
-# Собираем bootJar
-RUN gradle bootJar --no-daemon
+RUN gradle bootJar --no-daemon -x test
 
-# ЭТАП 2: Запуск
+RUN java -Djarmode=layertools -jar build/libs/*.jar extract
+
 FROM eclipse-temurin:17-jre-alpine
-
 WORKDIR /app
 
-COPY --from=build /app/build/libs/*.jar app.jar
+
+COPY --from=builder /app/dependencies/ ./
+COPY --from=builder /app/spring-boot-loader/ ./
+COPY --from=builder /app/snapshot-dependencies/ ./
+COPY --from=builder /app/application/ ./
 
 EXPOSE 8082
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
