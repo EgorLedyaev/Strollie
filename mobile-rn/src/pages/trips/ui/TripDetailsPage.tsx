@@ -1,5 +1,4 @@
 import PlusIcon from '@/assets/icons/action/PlusIcon';
-import EditPhotoIcon from '@/assets/icons/EditPhotoIcon';
 import { format, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
@@ -24,6 +23,7 @@ import {
 	AppButton,
 	AppText,
 	AppTextInput,
+	EditButton,
 	SectionItem,
 } from '@/shared/ui';
 
@@ -265,7 +265,7 @@ export const TripDetailsPage: React.FC = () => {
 									Чек-лист
 								</AppText>
 								<View style={styles.rowGap10}>
-									<ActionTouchable
+									<EditButton
 										onPress={() =>
 											setChecklistMode(prev =>
 												prev === 'view'
@@ -273,23 +273,19 @@ export const TripDetailsPage: React.FC = () => {
 													: 'view',
 											)
 										}
-									>
-										<View
-											style={
-												checklistMode === 'edit'
-													? styles.smallSquareGreen
-													: styles.smallSquareWhite
-											}
-										>
-											<EditPhotoIcon
-												color={
-													checklistMode === 'edit'
-														? Colors.white
-														: Colors.textAAA
-												}
-											/>
-										</View>
-									</ActionTouchable>
+										size={32}
+										borderRadius={Radius.r8}
+										backgroundColor={
+											checklistMode === 'edit'
+												? Colors.successGreen
+												: Colors.white
+										}
+										iconColor={
+											checklistMode === 'edit'
+												? Colors.white
+												: Colors.textAAA
+										}
+									/>
 									<ActionTouchable
 										onPress={() =>
 											setIsAddingChecklistItem(
@@ -496,14 +492,6 @@ const styles = StyleSheet.create({
 	},
 	sectionsContainer: {
 		// paddingTop: 30,
-	},
-	smallSquareGreen: {
-		alignItems: 'center',
-		backgroundColor: Colors.successGreen,
-		borderRadius: Radius.r8,
-		height: 32,
-		justifyContent: 'center',
-		width: 32,
 	},
 	smallSquareWhite: {
 		alignItems: 'center',

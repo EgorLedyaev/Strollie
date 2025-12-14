@@ -1,337 +1,359 @@
 {
-	"openapi": "3.0.1",
-	"info": { "title": "OpenAPI definition", "version": "v0" },
-	"servers": [
-		{
-			"url": "http://92.246.141.61:8081",
-			"description": "Generated server url"
-		}
-	],
-	"tags": [
-		{
-			"name": "Auth",
-			"description": "Эндпоинты аутентификации и управления токенами"
-		}
-	],
-	"paths": {
-		"/auth/verify-code": {
-			"post": {
-				"tags": ["Auth"],
-				"summary": "Подтвердить OTP-код",
-				"description": "Верифицирует OTP и выдаёт пару токенов",
-				"operationId": "verify",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/VerifyCodeRequest"
-							},
-							"example": {
-								"email": "user@test.local",
-								"code": "123456"
-							}
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"401": {
-						"description": "Неверный код",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Отсутствуют поля",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"200": {
-						"description": "Успешная аутентификация",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/VerifyCodeResponse"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/request-code": {
-			"post": {
-				"tags": ["Auth"],
-				"summary": "Запросить OTP-код для входа",
-				"description": "Создаёт пользователя при необходимости, генерирует OTP и отправляет на email",
-				"operationId": "requestCode",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/RequestCodeRequest"
-							},
-							"example": { "email": "user@test.local" }
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"400": {
-						"description": "Неверный запрос",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"200": {
-						"description": "Код отправлен",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RequestCodeResponse"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/refresh": {
-			"post": {
-				"tags": ["Auth"],
-				"summary": "Обновить access-токен",
-				"description": "По валидному refresh-токену выдаёт новый access-токен",
-				"operationId": "refresh",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/RefreshRequest"
-							},
-							"example": { "refresh_token": "<uuid>" }
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"401": {
-						"description": "Некорректный refresh-токен",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"200": {
-						"description": "Новый access-токен",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/RefreshResponse"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/auth/logout": {
-			"post": {
-				"tags": ["Auth"],
-				"summary": "Выйти из системы",
-				"description": "Отзывает refresh-токен",
-				"operationId": "logout",
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/LogoutRequest"
-							},
-							"example": { "refresh_token": "<uuid>" }
-						}
-					},
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"description": "Выход выполнен",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/LogoutResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Отсутствует refresh_token",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/oauth/jwks": {
-			"get": {
-				"tags": ["Auth"],
-				"summary": "Опубликовать JWKS",
-				"description": "Возвращает набор публичных ключей для проверки JWT",
-				"operationId": "jwks",
-				"responses": {
-					"200": {
-						"description": "JWKS",
-						"content": {
-							"*/*": {
-								"schema": {
-									"$ref": "#/components/schemas/JwksResponse"
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"components": {
-		"schemas": {
-			"VerifyCodeRequest": {
-				"type": "object",
-				"properties": {
-					"email": {
-						"type": "string",
-						"description": "Email пользователя",
-						"example": "user@test.local"
-					},
-					"code": {
-						"type": "string",
-						"description": "OTP-код",
-						"example": "123456"
-					}
-				}
-			},
-			"ErrorResponse": {
-				"type": "object",
-				"properties": {
-					"error": {
-						"type": "string",
-						"description": "Описание ошибки",
-						"example": "invalid_code"
-					}
-				}
-			},
-			"VerifyCodeResponse": {
-				"type": "object",
-				"properties": {
-					"access_token": {
-						"type": "string",
-						"description": "JWT access-токен"
-					},
-					"refresh_token": {
-						"type": "string",
-						"description": "Refresh-токен (UUID)"
-					},
-					"token_type": {
-						"type": "string",
-						"description": "Тип токена",
-						"example": "Bearer"
-					}
-				}
-			},
-			"RequestCodeRequest": {
-				"type": "object",
-				"properties": {
-					"email": {
-						"type": "string",
-						"description": "Email пользователя",
-						"example": "user@test.local"
-					}
-				}
-			},
-			"RequestCodeResponse": {
-				"type": "object",
-				"properties": {
-					"status": {
-						"type": "string",
-						"description": "Статус отправки",
-						"example": "sent"
-					},
-					"to": {
-						"type": "string",
-						"description": "Маскированный email получателя",
-						"example": "**@test.local"
-					}
-				}
-			},
-			"RefreshRequest": {
-				"type": "object",
-				"properties": {
-					"refresh_token": {
-						"type": "string",
-						"description": "Refresh-токен",
-						"example": "3b1f6c2e-5b8a-4c0b-9e21-0d2a1b8c7f2e"
-					}
-				}
-			},
-			"RefreshResponse": {
-				"type": "object",
-				"properties": {
-					"access_token": {
-						"type": "string",
-						"description": "Новый JWT access-токен"
-					},
-					"token_type": {
-						"type": "string",
-						"description": "Тип токена",
-						"example": "Bearer"
-					}
-				}
-			},
-			"LogoutRequest": {
-				"type": "object",
-				"properties": {
-					"refresh_token": {
-						"type": "string",
-						"description": "Refresh-токен",
-						"example": "3b1f6c2e-5b8a-4c0b-9e21-0d2a1b8c7f2e"
-					}
-				}
-			},
-			"LogoutResponse": {
-				"type": "object",
-				"properties": {
-					"status": {
-						"type": "string",
-						"description": "Статус операции",
-						"example": "ok"
-					}
-				}
-			},
-			"JwksResponse": {
-				"type": "object",
-				"properties": {
-					"keys": { "type": "object", "description": "Массив ключей" }
-				}
-			}
-		}
-	}
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://185.246.222.56:8081",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Эндпоинты аутентификации и управления токенами"
+    }
+  ],
+  "paths": {
+    "/auth/verify-code": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Подтвердить OTP-код",
+        "description": "Верифицирует OTP и выдаёт пару токенов",
+        "operationId": "verify",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyCodeRequest"
+              },
+              "example": {
+                "email": "user@test.local",
+                "code": "123456"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешная аутентификация",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyCodeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Отсутствуют поля",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Неверный код",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/request-code": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Запросить OTP-код для входа",
+        "description": "Создаёт пользователя при необходимости, генерирует OTP и отправляет на email",
+        "operationId": "requestCode",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestCodeRequest"
+              },
+              "example": {
+                "email": "user@test.local"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Код отправлен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestCodeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный запрос",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Обновить access-токен",
+        "description": "По валидному refresh-токену выдаёт новый access-токен",
+        "operationId": "refresh",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              },
+              "example": {
+                "refresh_token": "<uuid>"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Новый access-токен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Некорректный refresh-токен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Выйти из системы",
+        "description": "Отзывает refresh-токен",
+        "operationId": "logout",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              },
+              "example": {
+                "refresh_token": "<uuid>"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Выход выполнен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Отсутствует refresh_token",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth/jwks": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Опубликовать JWKS",
+        "description": "Возвращает набор публичных ключей для проверки JWT",
+        "operationId": "jwks",
+        "responses": {
+          "200": {
+            "description": "JWKS",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/JwksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "VerifyCodeRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "user@test.local"
+          },
+          "code": {
+            "type": "string",
+            "description": "OTP-код",
+            "example": "123456"
+          }
+        }
+      },
+      "VerifyCodeResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access-токен"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh-токен (UUID)"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Тип токена",
+            "example": "Bearer"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Описание ошибки",
+            "example": "invalid_code"
+          }
+        }
+      },
+      "RequestCodeRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email пользователя",
+            "example": "user@test.local"
+          }
+        }
+      },
+      "RequestCodeResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Статус отправки",
+            "example": "sent"
+          },
+          "to": {
+            "type": "string",
+            "description": "Маскированный email получателя",
+            "example": "**@test.local"
+          }
+        }
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh-токен",
+            "example": "3b1f6c2e-5b8a-4c0b-9e21-0d2a1b8c7f2e"
+          }
+        }
+      },
+      "RefreshResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "Новый JWT access-токен"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Тип токена",
+            "example": "Bearer"
+          }
+        }
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh-токен",
+            "example": "3b1f6c2e-5b8a-4c0b-9e21-0d2a1b8c7f2e"
+          }
+        }
+      },
+      "LogoutResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Статус операции",
+            "example": "ok"
+          }
+        }
+      },
+      "JwksResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "object",
+            "description": "Массив ключей"
+          }
+        }
+      }
+    }
+  }
 }

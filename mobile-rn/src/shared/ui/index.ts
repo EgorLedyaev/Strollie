@@ -14,6 +14,7 @@ export { MapStatusIndicator } from './MapStatusIndicator';
 export { AppText, AppTextInput } from './Text';
 export { PaginationDots } from './PaginationDots';
 export { LikeButton } from './LikeButton';
+export { EditButton } from './EditButton/EditButton';
 export { DatePickerModal } from './DatePickerModal/DatePickerModal';
 export { SectionItem } from './SectionItem';
 

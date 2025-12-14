@@ -4,10 +4,11 @@
      Allowed host: 91.108.246.148 (WebView fallback from webview.ts)
 -->
 <network-security-config>
-    <!-- Default: disallow cleartext globally -->
-    <base-config cleartextTrafficPermitted="false" />
-    <!-- Explicitly allow ONLY the production fallback IP -->
+    <!-- TEMP: allow cleartext globally to unblock release (revert after HTTPS/more narrow config) -->
+    <base-config cleartextTrafficPermitted="true" />
+    <!-- Keep explicit whitelist for documentation; redundant while base-config=true -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="false">91.108.246.148</domain>
+        <domain includeSubdomains="false">185.246.222.56</domain>
     </domain-config>
 </network-security-config>

@@ -63,7 +63,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
 				duration: 250,
 			},
 		);
-	}, [isVisible, visibilityTranslateY]);
+	}, [isVisible]);
 
 	useEffect(() => {
 		setPointerEventsState(isVisible ? 'auto' : 'none');

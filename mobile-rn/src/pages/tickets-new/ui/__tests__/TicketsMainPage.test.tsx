@@ -3,8 +3,7 @@ import { render, waitFor } from '@testing-library/react-native';
 import { createStore, Provider as JotaiProvider } from 'jotai';
 import React from 'react';
 
-import type { Ticket } from '@/entities/ticket';
-import { ticketApi } from '@/entities/ticket/api/ticketApi';
+import { ticketApi, type Ticket } from '@/entities/ticket';
 import { ticketsKeys } from '@/shared/api';
 
 import { TicketsMainPage } from '../TicketsMainPage';

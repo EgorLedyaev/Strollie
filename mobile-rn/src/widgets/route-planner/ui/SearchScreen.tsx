@@ -85,7 +85,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({
 		translateY.value = withTiming(isVisible ? 0 : height, {
 			duration: 350,
 		});
-	}, [isVisible, height, translateY]);
+	}, [isVisible, height]);
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [{ translateY: translateY.value }],

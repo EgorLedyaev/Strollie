@@ -26,6 +26,7 @@ export interface AppButtonProps extends PressableProps {
 	variant?: ButtonVariant;
 	buttonColor?: string;
 	buttonBorderRadius?: number;
+	buttonHeight?: number;
 	textColor?: string;
 	textFontSize?: number;
 	textFontFamily?: string;
@@ -58,6 +59,7 @@ export const AppButton = ({
 	disabled,
 	buttonColor = Colors.grayBackground,
 	buttonBorderRadius = Radius.r20,
+	buttonHeight = 52,
 	textColor = Colors.white,
 	textFontSize = Fonts.f18,
 	textFontFamily = Fonts.semibold,
@@ -154,7 +156,10 @@ export const AppButton = ({
 
 	return (
 		<Pressable
-			style={style}
+			style={state => [
+				{ height: buttonHeight, minHeight: buttonHeight },
+				typeof style === 'function' ? style(state) : style,
+			]}
 			{...props}
 			disabled={isDisabled}
 			onPressIn={handlePressIn}
@@ -215,7 +220,7 @@ export const AppButton = ({
 
 const styles = StyleSheet.create({
 	buttonContainer: {
-		height: '100%',
+		flex: 1,
 		width: '100%',
 	},
 	disabledText: {

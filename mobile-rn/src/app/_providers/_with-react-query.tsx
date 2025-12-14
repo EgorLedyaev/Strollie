@@ -63,3 +63,5 @@ export function ReactQueryProvider({
 		</PersistQueryClientProvider>
 	);
 }
+
+export default ReactQueryProvider;

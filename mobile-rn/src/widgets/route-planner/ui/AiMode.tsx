@@ -1,43 +1,50 @@
 import DeleteIcon from '@/assets/icons/DeleteIcon';
 import { GreenPointerIcon } from '@/assets/icons/map';
-import Slider from '@react-native-community/slider';
-import { LinearGradient } from 'expo-linear-gradient';
-import React, { useState } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Colors, Fonts, Radius, Shadows } from '@/shared/tokens';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
 import { AppText, AppTextInput } from '@/shared/ui';
 
-const categoryRows = [
-	[
-		{ key: 'sights', label: 'Обзорные площадки' },
-		{ key: 'museums', label: 'Музеи' },
-	],
-	[
-		{ key: 'parks', label: 'Парки' },
-		{ key: 'cafe', label: 'Кафе' },
-		{ key: 'embankments', label: 'Набережные' },
-	],
-];
+interface AiModeProps {
+	startPoint: string;
+	onStartPointChange: (value: string) => void;
+	onStartPointBlur: () => void;
+	onClearStartPoint: () => void;
+	onUseMyLocation: () => void;
+	startPointError?: string | null;
+	categories: { id: string; label: string }[];
+	selectedCategories: string[];
+	onToggleCategory: (id: string) => void;
+	hours: string;
+	onHoursChange: (value: string) => void;
+	minutes: string;
+	onMinutesChange: (value: string) => void;
+	comment: string;
+	onCommentChange: (value: string) => void;
+	isCategoriesLoading?: boolean;
+	isGeocoding?: boolean;
+}
 
-export const AiMode = () => {
-	const [startPoint, setStartPoint] = useState<string>('');
-	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-	const [criteria] = useState<'time' | 'distance'>('time');
-	const [hours, setHours] = useState<string>('');
-	const [minutes, setMinutes] = useState<string>('');
-	const [comment, setComment] = useState<string>('');
-
-	const [distance, setDistance] = useState<number>(2);
-
-	const handleCategorySelect = (categoryKey: string) => {
-		setSelectedCategories(prev =>
-			prev.includes(categoryKey)
-				? prev.filter(c => c !== categoryKey)
-				: [...prev, categoryKey],
-		);
-	};
-
+export const AiMode = ({
+	startPoint,
+	onStartPointChange,
+	onStartPointBlur,
+	onClearStartPoint,
+	onUseMyLocation,
+	startPointError,
+	categories = [],
+	selectedCategories = [],
+	onToggleCategory,
+	hours,
+	onHoursChange,
+	minutes,
+	onMinutesChange,
+	comment,
+	onCommentChange,
+	isCategoriesLoading,
+	isGeocoding,
+}: AiModeProps) => {
 	return (
 		<ScrollView
 			showsVerticalScrollIndicator={false}
@@ -51,12 +58,25 @@ export const AiMode = () => {
 					placeholder='Откуда'
 					placeholderTextColor={Colors.lightInputText}
 					value={startPoint}
-					onChangeText={setStartPoint}
+					onChangeText={onStartPointChange}
+					onBlur={onStartPointBlur}
 				/>
-				<TouchableOpacity onPress={() => setStartPoint('')}>
+				<TouchableOpacity
+					onPress={onUseMyLocation}
+					style={styles.inlineButton}
+					disabled={isGeocoding}
+				>
+					<AppText style={styles.inlineButtonText}>
+						{isGeocoding ? '...' : 'Моё местоп.'}
+					</AppText>
+				</TouchableOpacity>
+				<TouchableOpacity onPress={onClearStartPoint}>
 					<DeleteIcon />
 				</TouchableOpacity>
 			</View>
+			{startPointError ? (
+				<AppText style={styles.errorText}>{startPointError}</AppText>
+			) : null}
 
 			{/* Категории */}
 			<View style={styles.section}>
@@ -65,152 +85,66 @@ export const AiMode = () => {
 				</AppText>
 
 				<View style={styles.categoryContainer}>
-					{categoryRows.map((row, rowIndex) => (
-						<View key={rowIndex} style={styles.categoryRow}>
-							{row.map(category => {
-								const isSelected = selectedCategories.includes(
-									category.key,
-								);
-								return (
-									<TouchableOpacity
-										key={category.key}
-										style={[
-											styles.categoryChip,
-											isSelected &&
-												styles.categoryChipSelected,
-										]}
-										onPress={() =>
-											handleCategorySelect(category.key)
-										}
-									>
-										<AppText style={styles.categoryText}>
-											{category.label}
-										</AppText>
-									</TouchableOpacity>
-								);
-							})}
-						</View>
-					))}
+					{categories.length === 0 && !isCategoriesLoading ? (
+						<AppText style={styles.placeholderText}>
+							Категории пока недоступны
+						</AppText>
+					) : (
+						categories.map(category => {
+							const isSelected = selectedCategories.includes(
+								category.label,
+							);
+							return (
+								<TouchableOpacity
+									key={category.id}
+									style={[
+										styles.categoryChip,
+										isSelected &&
+											styles.categoryChipSelected,
+									]}
+									onPress={() =>
+										onToggleCategory(category.label)
+									}
+								>
+									<AppText style={styles.categoryText}>
+										{category.label}
+									</AppText>
+								</TouchableOpacity>
+							);
+						})
+					)}
 				</View>
 			</View>
 
-			{/* Переключатель */}
-			{/*<View style={styles.toggleContainer}>*/}
-			{/*	<TouchableOpacity*/}
-			{/*		style={[*/}
-			{/*			styles.toggleButton,*/}
-			{/*			criteria === 'time' && styles.toggleButtonActive,*/}
-			{/*		]}*/}
-			{/*		onPress={() => setCriteria('time')}*/}
-			{/*	>*/}
-			{/*		<AppText*/}
-			{/*			style={[*/}
-			{/*				styles.toggleText,*/}
-			{/*				criteria === 'time' && styles.toggleTextActive,*/}
-			{/*			]}*/}
-			{/*		>*/}
-			{/*			По времени*/}
-			{/*		</AppText>*/}
-			{/*	</TouchableOpacity>*/}
-			{/*	<TouchableOpacity*/}
-			{/*		style={[*/}
-			{/*			styles.toggleButton,*/}
-			{/*			criteria === 'distance' && styles.toggleButtonActive,*/}
-			{/*		]}*/}
-			{/*		onPress={() => setCriteria('distance')}*/}
-			{/*	>*/}
-			{/*		<AppText*/}
-			{/*			style={[*/}
-			{/*				styles.toggleText,*/}
-			{/*				criteria === 'distance' && styles.toggleTextActive,*/}
-			{/*			]}*/}
-			{/*		>*/}
-			{/*			По расстоянию*/}
-			{/*		</AppText>*/}
-			{/*	</TouchableOpacity>*/}
-			{/*</View>*/}
 			<AppText style={[styles.sectionTitle, styles.timeTitle]}>
 				Время прохождения маршрута
 			</AppText>
-			{criteria === 'time' ? (
-				<View style={styles.timeInputWrapper}>
-					<View style={styles.timeInputContainer}>
-						<AppTextInput
-							style={styles.timeInput}
-							keyboardType='number-pad'
-							maxLength={2}
-							value={hours}
-							onChangeText={setHours}
-							placeholder='00'
-							placeholderTextColor={Colors.headerAndInputText}
-						/>
-						<AppText style={styles.timeUnitText}>ч.</AppText>
-					</View>
-					<View style={styles.timeInputContainer}>
-						<AppTextInput
-							style={styles.timeInput}
-							keyboardType='number-pad'
-							maxLength={2}
-							value={minutes}
-							onChangeText={setMinutes}
-							placeholder='00'
-							placeholderTextColor={Colors.headerAndInputText}
-						/>
-						<AppText style={styles.timeUnitText}>мин.</AppText>
-					</View>
+			<View style={styles.timeInputWrapper}>
+				<View style={styles.timeInputContainer}>
+					<AppTextInput
+						style={styles.timeInput}
+						keyboardType='number-pad'
+						maxLength={2}
+						value={hours}
+						onChangeText={onHoursChange}
+						placeholder='00'
+						placeholderTextColor={Colors.headerAndInputText}
+					/>
+					<AppText style={styles.timeUnitText}>ч.</AppText>
 				</View>
-			) : (
-				<View style={styles.distanceSliderContainer}>
-					<View style={styles.sliderWrapper}>
-						{/* Подсказка со значением */}
-						<View
-							style={[
-								styles.callout,
-								{
-									left: `${((distance - 1) / (12 - 1)) * 100}%`, // Динамическое позиционирование
-								},
-							]}
-						>
-							<View style={styles.calloutBody}>
-								<AppText style={styles.calloutText}>
-									{Math.round(distance)} км
-								</AppText>
-							</View>
-							<View style={styles.calloutTriangle} />
-						</View>
-						<LinearGradient
-							colors={['#1BEE88', '#E5F041', '#FF5900']}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 0 }}
-							style={styles.gradientTrack}
-						/>
-						{/* Слайдер */}
-						<View
-							style={[
-								styles.thumb,
-								{
-									left: `${((distance - 1) / (12 - 1)) * 100}%`,
-								},
-							]}
-						/>
-						<Slider
-							style={styles.slider}
-							minimumValue={1}
-							maximumValue={12}
-							step={1}
-							value={distance}
-							onValueChange={setDistance}
-							minimumTrackTintColor='transparent'
-							maximumTrackTintColor='transparent'
-							thumbTintColor={Colors.transparent}
-						/>
-					</View>
-					<View style={styles.labelsContainer}>
-						<AppText style={styles.labelText}>1 км</AppText>
-						<AppText style={styles.labelText}>12 км</AppText>
-					</View>
+				<View style={styles.timeInputContainer}>
+					<AppTextInput
+						style={styles.timeInput}
+						keyboardType='number-pad'
+						maxLength={2}
+						value={minutes}
+						onChangeText={onMinutesChange}
+						placeholder='00'
+						placeholderTextColor={Colors.headerAndInputText}
+					/>
+					<AppText style={styles.timeUnitText}>мин.</AppText>
 				</View>
-			)}
+			</View>
 
 			{/* Комментарий */}
 			<View style={styles.section}>
@@ -223,7 +157,7 @@ export const AiMode = () => {
 					placeholderTextColor={Colors.placeHolderInput}
 					multiline
 					value={comment}
-					onChangeText={setComment}
+					onChangeText={onCommentChange}
 				/>
 			</View>
 		</ScrollView>
@@ -231,40 +165,12 @@ export const AiMode = () => {
 };
 
 const styles = StyleSheet.create({
-	callout: {
-		alignItems: 'center',
-		position: 'absolute',
-		top: -35,
-		transform: [{ translateX: -24 }],
-	},
-	calloutBody: {
-		backgroundColor: Colors.grayBackground,
-		borderRadius: Radius.r8,
-		paddingHorizontal: 12,
-		paddingVertical: 6,
-	},
-	calloutText: {
-		color: Colors.secondaryText,
-		fontSize: Fonts.f12,
-	},
-	calloutTriangle: {
-		backgroundColor: Colors.transparent,
-		borderLeftColor: Colors.transparent,
-		borderLeftWidth: 6,
-		borderRightColor: Colors.transparent,
-		borderRightWidth: 6,
-		borderStyle: 'solid',
-		borderTopColor: Colors.grayBackground,
-		borderTopWidth: 8,
-		marginTop: -1,
-	},
 	categoryChip: {
 		alignItems: 'center',
 		backgroundColor: Colors.uploadButtonBackground,
 		borderRadius: Radius.r16,
-		flex: 1,
-		height: 110,
-		justifyContent: 'flex-end',
+		flexBasis: '48%',
+		justifyContent: 'center',
 		paddingHorizontal: 10,
 		paddingVertical: 12,
 	},
@@ -273,10 +179,8 @@ const styles = StyleSheet.create({
 		borderWidth: 1.5,
 	},
 	categoryContainer: {
-		gap: 12,
-	},
-	categoryRow: {
 		flexDirection: 'row',
+		flexWrap: 'wrap',
 		gap: 12,
 	},
 	categoryText: {
@@ -298,9 +202,12 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingTop: 24,
 	},
-	distanceSliderContainer: {
-		paddingHorizontal: 16,
-		paddingTop: 48,
+	errorText: {
+		color: Colors.error,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f12,
+		marginTop: 6,
+		paddingLeft: 10,
 	},
 	fromRow: {
 		alignItems: 'center',
@@ -311,23 +218,23 @@ const styles = StyleSheet.create({
 		height: 52,
 		paddingHorizontal: 20,
 	},
-	gradientTrack: {
-		borderRadius: Radius.r8,
-		height: 12,
+	inlineButton: {
+		marginHorizontal: 8,
+	},
+	inlineButtonText: {
+		color: Colors.greenPrimary,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f12,
 	},
 	input: {
 		flex: 1,
 		fontSize: Fonts.f16,
 	},
-	labelText: {
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f16,
-	},
-	labelsContainer: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingHorizontal: 8,
-		paddingTop: 2,
+	placeholderText: {
+		color: Colors.secondaryText,
+		fontFamily: Fonts.medium,
+		fontSize: Fonts.f14,
+		paddingHorizontal: 4,
 	},
 	pointer: {
 		alignSelf: 'center',
@@ -340,24 +247,6 @@ const styles = StyleSheet.create({
 		fontSize: Fonts.f16,
 		marginBottom: 16,
 		paddingLeft: 10,
-	},
-	slider: {
-		height: 40,
-		position: 'absolute',
-		width: '100%',
-	},
-	sliderWrapper: {
-		height: 40,
-		justifyContent: 'center',
-	},
-	thumb: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r20,
-		boxShadow: Shadows.boxShadow,
-		height: 32,
-		position: 'absolute',
-		transform: [{ translateX: -16 }],
-		width: 32,
 	},
 	timeInput: {
 		fontFamily: Fonts.medium,

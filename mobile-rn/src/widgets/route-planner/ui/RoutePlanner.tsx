@@ -1,190 +1,161 @@
-import walk_image from '@/assets/images/routes/embankment.png';
-import run_image from '@/assets/images/routes/sports.png';
-import React, { useEffect, useState } from 'react';
-import {
-	Pressable,
-	ScrollView,
-	StyleSheet,
-	useWindowDimensions,
-	View,
-} from 'react-native';
-import Animated, {
-	useAnimatedStyle,
-	useSharedValue,
-	withTiming,
-} from 'react-native-reanimated';
+import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AiMode } from '@/widgets/route-planner/ui/AiMode';
-import { ManualMode } from '@/widgets/route-planner/ui/ManualMode';
-import { SearchScreen } from '@/widgets/route-planner/ui/SearchScreen';
 import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppButton, BackButton } from '@/shared/ui';
+import { AppButton, AppText, BackButton } from '@/shared/ui';
+
+import { AiMode } from './AiMode';
+import { RouteResult } from './components/RouteResult';
+import { useRoutePlanner } from './useRoutePlanner';
 
 interface RoutePlannerProps {
 	isVisible: boolean;
 	onClose: () => void;
 }
-interface RoutePoint {
-	id: number;
-	address: string;
-}
-
-const nearbyPlaces = [
-	{
-		id: '1',
-		title: 'Проспект Столыпина',
-		type: 'Улица',
-		address: 'г. Саратов, ул. пр-т Столыпина',
-		isFavourite: false,
-		image: walk_image,
-	},
-	{
-		id: '2',
-		title: 'Набережная космонавтов',
-		type: 'Улица',
-		address: 'г. Саратов, ул. Наб. Космонавтов',
-		isFavourite: true,
-		image: walk_image,
-	},
-	{
-		id: '3',
-		title: 'Набережная космонавтов 2',
-		type: 'Улица',
-		address: 'г. Саратов, ул. Наб. Космонавтов',
-		isFavourite: true,
-		image: walk_image,
-	},
-];
-const nearbyEvents = [
-	{
-		id: '1',
-		title: 'Саратов - сердце Волги',
-		type: 'Фестиваль',
-		address: 'г. Саратов, Наб. Космонавтов',
-		isFavourite: false,
-		image: run_image,
-	},
-];
 
 export const RoutePlanner: React.FC<RoutePlannerProps> = ({
 	isVisible,
 	onClose,
 }) => {
-	const { height } = useWindowDimensions();
-	const { top, bottom } = useSafeAreaInsets();
-	const translateY = useSharedValue(height);
-	const [mode, setMode] = useState<'manual' | 'ai'>('manual');
-	const [isSearchVisible, setSearchVisible] = useState(false);
-	const [routePoints, setRoutePoints] = useState<RoutePoint[]>([]);
+	const { bottom, top } = useSafeAreaInsets();
+	const sheetRef = useRef<BottomSheetModal>(null);
 
-	const [isPlacesExpanded, setIsPlacesExpanded] = useState(false);
+	const {
+		startPointText,
+		startPointError,
+		locationError,
+		orderedCategories,
+		selectedCategories,
+		hours,
+		minutes,
+		comment,
+		routeResult,
+		canOpenDirections,
+		hiddenPlaceIds,
+		isCategoriesLoading,
+		isGenerating,
+		isGeocoding,
+		isOpeningExternal,
+		handleStartPointChange,
+		handleClearStartPoint,
+		setHours,
+		setMinutes,
+		setComment,
+		resetResult,
+		applyMyLocation,
+		geocodeOnBlur,
+		toggleCategory,
+		handleHidePlace,
+		handleSubmit,
+		handleOpenDirections,
+	} = useRoutePlanner({ isVisible });
 
-	const [isEventsExpanded, setIsEventsExpanded] = useState(false);
+	const snapPoints = useMemo(
+		() => (routeResult ? ['62%'] : ['92%']),
+		[routeResult],
+	);
 
-	const togglePlacesExpansion = () => {
-		setIsPlacesExpanded(prevState => !prevState);
-	};
-
-	const displayedPlaces = isPlacesExpanded
-		? nearbyPlaces.slice(0, 10)
-		: nearbyPlaces.slice(0, 2);
-	const toggleEventsExpansion = () => {
-		setIsEventsExpanded(prevState => !prevState);
-	};
-	const displayedEvents = isEventsExpanded
-		? nearbyEvents.slice(0, 10)
-		: nearbyEvents.slice(0, 2);
-
-	const handleRemovePoint = (id: number) => {
-		setRoutePoints(prevPoints => prevPoints.filter(p => p.id !== id));
-	};
-
-	const handleSelectPoint = (point: { address: string }) => {
-		const newPoint: RoutePoint = {
-			id: Date.now(), // Уникальный id на основе времени
-			address: point.address,
-		};
-		setRoutePoints(prevPoints => [...prevPoints, newPoint]);
-		setSearchVisible(false);
-	};
+	const hasError = Boolean(startPointError || locationError);
 
 	useEffect(() => {
-		translateY.value = withTiming(isVisible ? 0 : height, {
-			duration: 350,
-		});
-	}, [isVisible, height, translateY]);
-
-	const animatedStyle = useAnimatedStyle(() => {
-		return {
-			transform: [{ translateY: translateY.value }],
-		};
-	});
-
-	const handleSwitchModeFromSearch = (newMode: 'manual' | 'ai') => {
-		setMode(newMode);
-		setSearchVisible(false);
-	};
+		if (!sheetRef.current) return;
+		if (isVisible) {
+			sheetRef.current.present();
+			sheetRef.current.snapToIndex(0);
+		} else {
+			sheetRef.current.dismiss();
+		}
+	}, [isVisible]);
 
 	return (
-		<Animated.View
-			style={[styles.container, animatedStyle]}
-			pointerEvents={isVisible ? 'auto' : 'none'}
+		<BottomSheetModal
+			ref={sheetRef}
+			snapPoints={snapPoints}
+			index={0}
+			onChange={index => {
+				if (index === -1) onClose();
+			}}
+			enablePanDownToClose
+			handleIndicatorStyle={styles.handleIndicator}
+			backgroundStyle={styles.sheetBackground}
 		>
-			<Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 			<View
 				style={[
-					styles.widget,
-					{ paddingBottom: bottom || 16, top: top + 90 },
+					styles.sheetContainer,
+					{ paddingBottom: bottom || 12, paddingTop: top + 12 },
 				]}
 			>
-				<ScrollView showsVerticalScrollIndicator={false}>
-					{/*<ModeToggle*/}
-					{/*	activeMode={mode}*/}
-					{/*	onModeChange={setMode}*/}
-					{/*	style={styles.modeToggle}*/}
-					{/*/>*/}
-
-					{mode === 'manual' ? (
-						<ManualMode
-							routePoints={routePoints}
-							onRemovePoint={handleRemovePoint}
-							onAddPoint={() => setSearchVisible(true)}
-							displayedPlaces={displayedPlaces}
-							isPlacesExpanded={isPlacesExpanded}
-							onTogglePlacesExpansion={togglePlacesExpansion}
-							displayedEvents={displayedEvents}
-							isEventsExpanded={isEventsExpanded}
-							onToggleEventsExpansion={toggleEventsExpansion}
+				<BottomSheetScrollView
+					showsVerticalScrollIndicator={false}
+					contentContainerStyle={styles.scrollContent}
+				>
+					{routeResult ? (
+						<RouteResult
+							result={routeResult}
+							onReset={resetResult}
+							onOpenDirections={handleOpenDirections}
+							onHidePlace={handleHidePlace}
+							hiddenPlaceIds={hiddenPlaceIds}
 						/>
 					) : (
-						<AiMode />
+						<AiMode
+							startPoint={startPointText}
+							onStartPointChange={handleStartPointChange}
+							onStartPointBlur={() => void geocodeOnBlur()}
+							onUseMyLocation={applyMyLocation}
+							onClearStartPoint={handleClearStartPoint}
+							isGeocoding={isGeocoding}
+							startPointError={startPointError || locationError}
+							categories={orderedCategories}
+							selectedCategories={selectedCategories}
+							onToggleCategory={toggleCategory}
+							hours={hours}
+							onHoursChange={setHours}
+							minutes={minutes}
+							onMinutesChange={setMinutes}
+							comment={comment}
+							onCommentChange={setComment}
+							isCategoriesLoading={isCategoriesLoading}
+						/>
 					)}
-				</ScrollView>
+					{hasError && (
+						<AppText style={styles.errorText}>
+							{startPointError ||
+								'Не удалось построить маршрут. Попробуйте позже.'}
+						</AppText>
+					)}
+				</BottomSheetScrollView>
 
-				{/* Футер */}
 				<View style={styles.footer}>
 					<BackButton
 						variant='icon'
-						onPress={onClose}
+						onPress={routeResult ? resetResult : onClose}
 						style={styles.backButton}
 					/>
-					<AppButton
-						text={'Построить'}
-						style={styles.buildButton}
-						textFontFamily={Fonts.bold}
-					/>
+					{routeResult ? (
+						<AppButton
+							text='Открыть в картах'
+							onPress={handleOpenDirections}
+							isLoading={isOpeningExternal}
+							disabled={!canOpenDirections}
+							style={styles.buildButton}
+							textFontFamily={Fonts.bold}
+						/>
+					) : (
+						<AppButton
+							text={'Построить'}
+							onPress={handleSubmit}
+							isLoading={isGenerating || isGeocoding}
+							disabled={isCategoriesLoading}
+							style={styles.buildButton}
+							textFontFamily={Fonts.bold}
+						/>
+					)}
 				</View>
 			</View>
-
-			<SearchScreen
-				isVisible={isSearchVisible}
-				onClose={() => setSearchVisible(false)}
-				onSelectPoint={handleSelectPoint}
-				currentMode={mode}
-				onSwitchMode={handleSwitchModeFromSearch}
-			/>
-		</Animated.View>
+		</BottomSheetModal>
 	);
 };
 
@@ -201,9 +172,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: 52,
 	},
-	container: {
-		...StyleSheet.absoluteFillObject,
-		zIndex: 10,
+	errorText: {
+		color: Colors.error,
+		fontSize: Fonts.f14,
+		marginTop: 12,
+		paddingHorizontal: 16,
 	},
 	footer: {
 		alignItems: 'center',
@@ -215,14 +188,22 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 16,
 		paddingTop: 16,
 	},
-	widget: {
+	handleIndicator: {
+		backgroundColor: Colors.gray,
+		borderRadius: Radius.r4,
+		height: 4,
+		width: 42,
+	},
+	scrollContent: {
+		paddingBottom: 16,
+	},
+	sheetBackground: {
 		backgroundColor: Colors.white,
 		borderTopLeftRadius: Radius.r20,
 		borderTopRightRadius: Radius.r20,
-		bottom: 0,
-		left: 0,
-		paddingTop: 16,
-		position: 'absolute',
-		right: 0,
+	},
+	sheetContainer: {
+		flex: 1,
+		paddingHorizontal: 16,
 	},
 });

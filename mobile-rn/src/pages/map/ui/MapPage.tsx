@@ -1,4 +1,5 @@
-import React, { useCallback, useRef } from 'react';
+import { useAtomValue } from 'jotai';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Alert, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { SystemBars } from 'react-native-edge-to-edge';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,6 +11,7 @@ import {
 	usePlaceDetails,
 	type Place,
 } from '@/pages/map/place-details';
+import { generatedRouteAtom } from '@/entities/generated-route';
 import { calculateDistanceMeters, formatDistance } from '@/shared/lib';
 import { Colors } from '@/shared/tokens';
 
@@ -22,6 +24,8 @@ function MapPageContent() {
 	const insets = useSafeAreaInsets();
 	const { setSelectedPlace, resetState } = usePlaceDetails();
 	const userLocationRef = useRef<{ lat: number; lon: number } | null>(null);
+	const generatedRoute = useAtomValue(generatedRouteAtom);
+	const lastRouteIdRef = useRef<string | null>(null);
 
 	const clearPlaceDetails = useCallback(() => {
 		resetState();
@@ -123,17 +127,110 @@ function MapPageContent() {
 		uiFollowMode,
 		clearMarkers,
 		userLocation,
+		drawRoute,
+		clearRoute,
+		setMapLocation,
+		setMarkers,
 	} = useMapBridge({
 		onMarkerClick: handleMarkerClick,
 		onMapClick: handleMapClick,
 	});
+
+	useEffect(() => {
+		if (!generatedRoute || !generatedRoute.places?.length) {
+			if (lastRouteIdRef.current) {
+				clearMarkers();
+				clearRoute();
+				lastRouteIdRef.current = null;
+			}
+			return;
+		}
+
+		const routeId =
+			generatedRoute.directionsUrl ||
+			generatedRoute.description ||
+			`${generatedRoute.places.length}`;
+		lastRouteIdRef.current = routeId;
+
+		const markers = generatedRoute.places.map((place, index) => ({
+			id: place.id || `route-place-${index}`,
+			coordinates: [place.lon, place.lat] as [number, number],
+			title: place.name,
+			color: index === 0 ? '#2688EB' : '#FF7A00',
+			isRoutePoint: true,
+			placeData: place,
+		}));
+
+		setMarkers(markers, true);
+
+		if (mapReady) {
+			const coordinates = generatedRoute.places.map(
+				place => [place.lon, place.lat] as [number, number],
+			);
+			drawRoute(coordinates);
+			setMapLocation(coordinates[0], 14);
+		}
+	}, [
+		clearMarkers,
+		clearRoute,
+		drawRoute,
+		generatedRoute,
+		mapReady,
+		setMapLocation,
+		setMarkers,
+	]);
 
 	userLocationRef.current = userLocation;
 
 	const handleSheetDismiss = useCallback(() => {
 		clearMarkers();
 		clearPlaceDetails();
-	}, [clearMarkers, clearPlaceDetails]);
+		clearRoute();
+	}, [clearMarkers, clearPlaceDetails, clearRoute]);
+
+	const handleBuildRoute = useCallback(
+		(place: Place) => {
+			if (!userLocation) {
+				Alert.alert(
+					'Геолокация недоступна',
+					'Для построения маршрута нужно знать текущее местоположение.',
+				);
+				return;
+			}
+
+			const origin: [number, number] = [
+				userLocation.lon,
+				userLocation.lat,
+			];
+			const destination: [number, number] = [
+				place.point.lon,
+				place.point.lat,
+			];
+
+			const markers = [
+				{
+					id: 'route-origin',
+					coordinates: origin,
+					title: 'Вы здесь',
+					color: '#2688EB',
+					isRoutePoint: true,
+				},
+				{
+					id: `route-destination-${place.id ?? place.point.lon}-${place.point.lat}`,
+					coordinates: destination,
+					title: place.name,
+					placeData: place,
+					color: '#FF7A00',
+					isRoutePoint: true,
+				},
+			];
+
+			setMarkers(markers, true);
+			drawRoute([origin, destination]);
+			setMapLocation(destination, 14);
+		},
+		[drawRoute, setMapLocation, setMarkers, userLocation],
+	);
 
 	const rightForWeatherWidget = { right: 16 - SHADOW_PADDING };
 	const temperature = 16;
@@ -175,7 +272,10 @@ function MapPageContent() {
 			<View style={[styles.weatherContainer, rightForWeatherWidget]}>
 				<WeatherWidget temperature={temperature} />
 			</View>
-			<PlaceDetailsSheet onDismiss={handleSheetDismiss} />
+			<PlaceDetailsSheet
+				onDismiss={handleSheetDismiss}
+				onBuildRoute={handleBuildRoute}
+			/>
 		</>
 	);
 }

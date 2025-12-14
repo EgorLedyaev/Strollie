@@ -1,6 +1,5 @@
 import { useAtom, useSetAtom } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert } from 'react-native';
 import WebView from 'react-native-webview';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,24 +9,17 @@ import {
 	ensureApiKeyPersisted,
 	loadPersistedLocation,
 	MapBootstrapPayload,
-	updateShouldCenterOnUser,
 	useLocationTracking,
 } from '@/shared/lib';
 
+import type { UseMapBridgeOptions } from './map-bridge/types';
+import { useFollowMode } from './map-bridge/useFollowMode';
+import { useMarkerActions } from './map-bridge/useMarkerActions';
+import { useWebViewMessageHandler } from './map-bridge/useWebViewMessageHandler';
 import { is3DModeAtom, mapErrorAtom, mapReadyAtom } from './map-store';
-import { placedMarkersAtom } from './marker-store';
-
-export type FollowMode = 'none' | 'center' | 'heading';
-
-interface UseMapBridgeOptions {
-	// Вызывается при клике на существующий маркер, передаёт сохранённые данные места
-	onMarkerClick?: (placeData: unknown) => void;
-	// Вызывается при клике по карте, должен вернуть данные места или null
-	onMapClick?: (coordinates: [number, number]) => Promise<unknown | null>;
-}
+import { placedMarkersAtom, type PlacedMarkerData } from './marker-store';
 
 export function useMapBridge(options?: UseMapBridgeOptions) {
-	const { onMarkerClick, onMapClick } = options || {};
 	const webViewRef = useRef<WebView>(null);
 
 	const [mapReady, setMapReady] = useAtom(mapReadyAtom);
@@ -41,18 +33,44 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 	const [isBootstrapReady, setIsBootstrapReady] = useState(false);
 	const bootstrapPayloadRef = useRef<MapBootstrapPayload | null>(null);
 	const hasSentBootstrapRef = useRef(false);
+	const hasCenteredOnUserRef = useRef(false);
 
-	const { location } = useLocationTracking(mapReady);
+	const { location, heading, headingAvailable } =
+		useLocationTracking(mapReady);
 	const isLocationAvailable = !!location;
 
 	const sendMessageToWebView = useCallback(
 		(message: Record<string, unknown>) => {
+			console.log('[Native->WebView] send', message);
 			if (webViewRef.current) {
 				webViewRef.current.postMessage(JSON.stringify(message));
+			} else {
+				console.warn('[Native->WebView] no webViewRef available');
 			}
 		},
 		[],
 	);
+
+	// Шлём статус доступности компаса в WebView
+	useEffect(() => {
+		if (mapReady) {
+			sendMessageToWebView({
+				type: headingAvailable
+					? 'headingAvailable'
+					: 'headingUnavailable',
+			});
+		}
+	}, [mapReady, headingAvailable, sendMessageToWebView]);
+
+	// Шлём heading (направление компаса) в WebView
+	useEffect(() => {
+		if (mapReady && heading !== null) {
+			sendMessageToWebView({
+				type: 'updateHeading',
+				payload: { heading },
+			});
+		}
+	}, [mapReady, heading, sendMessageToWebView]);
 
 	// Шлём user location в WebView при каждом обновлении координат после mapReady
 	useEffect(() => {
@@ -73,7 +91,17 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		}
 	}, [mapReady, location, sendMessageToWebView]);
 
-	const [followMode, setFollowMode] = useState<FollowMode>('none');
+	useEffect(() => {
+		if (!mapReady || !location || hasCenteredOnUserRef.current) return;
+
+		sendMessageToWebView({
+			type: 'centerOnUser',
+			payload: {
+				coordinates: [location.longitude, location.latitude],
+			},
+		});
+		hasCenteredOnUserRef.current = true;
+	}, [mapReady, location, sendMessageToWebView]);
 
 	// Anti-bounce for 2D/3D switching
 	const [isSwitchingMode, setIsSwitchingMode] = useState(false);
@@ -89,49 +117,10 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		}
 	}, []);
 
-	const handleDeleteMarker = useCallback(
-		(idToDelete: string | null) => {
-			if (idToDelete) {
-				sendMessageToWebView({
-					type: 'removeMarker',
-					payload: { markerId: idToDelete },
-				});
-				setPlacedMarkers(prev => prev.filter(m => m.id !== idToDelete));
-			}
-		},
-		[sendMessageToWebView, setPlacedMarkers],
-	);
-
-	const showMarkerActionMenu = useCallback(
-		(markerId: string) => {
-			Alert.alert(
-				`Метка ${markerId.substring(0, 6)}...`,
-				'Выберите действие',
-				[
-					{
-						text: 'Удалить',
-						onPress: () => handleDeleteMarker(markerId),
-						style: 'destructive',
-					},
-					{ text: 'Отмена', style: 'cancel' },
-				],
-				{ cancelable: true },
-			);
-		},
-		[handleDeleteMarker],
-	);
-
-	const clearAllMarkers = useCallback(() => {
-		setPlacedMarkers(prev => {
-			prev.forEach(marker => {
-				sendMessageToWebView({
-					type: 'removeMarker',
-					payload: { markerId: marker.id },
-				});
-			});
-			return [];
-		});
-	}, [setPlacedMarkers, sendMessageToWebView]);
+	const { showMarkerActionMenu, clearAllMarkers } = useMarkerActions({
+		sendMessageToWebView,
+		setPlacedMarkers,
+	});
 
 	useEffect(() => {
 		let cancelled = false;
@@ -175,249 +164,46 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		const payload = bootstrapPayloadRef.current;
 		if (!payload || hasSentBootstrapRef.current) return;
 
+		console.log('[useMapBridge] send bootstrap payload');
 		sendMessageToWebView({ type: 'bootstrapMap', payload });
 		hasSentBootstrapRef.current = true;
 	}, [isWebViewLoaded, isBootstrapReady, sendMessageToWebView]);
 
-	const handleWebViewMessage = useCallback(
-		(event: { nativeEvent: { data: string } }) => {
-			try {
-				const message = JSON.parse(event.nativeEvent.data);
-				console.log('Message from WebView:', message);
-
-				switch (message.type) {
-					case 'mapReady':
-						setMapReady(true);
-						setMapError(null);
-						if (placedMarkers.length > 0) {
-							placedMarkers.forEach(marker => {
-								sendMessageToWebView({
-									type: 'addMarker',
-									payload: marker,
-								});
-							});
-						}
-						if (location) {
-							sendMessageToWebView({
-								type: 'updateUserLocation',
-								payload: {
-									coordinates: [
-										location.longitude,
-										location.latitude,
-									],
-								},
-							});
-						}
-						break;
-					case 'mapError':
-						setMapError(
-							message.payload?.message ||
-								'Неизвестная ошибка карты',
-						);
-						setMapReady(false);
-						break;
-					case 'mapModeChanged': {
-						const modeStr: '2d' | '3d' | undefined =
-							message.payload?.mode;
-						if (!modeStr) break;
-
-						// Если ожидаем подтверждение конкретного режима и пришел другой — игнорируем как дребезг
-						if (
-							pendingModeRef.current &&
-							modeStr !== pendingModeRef.current
-						) {
-							console.log(
-								'[mapModeChanged] Игнорируем противоречащее событие:',
-								modeStr,
-								'ожидали:',
-								pendingModeRef.current,
-							);
-							break;
-						}
-
-						// Подтвердили ожидаемый режим или ожидания нет — применяем
-						const nextIs3D = modeStr === '3d';
-						if (is3DMode !== nextIs3D) {
-							setIs3DMode(nextIs3D);
-						}
-						// Снимаем флаг переключения
-						clearSwitching();
-						break;
-					}
-					case 'markerClick': {
-						const clickedId: string | undefined =
-							message.payload?.id;
-						if (clickedId) {
-							const marker = placedMarkers.find(
-								m => m.id === clickedId,
-							);
-							if (marker && onMarkerClick) {
-								// Передаём сохранённые данные места из маркера
-								onMarkerClick(
-									(marker as { placeData?: unknown })
-										.placeData,
-								);
-							} else if (!onMarkerClick) {
-								// Если нет callback - удаляем как раньше
-								handleDeleteMarker(clickedId);
-							}
-						}
-						break;
-					}
-					case 'mapClick': {
-						const { coordinates } = message.payload as {
-							coordinates: [number, number];
-						};
-
-						console.log(
-							'mapClick event, coordinates:',
-							coordinates,
-						);
-
-						if (onMapClick) {
-							// Асинхронно ищем место по координатам
-							onMapClick(coordinates).then(placeData => {
-								console.log(
-									'onMapClick результат:',
-									placeData
-										? 'Место найдено'
-										: 'Место не найдено',
-								);
-
-								// Удаляем все старые маркеры
-								clearAllMarkers();
-
-								if (placeData) {
-									// Место найдено - создаём новый маркер с данными
-									const newMarker = {
-										id: uuidv4(),
-										coordinates,
-										placeData, // Сохраняем данные места в маркере
-									};
-									console.log(
-										'Создаём маркер с ID:',
-										newMarker.id,
-									);
-									setPlacedMarkers([newMarker]);
-									sendMessageToWebView({
-										type: 'addMarker',
-										payload: newMarker,
-									});
-
-									// Показываем sheet с данными места
-									if (onMarkerClick) {
-										console.log(
-											'Вызываем onMarkerClick для открытия sheet',
-										);
-										onMarkerClick(placeData);
-									}
-								} else {
-									console.log(
-										'placeData === null, маркер не создаётся',
-									);
-								}
-							});
-						} else {
-							// Fallback - старое поведение если нет onMapClick
-							const newMarker = { id: uuidv4(), coordinates };
-							setPlacedMarkers(prev => [...prev, newMarker]);
-							sendMessageToWebView({
-								type: 'addMarker',
-								payload: newMarker,
-							});
-						}
-						break;
-					}
-					case 'longPressOnMarker':
-						showMarkerActionMenu(message.payload.markerId);
-						break;
-					case 'jsError':
-						console.error(
-							'JavaScript Error in WebView:',
-							message.payload?.message,
-						);
-						setMapError(
-							`JS Error: ${message.payload?.message || 'Неизвестная JS ошибка'}`,
-						);
-						break;
-					case 'routeDrawSuccess':
-						console.log('Маршрут успешно отрисован в WebView');
-						break;
-					case 'routeDrawError':
-						Alert.alert(
-							'Ошибка отрисовки',
-							message.payload?.message ||
-								'WebView не смог отрисовать маршрут',
-						);
-						break;
-					case 'log':
-						console.log(
-							'WebView Log:',
-							message.payload?.message,
-							message.payload?.data,
-						);
-						break;
-					case 'userFocusLost':
-						setFollowMode('none');
-						break;
-					case 'userFocusGained':
-						// keep current mode
-						break;
-					case 'followModeChanged': {
-						const mode: FollowMode | undefined =
-							message.payload?.mode;
-						if (
-							mode === 'none' ||
-							mode === 'center' ||
-							mode === 'heading'
-						) {
-							setFollowMode(mode);
-						} else {
-							console.warn(
-								'[followModeChanged] Некорректный mode:',
-								mode,
-							);
-						}
-						break;
-					}
-					case 'followError': {
-						const reason: string | undefined =
-							message.payload?.reason;
-						console.warn('[followError] reason:', reason);
-						// Возвращаемся в none на любой ошибке
-						setFollowMode('none');
-						break;
-					}
-					default:
-						console.warn(
-							'Неизвестный тип сообщения от WebView:',
-							message.type,
-						);
-				}
-			} catch (error) {
-				console.error(
-					'Ошибка при разборе сообщения от WebView:',
-					error,
-				);
-			}
+	const updateBootstrapFollowPreference = useCallback(
+		(shouldCenter: boolean) => {
+			const payload = bootstrapPayloadRef.current;
+			if (!payload) return;
+			bootstrapPayloadRef.current = {
+				...payload,
+				centerOnUser: shouldCenter,
+				centerOnNextUserFix: shouldCenter,
+			};
 		},
-		[
-			setMapReady,
-			setMapError,
-			setIs3DMode,
-			setPlacedMarkers,
-			sendMessageToWebView,
-			showMarkerActionMenu,
-			placedMarkers,
-			location,
-			is3DMode,
-			clearSwitching,
-			setFollowMode,
-			clearAllMarkers,
-			onMarkerClick,
-			onMapClick,
-		],
+		[],
 	);
+
+	const { followMode, setFollowMode, cycleFollowMode } = useFollowMode({
+		mapReady,
+		location,
+		sendMessageToWebView,
+		updateBootstrapFollowPreference,
+	});
+
+	const handleWebViewMessage = useWebViewMessageHandler({
+		setMapReady,
+		setMapError,
+		setIs3DMode,
+		setPlacedMarkers,
+		sendMessageToWebView,
+		showMarkerActionMenu,
+		placedMarkers,
+		location,
+		is3DMode,
+		clearSwitching,
+		setFollowMode,
+		clearAllMarkers,
+		options,
+	});
 
 	const handleZoomIn = useCallback(() => {
 		if (mapReady) sendMessageToWebView({ type: 'zoomIn' });
@@ -453,115 +239,95 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		clearSwitching,
 	]);
 
-	const updateBootstrapFollowPreference = useCallback(
-		(shouldCenter: boolean) => {
-			const payload = bootstrapPayloadRef.current;
-			if (!payload) return;
-			bootstrapPayloadRef.current = {
-				...payload,
-				centerOnUser: shouldCenter,
-				centerOnNextUserFix: shouldCenter,
-			};
-		},
-		[],
-	);
-
-	const cycleFollowMode = useCallback(() => {
-		if (!mapReady) return;
-		setFollowMode(prev => {
-			const next: FollowMode =
-				prev === 'none'
-					? 'center'
-					: prev === 'center'
-						? 'heading'
-						: 'none';
-			switch (next) {
-				case 'none':
-					sendMessageToWebView({ type: 'stopFollow' });
-					void updateShouldCenterOnUser(false);
-					updateBootstrapFollowPreference(false);
-					break;
-				case 'center':
-					if (!location) {
-						Alert.alert(
-							'Геолокация недоступна',
-							'Невозможно определить ваше местоположение.',
-						);
-						return prev;
-					}
-					// Перед стартом follow отправляем актуальную позицию
-					sendMessageToWebView({
-						type: 'updateUserLocation',
-						payload: {
-							coordinates: [
-								location.longitude,
-								location.latitude,
-							],
-						},
-					});
-					sendMessageToWebView({ type: 'startFollowUser' });
-					void updateShouldCenterOnUser(true);
-					updateBootstrapFollowPreference(true);
-					break;
-				case 'heading':
-					if (!location) {
-						Alert.alert(
-							'Геолокация недоступна',
-							'Невозможно определить ваше местоположение.',
-						);
-						return prev;
-					}
-					sendMessageToWebView({
-						type: 'updateUserLocation',
-						payload: {
-							coordinates: [
-								location.longitude,
-								location.latitude,
-							],
-						},
-					});
-					sendMessageToWebView({ type: 'startFollowHeading' });
-					void updateShouldCenterOnUser(true);
-					updateBootstrapFollowPreference(true);
-					break;
-			}
-			return next;
-		});
-	}, [
-		mapReady,
-		location,
-		sendMessageToWebView,
-		updateBootstrapFollowPreference,
-	]);
-
-	const handleSearchResultSelect = useCallback(
-		(coordinates: [number, number], addressText: string) => {
-			if (mapReady) {
-				sendMessageToWebView({
-					type: 'setMapLocation',
-					payload: { center: coordinates, zoom: 16 },
-				});
-				sendMessageToWebView({
-					type: 'addMarker',
-					payload: {
-						id: `search-${uuidv4()}`,
-						coordinates,
-						title: addressText,
-					},
-				});
-			}
-		},
-		[mapReady, sendMessageToWebView],
-	);
-
 	const handleWebViewLoadStart = useCallback(() => {
 		setIsWebViewLoaded(false);
 		hasSentBootstrapRef.current = false;
+		hasCenteredOnUserRef.current = false;
 	}, []);
 
 	const handleWebViewLoadEnd = useCallback(() => {
 		setIsWebViewLoaded(true);
 	}, []);
+
+	const clearRoute = useCallback(() => {
+		if (!mapReady) return;
+		console.log('[useMapBridge] clearRoute');
+		sendMessageToWebView({ type: 'clearRoute' });
+	}, [mapReady, sendMessageToWebView]);
+
+	const drawRoute = useCallback(
+		(coordinates: [number, number][]) => {
+			if (!mapReady) return;
+			console.log('[useMapBridge] drawRoute', coordinates);
+			sendMessageToWebView({
+				type: 'drawRoute',
+				payload: { coordinates },
+			});
+		},
+		[mapReady, sendMessageToWebView],
+	);
+
+	const setMapLocation = useCallback(
+		(center: [number, number], zoom = 14) => {
+			if (!mapReady) return;
+			console.log('[useMapBridge] setMapLocation', { center, zoom });
+			sendMessageToWebView({
+				type: 'setMapLocation',
+				payload: { center, zoom },
+			});
+		},
+		[mapReady, sendMessageToWebView],
+	);
+
+	const setMarkers = useCallback(
+		(markers: PlacedMarkerData[], replace = false) => {
+			console.log('[useMapBridge] setMarkers', {
+				replace,
+				count: markers.length,
+				markers,
+				mapReady,
+			});
+
+			setPlacedMarkers(prev =>
+				replace ? markers : [...prev, ...markers],
+			);
+
+			if (!mapReady) {
+				console.log(
+					'[useMapBridge] map not ready; markers cached only',
+				);
+				return;
+			}
+
+			markers.forEach(marker => {
+				console.log('[useMapBridge] send addMarker', marker);
+				sendMessageToWebView({
+					type: 'addMarker',
+					payload: marker,
+				});
+			});
+		},
+		[mapReady, sendMessageToWebView, setPlacedMarkers],
+	);
+
+	const handleSearchResultSelect = useCallback(
+		(coordinates: [number, number], addressText: string) => {
+			if (mapReady) {
+				console.log('[useMapBridge] handleSearchResultSelect', {
+					coordinates,
+					addressText,
+				});
+				const marker = {
+					id: `search-${uuidv4()}`,
+					coordinates,
+					title: addressText,
+				};
+				setMapLocation(coordinates, 16);
+				setMarkers([marker], true);
+			}
+		},
+		[mapReady, setMarkers, setMapLocation],
+	);
 
 	const userLocation = location
 		? { lat: location.latitude, lon: location.longitude }
@@ -590,6 +356,10 @@ export function useMapBridge(options?: UseMapBridgeOptions) {
 		uiIs3DMode: isSwitchingMode
 			? pendingModeRef.current === '3d'
 			: is3DMode,
+		drawRoute,
+		clearRoute,
+		setMapLocation,
+		setMarkers,
 		userLocation,
 	} as const;
 }

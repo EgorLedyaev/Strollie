@@ -8,7 +8,7 @@
  * `.env.production` always contains the production URL committed to VCS.
  */
 
-const PROD_FALLBACK = 'http://91.108.246.148';
+const PROD_FALLBACK = 'http://185.246.222.56';
 
 const PRIVATE_IP_REGEX = /^(?:10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[0-1])\.)/;
 

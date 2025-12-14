@@ -1,6 +1,7 @@
 // Axios client
 export { default as axiosClient } from './axios-client';
 export { ApiError, setupAuthInterceptors } from './axios-client';
+export { routesAxiosClient } from './routes-axios-client';
 
 // Services
 export * from './routeService';

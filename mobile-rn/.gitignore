@@ -62,8 +62,6 @@ app-example
 .env
 
 .docs
-.github/instructions
-
 # --- Android native project skeleton tracked ---
 # Удалили ранее глобальный /android. Теперь игнорируем только артефакты и секреты.
 android/.gradle/
@@ -103,3 +101,5 @@ coverage/**/*
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+.github/prompts/*
