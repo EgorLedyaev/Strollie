@@ -1,0 +1,21 @@
+{
+	"servers": {
+		"memory-strollie": {
+			"type": "stdio",
+			"command": "npx",
+			"args": ["-y", "@modelcontextprotocol/server-memory"],
+			"env": {
+				"MEMORY_FILE_PATH": "${workspaceFolder}/.vscode/.mcp/memory.json"
+			}
+		},
+		"memory-webview": {
+			"type": "stdio",
+			"command": "npx",
+			"args": ["-y", "@modelcontextprotocol/server-memory"],
+			"env": {
+				"MEMORY_FILE_PATH": "${workspaceFolder:strollie-map-webview}/.vscode/.mcp/memory.json"
+			}
+		}
+	},
+	"inputs": []
+}
