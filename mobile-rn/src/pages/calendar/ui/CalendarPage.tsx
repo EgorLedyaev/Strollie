@@ -1,115 +1,65 @@
-import React, { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import AddTicketIcon from '@/assets/icons/tickets/AddTicketIcon';
+import tickets_empty from '@/assets/images/tickets/tickets-empty.png';
+import { useRouter } from 'expo-router';
+import React, { useMemo } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Colors, Fonts, Radius } from '@/shared/tokens';
-import { AppText } from '@/shared/ui';
+import { TicketsErrorState, useTicketsQuery } from '@/entities/ticket';
+import { Header } from '@/widgets/header';
+import { bindLogger } from '@/shared/lib/logger';
+import { Colors } from '@/shared/tokens';
 
-import { CalendarFilter, CalendarFilterValue } from './CalendarFilter';
-
-type CalendarEvent = {
-	id: string;
-	title: string;
-	type: Exclude<CalendarFilterValue, 'all'>;
-	time: string;
-};
-
-const mockEvents: CalendarEvent[] = [
-	{
-		id: '1',
-		title: 'Экскурсия по центру города',
-		type: 'excursion',
-		time: '10:00',
-	},
-	{
-		id: '2',
-		title: 'Поход в театр',
-		type: 'ticket',
-		time: '19:00',
-	},
-	{
-		id: '3',
-		title: 'Йога в парке',
-		type: 'activity',
-		time: '08:30',
-	},
-];
+import { MyCalendarWidget } from './MyCalendarWidget';
 
 export const CalendarPage: React.FC = () => {
-	const [filter, setFilter] = useState<CalendarFilterValue>('all');
+	const router = useRouter();
+	const {
+		data: tickets = [],
+		isLoading,
+		error,
+		refetch: forceRefresh,
+	} = useTicketsQuery();
 
-	const filteredEvents = useMemo(() => {
-		if (filter === 'all') {
-			return mockEvents;
-		}
-
-		return mockEvents.filter(event => event.type === filter);
-	}, [filter]);
+	const log = useMemo(() => bindLogger('calendar'), []);
+	React.useEffect(() => {
+		log.info('mount');
+	}, [log]);
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.content}>
-				<AppText style={styles.title}>Календарь</AppText>
-				<CalendarFilter value={filter} onChange={setFilter} />
-				<View style={styles.list}>
-					{filteredEvents.length ? (
-						filteredEvents.map(event => (
-							<View key={event.id} style={styles.eventRow}>
-								<AppText style={styles.eventTitle}>
-									{event.title}
-								</AppText>
-								<AppText style={styles.eventTime}>
-									{event.time}
-								</AppText>
-							</View>
-						))
-					) : (
-						<AppText style={styles.emptyText}>
-							Для выбранного типа пока нет событий
-						</AppText>
-					)}
+		<SafeAreaView style={styles.root}>
+			<Header title='Мой календарь' />
+
+			{isLoading ? (
+				<View style={styles.loadingWrap} testID='calendar-loading'>
+					<ActivityIndicator
+						size='large'
+						color={Colors.greenPrimary}
+					/>
 				</View>
-			</View>
+			) : error ? (
+				<View style={styles.loadingWrap}>
+					<TicketsErrorState onRetry={() => forceRefresh()} />
+				</View>
+			) : (
+				<MyCalendarWidget
+					tickets={tickets}
+					onAddTicket={() => router.push('/tickets/add')}
+				/>
+			)}
 		</SafeAreaView>
 	);
 };
 
 const styles = StyleSheet.create({
-	container: {
-		backgroundColor: Colors.lightBackground,
+	loadingWrap: {
+		alignItems: 'center',
+		flex: 1,
+		justifyContent: 'center',
+	},
+	root: {
+		backgroundColor: Colors.grayBackground,
 		flex: 1,
 		padding: 16,
-	},
-	content: {
-		backgroundColor: Colors.white,
-		borderRadius: Radius.r20,
-		flex: 1,
-		padding: 16,
-	},
-	emptyText: {
-		color: Colors.secondaryText,
-	},
-	eventRow: {
-		borderBottomColor: Colors.gray,
-		borderBottomWidth: StyleSheet.hairlineWidth,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingVertical: 12,
-	},
-	eventTime: {
-		color: Colors.secondaryText,
-	},
-	eventTitle: {
-		color: Colors.headerAndInputText,
-		fontFamily: Fonts.medium,
-	},
-	list: {
-		flex: 1,
-	},
-	title: {
-		color: Colors.black,
-		fontFamily: Fonts.bold,
-		fontSize: Fonts.f20,
-		marginBottom: 16,
 	},
 });
