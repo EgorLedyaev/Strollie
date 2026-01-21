@@ -99,6 +99,7 @@ coverage/**/*
 !.vscode/*.code-snippets
 !*.code-workspace
 !.vscode/mcp.json
+!.vscode/.mcp/
 !.vscode/.mcp/memory.json
 
 # Built Visual Studio Code Extensions
