@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: MessengerService
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/social-network
+server:
+  port: 8083
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    oauth:
+      client-id: messenger-service
+      client-secret: OpPdM0aOaKU0U5Nu6fYrY2HeJn2QOP09
