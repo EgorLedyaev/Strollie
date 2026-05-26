@@ -1,0 +1,49 @@
+server:
+  port: 9100
+
+spring:
+  application:
+    name: auth-server
+
+  mail:
+    # host, port, username, password должны предоставляться средой исполнения
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  datasource:
+    # url, username, password НЕ ДОЛЖНЫ БЫТЬ ЗДЕСЬ.
+    # Они должны предоставляться ИСКЛЮЧИТЕЛЬНО средой исполнения.
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+app:
+  otp:
+    lifetime-minutes: 5
+    max-attempts: 3
+    resend-cooldown-seconds: 60
+  admin:
+    email: ${ADMIN_EMAIL}
+    nickname: ${ADMIN_NICKNAME}
+
+authorization:
+  server:
+    issuer: ${AUTH_SERVER_ISSUER:http://localhost:9100}
+  security:
+    keystore:
+      path: ${KEYSTORE_PATH}
+      password: ${AUTH_KEYSTORE_PASSWORD}
+      key-alias: ${AUTH_KEYSTORE_KEY_ALIAS:jwt-signing-key}
+      private-key-passphrase: ${AUTH_KEYSTORE_KEY_PASSPHRASE}

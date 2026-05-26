@@ -1,0 +1,58 @@
+# Ignore Git files and directories
+.git
+.gitignore
+.gitattributes
+.github/
+
+# Ignore build output and temporary files
+.gradle/
+build/
+out/
+bin/
+target/
+*.class
+
+# Ignore IDE files
+.idea/
+*.iws
+*.ipr
+.settings/
+.classpath
+.project
+.vscode/
+
+# Ignore logs
+*.log
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore test reports
+**/test-reports/
+**/coverage-reports/
+
+# Ignore Docker related files (to avoid recursive inclusions)
+.dockerignore
+docker-compose*.yml
+
+# Ignore documentation files (except when specifically needed)
+*.md
+docs/
+CHANGELOG
+LICENSE
+
+# Ignore other unnecessary files
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.rar
+
+# Ignore application properties that might contain sensitive data
+src/main/resources/application-*.properties
+src/main/resources/application-*.yml
+!src/main/resources/application.yml
+!src/main/resources/application-prod.yml
+
+# Ensure keystore directory is included despite ignoring resources
+!src/main/resources/keystore/
