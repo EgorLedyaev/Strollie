@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: route-service
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=24h
+
+api:
+  gis:
+    base-url: https://catalog.api.2gis.com
+    key: ${GIS_API_KEY}
+    timeout: 5000
+    max-places-per-category: 10
+  llm:
+    provider: openrouter
+    base-url: https://openrouter.ai/api/v1
+    key: ${LLM_API_KEY}
+    model: x-ai/grok-4.1-fast:free
+    max-tokens: 20000
+    timeout: 30000
+
+routing:
+  default-radius-meters: 5000
+  min-places: 3
+  max-places: 10
+  max-route-duration-hours: 5
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui
+
+logging:
+  level:
+    com.strollie.route.client: INFO
