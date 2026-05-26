@@ -1,0 +1,32 @@
+services:
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: auth-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_URL: jdbc:postgresql://<db-host>:<port>/<db-name>
+      POSTGRES_USER: <db-user>
+      POSTGRES_PASSWORD: <db-pass>
+      REDIS_HOST: <redis-host>
+      REDIS_PORT: 6379
+      JWT_ISSUER: https://auth.your-domain.com
+      # JWT_PRIVATE_KEY_PEM: |
+      #   -----BEGIN PRIVATE KEY-----
+      #   ...
+      #   -----END PRIVATE KEY-----
+      # JWT_PUBLIC_KEY_PEM: |
+      #   -----BEGIN PUBLIC KEY-----
+      #   ...
+      #   -----END PUBLIC KEY-----
+      SPRING_MAIL_HOST: <smtp-host>
+      SPRING_MAIL_PORT: <smtp-port>
+      # SPRING_MAIL_USERNAME: <smtp-user>
+      # SPRING_MAIL_PASSWORD: <smtp-pass>
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8081/actuator/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
