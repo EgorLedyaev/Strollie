@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ошибка</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Произошла ошибка</h1>
+    <div class="error-message">
+        Пользователь с таким никнеймом не был найден
+    </div>
+    <a th:href="@{/chats}">Вернуться к списку чатов</a>
+</div>
+</body>
+</html>

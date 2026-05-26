@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание чата</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="container">
+    <h2>Создать новый чат</h2>
+
+    <form th:action="@{/chats/create}" th:object="${chatForm}" method="post">
+        <label for="chatName">Название чата:</label>
+        <input type="text" id="chatName" th:field="*{chatName}" maxlength="50" required/>
+
+        <label for="participantUsernames">Никнеймы участников (через запятую):</label>
+        <input type="text" id="participantUsernames" name="participantUsernames" placeholder="user1,user2,user3" required/>
+
+        <button type="submit">Создать</button>
+    </form>
+</div>
+
+</body>
+</html>

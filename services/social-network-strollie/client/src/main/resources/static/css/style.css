@@ -1,0 +1,518 @@
+/* Общие стили */
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #edf0f5;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+h1, h2, h3 {
+    margin: 0 0 20px;
+    font-weight: 600;
+}
+
+/* Кнопки */
+.button, button {
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover, button:hover {
+    background-color: #145dbf;
+}
+
+/* Контейнер */
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* ========== Страница чатов ========== */
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 250px;
+    background: #fff;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header h1 {
+    font-size: 24px;
+    color: #1877f2;
+    margin-bottom: 30px;
+}
+
+.sidebar-nav a {
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: block;
+    color: #333;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.sidebar-nav a.active,
+.sidebar-nav a:hover {
+    background: #e6f0ff;
+    color: #1877f2;
+}
+
+.content {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #f7f9fc;
+    padding: 30px;
+}
+
+.chat-list-container {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.chat-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.create-chat-btn {
+    background-color: #1877f2;
+    padding: 8px 14px;
+    font-size: 0.9em;
+    color: white;
+    border-radius: 6px;
+}
+
+.chat-item {
+    background: white;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+
+.chat-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.chat-avatar {
+    width: 40px;
+    height: 40px;
+    background: #cfd8dc;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.chat-details h3 {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #1877f2;
+}
+
+.chat-meta {
+    font-size: 0.85em;
+    color: #666;
+}
+
+/* ========== Страница конкретного чата ========== */
+
+.chat-page {
+    display: flex;
+    max-width: 1000px;
+    height: 85vh; /* Consider using calc(100vh - some_margin) if you want it to be more responsive to viewport changes */
+    margin: 40px auto;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+.messages-section {
+    flex: 3; /* flex: 3; is more common than flex: 3px; for proportions */
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-right: 1px solid #eee;
+    /* overflow-y: auto; /* Removed this, as messages-container will handle its own scroll */
+}
+
+.messages-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    /* padding-bottom: 10px; /* Add some padding at the bottom if messages are too close to input */
+}
+
+.messages-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.messages-container li {
+    padding: 12px 16px;
+    background: #f1f3f7;
+    border-radius: 10px;
+    align-self: flex-start;
+    max-width: 75%;
+    position: relative;
+    word-wrap: break-word; /* Ensure long words break */
+}
+
+.messages-container li strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #1877f2;
+}
+
+.messages-container li small {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8em;
+    color: #777;
+}
+
+/* Форма отправки */
+.message-form {
+    display: flex;
+    align-items: flex-end; /* Align button to bottom of textarea as it grows */
+    border-top: 1px solid #ccc;
+    padding-top: 15px; /* Adjusted padding */
+    margin-top: auto; /* Pushes form to the bottom of messages-section */
+    gap: 10px;
+}
+
+.message-form textarea {
+    flex: 1;
+    resize: none;
+    padding: 10px; /* Adjusted padding */
+    font-size: 1em;
+    line-height: 1.5; /* Improved line height for readability */
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Consistent with other inputs */
+    min-height: 44px; /* Min height for ~1 line + padding (outer height) */
+    max-height: 120px; /* Max height for ~4-5 lines + padding */
+    height: auto; /* Allow textarea to grow with content */
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.message-form button {
+    padding: 10px 15px; /* Adjusted padding to make button less wide and match textarea height */
+    /* height: 44px; */ /* Explicit height can be used, but padding should achieve similar result */
+    /* If using explicit height, ensure text is centered, e.g. line-height: 44px or flex properties */
+    border-radius: 8px; /* Ensure consistency if not inherited */
+    /* align-self: flex-end; /* Already handled by form's align-items: flex-end */
+}
+
+
+/* Участники */
+.participants-section {
+    flex: 1;
+    background: #f8f9fb;
+    padding: 20px;
+    overflow-y: auto;
+    max-width: 250px; /* Added max-width from inline style for consistency */
+    display: flex; /* Added from inline style */
+    flex-direction: column; /* Added from inline style */
+    /* height: 100%; /* This was in inline, might conflict with flex sizing. Usually flex handles it. */
+    border-left: 1px solid #eee; /* HTML has messages-section border-right, so this would be border-left */
+}
+
+
+.participants-section h3 {
+    margin-top: 0; /* Added from inline style */
+    margin-bottom: 16px;
+    font-size: 1.1em;
+    flex-shrink: 0; /* Added from inline style */
+}
+
+.participants-list { /* Styles combined from inline and general */
+    flex: 1;
+    overflow-y: auto;
+    margin: 0 0 10px 0; /* Adjusted margin */
+    padding: 0;
+    list-style: none;
+    min-height: 0;
+}
+
+.participant {
+    background: white;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: background 0.2s;
+    display: flex; /* For aligning username and remove button */
+    justify-content: space-between; /* For aligning username and remove button */
+    align-items: center; /* For aligning username and remove button */
+}
+
+.participant:hover {
+    background: #f0f4fa;
+}
+
+.participant .remove-btn {
+    background: transparent;
+    color: #cc5854;
+    border: none;
+    padding: 2px 5px;
+    font-size: 1.2em;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.participant .remove-btn:hover {
+    background-color: #f8d7da;
+    color: #c9302c;
+}
+
+
+.add-participant-form { /* Styles combined from inline and general */
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    gap: 5px; /* Keep 5px gap as in inline style */
+    flex-shrink: 0; /* Added from inline style */
+}
+
+.add-participant-form input[type="text"] {
+    margin-bottom: 0; /* From general section */
+    border-top-right-radius: 0; /* From general section */
+    border-bottom-right-radius: 0; /* From general section */
+    flex-grow: 1; /* Allow input to take available space */
+}
+
+.add-participant-form button {
+    border-top-left-radius: 0; /* From general section */
+    border-bottom-left-radius: 0; /* From general section */
+    margin-left: -1px; /* From general section, creates attached look */
+    padding: 10px 12px; /* Adjust padding for '+' button */
+}
+
+
+.empty-state {
+    text-align: center;
+    margin-top: 50px;
+    color: #777;
+}
+
+.empty-icon {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+.logout-btn {
+    margin-top: auto;
+    color: #d9534f;
+    font-weight: 500;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+}
+
+.logout-btn:hover {
+    background-color: #f8d7da;
+    color: #c9302c;
+}
+
+/* Общие стили для всех инпутов */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="search"],
+textarea,
+select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1em;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+    background-color: white;
+    margin-bottom: 15px;
+}
+
+/* Стили при фокусе */
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #1877f2;
+    box-shadow: 0 0 0 3px rgba(24, 119, 242, 0.2);
+}
+
+/* Стили для disabled состояний */
+input[type="text"]:disabled,
+input[type="password"]:disabled,
+input[type="email"]:disabled,
+input[type="search"]:disabled,
+textarea:disabled,
+select:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* Специфические стили для textarea (если нужно) */
+textarea { /* General textarea style */
+    /* min-height: 100px; */ /* This was making chat input too big. Specific min-height is now on .message-form textarea */
+    resize: vertical; /* Allow vertical resize for general textareas, chat one is 'none' */
+}
+
+/* Стили для поисковых инпутов */
+input[type="search"] {
+    padding-left: 40px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 16px center;
+    background-size: 16px;
+}
+
+/* Стили для селектов */
+select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+/* Для формы добавления участника - эти стили уже были в конце CSS, проверил и оставил */
+.add-participant-form input[type="text"] {
+    margin-bottom: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.add-participant-form button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -1px; /* Keeps button attached */
+}
+
+/* Для мобильных устройств */
+@media (max-width: 768px) {
+    .chat-page {
+        flex-direction: column;
+        height: auto; /* Adjust for mobile */
+        margin: 10px;
+        padding: 10px;
+    }
+
+    .messages-section {
+        border-right: none;
+        border-bottom: 1px solid #eee; /* Separator on mobile */
+        padding: 15px;
+    }
+
+    .participants-section {
+        max-width: none; /* Allow full width on mobile */
+        padding: 15px;
+        border-left: none;
+    }
+
+    .message-form {
+        padding-left: 0; /* Adjust if parent padding changes */
+        padding-right: 0;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="search"],
+    textarea,
+    select {
+        padding: 10px 14px;
+        font-size: 0.95em;
+    }
+}
+
+.message-form {
+    display: flex;
+    align-items: flex-end; /* Выравнивает элементы по нижнему краю их контейнера */
+    border-top: 1px solid #ccc;
+    padding-top: 15px;
+    margin-top: auto;
+    gap: 10px;
+}
+
+.message-form textarea {
+    flex: 1;
+    resize: none;
+    padding: 5px;
+    font-size: 1em;
+    line-height: 1.5;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    min-height: 44px; /* Минимальная высота текстового поля */
+    max-height: 50px;
+    height: auto;
+    font-family: inherit;
+    box-sizing: border-box; /* Учитывает padding и border в общей высоте/ширине */
+    margin: 0;
+}
+
+.message-form button {
+    padding: 10px 15px; /* Внутренние отступы кнопки */
+    border-radius: 8px;
+    /* --- ДОБАВЛЕНО/ИЗМЕНЕНО --- */
+    height: 44px;       /* Устанавливаем высоту кнопки равной min-height textarea */
+    box-sizing: border-box;
+}
+
+h1, h2, h3 {
+    margin: 0;
+}
+
+.user-info {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-size: 0.95em;
+    color: #333;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.user-info p {
+    margin: 0;
+    font-weight: 500;
+}
