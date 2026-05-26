@@ -1,0 +1,1 @@
+export { StatusBarBackground } from './StatusBarBackground';

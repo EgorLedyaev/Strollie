@@ -1,0 +1,295 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Route API",
+		"description": "API для генерации туристических маршрутов и справочника категорий",
+		"contact": { "name": "Strollie", "email": "support@strollie.com" },
+		"license": { "name": "MIT" },
+		"version": "v1"
+	},
+	"externalDocs": {
+		"description": "Дополнительная документация",
+		"url": "https://swagger.io/docs/"
+	},
+	"servers": [
+		{ "url": "http://localhost:8082", "description": "Локальная среда" }
+	],
+	"paths": {
+		"/api/routes/generate": {
+			"post": {
+				"tags": ["Routes"],
+				"summary": "Генерация туристического маршрута",
+				"description": "На основе предпочтений пользователя и начальной точки возвращает сгенерированный маршрут",
+				"operationId": "generateRoute",
+				"requestBody": {
+					"description": "Параметры генерации маршрута",
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/RouteRequest"
+							},
+							"examples": {
+								"Пример": {
+									"description": "Пример",
+									"value": {
+										"city": "Санкт-Петербург",
+										"categories": ["Музеи", "Парки"],
+										"description": "Культура и прогулки",
+										"durationHours": 6,
+										"startPoint": {
+											"lat": 59.9311,
+											"lon": 30.3609
+										}
+									}
+								}
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"500": {
+						"description": "Внутренняя ошибка сервера",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "Маршрут успешно сгенерирован",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RouteResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Ошибка валидации входных данных",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/RouteResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"ErrorResponse": {
+				"type": "object",
+				"description": "Стандартный формат ошибки API",
+				"properties": {
+					"timestamp": {
+						"type": "string",
+						"format": "date-time",
+						"description": "Момент времени",
+						"example": "2025-12-02T12:00:00Z"
+					},
+					"status": {
+						"type": "integer",
+						"format": "int32",
+						"description": "HTTP статус",
+						"example": 400
+					},
+					"error": {
+						"type": "string",
+						"description": "Название статуса",
+						"example": "Bad Request"
+					},
+					"message": {
+						"type": "string",
+						"description": "Сообщение ошибки",
+						"example": "Validation failed"
+					},
+					"path": {
+						"type": "string",
+						"description": "Путь запроса",
+						"example": "uri=/api/routes/generate"
+					},
+					"violations": {
+						"type": "array",
+						"description": "Нарушения валидации",
+						"items": { "$ref": "#/components/schemas/Violation" }
+					}
+				}
+			},
+			"Violation": {
+				"type": "object",
+				"description": "Ошибка для конкретного поля",
+				"properties": {
+					"field": {
+						"type": "string",
+						"description": "Поле",
+						"example": "city"
+					},
+					"message": {
+						"type": "string",
+						"description": "Сообщение",
+						"example": "must not be blank"
+					}
+				}
+			},
+			"RoutePoint": {
+				"type": "object",
+				"description": "Координаты точки",
+				"properties": {
+					"lat": {
+						"type": "number",
+						"format": "double",
+						"description": "Широта",
+						"example": 59.9311
+					},
+					"lon": {
+						"type": "number",
+						"format": "double",
+						"description": "Долгота",
+						"example": 30.3609
+					}
+				},
+				"required": ["lat", "lon"]
+			},
+			"RouteRequest": {
+				"type": "object",
+				"description": "Запрос на генерацию туристического маршрута",
+				"properties": {
+					"city": {
+						"type": "string",
+						"description": "Город",
+						"example": "Санкт-Петербург",
+						"minLength": 1
+					},
+					"categories": {
+						"type": "array",
+						"description": "Список категорий",
+						"example": ["Музеи", "Парки"],
+						"items": { "type": "string" },
+						"maxItems": 2147483647,
+						"minItems": 1
+					},
+					"description": {
+						"type": "string",
+						"description": "Описание интересов пользователя",
+						"example": "Хочу культурный маршрут и прогулки",
+						"minLength": 1
+					},
+					"durationHours": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Длительность маршрута в часах",
+						"example": 6
+					},
+					"startPoint": {
+						"$ref": "#/components/schemas/RoutePoint",
+						"description": "Стартовая точка"
+					}
+				},
+				"required": [
+					"city",
+					"description",
+					"durationHours",
+					"startPoint"
+				]
+			},
+			"Place": {
+				"type": "object",
+				"description": "Точка интереса (POI) в маршруте",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Идентификатор места",
+						"example": "poi_123"
+					},
+					"name": {
+						"type": "string",
+						"description": "Название",
+						"example": "Государственный Эрмитаж"
+					},
+					"category": {
+						"type": "string",
+						"description": "Категория",
+						"example": "Музеи"
+					},
+					"lat": {
+						"type": "number",
+						"format": "double",
+						"description": "Широта",
+						"example": 59.9398
+					},
+					"lon": {
+						"type": "number",
+						"format": "double",
+						"description": "Долгота",
+						"example": 30.3146
+					},
+					"description": {
+						"type": "string",
+						"description": "Краткое описание",
+						"example": "Крупнейший художественный музей России"
+					},
+					"address": {
+						"type": "string",
+						"description": "Адрес",
+						"example": "Дворцовая пл., 2"
+					},
+					"rating": {
+						"type": "number",
+						"format": "double",
+						"description": "Рейтинг по отзывам",
+						"example": 4.8
+					},
+					"reviewCount": {
+						"type": "integer",
+						"format": "int32",
+						"description": "Количество отзывов",
+						"example": 12543
+					},
+					"workingHours": {
+						"type": "string",
+						"description": "Время работы",
+						"example": "10:00–21:00"
+					},
+					"openNow": {
+						"type": "boolean",
+						"description": "Открыто ли сейчас",
+						"example": true
+					},
+					"photoUrl": {
+						"type": "string",
+						"description": "URL фотографии",
+						"example": "https://example.com/photo.jpg"
+					}
+				}
+			},
+			"RouteResponse": {
+				"type": "object",
+				"description": "Сгенерированный маршрут с точками и кратким описанием",
+				"properties": {
+					"places": {
+						"type": "array",
+						"description": "Список точек маршрута",
+						"items": { "$ref": "#/components/schemas/Place" }
+					},
+					"directionsUrl": {
+						"type": "string",
+						"description": "Ссылка на навигацию (например, Google Maps)",
+						"example": "https://maps.google.com/?q=..."
+					},
+					"description": {
+						"type": "string",
+						"description": "Описание маршрута",
+						"example": "Маршрут включает 3 музея и прогулку по набережной"
+					}
+				}
+			}
+		}
+	}
+}

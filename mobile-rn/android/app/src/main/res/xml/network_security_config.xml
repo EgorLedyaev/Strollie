@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Network Security Config: scoped cleartext exception.
+     Keep as narrow as possible and REMOVE after migrating to HTTPS.
+     Allowed host: 91.108.246.148 (WebView fallback from webview.ts)
+-->
+<network-security-config>
+    <!-- TEMP: allow cleartext globally to unblock release (revert after HTTPS/more narrow config) -->
+    <base-config cleartextTrafficPermitted="true" />
+    <!-- Keep explicit whitelist for documentation; redundant while base-config=true -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">91.108.246.148</domain>
+        <domain includeSubdomains="false">185.246.222.56</domain>
+    </domain-config>
+</network-security-config>

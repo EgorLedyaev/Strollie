@@ -1,0 +1,224 @@
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+  push:
+    branches: [master, main]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      android: ${{ steps.filter.outputs.android }}
+      native_impact: ${{ steps.filter.outputs.native_impact }}
+      app_code: ${{ steps.filter.outputs.app_code }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            android:
+              - 'android/**'
+              - '**/*.gradle*'
+              - 'gradle/wrapper/**'
+              - 'gradle.properties'
+              - 'package-lock.json'
+              - 'app.json'
+              - 'app.config.ts'
+            native_impact:
+              - 'app.json'
+              - 'app.config.*'
+              - 'plugins/**'
+              - 'assets/**'
+              - 'expo-env.d.ts'
+            app_code:
+              - 'src/**/*.ts'
+              - 'src/**/*.tsx'
+              - 'src/**/*.js'
+              - 'src/**/*.jsx'
+              - 'package.json'
+
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache ESLint
+        uses: actions/cache@v4
+        with:
+          path: .cache/eslint
+          key: eslint-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.ts','src/**/*.tsx','src/**/*.js','src/**/*.jsx') }}
+          restore-keys: |
+            eslint-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      - name: Cache Prettier
+        uses: actions/cache@v4
+        with:
+          path: .cache/prettier
+          key: prettier-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**/*.ts','src/**/*.tsx','src/**/*.js','src/**/*.jsx','src/**/*.json') }}
+          restore-keys: |
+            prettier-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier check
+        run: npm run format:check
+
+      - name: ESLint (fail on warnings)
+        run: npm run lint -- --max-warnings=0
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: FSD architecture
+        run: npm run fsd:check
+
+      - name: Tests
+        run: npm test -- --ci
+
+  android-build:
+    name: Android Build (release APK)
+    needs: [build-and-validate, changes]
+    # Запускаем сборку ТОЛЬКО на master + если есть изменения в коде/нативке
+    if: ${{ github.ref == 'refs/heads/master' && (needs.changes.outputs.android == 'true' || needs.changes.outputs.native_impact == 'true' || needs.changes.outputs.app_code == 'true') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      EXPO_PUBLIC_WEBVIEW_URL: "http://91.108.246.148"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inject .env
+        # Генерируем .env файл с публичным ключом 2GIS (должен быть добавлен в Secrets как EXPO_PUBLIC_2GIS_API_KEY)
+        # Если секрета нет – шаг создаст пустой файл, а приложение упадёт при запуске (осознанно)
+        run: |
+          echo "EXPO_PUBLIC_2GIS_API_KEY=${{ secrets.EXPO_PUBLIC_2GIS_API_KEY }}" >> .env
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      # Expo & dependency caches (do not depend on native android project yet)
+      - name: Cache Expo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.expo
+            ~/.cache/expo
+          key: expo-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            expo-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: (Advisory) Native drift check
+        if: ${{ needs.changes.outputs.native_impact == 'true' }}
+        run: bash scripts/native-drift-check.sh || true
+
+      - name: Validate Gradle Wrapper
+        # v3 deprecated; moved to maintained action per deprecation guide
+        uses: gradle/actions/wrapper-validation@v4
+
+      - name: Setup Java (Temurin 17)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: "platform-tools platforms;android-35 build-tools;35.0.0"
+
+      - name: Restore release keystore
+        run: |
+          mkdir -p android/app
+          echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 --decode > android/app/upload-keystore.jks
+
+      - name: Make gradlew executable
+        working-directory: android
+        run: chmod +x ./gradlew
+
+      # - name: Signing report (diagnostic)
+      #   working-directory: android
+      #   env:
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      #   run: ./gradlew :app:signingReport --quiet || true
+
+      # - name: Debug signing props
+      #   working-directory: android
+      #   env:
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      #       ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      #   run: ./gradlew :app:properties | grep -i -E 'MYAPP_UPLOAD|signing'
+
+      - name: Gradle assembleRelease
+        working-directory: android
+        env:
+          JAVA_OPTS: -Xmx2g
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=512m" -Dorg.gradle.caching=true
+          ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_FILE: upload-keystore.jks
+          ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Upload release APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+
+      - name: Create GitHub Pre-release
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android/app/build/outputs/apk/release/*.apk
+          name: "Pre-release Build #${{ github.run_number }} (${{ github.ref_name }})"
+          tag_name: build-${{ github.ref_name }}-${{ github.run_number }}
+          prerelease: true
+          body: |
+            Автоматическая сборка APK для тестирования.
+            Коммит: ${{ github.sha }}
+
+      # Optional: also build debug variant (uncomment if needed)
+      # - name: Gradle assembleDebug
+      #   working-directory: android
+      #   run: ./gradlew assembleDebug --stacktrace
+      # - name: Upload debug APK artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: app-debug-apk
+      #     path: android/app/build/outputs/apk/debug/*.apk

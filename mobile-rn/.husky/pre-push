@@ -1,0 +1,21 @@
+echo "[Deps] Проверка package.json ↔ node_modules"
+if ! npm ls --depth=0 >/dev/null 2>&1; then
+	echo "❌ Обнаружены несогласованные зависимости. Убедитесь, что пакет добавлен в package.json/package-lock.json и выполните 'npm install' без флага --no-save."
+	npm ls --depth=0
+	exit 1
+fi
+
+echo "[Format] Проверка форматирования"
+npm run format:check || exit 1
+
+echo "[Lint] Проверка линтером"
+npm run lint || exit 1
+
+echo "[Tests] Прогон быстрых тестов"
+npm run test -- --bail || exit 1
+
+echo "[Types] Проверка типизации"
+npm run typecheck || exit 1
+
+echo "[FSD] Архитектурная проверка (не блокирует push, исправьте позже)"
+npm run fsd:check || exit 1

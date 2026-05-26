@@ -1,0 +1,72 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Route API",
+		"description": "API для генерации туристических маршрутов и справочника категорий",
+		"contact": { "name": "Strollie", "email": "support@strollie.com" },
+		"license": { "name": "MIT" },
+		"version": "v1"
+	},
+	"externalDocs": {
+		"description": "Дополнительная документация",
+		"url": "https://swagger.io/docs/"
+	},
+	"servers": [
+		{ "url": "http://localhost:8082", "description": "Локальная среда" }
+	],
+	"tags": [
+		{
+			"name": "Categories",
+			"description": "Справочник доступных категорий мест"
+		}
+	],
+	"paths": {
+		"/api/categories": {
+			"get": {
+				"tags": ["Categories"],
+				"summary": "Получение списка категорий",
+				"description": "Возвращает полный список категорий, доступных для построения маршрутов",
+				"operationId": "getCategories",
+				"responses": {
+					"500": {
+						"description": "Внутренняя ошибка",
+						"content": {}
+					},
+					"200": {
+						"description": "Список категорий",
+						"content": {
+							"*/*": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Category"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Category": {
+				"type": "object",
+				"description": "Категория места/активности",
+				"properties": {
+					"category": {
+						"type": "string",
+						"description": "Название категории",
+						"example": "Музеи"
+					},
+					"id": {
+						"type": "string",
+						"description": "Идентификатор категории",
+						"example": "museum"
+					}
+				}
+			}
+		}
+	}
+}

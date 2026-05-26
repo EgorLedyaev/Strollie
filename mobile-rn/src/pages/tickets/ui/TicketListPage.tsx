@@ -1,0 +1,171 @@
+/**
+ * @deprecated ARCHIVED ("старый экран 'Мои билеты'")
+ * Не удалять: может понадобиться при возврате к секционному списку.
+ * Новый пустой экран: см. pages/tickets-new.
+ */
+import {
+	compareAsc,
+	endOfToday,
+	isAfter,
+	isWithinInterval,
+	parseISO,
+	startOfToday,
+} from 'date-fns';
+import { useRouter } from 'expo-router';
+import React, { useMemo, useState } from 'react';
+import { SectionList, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import {
+	TicketCard,
+	TicketsErrorState,
+	useTicketsQuery,
+	type Ticket,
+} from '@/entities/ticket';
+import { Colors, Sizes } from '@/shared/tokens';
+import { AppText, BackButton } from '@/shared/ui';
+
+import { ShowTicketQrDialog } from './ShowTicketQrDialog';
+import { TicketDetailsDialog } from './TicketDetailsDialog';
+
+export const TicketListPage: React.FC = () => {
+	const {
+		data: tickets = [],
+		isLoading,
+		error,
+		refetch: forceRefresh,
+	} = useTicketsQuery();
+	const hydrated = true;
+	const [qrVisible, setQrVisible] = useState(false);
+	const [qrUri, setQrUri] = useState<string | undefined>();
+	const [detailsVisible, setDetailsVisible] = useState(false);
+	const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
+	const router = useRouter();
+
+	const sections = useMemo(() => {
+		const todayStart = startOfToday();
+		const todayEnd = endOfToday();
+
+		const today = tickets.filter(t => {
+			const d = parseISO(t.departureTime);
+			return isWithinInterval(d, { start: todayStart, end: todayEnd });
+		});
+		const future = tickets.filter(t =>
+			isAfter(parseISO(t.departureTime), todayEnd),
+		);
+
+		const byAsc = (a: Ticket, b: Ticket) =>
+			compareAsc(parseISO(a.departureTime), parseISO(b.departureTime));
+
+		const result: Array<{ title: string; data: Ticket[] }> = [];
+		if (today.length)
+			result.push({ title: 'Сегодня', data: today.sort(byAsc) });
+		if (future.length)
+			result.push({
+				title: 'В последующие дни',
+				data: future.sort(byAsc),
+			});
+		return result;
+	}, [tickets]);
+
+	return (
+		<SafeAreaView style={styles.container}>
+			<View style={styles.header}>
+				<BackButton variant='icon' onPress={() => router.back()} />
+				<AppText style={styles.headerTitle}>Мои билеты</AppText>
+				<View
+					style={{ width: Sizes.button.sm, height: Sizes.button.sm }}
+				/>
+			</View>
+			<View style={styles.content}>
+				{isLoading && (!hydrated || !tickets.length) ? (
+					<AppText>Загрузка…</AppText>
+				) : error ? (
+					<TicketsErrorState onRetry={() => forceRefresh()} />
+				) : !sections.length ? (
+					<AppText>Пока нет билетов</AppText>
+				) : (
+					<SectionList
+						sections={sections}
+						keyExtractor={item => item.id}
+						renderSectionHeader={({ section }) => (
+							<AppText
+								style={
+									section.title === 'Сегодня'
+										? styles.sectionToday
+										: styles.sectionFuture
+								}
+							>
+								{section.title}
+							</AppText>
+						)}
+						renderItem={({ item }) => (
+							<View style={styles.listItem}>
+								<TicketCard
+									ticket={item}
+									onShowQr={() => {
+										setQrUri(item.qrCodeUrl);
+										setQrVisible(true);
+									}}
+									onMorePress={() => {
+										setSelectedTicket(item);
+										setDetailsVisible(true);
+									}}
+								/>
+							</View>
+						)}
+						contentContainerStyle={styles.listContent}
+					/>
+				)}
+			</View>
+			<ShowTicketQrDialog
+				visible={qrVisible}
+				onClose={() => setQrVisible(false)}
+				qrUri={qrUri}
+				title='QR код билета'
+			/>
+			<TicketDetailsDialog
+				visible={detailsVisible}
+				onClose={() => {
+					setDetailsVisible(false);
+					setSelectedTicket(null);
+				}}
+				ticket={selectedTicket}
+			/>
+		</SafeAreaView>
+	);
+};
+
+const styles = StyleSheet.create({
+	container: {
+		backgroundColor: Colors.lightBackground,
+		flex: 1,
+		padding: 16,
+	},
+	content: {
+		// белыми остаются только карточки билетов
+		flex: 1,
+	},
+	header: {
+		alignItems: 'center',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 16,
+	},
+	headerTitle: {
+		color: Colors.headerAndInputText ?? Colors.black,
+		textAlign: 'center',
+	},
+	listContent: { paddingBottom: 24 },
+	listItem: { marginBottom: 16 },
+	sectionFuture: {
+		color: Colors.grayText,
+		marginBottom: 8,
+		marginTop: 24,
+	},
+	sectionToday: {
+		color: Colors.greenLink,
+		marginBottom: 8,
+		marginTop: 8,
+	},
+});

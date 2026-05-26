@@ -1,0 +1,184 @@
+import MoreArrowIcon from '@/assets/icons/MoreArrowIcon';
+import {
+	compareDesc,
+	format,
+	isBefore,
+	parseISO,
+	startOfToday,
+} from 'date-fns';
+import { Link } from 'expo-router';
+import React, { useMemo } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+
+import { Ticket } from '@/entities/ticket';
+import { Trip } from '@/entities/trip';
+import { Colors, Fonts, Radius } from '@/shared/tokens';
+import { AppText } from '@/shared/ui';
+
+interface TripVm {
+	id: string;
+	title: string; // исходное из API
+	period: string; // 18.06.2025–24.06.2025
+	ticketIds: string[];
+	displayTitle: string;
+	endDate: Date;
+}
+
+interface TripListProps {
+	trips: Trip[];
+	tickets: Ticket[];
+}
+
+function formatDate(d: Date) {
+	return format(d, 'dd.MM.yyyy');
+}
+
+const TripCard: React.FC<{ trip: TripVm; isCompleted?: boolean }> = ({
+	trip,
+	isCompleted = false,
+}) => (
+	<Link href={`/trips/${trip.id}`} asChild>
+		<TouchableOpacity style={styles.tripCard}>
+			<View>
+				<AppText
+					style={[
+						styles.tripTitle,
+						isCompleted && styles.tripCompleted,
+					]}
+				>
+					{trip.displayTitle}
+				</AppText>
+				<AppText
+					style={[
+						styles.tripPeriod,
+						isCompleted && styles.tripCompleted,
+					]}
+				>
+					{trip.period}
+				</AppText>
+			</View>
+			<MoreArrowIcon />
+		</TouchableOpacity>
+	</Link>
+);
+
+export const TripList: React.FC<TripListProps> = ({ trips, tickets }) => {
+	const sections = useMemo(() => {
+		const tMap: Record<string, { to: string }> = {};
+		for (const tk of tickets) tMap[tk.id] = { to: tk.to };
+
+		const tripsVm: TripVm[] = trips.map(t => {
+			const firstTicket = t.ticketIds[0]
+				? tMap[t.ticketIds[0]]
+				: undefined;
+			const displayTitle = firstTicket
+				? `Поездка в ${firstTicket.to}`
+				: t.title || 'Поездка';
+			const startDate = parseISO(t.startDate);
+			const endDate = parseISO(t.endDate);
+
+			return {
+				id: t.id,
+				title: t.title || 'Поездка',
+				displayTitle,
+				period: `${formatDate(startDate)}–${formatDate(endDate)}`,
+				ticketIds: t.ticketIds,
+				endDate,
+			};
+		});
+
+		const start = startOfToday();
+
+		const actual = tripsVm.filter(t => !isBefore(t.endDate, start));
+		const completed = tripsVm.filter(t => isBefore(t.endDate, start));
+
+		const byEndDateDesc = (a: TripVm, b: TripVm) =>
+			compareDesc(a.endDate, b.endDate);
+
+		const result: Array<{ title: string; data: TripVm[] }> = [];
+		if (actual.length > 0) {
+			result.push({ title: 'Актуальные', data: actual });
+		}
+		if (completed.length > 0) {
+			result.push({
+				title: 'Завершенные',
+				data: completed.sort(byEndDateDesc),
+			});
+		}
+		return result;
+	}, [trips, tickets]);
+
+	return (
+		<View style={styles.container}>
+			{sections.map(section => (
+				<View key={section.title} style={styles.section}>
+					<AppText
+						style={
+							section.title === 'Актуальные'
+								? [
+										styles.sectionHeader,
+										styles.sectionActualHeader,
+									]
+								: styles.sectionHeader
+						}
+					>
+						{section.title}
+					</AppText>
+					<View style={styles.cardList}>
+						{section.data.map(trip => (
+							<TripCard
+								key={trip.id}
+								trip={trip}
+								isCompleted={section.title === 'Завершенные'}
+							/>
+						))}
+					</View>
+				</View>
+			))}
+		</View>
+	);
+};
+
+const styles = StyleSheet.create({
+	cardList: {
+		gap: 12,
+	},
+	container: {
+		backgroundColor: Colors.grayBackground,
+		flex: 1,
+	},
+
+	section: {
+		marginBottom: 24,
+	},
+	sectionActualHeader: {
+		color: Colors.successGreen,
+	},
+	sectionHeader: {
+		color: Colors.secondaryText,
+		fontFamily: Fonts.bold,
+		fontSize: Fonts.f20,
+		padding: 16,
+	},
+	tripCard: {
+		alignItems: 'center',
+		backgroundColor: Colors.white,
+		borderRadius: Radius.r15,
+		color: Colors.red,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		padding: 24,
+	},
+	tripCompleted: {
+		color: Colors.secondaryText,
+	},
+	tripPeriod: {
+		color: Colors.headerAndInputText,
+		fontSize: Fonts.f14,
+		marginTop: 6,
+	},
+	tripTitle: {
+		fontFamily: Fonts.semibold,
+		fontSize: Fonts.f16,
+	},
+});

@@ -1,0 +1,31 @@
+{
+	"plugins": [
+		"@ianvs/prettier-plugin-sort-imports",
+		"prettier-plugin-css-order"
+	],
+	"trailingComma": "all",
+	"tabWidth": 4,
+	"useTabs": true,
+	"semi": true,
+	"singleQuote": true,
+	"jsxSingleQuote": true,
+	"arrowParens": "avoid",
+	"importOrder": [
+		"<BUILTIN_MODULES>",
+		"",
+		"<THIRD_PARTY_MODULES>",
+		"",
+		"^@/app/(.*)$",
+		"^@/processes/(.*)$",
+		"^@/pages/(.*)$",
+		"^@/widgets/(.*)$",
+		"^@/features/(.*)$",
+		"^@/entities/(.*)$",
+		"^@/shared/(.*)$",
+		"",
+		"^[./]"
+	],
+	"importOrderTypeScriptVersion": "5.0.0",
+	"importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"],
+	"importOrderCaseSensitive": false
+}
