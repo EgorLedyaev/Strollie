@@ -1,0 +1,53 @@
+name: Strollie
+description: Strollie
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.16.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  dio: ^4.0.0
+  flutter_polyline_points: ^0.2.6
+  google_maps_flutter: ^2.0.2
+  flutter_svg: ^0.20.0-nullsafety.3
+  location: 4.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+fonts:
+  - family: SFProText
+    fonts:
+      - asset: assets/fonts/SFProText-Semibold.ttf
+      - asset: assets/fonts/SFProText-Bold.ttf
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/Strollie_logo.png
+    - assets/images/start_icon.svg
+    - assets/images/profile_icon.svg
+    - assets/images/stats_icon.svg
+    - assets/images/settings_1.svg
+    - assets/images/settings_2.svg
+    - assets/images/Dsc_00041.png
+    - assets/images/Img_20210704_2103431.png
+    - assets/images/Dsc_00761.png
+    - assets/images/view_info_route.svg
+    - assets/images/Dsc_00111.png
+    - assets/images/steps_logo.svg
+    - assets/images/distance_logo.svg
+    - assets/images/score.svg
+    - assets/images/visited_places.svg
+    - assets/images/walks.svg
+    - assets/images/arrow.svg
+    - assets/images/crossicon.svg
+    - assets/images/ellipse.svg
+    - assets/images/ellipse_2.svg
+    - assets/images/check_mark.svg
+    - assets/images/return.svg
