@@ -95,7 +95,7 @@
 		"expo-sensors": "~14.1.4"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.28.0",
+		"@babel/core": "^7.29.6",
 		"@feature-sliced/steiger-plugin": "^0.5.7",
 		"@ianvs/prettier-plugin-sort-imports": "^4.5.1",
 		"@testing-library/react-native": "^12.7.2",
